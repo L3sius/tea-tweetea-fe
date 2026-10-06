@@ -9,6 +9,7 @@ import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
 import { teamColor } from '@/ui/colors'
 import { formatGp } from '@/ui/format'
+import { TtButton, TtDisplayBox, TtPanel, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const stats = useStatsStore()
@@ -91,7 +92,11 @@ const tiles = computed(() => {
   if (!k) return []
   const accounts = tables.value?.account.length ?? 0
   return [
-    { label: 'Loot value', value: formatGp((k.loot?.value ?? 0) + (k.clue?.value ?? 0)) },
+    {
+      label: 'Loot value',
+      value: formatGp((k.loot?.value ?? 0) + (k.clue?.value ?? 0)),
+      color: 'var(--osrs-cash)',
+    },
     { label: 'Drops', value: (k.loot?.count ?? 0).toLocaleString() },
     { label: 'Boss kills', value: (k.kill_count?.count ?? 0).toLocaleString() },
     { label: 'Clues', value: (k.clue?.count ?? 0).toLocaleString() },
@@ -116,106 +121,85 @@ const gameRows = computed(() =>
 
 <template>
   <div class="h-full overflow-y-auto">
-    <div class="mx-auto flex max-w-6xl flex-col gap-5 p-4 lg:p-6">
-      <div class="flex flex-wrap items-center gap-2">
-        <h2 class="mr-auto text-xl font-bold text-slate-100">Statistics</h2>
-        <select v-model="filter.kind" class="stat-select" aria-label="Activity">
-          <option v-for="k in KINDS" :key="k.label" :value="k.value">{{ k.label }}</option>
-        </select>
-        <select v-model="filter.teamId" class="stat-select" aria-label="Team">
-          <option :value="null">All teams</option>
-          <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-        </select>
-        <div
-          class="flex overflow-hidden rounded-md border border-slate-700 text-xs"
-          role="group"
-          aria-label="Rank by"
-        >
-          <button
-            v-for="m in ['value', 'count'] as const"
-            :key="m"
-            type="button"
-            class="px-2.5 py-1.5"
-            :class="effectiveMeasure === m ? 'bg-slate-700 text-slate-100' : 'text-slate-400'"
-            :disabled="m === 'value' && effectiveMeasure === 'count' && measure === 'value'"
-            @click="measure = m"
-          >
-            {{ m === 'value' ? 'GP value' : 'Count' }}
-          </button>
+    <div class="mx-auto flex max-w-[1440px] flex-col gap-1.5">
+      <TtPanel variant="iron" :padding="6" :gap="9">
+        <TtText as="h2" :size="3" font="quill" color="orange" glow>Statistics</TtText>
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+          <select v-model="filter.kind" class="tt-input" aria-label="Activity">
+            <option v-for="k in KINDS" :key="k.label" :value="k.value">{{ k.label }}</option>
+          </select>
+          <select v-model="filter.teamId" class="tt-input" aria-label="Team">
+            <option :value="null">All teams</option>
+            <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
+          </select>
+          <div class="flex gap-1" role="group" aria-label="Rank by">
+            <TtButton
+              v-for="m in ['value', 'count'] as const"
+              :key="m"
+              size="sm"
+              :selected="effectiveMeasure === m"
+              :aria-pressed="effectiveMeasure === m"
+              :disabled="m === 'value' && effectiveMeasure === 'count' && measure === 'value'"
+              @click="measure = m"
+            >
+              {{ m === 'value' ? 'GP value' : 'Count' }}
+            </TtButton>
+          </div>
+          <TtText v-if="loading" :size="1" color="muted">Updating...</TtText>
         </div>
-        <span v-if="loading" class="text-xs text-slate-500">Updating…</span>
-      </div>
-      <p v-if="error" role="alert" class="text-sm text-red-300">{{ error }}</p>
+        <TtText v-if="error" role="alert" :size="1" color="red">{{ error }}</TtText>
+        <dl class="flex flex-wrap justify-center gap-1.5">
+          <TtDisplayBox
+            v-for="t in tiles"
+            :key="t.label"
+            :label="t.label"
+            :value="t.value"
+            :value-color="t.color"
+            :width="174"
+          />
+        </dl>
+      </TtPanel>
 
-      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <div
-          v-for="t in tiles"
-          :key="t.label"
-          class="rounded-xl border border-slate-800 bg-slate-900/70 p-3"
-        >
-          <dt class="text-xs text-slate-400">{{ t.label }}</dt>
-          <dd class="text-2xl font-bold text-slate-100 tabular-nums">{{ t.value }}</dd>
-        </div>
-      </dl>
-
-      <div class="grid gap-5 lg:grid-cols-2">
-        <section class="stat-card">
-          <h3 class="stat-title">By team</h3>
+      <div class="grid gap-1.5 lg:grid-cols-2">
+        <TtPanel title="By team" :padding="12">
           <BarList :rows="byTeam" />
-          <table class="mt-4 w-full text-sm">
-            <caption class="mb-1 text-left text-xs text-slate-500">
+          <table class="tt-1 w-full">
+            <caption class="pb-1" style="color: var(--osrs-orange)">
               On the board
             </caption>
-            <thead class="text-xs text-slate-400">
+            <thead style="color: var(--osrs-orange)">
               <tr>
-                <th class="text-left font-medium">Team</th>
-                <th class="text-right font-medium">Gems</th>
-                <th class="text-right font-medium">Tiles</th>
-                <th class="text-right font-medium">Gold</th>
-                <th class="text-right font-medium">Cards left</th>
+                <th class="text-left font-normal">Team</th>
+                <th class="text-right font-normal">Gems</th>
+                <th class="text-right font-normal">Tiles</th>
+                <th class="text-right font-normal">Gold</th>
+                <th class="text-right font-normal">Cards left</th>
               </tr>
             </thead>
-            <tbody>
-              <tr v-for="r in gameRows" :key="r.id" class="border-t border-slate-800">
-                <td class="py-1 font-semibold" :style="{ color: r.color }">{{ r.name }}</td>
-                <td class="text-right tabular-nums">{{ r.gems }}</td>
-                <td class="text-right tabular-nums">{{ r.tiles }}</td>
-                <td class="text-right text-amber-300 tabular-nums">{{ r.gold }}</td>
-                <td class="text-right tabular-nums">{{ r.cards }}</td>
+            <tbody style="color: var(--osrs-white)">
+              <tr v-for="r in gameRows" :key="r.id">
+                <td class="tt-bold py-0.5 text-left" :style="{ color: r.color }">{{ r.name }}</td>
+                <td class="text-right">{{ r.gems }}</td>
+                <td class="text-right">{{ r.tiles }}</td>
+                <td class="text-right" style="color: var(--osrs-yellow)">{{ r.gold }}</td>
+                <td class="text-right">{{ r.cards }}</td>
               </tr>
             </tbody>
           </table>
-        </section>
+        </TtPanel>
 
-        <section class="stat-card">
-          <h3 class="stat-title">{{ kindInfo.subject }}</h3>
+        <TtPanel :title="kindInfo.subject" :padding="12">
           <BarList :rows="bySubject" />
-        </section>
+        </TtPanel>
 
-        <section class="stat-card">
-          <h3 class="stat-title">Top players</h3>
+        <TtPanel title="Top players" :padding="12">
           <BarList :rows="byAccount" />
-        </section>
+        </TtPanel>
 
-        <section class="stat-card">
-          <h3 class="stat-title">Activity per hour</h3>
+        <TtPanel title="Activity per hour" :padding="12">
           <HourChart :rows="tables?.hour ?? []" :measure="effectiveMeasure" />
-        </section>
+        </TtPanel>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-@reference '../assets/main.css';
-
-.stat-select {
-  @apply rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm;
-}
-.stat-card {
-  @apply rounded-xl border border-slate-800 bg-slate-900/70 p-4;
-}
-.stat-title {
-  @apply mb-3 text-sm font-semibold tracking-wide text-amber-200 uppercase;
-}
-</style>

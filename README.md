@@ -45,9 +45,14 @@ src/
   stores/   Pinia stores: the only code that calls the ApiClient (provided in main.ts)
   map/      the world map projection; the image is assets/map/, copied from the backend
   ui/       colours and formatting shared by components
+    tt/       the Tweetea design system's Vue components (Tt*), copied from tweetea-design-system/
+  assets/tt/  its tokens, fonts and sprites (only what we use)
   components/, views/  the screens
 ```
 
+- The look is the Tweetea design system: OSRS stone/iron frames, pixel fonts in 16px steps, hard
+  shadows. Use the `Tt*` components and `tt-*` classes; Tailwind is for layout only.
+  `tweetea-design-system/` (gitignored) is the reference: copy from it, never import it.
 - Dependencies point inward: UI → domain ← api. Only `api/` knows the wire format.
 - Every response is validated. A response that breaks the contract fails loudly as an
   `invalid_response` `ApiError` instead of rendering wrong.

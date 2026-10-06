@@ -72,7 +72,7 @@ function onClick(e: MouseEvent) {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-lg border-2 border-slate-900 bg-slate-900 shadow-xl"
+    class="relative overflow-hidden border-[3px] border-black bg-black shadow-[3px_3px_0_#000]"
     :style="{ aspectRatio: `${worldMap.width} / ${worldMap.height}` }"
   >
     <button
@@ -84,19 +84,19 @@ function onClick(e: MouseEvent) {
       <img
         :src="worldMap.imageUrl"
         alt=""
-        class="size-full opacity-70 saturate-50"
+        class="size-full opacity-80"
         style="image-rendering: pixelated"
       />
     </button>
     <div
       v-if="viewBox"
-      class="pointer-events-none absolute border border-amber-300/90 bg-amber-200/10"
+      class="pointer-events-none absolute border-2 border-[var(--osrs-yellow)] bg-[rgb(255_255_0/0.08)]"
       :style="viewBox"
     />
     <span
       v-for="g in gems"
       :key="g.gem"
-      class="pointer-events-none absolute size-2 -translate-1/2 rotate-45 border border-slate-950"
+      class="pointer-events-none absolute size-2 -translate-1/2 border border-black"
       :style="{ left: `${g.left}%`, top: `${g.top}%`, background: GEM_COLORS[g.gem] }"
       :title="`${g.gem} gem`"
     />
@@ -104,8 +104,8 @@ function onClick(e: MouseEvent) {
       v-for="team in teams"
       :key="team.id"
       type="button"
-      class="absolute size-3 -translate-1/2 rounded-full border-2 border-slate-950 transition-[left,top] duration-700"
-      :class="selected === team.id ? 'ring-2 ring-amber-300' : ''"
+      class="absolute size-3 -translate-1/2 border-2 border-black transition-[left,top] duration-700"
+      :class="selected === team.id ? 'outline-2 outline-[var(--osrs-yellow)]' : ''"
       :style="{ left: `${team.left}%`, top: `${team.top}%`, background: team.color }"
       :title="team.name"
       :aria-label="`Follow ${team.name}`"

@@ -4,6 +4,7 @@
   "env": {
     "browser": true
   },
+  "ignorePatterns": ["tweetea-design-system/**"],
   "categories": {
     "correctness": "error"
   }

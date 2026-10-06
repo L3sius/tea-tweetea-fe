@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useIntervalFn, useNow } from '@vueuse/core'
+import { useIntervalFn, useMediaQuery, useNow } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import ActivityFeed from '@/components/ActivityFeed.vue'
@@ -7,7 +7,6 @@ import AlertToasts from '@/components/AlertToasts.vue'
 import BoardMap from '@/components/BoardMap.vue'
 import EventsPanel from '@/components/EventsPanel.vue'
 import GameLog from '@/components/GameLog.vue'
-import GemRow from '@/components/GemRow.vue'
 import InsetMap from '@/components/InsetMap.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
@@ -15,11 +14,12 @@ import TeamControls from '@/components/TeamControls.vue'
 import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
-import type { Item } from '@/domain/vocabulary'
+import { GEMS, type Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
-import { teamColor } from '@/ui/colors'
+import { TILE_COLORS, teamColor } from '@/ui/colors'
+import { TtButton, TtDivider, TtPanel, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -34,7 +34,8 @@ const tab = ref<Tab>('teams')
 /** On phones the panel is a bottom sheet that can be tucked away to see more map. */
 const sheetOpen = ref(true)
 const shopOpen = ref(false)
-const insetOpen = ref(true)
+/** The overview starts closed on phones, where it would cover most of the map. */
+const insetOpen = ref(!useMediaQuery('(max-width: 639px)').value)
 
 const selected = ref<TeamId | null>(null)
 const follow = ref(false)
@@ -51,16 +52,21 @@ const liveCount = computed(() => {
 })
 
 const TABS = computed(() => [
-  { id: 'play' as const, label: my.team ? my.team.name : 'Play' },
-  { id: 'teams' as const, label: 'Teams' },
+  { id: 'play' as const, label: my.team ? 'My team' : 'Play' },
+  { id: 'teams' as const, label: 'Standings' },
   { id: 'events' as const, label: 'Events', badge: liveCount.value },
-  { id: 'feed' as const, label: 'Feed' },
+  { id: 'feed' as const, label: 'Activity' },
   { id: 'log' as const, label: 'Log' },
 ])
 
+const LEGEND = [
+  { color: TILE_COLORS.normal, label: 'Tile' },
+  { color: TILE_COLORS.red, label: 'Minigame' },
+  { color: TILE_COLORS.shop, label: 'Shop' },
+]
+
 function openTab(id: Tab) {
   tab.value = id
-  shopOpen.value = false
   sheetOpen.value = true
 }
 
@@ -135,7 +141,6 @@ const buyer = computed(() => {
 
 function openShop() {
   shopOpen.value = true
-  sheetOpen.value = true
 }
 
 async function buy(item: Item) {
@@ -148,11 +153,13 @@ function locateMine() {
 </script>
 
 <template>
-  <p v-if="loading && !state" class="py-24 text-center text-slate-400">Loading the board…</p>
+  <div v-if="loading && !state" class="flex h-full items-center justify-center">
+    <TtText :size="2">Loading the board...</TtText>
+  </div>
 
-  <div v-if="state && board" class="flex h-full flex-col lg:flex-row">
-    <!-- The map and its overlays -->
-    <div class="relative min-h-0 min-w-0 flex-1">
+  <div v-if="state && board" class="relative flex h-full flex-col gap-1.5 lg:flex-row">
+    <!-- The map and its overlays, in a stone frame -->
+    <div class="tt-frame-stone relative box-border min-h-0 min-w-0 flex-1">
       <BoardMap
         ref="boardMap"
         :board="board"
@@ -178,22 +185,24 @@ function locateMine() {
 
       <!-- Standings strip -->
       <ol
-        class="pointer-events-none absolute top-2 left-2 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1.5"
+        class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1 max-sm:hidden"
         aria-label="Standings"
       >
         <li v-for="(team, i) in standings" :key="team.id" class="pointer-events-auto">
           <button
             type="button"
-            class="flex items-center gap-2 rounded-lg border bg-slate-950/85 px-2 py-1 text-xs shadow-lg backdrop-blur hover:bg-slate-900"
-            :style="{ borderColor: selected === team.id ? teamColor(team) : 'transparent' }"
+            class="tt-sprite-display flex items-center gap-1.5 px-1 hover:brightness-[1.18]"
+            :style="{
+              boxShadow: selected === team.id ? `0 0 0 3px ${teamColor(team)}` : undefined,
+            }"
             :aria-pressed="selected === team.id"
             :title="`Follow ${team.name}`"
             @click="selectTeam(team.id)"
           >
-            <span class="text-slate-500 tabular-nums">{{ i + 1 }}</span>
-            <span class="font-bold" :style="{ color: teamColor(team) }">{{ team.name }}</span>
-            <GemRow :gems="team.gems" class="hidden scale-75 sm:flex" />
-            <span class="text-slate-300 tabular-nums sm:hidden">{{ team.gems.size }}💎</span>
+            <TtText :size="1" color="orange">{{ i + 1 }}.</TtText>
+            <TtText :size="1" font="bold" :color="teamColor(team)">{{ team.name }}</TtText>
+            <span class="tt-sprite tt-gem-white size-[14px]" aria-hidden="true" />
+            <TtText :size="1" color="white">{{ team.gems.size }}/{{ GEMS.length }}</TtText>
           </button>
         </li>
       </ol>
@@ -201,65 +210,81 @@ function locateMine() {
       <!-- Play-testing tools -->
       <div
         v-if="dev.enabled"
-        class="pointer-events-none absolute top-2 right-2 z-[1060] flex justify-end max-sm:top-12"
+        class="pointer-events-none absolute top-1.5 right-1.5 z-[1060] flex justify-end"
       >
         <DevTools />
       </div>
 
       <!-- Alerts -->
-      <div class="absolute top-12 left-1/2 z-[1050] -translate-x-1/2 sm:top-3">
+      <div class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3">
         <AlertToasts :alerts="alerts" @dismiss="game.dismiss" />
       </div>
 
       <!-- Follow / free roam -->
       <div
         v-if="followed"
-        class="absolute bottom-2 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-950/90 px-3 py-1.5 text-xs shadow-lg"
+        class="tt-sprite-display absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 py-0 pr-0 pl-1"
       >
-        <span class="size-2 rounded-full" :style="{ background: teamColor(followed) }" />
-        <span v-if="follow" class="text-slate-200">Following {{ followed.name }}</span>
-        <span v-else class="text-slate-400">Free roam</span>
-        <button
-          type="button"
-          class="rounded-full bg-slate-800 px-2 py-0.5 text-slate-200 hover:bg-slate-700"
+        <span class="tt-swatch" :style="{ background: teamColor(followed) }" />
+        <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
+          Following {{ followed.name }}
+        </TtText>
+        <TtText v-else :size="1" color="muted">Free roam</TtText>
+        <TtButton
+          size="sm"
+          class="!min-h-9"
           @click="follow ? (follow = false) : selectTeam(followed.id)"
         >
-          {{ follow ? 'Stop' : `Follow ${followed.name}` }}
-        </button>
+          {{ follow ? 'Stop' : 'Follow' }}
+        </TtButton>
       </div>
 
       <!-- Map controls -->
-      <div class="absolute right-2 bottom-2 z-[1000] flex flex-col gap-1 lg:bottom-3">
-        <button type="button" class="map-btn" aria-label="Zoom in" @click="boardMap?.zoomBy(1)">
-          +
-        </button>
-        <button type="button" class="map-btn" aria-label="Zoom out" @click="boardMap?.zoomBy(-1)">
-          −
-        </button>
-        <button
-          type="button"
-          class="map-btn text-xs"
-          aria-label="Show the whole map"
-          @click="boardMap?.showAll()"
+      <div class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1">
+        <div
+          class="tt-sprite-display flex flex-col gap-0.5 px-1 py-0 max-sm:hidden"
+          aria-label="Map legend"
         >
-          ⤢
-        </button>
-        <button
-          type="button"
-          class="map-btn text-xs"
-          :aria-pressed="insetOpen"
-          aria-label="Toggle the overview map"
-          @click="insetOpen = !insetOpen"
-        >
-          🗺
-        </button>
+          <span v-for="l in LEGEND" :key="l.label" class="flex items-center gap-1.5">
+            <span class="tt-swatch" :style="{ background: l.color }" />
+            <TtText :size="1" color="white">{{ l.label }}</TtText>
+          </span>
+        </div>
+        <div class="flex gap-1">
+          <TtButton size="sm" class="map-btn" aria-label="Zoom in" @click="boardMap?.zoomBy(1)">
+            +
+          </TtButton>
+          <TtButton size="sm" class="map-btn" aria-label="Zoom out" @click="boardMap?.zoomBy(-1)">
+            -
+          </TtButton>
+        </div>
+        <div class="flex gap-1">
+          <TtButton
+            size="sm"
+            class="map-btn"
+            title="Show the whole map"
+            @click="boardMap?.showAll()"
+          >
+            All
+          </TtButton>
+          <TtButton
+            size="sm"
+            class="map-btn"
+            :selected="insetOpen"
+            :aria-pressed="insetOpen"
+            title="Toggle the overview map"
+            @click="insetOpen = !insetOpen"
+          >
+            Map
+          </TtButton>
+        </div>
       </div>
 
       <!-- Overview -->
       <div
         v-if="insetOpen"
-        class="absolute bottom-2 left-2 z-[1000] w-36 sm:w-52 lg:bottom-3 lg:w-64"
-        :class="followed ? 'bottom-12 sm:bottom-2' : ''"
+        class="absolute bottom-1.5 left-1.5 z-[1000] w-36 sm:w-52 lg:w-64"
+        :class="followed ? 'bottom-14 sm:bottom-1.5' : ''"
       >
         <InsetMap
           :board="board"
@@ -275,65 +300,62 @@ function locateMine() {
 
     <!-- Side panel (desktop) / bottom sheet (phone) -->
     <aside
-      class="z-[1000] flex flex-col border-slate-800 bg-slate-900/95 backdrop-blur max-lg:rounded-t-2xl max-lg:border-t lg:w-[400px] lg:border-l xl:w-[440px]"
-      :class="sheetOpen ? 'max-lg:h-[48dvh]' : ''"
+      class="z-[1000] flex min-h-0 flex-col gap-1.5 lg:w-[456px]"
+      :class="sheetOpen ? 'max-lg:h-[46dvh]' : ''"
     >
-      <button
-        type="button"
-        class="mx-auto my-1 h-1.5 w-12 rounded-full bg-slate-600 lg:hidden"
-        :aria-label="sheetOpen ? 'Hide the panel' : 'Show the panel'"
-        @click="sheetOpen = !sheetOpen"
-      />
       <nav
-        class="flex shrink-0 gap-1 overflow-x-auto border-b border-slate-800 px-2"
+        class="flex shrink-0 gap-1 max-lg:overflow-x-auto max-lg:pb-1 lg:flex-wrap lg:justify-center"
         role="tablist"
       >
-        <button
+        <TtButton
           v-for="t in TABS"
           :key="t.id"
-          type="button"
+          size="sm"
           role="tab"
-          class="relative shrink-0 border-b-2 px-3 py-2 text-sm whitespace-nowrap"
-          :class="
-            tab === t.id && !shopOpen
-              ? 'border-amber-400 text-amber-200'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          "
+          class="!min-w-0 shrink-0"
+          :selected="tab === t.id && sheetOpen"
           :aria-selected="tab === t.id"
           @click="openTab(t.id)"
         >
           {{ t.label }}
-          <span
-            v-if="t.badge"
-            class="ml-1 rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-slate-950"
-            >{{ t.badge }}</span
-          >
-        </button>
+          <span v-if="t.badge" :style="{ color: 'var(--osrs-red)' }">({{ t.badge }})</span>
+        </TtButton>
+        <TtButton
+          size="sm"
+          class="!min-w-0 shrink-0 lg:hidden"
+          :aria-label="sheetOpen ? 'Hide the panel' : 'Show the panel'"
+          @click="sheetOpen = !sheetOpen"
+        >
+          {{ sheetOpen ? 'Hide' : 'Show' }}
+        </TtButton>
       </nav>
-      <div v-if="sheetOpen" class="min-h-0 flex-1 overflow-y-auto">
-        <ShopPanel
-          v-if="shopOpen"
-          class="h-full"
-          :buyer="buyer"
-          :pending="my.pending"
-          @buy="buy"
-          @close="shopOpen = false"
-        />
-        <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" @locate="locateMine" />
-        <div v-else-if="tab === 'teams'" class="flex flex-col gap-3 p-3">
-          <TeamCard
-            v-for="(team, i) in standings"
-            :key="team.id"
-            :team="team"
-            :rank="i + 1"
-            :state="state"
-            :challenges="challenges"
-            :names="game.names"
-            :now="now"
-            :moving="isAnimating(team.id)"
-            @locate="selectTeam(team.id)"
-          />
-        </div>
+      <div
+        v-if="sheetOpen"
+        class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
+      >
+        <TeamControls v-if="tab === 'play'" @open-shop="openShop" @locate="locateMine" />
+        <TtPanel
+          v-else-if="tab === 'teams'"
+          title="Standings"
+          width="100%"
+          :padding="12"
+          :gap="12"
+          class="min-h-full"
+        >
+          <template v-for="(team, i) in standings" :key="team.id">
+            <TeamCard
+              :team="team"
+              :rank="i + 1"
+              :state="state"
+              :challenges="challenges"
+              :names="game.names"
+              :now="now"
+              :moving="isAnimating(team.id)"
+              @locate="selectTeam(team.id)"
+            />
+            <TtDivider v-if="i < standings.length - 1" />
+          </template>
+        </TtPanel>
         <EventsPanel
           v-else-if="tab === 'events'"
           :state="state"
@@ -341,30 +363,21 @@ function locateMine() {
           :names="game.names"
           :now="now"
         />
-        <ActivityFeed
-          v-else-if="tab === 'feed'"
-          class="h-full"
-          :feed="feed"
-          :teams="state.teams"
-          :now="now"
-        />
-        <GameLog
-          v-else
-          class="h-full"
-          :log="log"
-          :names="game.names"
-          :now="now"
-          :revealed="revealed"
-        />
+        <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />
+        <GameLog v-else :log="log" :names="game.names" :now="now" :revealed="revealed" />
       </div>
     </aside>
+
+    <!-- The shop opens over everything, like the event site's shop modal -->
+    <div v-if="shopOpen" class="tt-overlay" @click.self="shopOpen = false">
+      <ShopPanel :buyer="buyer" :pending="my.pending" @buy="buy" @close="shopOpen = false" />
+    </div>
   </div>
 </template>
 
 <style scoped>
-@reference '../assets/main.css';
-
 .map-btn {
-  @apply grid size-9 place-items-center rounded-lg border border-slate-700 bg-slate-950/90 text-lg text-slate-200 shadow-lg hover:bg-slate-800;
+  min-width: 48px !important;
+  min-height: 42px !important;
 }
 </style>

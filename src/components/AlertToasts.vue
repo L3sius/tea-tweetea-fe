@@ -1,46 +1,42 @@
 <script setup lang="ts">
 import type { Alert } from '@/stores/game'
+import { TtText } from '@/ui/tt'
 
 defineProps<{ alerts: readonly Alert[] }>()
 const emit = defineEmits<{ dismiss: [id: string] }>()
 
-const ICONS = { minigame: '🎲', match: '⚔️', gem: '💎', end: '🏆' } as const
-const TONES = {
-  minigame: 'border-amber-400/70 bg-amber-950/90',
-  match: 'border-red-400/70 bg-red-950/90',
-  gem: 'border-fuchsia-400/70 bg-fuchsia-950/90',
-  end: 'border-emerald-400/70 bg-emerald-950/90',
+const TITLE_COLOR = {
+  minigame: 'var(--osrs-orange)',
+  match: 'var(--osrs-red)',
+  gem: 'var(--gem-purple-glow)',
+  end: 'var(--osrs-green)',
 } as const
 </script>
 
 <template>
   <TransitionGroup
     tag="ol"
-    class="pointer-events-none flex w-[min(28rem,calc(100vw-2rem))] flex-col gap-2"
+    class="pointer-events-none flex w-[min(30rem,calc(100vw-2rem))] flex-col gap-1.5"
     aria-live="polite"
-    enter-from-class="opacity-0 -translate-y-3 scale-95"
+    enter-from-class="opacity-0 -translate-y-3"
     leave-to-class="opacity-0 translate-x-6"
-    enter-active-class="transition duration-300"
-    leave-active-class="transition duration-300"
+    enter-active-class="transition duration-300 ease-[steps(4)]"
+    leave-active-class="transition duration-300 ease-[steps(4)]"
   >
     <li
       v-for="alert in alerts"
       :key="alert.id"
-      class="pointer-events-auto flex items-start gap-3 rounded-xl border-2 px-4 py-3 shadow-2xl backdrop-blur"
-      :class="TONES[alert.tone]"
+      class="tt-sprite-display pointer-events-auto relative flex flex-col items-center gap-1 px-6 py-1"
     >
-      <span class="text-2xl leading-none" aria-hidden="true">{{ ICONS[alert.tone] }}</span>
-      <div class="min-w-0 flex-1">
-        <p class="font-bold text-slate-50">{{ alert.title }}</p>
-        <p class="text-sm text-slate-300">{{ alert.text }}</p>
-      </div>
+      <TtText :size="2" :color="TITLE_COLOR[alert.tone]" glow>{{ alert.title }}</TtText>
+      <TtText :size="1" color="white">{{ alert.text }}</TtText>
       <button
         type="button"
-        class="text-slate-400 hover:text-slate-100"
+        class="tt-link tt-1 absolute -top-2 -right-2"
         aria-label="Dismiss"
         @click="emit('dismiss', alert.id)"
       >
-        ✕
+        x
       </button>
     </li>
   </TransitionGroup>

@@ -6,6 +6,7 @@ import AppHeader from '@/components/AppHeader.vue'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
 import { useFrontendUpdates } from '@/ui/frontendUpdates'
+import { TtButton, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const team = useTeamStore()
@@ -23,21 +24,25 @@ const reload = () => window.location.reload()
 </script>
 
 <template>
-  <div class="flex h-dvh flex-col overflow-hidden">
+  <div class="flex h-dvh flex-col gap-1.5 overflow-hidden p-1.5">
     <AppHeader />
     <div
       v-if="newBuildAvailable || frontendUpdated"
-      class="z-[1100] flex items-center gap-3 bg-sky-900/80 px-4 py-1.5 text-sm text-sky-100"
+      class="tt-sprite-display z-[1100] flex flex-wrap items-center justify-center gap-3 px-3"
     >
-      {{ frontendUpdated ? 'A new version of this site is out.' : 'The game server was updated.' }}
-      <button type="button" class="font-semibold underline" @click="reload">Reload</button>
+      <TtText :size="1" color="white">
+        {{
+          frontendUpdated ? 'A new version of this site is out.' : 'The game server was updated.'
+        }}
+      </TtText>
+      <TtButton size="sm" @click="reload">Reload</TtButton>
     </div>
     <div
       v-if="error"
       role="alert"
-      class="z-[1100] border-b border-red-500/40 bg-red-950/80 px-4 py-2 text-sm whitespace-pre-line text-red-200"
+      class="tt-sprite-display z-[1100] px-3 py-1 text-center whitespace-pre-line"
     >
-      {{ error }}
+      <TtText :size="1" color="red">{{ error }}</TtText>
     </div>
     <main class="relative min-h-0 flex-1">
       <RouterView />

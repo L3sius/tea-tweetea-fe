@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { TtText } from '@/ui/tt'
 
 export type BarRow = {
   key: string
@@ -16,33 +17,37 @@ const max = computed(() => Math.max(1, ...props.rows.map((r) => r.value)))
 </script>
 
 <template>
-  <p v-if="rows.length === 0" class="py-4 text-sm text-slate-500">{{ empty ?? 'No data yet.' }}</p>
-  <ol v-else class="flex flex-col gap-1.5">
+  <TtText v-if="rows.length === 0" :size="1" color="muted">{{ empty ?? 'No data yet.' }}</TtText>
+  <ol v-else class="flex w-full flex-col gap-1">
     <li
       v-for="(row, i) in rows"
       :key="row.key"
-      class="grid grid-cols-[1.5rem_minmax(0,9rem)_1fr_auto] items-center gap-2 text-sm"
+      class="grid grid-cols-[1.75rem_minmax(0,9rem)_1fr_4.5rem] items-center gap-2"
       :title="
         row.note ? `${row.label}: ${row.display} · ${row.note}` : `${row.label}: ${row.display}`
       "
     >
-      <span class="text-right text-xs text-slate-500 tabular-nums">{{ i + 1 }}</span>
-      <span class="flex items-center gap-1.5 truncate text-slate-200">
+      <TtText :size="1" color="orange" align="right" block>{{ i + 1 }}.</TtText>
+      <TtText
+        :size="1"
+        :font="row.color ? 'bold' : 'small'"
+        :color="row.color ?? 'white'"
+        align="left"
+        block
+        class="truncate"
+      >
+        {{ row.label }}
+      </TtText>
+      <span class="h-[18px]" aria-hidden="true">
         <span
-          v-if="row.color"
-          class="size-2 shrink-0 rounded-full"
-          :style="{ background: row.color }"
-          aria-hidden="true"
-        />
-        <span class="truncate">{{ row.label }}</span>
-      </span>
-      <span class="h-3 overflow-hidden" aria-hidden="true">
-        <span
-          class="block h-full rounded-r-[4px] transition-[width] duration-500"
-          :style="{ width: `${(row.value / max) * 100}%`, background: row.color ?? '#f59e0b' }"
+          class="block h-full border-[3px] border-black shadow-[3px_3px_0_#000] transition-[width] duration-500 ease-[steps(6)]"
+          :style="{
+            width: `max(9px, ${(row.value / max) * 100}%)`,
+            background: row.color ?? 'var(--osrs-orange)',
+          }"
         />
       </span>
-      <span class="w-16 text-right text-slate-300 tabular-nums">{{ row.display }}</span>
+      <TtText :size="1" align="right" block>{{ row.display }}</TtText>
     </li>
   </ol>
 </template>

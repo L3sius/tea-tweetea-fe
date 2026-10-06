@@ -7,7 +7,18 @@ import { whyNotUsable } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
-import { GEM_COLORS, teamColor } from '@/ui/colors'
+import { teamColor } from '@/ui/colors'
+import {
+  GEM_NAMES,
+  TtButton,
+  TtDisplayBox,
+  TtDivider,
+  TtGemTracker,
+  TtPanel,
+  TtProgressBar,
+  TtSlot,
+  TtText,
+} from '@/ui/tt'
 import CardDraw from './CardDraw.vue'
 import PlayingCard from './PlayingCard.vue'
 import PowerUpPicker from './PowerUpPicker.vue'
@@ -22,7 +33,7 @@ const cardDraw = useTemplateRef('cardDraw')
 
 const team = computed(() => my.team)
 const state = computed(() => game.state as GameState)
-const color = computed(() => (team.value ? teamColor(team.value) : '#94a3b8'))
+const color = computed(() => (team.value ? teamColor(team.value) : 'var(--text-muted)'))
 
 /** The piece is still walking on the map; the new status would spoil where it ends. */
 const animating = computed(() => {
@@ -94,7 +105,7 @@ const drawEffects = computed(() => {
   if (!t) return []
   const out: { text: string; tone: 'good' | 'bad' }[] = []
   if (t.effects.moveMultiplier > 1)
-    out.push({ text: `Move ×${t.effects.moveMultiplier}`, tone: 'good' })
+    out.push({ text: `Move x${t.effects.moveMultiplier}`, tone: 'good' })
   if (t.effects.nextMoveHalved) out.push({ text: 'Rain: move halved', tone: 'bad' })
   if (t.effects.suitGold)
     out.push({
@@ -103,7 +114,7 @@ const drawEffects = computed(() => {
     })
   const boot = state.value.boot
   if (boot && boot.owner !== t.id && boot.until > now.value)
-    out.push({ text: `${game.names.team(boot.owner)}’s boot: only ${boot.suit} move`, tone: 'bad' })
+    out.push({ text: `${game.names.team(boot.owner)}'s boot: only ${boot.suit} move`, tone: 'bad' })
   return out
 })
 
@@ -158,13 +169,15 @@ function onPick() {
   })
 }
 
+const TONE_COLOR = { good: 'green', bad: 'red', info: 'cyan' } as const
+
 const outcomeLines = computed(() => {
   const o = my.lastDraw
   if (!o) return []
   const lines: { text: string; tone: 'good' | 'bad' | 'info' }[] = []
   if (o.restarted)
     lines.push({
-      text: 'Wrong suit under a rival’s boot: no move, and your tile restarts.',
+      text: "Wrong suit under a rival's boot: no move, and your tile restarts.",
       tone: 'bad',
     })
   else if (o.joker)
@@ -194,14 +207,15 @@ const rivals = computed(() =>
 )
 const routeSteps = computed(() => (my.route ? my.route.length - 1 : 0))
 
-/** Using an item from the inventory list goes back to the power-up step, where targeting shows. */
+/** Using an item goes back to the power-up step, where targeting shows. */
 function use(item: Item) {
   my.skippedPowerup = false
   void my.useItem(item)
 }
 
 async function discard(item: Item) {
-  if (window.confirm(`Throw away ${itemName(item)}?`)) await my.act({ kind: 'discard', item })
+  if (window.confirm(`Drop ${itemName(item)}? It's gone for good.`))
+    await my.act({ kind: 'discard', item })
 }
 
 async function login() {
@@ -211,421 +225,333 @@ async function login() {
 </script>
 
 <template>
-  <section class="flex flex-col gap-3 p-4 text-sm">
-    <!-- Login -->
-    <form v-if="!team" class="flex flex-col gap-2" @submit.prevent="login">
-      <h2 class="font-semibold text-slate-100">Manage your team</h2>
-      <p class="text-xs text-slate-400">
+  <!-- Login -->
+  <TtPanel
+    v-if="!team"
+    title="Manage your team"
+    width="100%"
+    :padding="15"
+    :gap="12"
+    class="min-h-full"
+  >
+    <form class="flex flex-col items-center gap-3" @submit.prevent="login">
+      <TtText :size="1" color="white" class="max-w-[340px]">
         Team captains enter their team code to use power-ups, draw cards and pick routes. Anyone can
         watch without one.
-      </p>
-      <div class="flex gap-2">
+      </TtText>
+      <div class="tt-sprite-display box-border flex h-[72px] w-[300px] max-w-full items-center">
         <input
           v-model="codeInput"
           type="password"
           autocomplete="off"
           placeholder="Team code"
           aria-label="Team code"
-          class="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-950 px-3 py-1.5 text-slate-100 placeholder:text-slate-500 focus:border-amber-400 focus:outline-none"
+          class="tt-2 w-full border-0 bg-transparent text-center outline-none"
+          style="color: var(--osrs-white); caret-color: var(--osrs-yellow)"
         />
-        <button
-          type="submit"
-          class="rounded-md bg-amber-500 px-3 py-1.5 font-semibold text-slate-950 hover:bg-amber-400 disabled:opacity-50"
-          :disabled="my.pending || !codeInput.trim()"
-        >
-          Log in
-        </button>
       </div>
-      <p v-if="my.error" role="alert" class="text-xs text-red-300">{{ my.error }}</p>
+      <TtText v-if="my.error" role="alert" :size="1" color="red">{{ my.error }}</TtText>
+      <TtButton type="submit" :disabled="my.pending || !codeInput.trim()">Log in</TtButton>
     </form>
+  </TtPanel>
 
-    <template v-else>
-      <header class="flex items-center gap-2">
-        <span class="size-3 rounded-full" :style="{ background: color }" aria-hidden="true" />
-        <h2 class="font-bold" :style="{ color }">{{ team.name }}</h2>
-        <span class="text-amber-300 tabular-nums">{{ team.gold }}g</span>
-        <span class="text-xs text-slate-500 tabular-nums">· {{ team.cardsLeft }} cards</span>
-        <button
-          type="button"
-          class="ml-auto rounded px-2 py-0.5 text-xs text-slate-400 hover:bg-slate-800"
-          @click="emit('locate')"
-        >
-          Find
-        </button>
-        <button
-          type="button"
-          class="rounded px-2 py-0.5 text-xs text-slate-400 hover:bg-slate-800"
-          @click="my.logout()"
-        >
-          Log out
-        </button>
-      </header>
-
-      <p
-        v-if="my.error"
-        role="alert"
-        class="rounded-md bg-red-950/60 px-3 py-2 text-xs text-red-200"
-      >
-        {{ my.error }}
-      </p>
-
-      <!-- Turn steps -->
-      <ol v-if="step" class="grid grid-cols-4 gap-1" aria-label="Your turn">
-        <li
-          v-for="(s, i) in STEPS"
-          :key="s.id"
-          class="flex flex-col items-center gap-1 text-[11px]"
-          :class="
-            i === stepIndex
-              ? 'font-semibold text-amber-200'
-              : i < stepIndex
-                ? 'text-slate-400'
-                : 'text-slate-600'
-          "
-          :aria-current="i === stepIndex ? 'step' : undefined"
-        >
-          <span
-            class="h-1.5 w-full rounded-full"
-            :class="
-              i === stepIndex ? 'bg-amber-400' : i < stepIndex ? 'bg-slate-500' : 'bg-slate-800'
-            "
-          />
-          <span>{{ i < stepIndex ? '✓ ' : '' }}{{ s.label }}</span>
-        </li>
-      </ol>
-
-      <!-- What holds the team outside its turn -->
-      <div v-if="blocker" class="rounded-lg border border-slate-700/60 bg-slate-950/50 p-3">
-        <template v-if="blocker === 'phase'">
-          <p class="text-slate-300">
-            {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
-          </p>
-        </template>
-        <template v-else-if="blocker === 'stealing' && stealing">
-          <p class="font-semibold text-emerald-300">You won the match! Pick a gem to steal.</p>
-          <p class="text-xs text-slate-400">Choose before {{ clock(stealing.deadline) }}.</p>
-          <div class="mt-2 flex flex-wrap gap-2">
-            <button
-              v-for="gem in stealing.options"
-              :key="gem"
-              type="button"
-              class="flex items-center gap-2 rounded-md border border-slate-600 px-3 py-1.5 capitalize hover:bg-slate-800 disabled:opacity-50"
-              :disabled="my.pending"
-              @click="my.act({ kind: 'steal_gem', gem })"
-            >
-              <span class="size-3 rotate-45" :style="{ background: GEM_COLORS[gem] }" />
-              {{ gem }}
-            </button>
-          </div>
-        </template>
-        <template v-else-if="blocker === 'frozen' && frozen">
-          <p class="font-semibold text-sky-300">❄ Frozen until {{ clock(frozen) }}</p>
-          <p class="text-xs text-slate-400">
-            You can’t draw or use power-ups while frozen. Hold a Monk’s Pendant to block the next
-            freeze.
-          </p>
-        </template>
-        <template v-else-if="blocker === 'match'">
-          <p class="font-semibold text-red-300">⚔ In a match</p>
-          <p class="text-xs text-slate-400">
-            The first team to finish the match challenge wins. See the Events tab.
-          </p>
-        </template>
-        <template v-else>
-          <p class="text-slate-300">On the move…</p>
-        </template>
-      </div>
-
-      <!-- Step 1: the tile -->
-      <div v-else-if="step === 'tile'" class="step-card">
-        <h3 class="step-title">Complete your tile</h3>
-        <div v-if="task" class="mt-1">
-          <div class="flex justify-between gap-2 text-xs">
-            <span class="font-medium text-amber-100">{{ task.challenge.name }}</span>
-            <span class="text-slate-400 tabular-nums">{{ task.done }}/{{ task.needed }}</span>
-          </div>
-          <p class="mt-0.5 text-xs text-slate-400">{{ task.challenge.description }}</p>
-          <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
-            <div
-              class="h-full rounded-full transition-[width] duration-500"
-              :style="{ width: `${(task.done / task.needed) * 100}%`, background: color }"
-            />
-          </div>
-        </div>
-        <p class="mt-3 text-xs text-slate-400">
-          🔒 Power-ups unlock when the tile is done. Then you pick one (or none) before drawing.
-        </p>
-      </div>
-
-      <!-- Step 2: power-up -->
-      <div v-else-if="step === 'powerup'" class="step-card border-emerald-500/40">
-        <h3 class="step-title">Use a power-up before you draw?</h3>
-        <p class="text-xs text-slate-400">
-          You may use <strong class="text-slate-200">one item</strong> on this tile. Once the card
-          is drawn it’s too late, so decide now.
-        </p>
-
-        <div
-          v-if="my.targeting"
-          class="mt-3 rounded-lg border border-orange-500/50 bg-orange-950/30 p-3"
-          role="status"
-        >
-          <p class="font-semibold text-orange-200">Using {{ itemName(my.targeting.item) }}</p>
-          <template v-if="my.targeting.kind === 'team'">
-            <p class="text-xs text-slate-400">Pick a rival team.</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <button
-                v-for="rival in rivals"
-                :key="rival.id"
-                type="button"
-                class="rounded-md border px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
-                :style="{ borderColor: teamColor(rival), color: teamColor(rival) }"
-                :disabled="my.pending"
-                @click="my.useOn({ kind: 'team', teamId: rival.id })"
-              >
-                {{ rival.name }}
-              </button>
-            </div>
-          </template>
-          <p v-else class="text-xs text-slate-400">
-            Tap one of the orange-ringed tiles on the map (within 10 steps of you).
-          </p>
-          <button
-            type="button"
-            class="mt-2 text-xs text-slate-400 underline"
-            @click="my.targeting = null"
-          >
-            Cancel
-          </button>
-        </div>
-
-        <div class="mt-3">
-          <PowerUpPicker
-            :team="team"
-            :now="now"
-            :pending="my.pending"
-            @use="my.useItem"
-            @discard="discard"
-          />
-        </div>
-
-        <button
-          type="button"
-          class="mt-4 w-full rounded-lg border border-slate-600 py-2 text-slate-200 hover:bg-slate-800"
-          @click="my.skippedPowerup = true"
-        >
-          No power-up: go to the draw →
-        </button>
-      </div>
-
-      <!-- Step 3: draw -->
-      <div v-else-if="step === 'draw'" class="step-card border-violet-500/40">
-        <h3 class="step-title">
-          {{ my.drawPhase === 'revealed' ? 'Your card' : 'Pick a card' }}
-        </h3>
-
-        <template v-if="my.drawPhase !== 'revealed'">
-          <p v-if="usedHere" class="text-xs text-emerald-300">
-            ✓ Used {{ itemName(usedHere) }} on this tile.
-          </p>
-          <p v-else-if="usableCount === 0" class="text-xs text-slate-400">
-            No power-ups to use right now.
-          </p>
-          <p v-else class="text-xs text-slate-400">
-            Drawing without a power-up.
-            <button
-              v-if="my.drawPhase === 'idle'"
-              type="button"
-              class="text-sky-300 underline"
-              @click="my.skippedPowerup = false"
-            >
-              Back to power-ups
-            </button>
-          </p>
-          <ul v-if="drawEffects.length" class="mt-2 flex flex-wrap gap-1.5">
-            <li
-              v-for="fx in drawEffects"
-              :key="fx.text"
-              class="rounded-full px-2 py-0.5 text-[11px] font-medium"
-              :class="
-                fx.tone === 'good'
-                  ? 'bg-emerald-500/15 text-emerald-300'
-                  : 'bg-red-500/15 text-red-300'
-              "
-            >
-              {{ fx.text }}
-            </li>
-          </ul>
-        </template>
-
-        <CardDraw
-          ref="cardDraw"
-          :result="my.lastDraw?.card ?? null"
-          :disabled="my.pending || team.cardsLeft === 0 || my.drawPhase === 'revealed'"
-          @pick="onPick"
-          @revealed="my.cardRevealed()"
-        />
-        <p v-if="my.drawPhase === 'idle'" class="-mt-3 text-center text-xs text-slate-500">
-          Tap a card to draw it.
-        </p>
-        <p v-else-if="my.drawPhase === 'picking'" class="-mt-3 text-center text-xs text-slate-400">
-          Drawing…
-        </p>
-
-        <div v-if="my.drawPhase === 'revealed' && my.lastDraw" class="reveal-in">
-          <ul class="flex flex-col gap-1">
-            <li
-              v-for="line in outcomeLines"
-              :key="line.text"
-              class="font-semibold"
-              :class="{
-                'text-emerald-300': line.tone === 'good',
-                'text-red-300': line.tone === 'bad',
-                'text-fuchsia-300': line.tone === 'info',
-              }"
-            >
-              {{ line.text }}
-            </li>
-          </ul>
-          <p
-            v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps && !my.lastDraw.restarted"
-            class="text-xs text-slate-400"
-          >
-            {{ cardLabel(my.lastDraw.card) }} is worth {{ baseSteps }}; your effects made it
-            {{ my.lastDraw.steps }}.
-          </p>
-          <button
-            type="button"
-            class="mt-3 w-full rounded-lg bg-amber-500 py-2 font-bold text-slate-950 hover:bg-amber-400"
-            @click="my.finishDraw()"
-          >
-            {{ my.lastDraw.restarted ? 'Back to your tile' : 'Choose your route →' }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 4: walk (route picking; to be reworked next) -->
-      <div v-else-if="step === 'walk'" class="step-card">
-        <template v-if="team.status.kind === 'drawn'">
-          <div class="flex gap-3">
-            <PlayingCard :card="team.status.card" />
-            <div class="flex flex-col gap-1">
-              <p class="font-semibold text-slate-100">Move {{ team.status.length }} tiles</p>
-              <p v-if="team.status.length < team.status.steps" class="text-xs text-slate-400">
-                The card is worth {{ team.status.steps }}, but no walk is that long.
-              </p>
-              <p class="text-xs text-slate-400">
-                Point at the map (or tap it) to pick a route. Rings mark where you can end. Click to
-                lock it.
-              </p>
-            </div>
-          </div>
-          <p v-if="my.route" class="mt-3 text-xs text-slate-300">
-            {{ my.routeLocked ? 'Route locked' : 'Previewing' }}: {{ routeSteps }} steps to tile #{{
-              my.route.at(-1)
-            }}
-          </p>
-          <div class="mt-2 flex gap-2">
-            <button
-              type="button"
-              class="flex-1 rounded-lg bg-emerald-500 py-2 font-bold text-slate-950 hover:bg-emerald-400 disabled:opacity-40"
-              :disabled="!my.route || my.pending"
-              @click="my.confirmRoute()"
-            >
-              Go!
-            </button>
-            <button
-              type="button"
-              class="rounded-lg border border-slate-600 px-3 py-2 text-slate-300 hover:bg-slate-800 disabled:opacity-40"
-              :disabled="!my.route"
-              @click="my.clearRoute()"
-            >
-              Clear
-            </button>
-          </div>
-        </template>
-        <template v-else-if="pause?.kind === 'shop'">
-          <p class="font-semibold text-amber-200">You’re passing a shop.</p>
-          <p class="text-xs text-slate-400">Buy what you like, then carry on walking.</p>
-          <div class="mt-2 flex gap-2">
-            <button
-              type="button"
-              class="flex-1 rounded-lg bg-amber-500 py-2 font-semibold text-slate-950 hover:bg-amber-400"
-              @click="emit('openShop')"
-            >
-              Browse the shop
-            </button>
-            <button
-              type="button"
-              class="flex-1 rounded-lg border border-slate-600 py-2 text-slate-200 hover:bg-slate-800 disabled:opacity-50"
-              :disabled="my.pending"
-              @click="my.act({ kind: 'close_shop' })"
-            >
-              Leave and walk on
-            </button>
-          </div>
-        </template>
-        <template v-else-if="pause?.kind === 'choose_opponent'">
-          <p class="font-semibold text-red-300">Several teams are here. Who do you challenge?</p>
-          <div class="mt-2 flex flex-wrap gap-2">
-            <button
-              v-for="id in pause.candidates"
-              :key="id"
-              type="button"
-              class="rounded-md border border-slate-600 px-3 py-1.5 hover:bg-slate-800 disabled:opacity-50"
-              :disabled="my.pending"
-              @click="my.act({ kind: 'choose_opponent', opponent: id })"
-            >
-              {{ game.names.team(id) }}
-            </button>
-          </div>
-        </template>
-        <p v-else class="text-slate-300">On the move…</p>
-      </div>
-
-      <button
-        v-if="atShop && pause?.kind !== 'shop' && !blocker"
-        type="button"
-        class="w-full rounded-lg border border-amber-500/50 py-1.5 text-amber-200 hover:bg-amber-500/10"
-        @click="emit('openShop')"
-      >
-        You’re on a shop: browse it
-      </button>
-
-      <!-- Inventory, outside the power-up step -->
-      <details v-if="step !== 'powerup'" class="group rounded-lg border border-slate-800">
-        <summary
-          class="flex cursor-pointer items-center justify-between px-3 py-2 text-xs font-semibold text-slate-400 uppercase"
-        >
-          Items ({{ [...team.items.values()].reduce((a, b) => a + b, 0) }}/10)
-          <span class="text-slate-600 group-open:rotate-180">▾</span>
-        </summary>
-        <div class="px-3 pb-3">
-          <PowerUpPicker
-            :team="team"
-            :now="now"
-            :pending="my.pending"
-            :locked="step === 'tile'"
-            @use="use"
-            @discard="discard"
-          />
-        </div>
-      </details>
+  <TtPanel v-else width="100%" :padding="15" :gap="12" class="min-h-full">
+    <template #title>
+      <span :style="{ color }">Team {{ team.name }}</span>
     </template>
-  </section>
+
+    <TtGemTracker :held="team.gems" :scale="1" />
+    <div class="flex flex-wrap justify-center gap-1.5">
+      <TtDisplayBox label="Gold" :value="team.gold" value-color="var(--osrs-yellow)" :width="117" />
+      <TtDisplayBox label="Cards left" :value="team.cardsLeft" :width="117" />
+      <TtDisplayBox label="Tiles done" :value="team.tilesCompleted" :width="117" />
+    </div>
+    <div class="flex gap-1.5">
+      <TtButton size="sm" @click="emit('locate')">Find team</TtButton>
+      <TtButton size="sm" @click="my.logout()">Log out</TtButton>
+    </div>
+
+    <TtText v-if="my.error" role="alert" :size="1" color="red">{{ my.error }}</TtText>
+
+    <TtDivider />
+
+    <!-- Turn steps -->
+    <ol
+      v-if="step"
+      class="flex flex-wrap items-center justify-center gap-x-2"
+      aria-label="Your turn"
+    >
+      <li
+        v-for="(s, i) in STEPS"
+        :key="s.id"
+        class="flex items-center gap-2"
+        :aria-current="i === stepIndex ? 'step' : undefined"
+      >
+        <TtText
+          :size="1"
+          :font="i === stepIndex ? 'bold' : 'small'"
+          :color="i === stepIndex ? 'yellow' : i < stepIndex ? 'green' : 'muted'"
+          :glow="i === stepIndex"
+        >
+          {{ s.label }}
+        </TtText>
+        <TtText v-if="i < STEPS.length - 1" :size="1" color="muted" aria-hidden="true">&gt;</TtText>
+      </li>
+    </ol>
+
+    <!-- What holds the team outside its turn -->
+    <div v-if="blocker" class="flex flex-col items-center gap-1.5">
+      <TtText v-if="blocker === 'phase'" :size="2" color="white">
+        {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
+      </TtText>
+      <template v-else-if="blocker === 'stealing' && stealing">
+        <TtText :size="2" color="green" glow>You won the match!</TtText>
+        <TtText :size="1" color="white">
+          Pick a gem to steal. Choose before {{ clock(stealing.deadline) }}.
+        </TtText>
+        <div class="mt-1 flex flex-wrap justify-center gap-1">
+          <TtSlot
+            v-for="gem in stealing.options"
+            :key="gem"
+            :gem="gem"
+            :size="90"
+            :label="GEM_NAMES[gem]"
+            :title="`Steal the ${GEM_NAMES[gem]}`"
+            :empty="my.pending"
+            @click="!my.pending && my.act({ kind: 'steal_gem', gem })"
+          />
+        </div>
+      </template>
+      <template v-else-if="blocker === 'frozen' && frozen">
+        <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
+        <TtText :size="1" color="white" class="max-w-[340px]">
+          You can't draw or use power-ups while frozen. Hold a Monk's Pendant to block the next
+          freeze.
+        </TtText>
+      </template>
+      <template v-else-if="blocker === 'match'">
+        <TtText :size="2" color="red" glow>In a match</TtText>
+        <TtText :size="1" color="white" class="max-w-[340px]">
+          The first team to finish the match challenge wins. See the Events tab.
+        </TtText>
+      </template>
+      <TtText v-else :size="2" color="white">Walking...</TtText>
+    </div>
+
+    <!-- Step 1: the tile -->
+    <div v-else-if="step === 'tile'" class="flex w-full flex-col items-center gap-1.5">
+      <TtText :size="1" color="orange">Current tile</TtText>
+      <template v-if="task">
+        <TtText :size="2">{{ task.challenge.name }}</TtText>
+        <TtText :size="1" color="white" class="max-w-[340px]">
+          {{ task.challenge.description }}
+        </TtText>
+        <TtProgressBar
+          :value="task.done"
+          :max="task.needed"
+          :label="`${task.done} / ${task.needed}`"
+          :width="330"
+          class="max-w-full"
+        />
+      </template>
+      <TtText :size="1" color="muted" class="max-w-[340px]">
+        Tiles complete automatically from Dink drops. Power-ups unlock when the tile is done.
+      </TtText>
+    </div>
+
+    <!-- Step 2: power-up -->
+    <div v-else-if="step === 'powerup'" class="flex w-full flex-col items-center gap-2">
+      <TtText :size="2" color="white">Use a power-up before you draw?</TtText>
+      <TtText :size="1" color="muted" class="max-w-[340px]">
+        You may use one item on this tile. Once the card is drawn it's too late, so decide now.
+      </TtText>
+
+      <div
+        v-if="my.targeting"
+        class="tt-sprite-display flex w-full flex-col items-center gap-1.5 px-2 py-1"
+        role="status"
+      >
+        <TtText :size="1" color="orange">Using {{ itemName(my.targeting.item) }}</TtText>
+        <template v-if="my.targeting.kind === 'team'">
+          <TtText :size="1" color="white">Pick a rival team.</TtText>
+          <div class="flex flex-wrap justify-center gap-1.5">
+            <TtButton
+              v-for="rival in rivals"
+              :key="rival.id"
+              size="sm"
+              :disabled="my.pending"
+              @click="my.useOn({ kind: 'team', teamId: rival.id })"
+            >
+              <span :style="{ color: teamColor(rival) }">{{ rival.name }}</span>
+            </TtButton>
+          </div>
+        </template>
+        <TtText v-else :size="1" color="white">
+          Click one of the orange-ringed tiles on the map (within 10 steps of you).
+        </TtText>
+        <button type="button" class="tt-link tt-1" @click="my.targeting = null">Cancel</button>
+      </div>
+
+      <PowerUpPicker
+        :team="team"
+        :now="now"
+        :pending="my.pending"
+        @use="my.useItem"
+        @discard="discard"
+      />
+
+      <TtButton @click="my.skippedPowerup = true">Skip to the draw</TtButton>
+    </div>
+
+    <!-- Step 3: draw -->
+    <div v-else-if="step === 'draw'" class="flex w-full flex-col items-center gap-1.5">
+      <TtText :size="2" color="white">
+        {{ my.drawPhase === 'revealed' ? 'Your card' : 'Pick a card' }}
+      </TtText>
+
+      <template v-if="my.drawPhase !== 'revealed'">
+        <TtText v-if="usedHere" :size="1" color="green">
+          Used {{ itemName(usedHere) }} on this tile.
+        </TtText>
+        <TtText v-else-if="usableCount === 0" :size="1" color="muted">
+          No power-ups to use right now.
+        </TtText>
+        <TtText v-else :size="1" color="muted">
+          Drawing without a power-up.
+          <button
+            v-if="my.drawPhase === 'idle'"
+            type="button"
+            class="tt-link"
+            @click="my.skippedPowerup = false"
+          >
+            Back to power-ups
+          </button>
+        </TtText>
+        <ul v-if="drawEffects.length" class="flex flex-wrap justify-center gap-x-3">
+          <li v-for="fx in drawEffects" :key="fx.text">
+            <TtText :size="1" :color="fx.tone === 'good' ? 'green' : 'red'">{{ fx.text }}</TtText>
+          </li>
+        </ul>
+      </template>
+
+      <CardDraw
+        ref="cardDraw"
+        class="w-full"
+        :result="my.lastDraw?.card ?? null"
+        :disabled="my.pending || team.cardsLeft === 0 || my.drawPhase === 'revealed'"
+        @pick="onPick"
+        @revealed="my.cardRevealed()"
+      />
+      <TtText v-if="my.drawPhase === 'idle'" :size="1" color="muted"
+        >Click a card to draw it.</TtText
+      >
+      <TtText v-else-if="my.drawPhase === 'picking'" :size="1" color="white">Drawing...</TtText>
+
+      <div
+        v-if="my.drawPhase === 'revealed' && my.lastDraw"
+        class="reveal-in flex flex-col items-center gap-1.5"
+      >
+        <TtText
+          v-for="line in outcomeLines"
+          :key="line.text"
+          :size="2"
+          :color="TONE_COLOR[line.tone]"
+          glow
+        >
+          {{ line.text }}
+        </TtText>
+        <TtText
+          v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps && !my.lastDraw.restarted"
+          :size="1"
+          color="white"
+        >
+          {{ cardLabel(my.lastDraw.card) }} is worth {{ baseSteps }}; your effects made it
+          {{ my.lastDraw.steps }}.
+        </TtText>
+        <TtButton class="mt-1.5" @click="my.finishDraw()">
+          {{ my.lastDraw.restarted ? 'Back to your tile' : 'Choose a path' }}
+        </TtButton>
+      </div>
+    </div>
+
+    <!-- Step 4: walk -->
+    <div v-else-if="step === 'walk'" class="flex w-full flex-col items-center gap-2">
+      <template v-if="team.status.kind === 'drawn'">
+        <div class="flex items-center gap-3">
+          <PlayingCard :card="team.status.card" />
+          <div class="flex flex-col items-center gap-1">
+            <TtText :size="2" color="white" glow>Move {{ team.status.length }} tiles</TtText>
+            <TtText v-if="team.status.length < team.status.steps" :size="1" color="muted">
+              The card is worth {{ team.status.steps }}, but no walk is that long.
+            </TtText>
+          </div>
+        </div>
+        <TtText :size="1" color="white" class="max-w-[340px]">
+          Point at the map to pick a route; yellow squares mark where you can end. Click to lock it.
+        </TtText>
+        <TtText v-if="my.route" :size="1" :color="my.routeLocked ? 'green' : 'yellow'">
+          {{ my.routeLocked ? 'Route locked' : 'Previewing' }}: {{ routeSteps }} steps to tile #{{
+            my.route.at(-1)
+          }}
+        </TtText>
+        <div class="flex gap-1.5">
+          <TtButton :disabled="!my.route || my.pending" @click="my.confirmRoute()">Go!</TtButton>
+          <TtButton :disabled="!my.route" @click="my.clearRoute()">Clear</TtButton>
+        </div>
+      </template>
+      <template v-else-if="pause?.kind === 'shop'">
+        <TtText :size="2">You're passing a shop.</TtText>
+        <TtText :size="1" color="white">Buy what you like, then carry on walking.</TtText>
+        <div class="flex flex-wrap justify-center gap-1.5">
+          <TtButton @click="emit('openShop')">Browse</TtButton>
+          <TtButton :disabled="my.pending" @click="my.act({ kind: 'close_shop' })">
+            Walk on
+          </TtButton>
+        </div>
+      </template>
+      <template v-else-if="pause?.kind === 'choose_opponent'">
+        <TtText :size="2" color="red">Several teams are here. Who do you challenge?</TtText>
+        <div class="flex flex-wrap justify-center gap-1.5">
+          <TtButton
+            v-for="id in pause.candidates"
+            :key="id"
+            size="sm"
+            :disabled="my.pending"
+            @click="my.act({ kind: 'choose_opponent', opponent: id })"
+          >
+            {{ game.names.team(id) }}
+          </TtButton>
+        </div>
+      </template>
+      <TtText v-else :size="2" color="white">Walking...</TtText>
+    </div>
+
+    <TtButton
+      v-if="atShop && pause?.kind !== 'shop' && !blocker"
+      size="sm"
+      @click="emit('openShop')"
+    >
+      You're on a shop: browse it
+    </TtButton>
+
+    <!-- Inventory, outside the power-up step (which shows it above) -->
+    <template v-if="step !== 'powerup'">
+      <TtDivider />
+      <PowerUpPicker
+        :team="team"
+        :now="now"
+        :pending="my.pending"
+        :locked="step === 'tile'"
+        @use="use"
+        @discard="discard"
+      />
+    </template>
+  </TtPanel>
 </template>
 
 <style scoped>
-@reference '../assets/main.css';
-
-.step-card {
-  @apply rounded-lg border border-slate-700/60 bg-slate-950/50 p-3;
-}
-.step-title {
-  @apply mb-1 font-semibold text-slate-100;
-}
 .reveal-in {
-  animation: reveal-in 0.4s ease-out;
+  animation: reveal-in 0.4s steps(4, end);
 }
 @keyframes reveal-in {
   from {

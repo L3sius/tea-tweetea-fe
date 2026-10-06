@@ -93,8 +93,10 @@ function fanStyle(i: number) {
       @click="pick(i - 1)"
     >
       <span class="draw-card-inner">
-        <span class="draw-card-back" aria-hidden="true"><span>🐤</span></span>
-        <span class="draw-card-face" :class="red ? 'text-red-600' : 'text-slate-900'">
+        <span class="draw-card-back" aria-hidden="true"
+          ><span class="tt-sprite tt-gem-white"
+        /></span>
+        <span class="draw-card-face" :class="{ red }">
           <template v-if="result?.kind === 'suited'">
             <span class="corner top">{{ rank }}<br />{{ suit }}</span>
             <span class="pip">{{ suit }}</span>
@@ -102,8 +104,8 @@ function fanStyle(i: number) {
             <span class="corner bottom">{{ rank }}<br />{{ suit }}</span>
           </template>
           <template v-else-if="result">
-            <span class="pip joker">🃏</span>
-            <span class="big text-fuchsia-700">JOKER</span>
+            <span class="pip joker tt-sprite tt-icon-mystery-box" />
+            <span class="big joker-text">JOKER</span>
           </template>
         </span>
       </span>
@@ -124,7 +126,6 @@ function fanStyle(i: number) {
   width: 72px;
   height: 104px;
   margin-left: -36px;
-  border-radius: 10px;
   transform: translate(var(--x), var(--y)) rotate(var(--r));
   transition:
     transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -145,7 +146,7 @@ function fanStyle(i: number) {
   outline: none;
 }
 .draw-card:not(:disabled):focus-visible .draw-card-back {
-  box-shadow: 0 0 0 3px #fbbf24;
+  outline: 3px solid var(--osrs-yellow);
 }
 .draw-table .draw-card.chosen {
   z-index: 10;
@@ -181,59 +182,70 @@ function fanStyle(i: number) {
 .draw-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 10px;
   backface-visibility: hidden;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.45);
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  text-shadow: none;
 }
 .draw-card-back {
   display: grid;
   place-items: center;
-  border: 3px solid #f8fafc;
-  background: repeating-linear-gradient(45deg, #6d28d9 0 6px, #7c3aed 6px 12px), #6d28d9;
-  font-size: 26px;
+  background: url('../assets/tt/img/borders/background.png') center repeat var(--brown-2);
+  box-shadow:
+    inset 0 0 0 3px var(--stone-hi),
+    inset 0 0 0 6px var(--stone-lo),
+    3px 3px 0 #000;
+  image-rendering: pixelated;
 }
 .draw-card-back span {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 9999px;
-  background: #fef3c7;
+  width: 42px;
+  height: 46px;
+  filter: drop-shadow(2px 2px 0 #000) drop-shadow(0 0 6px var(--gem-white-glow));
 }
 .draw-card-face {
   display: grid;
   place-items: center;
-  border: 2px solid #cbd5e1;
-  background: #f8fafc;
+  background: #e8dcb8;
   transform: rotateY(180deg);
-  font-weight: 900;
+  color: #000;
+  font-family: var(--font-bold);
+}
+.draw-card-face.red {
+  color: #b00000;
 }
 .draw-card-face .pip {
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1;
   margin-top: -14px;
 }
 .draw-card-face .pip.joker {
-  font-size: 40px;
+  width: 39px;
+  height: 42px;
+  background-size: contain;
 }
 .draw-card-face .big {
   position: absolute;
-  bottom: 16px;
-  font-size: 22px;
+  bottom: 12px;
+  font-size: 32px;
+  line-height: 1;
+}
+.draw-card-face .big.joker-text {
+  font-size: 16px;
+  color: #6a1b8a;
 }
 .draw-card-face .corner {
   position: absolute;
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1;
   text-align: center;
 }
 .draw-card-face .corner.top {
-  top: 5px;
-  left: 6px;
+  top: 4px;
+  left: 5px;
 }
 .draw-card-face .corner.bottom {
-  right: 6px;
-  bottom: 5px;
+  right: 5px;
+  bottom: 4px;
   transform: rotate(180deg);
 }
 @media (prefers-reduced-motion: reduce) {

@@ -1,37 +1,40 @@
 import type { Team } from '@/domain/game'
 import type { Gem, TileKind } from '@/domain/vocabulary'
 
+/** The bright tint of each gem sprite (design tokens `--gem-*-glow`), for dots and outlines. */
 export const GEM_COLORS: Record<Gem, string> = {
-  blue: '#3b82f6',
-  green: '#22c55e',
-  purple: '#a855f7',
-  red: '#ef4444',
-  yellow: '#facc15',
-  orange: '#f97316',
-  pink: '#ec4899',
-  white: '#f1f5f9',
+  blue: '#4a5cff',
+  green: '#3cbc27',
+  purple: '#b45cff',
+  red: '#ff3a1f',
+  yellow: '#ffff00',
+  orange: '#ff981f',
+  pink: '#ff4fb0',
+  white: '#ffffff',
 }
 
+/** Tile squares on the map, as in the design system's event site. */
 export const TILE_COLORS: Record<TileKind, string> = {
-  normal: '#e2e8f0',
-  red: '#dc2626',
-  shop: '#f59e0b',
+  normal: '#e8dcb8',
+  red: '#ff0000',
+  shop: '#ffb000',
 }
 
+// The OSRS text palette, so team names read like in-game text.
 const NAMED: Record<string, string> = {
-  red: '#ef4444',
-  blue: '#3b82f6',
-  green: '#22c55e',
-  gold: '#eab308',
-  yellow: '#eab308',
-  purple: '#a855f7',
-  orange: '#f97316',
-  pink: '#ec4899',
+  red: '#ff0000',
+  blue: '#4a5cff',
+  green: '#00ff00',
+  gold: '#ffb000',
+  yellow: '#ffff00',
+  purple: '#b45cff',
+  orange: '#ff981f',
+  pink: '#ff4fb0',
 }
 
-const FALLBACK = ['#06b6d4', '#84cc16', '#f43f5e', '#8b5cf6', '#14b8a6', '#fb923c']
+const FALLBACK = ['#00ffff', '#00ff80', '#ff4fb0', '#b45cff', '#ff981f', '#ffffff']
 
 /** A team named after a colour wears it; any other team gets a stable colour by id. */
 export function teamColor(team: Pick<Team, 'id' | 'name'>): string {
-  return NAMED[team.name.toLowerCase()] ?? FALLBACK[team.id % FALLBACK.length] ?? '#94a3b8'
+  return NAMED[team.name.toLowerCase()] ?? FALLBACK[team.id % FALLBACK.length] ?? '#c8c0a8'
 }

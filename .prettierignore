@@ -1,2 +1,5 @@
 # Recorded API responses, written by scripts/refresh-fixtures.mjs.
 src/api/fixtures/data/
+
+# Design system reference, not part of the build.
+tweetea-design-system/

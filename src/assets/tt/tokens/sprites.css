@@ -1,0 +1,271 @@
+/* Sprite utilities: the OSRS kit assembled into CSS 9-slices (assets/slices/*, cut from Thumbnail_Assets at 3px per art pixel).
+   Use these classes instead of CSS borders, radii and flat backgrounds. Generated; keep slice sizes in sync with tokens/spacing.css. */
+.tt-pixel,
+.tt-pixel img,
+img.tt-pixel {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.tt-text {
+  font-family: var(--font-small);
+  color: var(--text-primary);
+  text-shadow: var(--text-shadow-1);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-align: center;
+}
+.tt-bg-panel {
+  background: url('../img/borders/background.png') center repeat var(--brown-2);
+  image-rendering: pixelated;
+}
+.tt-frame-stone {
+  border: 21px solid transparent;
+  background-image:
+    url('../img/slices/stone/tl.png'), url('../img/slices/stone/tr.png'),
+    url('../img/slices/stone/bl.png'), url('../img/slices/stone/br.png'),
+    url('../img/slices/stone/t.png'), url('../img/slices/stone/b.png'),
+    url('../img/slices/stone/l.png'), url('../img/slices/stone/r.png'),
+    url('../img/borders/background.png');
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom,
+    left top,
+    left bottom,
+    left top,
+    right top,
+    center;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, repeat-x, repeat-x, repeat-y, repeat-y, repeat;
+  background-size: auto, auto, auto, auto, auto, auto, auto, auto, auto;
+  background-origin:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    border-box;
+  background-clip:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    border-box;
+  image-rendering: pixelated;
+}
+.tt-frame-stone {
+  background-color: var(--brown-2);
+  box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.45);
+}
+.tt-frame-iron {
+  border: 18px solid transparent;
+  background-image:
+    url('../img/slices/iron/tl.png'), url('../img/slices/iron/tr.png'),
+    url('../img/slices/iron/bl.png'), url('../img/slices/iron/br.png'),
+    url('../img/slices/iron/t.png'), url('../img/slices/iron/b.png'),
+    url('../img/slices/iron/l.png'), url('../img/slices/iron/r.png'),
+    url('../img/borders/background.png');
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom,
+    left top,
+    left bottom,
+    left top,
+    right top,
+    center;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, repeat-x, repeat-x, repeat-y, repeat-y, repeat;
+  background-size: auto, auto, auto, auto, auto, auto, auto, auto, auto;
+  background-origin:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    border-box;
+  background-clip:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    border-box;
+  image-rendering: pixelated;
+}
+.tt-frame-iron {
+  background-color: var(--brown-2);
+  box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.55);
+}
+.tt-sprite-button {
+  border: 12px solid transparent;
+  background-image:
+    url('../img/slices/button/tl.png'), url('../img/slices/button/tr.png'),
+    url('../img/slices/button/bl.png'), url('../img/slices/button/br.png'),
+    url('../img/slices/button/t.png'), url('../img/slices/button/b.png'),
+    url('../img/slices/button/l.png'), url('../img/slices/button/r.png'),
+    url('../img/slices/button/c.png');
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom,
+    12px top,
+    12px bottom,
+    left 12px,
+    right 12px,
+    center;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    calc(100% - 24px) 12px,
+    calc(100% - 24px) 12px,
+    12px calc(100% - 24px),
+    12px calc(100% - 24px),
+    100% 100%;
+  background-origin:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  background-clip:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  image-rendering: pixelated;
+}
+.tt-sprite-slot {
+  border: 15px solid transparent;
+  background-image:
+    url('../img/slices/slot/tl.png'), url('../img/slices/slot/tr.png'),
+    url('../img/slices/slot/bl.png'), url('../img/slices/slot/br.png'),
+    url('../img/slices/slot/t.png'), url('../img/slices/slot/b.png'),
+    url('../img/slices/slot/l.png'), url('../img/slices/slot/r.png'),
+    url('../img/slices/slot/c.png');
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom,
+    15px top,
+    15px bottom,
+    left 15px,
+    right 15px,
+    center;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    calc(100% - 30px) 15px,
+    calc(100% - 30px) 15px,
+    15px calc(100% - 30px),
+    15px calc(100% - 30px),
+    100% 100%;
+  background-origin:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  background-clip:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  image-rendering: pixelated;
+}
+.tt-sprite-display {
+  border: 18px solid transparent;
+  background-image:
+    url('../img/slices/display/tl.png'), url('../img/slices/display/tr.png'),
+    url('../img/slices/display/bl.png'), url('../img/slices/display/br.png'),
+    url('../img/slices/display/t.png'), url('../img/slices/display/b.png'),
+    url('../img/slices/display/l.png'), url('../img/slices/display/r.png'),
+    url('../img/slices/display/c.png');
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom,
+    18px top,
+    18px bottom,
+    left 18px,
+    right 18px,
+    center;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    calc(100% - 36px) 18px,
+    calc(100% - 36px) 18px,
+    18px calc(100% - 36px),
+    18px calc(100% - 36px),
+    100% 100%;
+  background-origin:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  background-clip:
+    border-box, border-box, border-box, border-box, border-box, border-box, border-box, border-box,
+    padding-box;
+  image-rendering: pixelated;
+}
+.tt-divider-h {
+  height: 21px;
+  background: url('../img/borders/panel_edge_horizontal.png') 0 -39px/96px 96px repeat-x;
+  image-rendering: pixelated;
+}
+.tt-divider-v {
+  width: 21px;
+  background: url('../img/borders/panel_edge_left.png') -39px 0/96px 96px repeat-y;
+  image-rendering: pixelated;
+}
+.tt-divider-iron-h {
+  height: 18px;
+  background: url('../img/borders/iron_rivets_horizontal.png') 0 -45px/108px 108px repeat-x;
+  image-rendering: pixelated;
+}
+.tt-divider-iron-v {
+  width: 18px;
+  background: url('../img/borders/iron_rivets_vertical.png') -45px 0/108px 108px repeat-y;
+  image-rendering: pixelated;
+}
+.tt-check-on {
+  background: url('../img/boxes/check_box.png') center/100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+.tt-check-off {
+  background: url('../img/boxes/cross_box.png') center/100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+@keyframes tt-click-red {
+  0% {
+    background-image: url('../img/click/red_frame1.png');
+  }
+  25% {
+    background-image: url('../img/click/red_frame2.png');
+  }
+  50% {
+    background-image: url('../img/click/red_frame3.png');
+  }
+  75%,
+  100% {
+    background-image: url('../img/click/red_frame4.png');
+  }
+}
+@keyframes tt-click-yellow {
+  0% {
+    background-image: url('../img/click/yellow_frame1.png');
+  }
+  25% {
+    background-image: url('../img/click/yellow_frame2.png');
+  }
+  50% {
+    background-image: url('../img/click/yellow_frame3.png');
+  }
+  75%,
+  100% {
+    background-image: url('../img/click/yellow_frame4.png');
+  }
+}
+.tt-click-red {
+  background: url('../img/click/red_frame1.png') center/100% 100% no-repeat;
+  animation: tt-click-red 480ms steps(1, end) 1 forwards;
+  image-rendering: pixelated;
+}
+.tt-click-yellow {
+  background: url('../img/click/yellow_frame1.png') center/100% 100% no-repeat;
+  animation: tt-click-yellow 480ms steps(1, end) 1 forwards;
+  image-rendering: pixelated;
+}

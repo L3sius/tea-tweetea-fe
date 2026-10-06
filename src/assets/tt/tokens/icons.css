@@ -1,0 +1,52 @@
+/* Icon and sprite classes. Background-image sprites so paths resolve from this stylesheet for any consumer. Always nearest-neighbour. */
+.tt-sprite {
+  display: inline-block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex: none;
+}
+.tt-gem-blue {
+  background-image: url('../img/gems/sapphire.png');
+}
+.tt-gem-green {
+  background-image: url('../img/gems/emerald.png');
+}
+.tt-gem-purple {
+  background-image: url('../img/gems/dragonstone.png');
+}
+.tt-gem-red {
+  background-image: url('../img/gems/ruby.png');
+}
+.tt-gem-yellow {
+  background-image: url('../img/gems/onyx.png');
+}
+.tt-gem-orange {
+  background-image: url('../img/gems/zenyte.png');
+}
+.tt-gem-pink {
+  background-image: url('../img/gems/red_topaz.png');
+}
+.tt-gem-white {
+  background-image: url('../img/gems/diamond.png');
+}
+.tt-icon-coins {
+  background-image: url('../img/items/coins.png');
+}
+.tt-icon-feather {
+  background-image: url('../img/items/feather.png');
+}
+.tt-icon-banana {
+  background-image: url('../img/items/banana.png');
+}
+.tt-icon-mystery-box {
+  background-image: url('../img/items/mystery_box.png');
+}
+.tt-icon-check {
+  background-image: url('../img/boxes/check_box.png');
+}
+.tt-icon-cross {
+  background-image: url('../img/boxes/cross_box.png');
+}

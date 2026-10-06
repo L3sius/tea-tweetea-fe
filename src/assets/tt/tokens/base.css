@@ -1,0 +1,26 @@
+/* Base element styles: pixel rendering everywhere, OSRS text defaults, centred content. */
+html {
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body-size);
+  line-height: var(--lh-body);
+  color: var(--text-primary);
+  text-shadow: var(--text-shadow-2);
+  background: var(--surface-page);
+}
+img,
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--text-link-hover);
+}

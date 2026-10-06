@@ -6,6 +6,7 @@ import type { GameState, Instance, Match, Minigame } from '@/domain/game'
 import type { ChallengeId, InstanceId } from '@/domain/ids'
 import { teamColor } from '@/ui/colors'
 import { timeFrom } from '@/ui/format'
+import { TtDivider, TtPanel, TtProgressBar, TtText } from '@/ui/tt'
 
 const props = defineProps<{
   state: GameState
@@ -115,111 +116,109 @@ const boot = computed(() => props.state.boot)
 </script>
 
 <template>
-  <section class="flex flex-col gap-4 p-4 text-sm">
-    <div>
-      <h2 class="mb-2 text-xs font-semibold tracking-wide text-amber-300 uppercase">
-        Happening now
-      </h2>
-      <p v-if="live.length === 0 && !boot" class="text-slate-500">
-        No minigames or matches right now. Landing on a red tile opens one.
-      </p>
-      <div
-        v-if="boot"
-        class="mb-2 rounded-lg border border-violet-500/40 bg-violet-950/30 px-3 py-2"
+  <TtPanel title="Events" width="100%" :padding="12" :gap="12" class="min-h-full">
+    <TtText as="h3" :size="2" color="orange">Happening now</TtText>
+    <TtText v-if="live.length === 0 && !boot" :size="1" color="muted">
+      No minigames or matches right now. Landing on a red tile opens one.
+    </TtText>
+    <div v-if="boot" class="tt-sprite-display flex w-full flex-col items-center gap-1 px-2">
+      <TtText :size="2" color="cyan">{{ names.team(boot.owner) }}'s {{ boot.suit }} boot</TtText>
+      <TtText :size="1" color="white">
+        Other teams only move on {{ boot.suit }}. Ends {{ timeFrom(boot.until, now) }}.
+      </TtText>
+    </div>
+    <ul class="flex w-full flex-col gap-2">
+      <li
+        v-for="row in live"
+        :key="row.key"
+        class="tt-sprite-display flex flex-col items-center gap-1 px-2 py-1"
       >
-        <p class="font-medium text-violet-200">
-          👢 {{ names.team(boot.owner) }}’s {{ boot.suit }} boot
-        </p>
-        <p class="text-xs text-slate-400">
-          Other teams only move on {{ boot.suit }}. Ends {{ timeFrom(boot.until, now) }}.
-        </p>
-      </div>
-      <ul class="flex flex-col gap-2">
-        <li
-          v-for="row in live"
-          :key="row.key"
-          class="rounded-lg border px-3 py-2.5"
-          :class="
-            row.kind === 'Match'
-              ? 'border-red-500/40 bg-red-950/20'
-              : 'border-amber-500/40 bg-amber-950/20'
-          "
-        >
-          <p class="flex items-baseline gap-2">
-            <span
-              class="rounded px-1.5 text-[10px] font-bold uppercase"
-              :class="
-                row.kind === 'Match' ? 'bg-red-500 text-red-950' : 'bg-amber-400 text-amber-950'
-              "
-              >{{ row.kind }}</span
+        <TtText :size="1" font="bold" :color="row.kind === 'Match' ? 'red' : 'orange'">
+          {{ row.kind }}
+        </TtText>
+        <TtText :size="2">{{ row.title }}</TtText>
+        <TtText :size="1" color="white">{{ row.description }}</TtText>
+        <TtText :size="1" color="muted">
+          {{ row.scoring }} · ends {{ timeFrom(row.deadline, now) }}
+        </TtText>
+        <TtText v-if="row.result" :size="1" color="green">{{ row.result }}</TtText>
+        <ul class="mt-1 flex w-full flex-col gap-1">
+          <li v-for="bar in row.bars" :key="bar.name" class="flex items-center gap-2">
+            <TtText
+              :size="1"
+              font="bold"
+              :color="bar.color"
+              align="right"
+              block
+              class="w-16 shrink-0 truncate"
             >
-            <span class="font-semibold text-slate-100">{{ row.title }}</span>
-          </p>
-          <p class="mt-0.5 text-xs text-slate-400">{{ row.description }}</p>
-          <p class="text-xs text-slate-500">
-            {{ row.scoring }} · ends {{ timeFrom(row.deadline, now) }}
-          </p>
-          <p v-if="row.result" class="mt-1 text-xs font-medium text-emerald-300">
-            {{ row.result }}
-          </p>
-          <ul class="mt-2 flex flex-col gap-1">
-            <li v-for="bar in row.bars" :key="bar.name" class="flex items-center gap-2 text-xs">
-              <span class="w-14 truncate font-medium" :style="{ color: bar.color }">{{
-                bar.name
-              }}</span>
-              <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  class="h-full rounded-full transition-[width] duration-700"
-                  :style="{ width: `${(bar.done / bar.needed) * 100}%`, background: bar.color }"
-                />
-              </div>
-              <span class="w-14 text-right text-slate-400 tabular-nums">
+              {{ bar.name }}
+            </TtText>
+            <TtProgressBar
+              class="min-w-0 flex-1"
+              width="auto"
+              :height="21"
+              :value="bar.done"
+              :max="bar.needed"
+              :color="bar.color"
+            />
+            <TtText :size="1" color="white" align="left" block class="w-14 shrink-0">
+              {{ bar.note ?? `${bar.done}/${bar.needed}` }}
+            </TtText>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <TtDivider />
+
+    <TtText as="h3" :size="2" color="orange">Results</TtText>
+    <TtText v-if="past.length === 0" :size="1" color="muted">
+      No finished minigames or matches yet.
+    </TtText>
+    <ul class="flex w-full flex-col gap-1">
+      <li v-for="row in past" :key="row.key" class="flex flex-col items-center">
+        <button
+          type="button"
+          class="tt-link flex w-full flex-wrap items-baseline justify-center gap-x-2"
+          :aria-expanded="open === row.key"
+          @click="toggle(row.key)"
+        >
+          <TtText :size="1" color="muted">{{ row.kind }}</TtText>
+          <TtText :size="1" :color="open === row.key ? 'white' : 'yellow'">{{ row.title }}</TtText>
+          <TtText :size="1" color="muted">{{ timeFrom(row.deadline, now) }}</TtText>
+        </button>
+        <div v-if="open === row.key" class="flex w-full flex-col items-center gap-1 pt-1 pb-2">
+          <TtText :size="1" color="white">{{ row.description }}</TtText>
+          <TtText :size="1" color="muted">{{ row.subtitle }}</TtText>
+          <TtText :size="1" color="green">{{ row.result }}</TtText>
+          <ul class="mt-1 flex w-full flex-col gap-1">
+            <li v-for="bar in row.bars" :key="bar.name" class="flex items-center gap-2">
+              <TtText
+                :size="1"
+                font="bold"
+                :color="bar.color"
+                align="right"
+                block
+                class="w-16 shrink-0 truncate"
+              >
+                {{ bar.name }}
+              </TtText>
+              <TtProgressBar
+                class="min-w-0 flex-1"
+                width="auto"
+                :height="21"
+                :value="bar.done"
+                :max="bar.needed"
+                :color="bar.color"
+              />
+              <TtText :size="1" color="white" align="left" block class="w-14 shrink-0">
                 {{ bar.note ?? `${bar.done}/${bar.needed}` }}
-              </span>
+              </TtText>
             </li>
           </ul>
-        </li>
-      </ul>
-    </div>
-
-    <div>
-      <h2 class="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">Results</h2>
-      <p v-if="past.length === 0" class="text-slate-500">No finished minigames or matches yet.</p>
-      <ul class="flex flex-col divide-y divide-slate-800 rounded-lg border border-slate-800">
-        <li v-for="row in past" :key="row.key">
-          <button
-            type="button"
-            class="flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-slate-800/50"
-            :aria-expanded="open === row.key"
-            @click="toggle(row.key)"
-          >
-            <span class="text-[10px] font-bold text-slate-500 uppercase">{{ row.kind }}</span>
-            <span class="flex-1 truncate text-slate-200">{{ row.title }}</span>
-            <span class="shrink-0 text-xs text-slate-500">{{ timeFrom(row.deadline, now) }}</span>
-          </button>
-          <div v-if="open === row.key" class="px-3 pb-3">
-            <p class="text-xs text-slate-400">{{ row.description }}</p>
-            <p class="text-xs text-slate-500">{{ row.subtitle }}</p>
-            <p class="mt-1 text-xs font-medium text-emerald-300">{{ row.result }}</p>
-            <ul class="mt-2 flex flex-col gap-1">
-              <li v-for="bar in row.bars" :key="bar.name" class="flex items-center gap-2 text-xs">
-                <span class="w-14 truncate font-medium" :style="{ color: bar.color }">{{
-                  bar.name
-                }}</span>
-                <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
-                  <div
-                    class="h-full rounded-full"
-                    :style="{ width: `${(bar.done / bar.needed) * 100}%`, background: bar.color }"
-                  />
-                </div>
-                <span class="w-14 text-right text-slate-400 tabular-nums">
-                  {{ bar.note ?? `${bar.done}/${bar.needed}` }}
-                </span>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </section>
+        </div>
+      </li>
+    </ul>
+  </TtPanel>
 </template>

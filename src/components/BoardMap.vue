@@ -19,7 +19,7 @@ import {
   type Map as LeafletMap,
   type Marker,
 } from 'leaflet'
-import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 import type { Board } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
 import { blockerName, cardLabel, challengeProgress, type Names } from '@/domain/describe'
@@ -29,7 +29,8 @@ import type { Choreography, Placement } from '@/domain/motion'
 import { nearestTile } from '@/domain/paths'
 import { spriteElement } from '@/map/sprite'
 import { CRS_ORIGIN, explvTileUrl, imageBounds, tileCentre, worldMap } from '@/map/world'
-import { GEM_COLORS, TILE_COLORS, teamColor } from '@/ui/colors'
+import { TILE_COLORS, teamColor } from '@/ui/colors'
+import { GEM_NAMES, TtClickMarker } from '@/ui/tt'
 
 const props = defineProps<{
   board: Board
@@ -77,6 +78,13 @@ const PICK_RADIUS = 56
 
 const BLOCKER_ICONS = { banana: '🍌', bees: '🐝', snake: '🐍', rock: '🪨' } as const
 
+/** Blockers with a kit sprite draw it; the rest fall back to their emoji. */
+const blockerHtml = (kind: keyof typeof BLOCKER_ICONS) =>
+  kind === 'banana' ? '<span class="tt-sprite tt-icon-banana"></span>' : BLOCKER_ICONS[kind]
+
+/** The last click while picking: a yellow cross on a tile, red when it missed. */
+const click = ref<{ x: number; y: number; key: number; color: 'yellow' | 'red' } | null>(null)
+
 function tileLatLng(tile: TileId): LatLng | null {
   const found = props.board.tiles.get(tile)
   if (!found) return null
@@ -102,9 +110,9 @@ function tilePopup(tile: TileId): HTMLElement {
     add(root, 'p', challenge.description)
   }
   const gem = tileGems().get(tile)
-  if (gem) add(root, 'p', `💎 The ${gem} gem is here`)
+  if (gem) add(root, 'p', `The ${GEM_NAMES[gem]} (${gem} gem) is here`).className = 'tile-popup-gem'
   const blocker = props.state.blockers.get(tile)
-  if (blocker) add(root, 'p', `${BLOCKER_ICONS[blocker.kind]} ${blockerName(blocker)}`)
+  if (blocker) add(root, 'p', blockerName(blocker)).className = 'tile-popup-bad'
 
   for (const team of props.state.teams.values()) {
     if (team.position !== tile) continue
@@ -132,23 +140,24 @@ function add<K extends keyof HTMLElementTagNameMap>(parent: HTMLElement, tag: K,
 }
 
 function drawBoard(map: LeafletMap) {
-  for (const [a, b] of props.board.roads) {
+  // Roads: a black outline under a parchment line, as on the event site's board.
+  const roads = props.board.roads.flatMap(([a, b]) => {
     const from = tileLatLng(a)
     const to = tileLatLng(b)
-    if (from && to)
-      polyline([from, to], {
-        color: '#3b2a17',
-        weight: 3,
-        opacity: 0.75,
-        interactive: false,
-      }).addTo(map)
-  }
+    return from && to ? [[from, to]] : []
+  })
+  polyline(roads, { color: '#000', weight: 4, opacity: 0.85, interactive: false }).addTo(map)
+  polyline(roads, { color: '#c8b98a', weight: 1.5, opacity: 0.95, interactive: false }).addTo(map)
   for (const tile of props.board.tiles.values()) {
     const at = tileLatLng(tile.id)
     if (!at) continue
     if (tile.kind === 'shop') {
       marker(at, {
-        icon: divIcon({ className: 'shop-marker', html: '<span></span>', iconSize: [16, 16] }),
+        icon: divIcon({
+          className: 'shop-marker',
+          html: '<span class="tt-sprite tt-icon-coins"></span>',
+          iconSize: [24, 24],
+        }),
         title: 'Shop',
       })
         .bindPopup(() => tilePopup(tile.id))
@@ -157,8 +166,8 @@ function drawBoard(map: LeafletMap) {
     }
     circleMarker(at, {
       radius: tile.kind === 'red' ? 5 : 3,
-      color: '#1c1208',
-      weight: 1,
+      color: '#000',
+      weight: 1.5,
       fillColor: TILE_COLORS[tile.kind],
       fillOpacity: 1,
     })
@@ -176,10 +185,10 @@ function drawPieces() {
     marker(at, {
       icon: divIcon({
         className: '',
-        html: `<div class="gem-marker" style="--gem:${GEM_COLORS[gem]}"></div>`,
-        iconSize: [16, 16],
+        html: `<div class="gem-marker tt-sprite tt-gem-${gem}" style="--gem:var(--gem-${gem}-glow)"></div>`,
+        iconSize: [21, 23],
       }),
-      title: `${gem} gem`,
+      title: `${GEM_NAMES[gem]} (${gem} gem)`,
       zIndexOffset: 500,
     })
       .bindPopup(() => tilePopup(tile))
@@ -191,7 +200,7 @@ function drawPieces() {
     marker(at, {
       icon: divIcon({
         className: 'blocker-marker',
-        html: BLOCKER_ICONS[blocker.kind],
+        html: blockerHtml(blocker.kind),
         iconSize: [20, 20],
       }),
       title: blockerName(blocker),
@@ -205,14 +214,14 @@ function drawPieces() {
 /** Highlights where a drawn card can take the team, or where an item can be placed. */
 function drawReach() {
   reachLayer.clearLayers()
-  const color = props.myTeam ? teamColor(props.myTeam) : '#facc15'
+  const color = props.myTeam ? teamColor(props.myTeam) : '#ffff00'
   if (props.targetTiles) {
     for (const tile of props.targetTiles) {
       const at = tileLatLng(tile)
       if (at)
         circleMarker(at, {
           radius: 6,
-          color: '#f97316',
+          color: '#ff981f',
           weight: 2,
           fillOpacity: 0.15,
           interactive: false,
@@ -240,8 +249,8 @@ function drawReach() {
     marker(at, {
       icon: divIcon({
         className: '',
-        html: `<div class="dest-ring" style="--team:${color}"></div>`,
-        iconSize: [22, 22],
+        html: '<div class="dest-ring"></div>',
+        iconSize: [18, 18],
       }),
       interactive: false,
     }).addTo(reachLayer)
@@ -253,10 +262,8 @@ function drawRoute() {
   const route = props.route
   if (!route || route.length < 2) return
   const points = route.map(tileLatLng).filter((p): p is LatLng => p !== null)
-  const color = props.myTeam ? teamColor(props.myTeam) : '#facc15'
-  polyline(points, { color: '#0f172a', weight: 8, opacity: 0.6, interactive: false }).addTo(
-    routeLayer,
-  )
+  const color = props.myTeam ? teamColor(props.myTeam) : '#ffff00'
+  polyline(points, { color: '#000', weight: 8, opacity: 0.7, interactive: false }).addTo(routeLayer)
   polyline(points, {
     color,
     weight: 4,
@@ -511,6 +518,10 @@ onMounted(() => {
   })
   map.on('click', (e: LeafletMouseEvent) => {
     const tile = tileUnder(e)
+    if (pickable()) {
+      const { x, y } = e.containerPoint
+      click.value = { x, y, key: Date.now(), color: tile === null ? 'red' : 'yellow' }
+    }
     if (tile !== null) emit('pick', tile)
   })
   // While picking a route or a target, a click picks instead of opening tile details.
@@ -564,12 +575,22 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 </script>
 
 <template>
-  <div ref="container" class="board-map size-full" aria-label="Board map" role="application" />
+  <div class="relative size-full">
+    <div ref="container" class="board-map size-full" aria-label="Board map" role="application" />
+    <TtClickMarker
+      v-if="click"
+      class="z-[900]"
+      :color="click.color"
+      :x="click.x"
+      :y="click.y"
+      :play-key="click.key"
+    />
+  </div>
 </template>
 
 <style>
 .board-map {
-  background: #0b1220;
+  background: #000;
   font: inherit;
 }
 .board-map .pixel-map {
@@ -578,81 +599,109 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 .board-map .detail-map {
   image-rendering: pixelated;
 }
+/* Popups read like the OSRS examine/right-click box. */
 .board-map .leaflet-popup-content-wrapper {
-  border-radius: 10px;
-  background: #0f172a;
-  color: #e2e8f0;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+  border: 3px solid #000;
+  border-radius: 0;
+  background: var(--tooltip-bg);
+  color: var(--osrs-white);
+  box-shadow: 6px 6px 0 #000;
 }
 .board-map .leaflet-popup-tip {
-  background: #0f172a;
+  border: 3px solid #000;
+  background: var(--tooltip-bg);
+  box-shadow: none;
 }
 .board-map .leaflet-popup-content {
-  margin: 10px 14px;
-  font-size: 13px;
-  line-height: 1.35;
+  margin: 6px 9px;
+  font-family: var(--font-small);
+  font-size: 16px;
+  line-height: 1.125;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+}
+.board-map .leaflet-popup-content strong {
+  font-family: var(--font-bold);
+  font-weight: normal;
+  color: var(--osrs-orange);
 }
 .board-map .leaflet-popup-content p {
-  margin: 4px 0 0;
+  margin: 3px 0 0;
+}
+.board-map .leaflet-popup-close-button {
+  color: var(--osrs-yellow) !important;
+  font-family: var(--font-bold);
 }
 .board-map .tile-popup-title {
-  font-weight: 600;
-  color: #fde68a;
+  color: var(--osrs-yellow);
+}
+.board-map .tile-popup-gem {
+  color: var(--osrs-cyan);
+}
+.board-map .tile-popup-bad {
+  color: var(--osrs-red);
 }
 .board-map .tile-popup-button {
-  margin-top: 8px;
-  border-radius: 6px;
-  background: #f59e0b;
-  padding: 4px 10px;
-  color: #0f172a;
-  font-weight: 600;
+  margin-top: 6px;
+  border: 3px solid #000;
+  background: var(--button-face);
+  box-shadow:
+    inset 3px 3px 0 var(--button-hi),
+    inset -3px -3px 0 var(--button-lo);
+  padding: 3px 9px;
+  color: var(--osrs-yellow);
+  font-family: var(--font-small);
+  font-size: 16px;
+  text-shadow: 1px 1px 0 #000;
+  cursor: pointer;
+}
+.board-map .tile-popup-button:hover {
+  color: var(--osrs-white);
+  filter: brightness(1.18);
 }
 .board-map .gem-marker {
-  width: 16px;
-  height: 16px;
-  transform: rotate(45deg);
-  border: 2px solid #0f172a;
-  border-radius: 3px;
-  background: var(--gem);
-  box-shadow: 0 0 12px var(--gem);
-  animation: gem-glint 2.4s ease-in-out infinite;
+  width: 21px;
+  height: 23px;
+  filter: drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px var(--gem));
+  animation: gem-glint 2.4s steps(2, end) infinite;
 }
 @keyframes gem-glint {
   50% {
-    box-shadow: 0 0 20px var(--gem);
-    filter: brightness(1.3);
+    filter: drop-shadow(1px 1px 0 #000) drop-shadow(0 0 8px var(--gem)) brightness(1.3);
+    transform: translateY(-2px);
   }
 }
 .board-map .shop-marker span {
   display: block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #1c1208;
-  border-radius: 3px;
-  background: linear-gradient(#f59e0b 0 45%, #fde68a 45%);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.5);
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker {
   font-size: 17px;
   line-height: 20px;
   text-align: center;
-  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6));
+  filter: drop-shadow(1px 1px 0 #000);
 }
+.board-map .blocker-marker .tt-sprite {
+  width: 20px;
+  height: 20px;
+}
+/* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
-  width: 22px;
-  height: 22px;
-  border: 3px solid var(--team);
-  border-radius: 9999px;
-  animation: dest-pulse 1.4s ease-out infinite;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 3px solid var(--osrs-yellow);
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 6px var(--osrs-yellow);
+  animation: dest-pulse 1.2s steps(3, end) infinite;
 }
 @keyframes dest-pulse {
-  0% {
-    transform: scale(0.6);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.3);
-    opacity: 0.2;
+  50% {
+    transform: scale(1.25);
+    opacity: 0.6;
   }
 }
 .board-map .route-line {
@@ -667,13 +716,14 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   display: grid;
   width: 26px;
   height: 26px;
+  box-sizing: border-box;
   place-items: center;
-  border: 2px solid #0f172a;
-  border-radius: 9999px;
+  border: 3px solid #000;
   background: var(--team);
-  color: #0f172a;
-  font-weight: 800;
-  font-size: 12px;
+  box-shadow: 3px 3px 0 #000;
+  color: #000;
+  font-family: var(--font-bold);
+  font-size: 16px;
 }
 
 /* Team pieces */
@@ -704,21 +754,19 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   left: 6px;
   width: 20px;
   height: 6px;
-  border-radius: 9999px;
   background: rgb(0 0 0 / 0.45);
 }
+/* Team names float under the piece like OSRS overhead text: team colour, hard shadow. */
 .board-map .sprite-label {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0 4px;
-  border-radius: 4px;
-  background: rgb(15 23 42 / 0.85);
-  color: #e2e8f0;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 14px;
+  color: var(--team);
+  font-family: var(--font-bold);
+  font-size: 16px;
+  line-height: 1;
+  text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
 }
 .board-map .sprite .feet-b {
@@ -802,40 +850,40 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   }
 }
 .board-map .sprite-selected .sprite-shadow {
-  background: rgb(250 204 21 / 0.55);
-  box-shadow: 0 0 10px 3px rgb(250 204 21 / 0.6);
+  background: rgb(255 255 0 / 0.55);
+  box-shadow: 0 0 10px 3px rgb(255 255 0 / 0.6);
 }
 
 /* Effect callouts */
 .board-map .cue-icon {
   pointer-events: none;
 }
+/* Callouts are OSRS overhead text: bold pixel font, bright colour, hard shadow, no box. */
 .board-map .cue {
   position: absolute;
   transform: translateX(-50%);
-  padding: 2px 8px;
-  border: 2px solid #0f172a;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 800;
+  font-family: var(--font-bold);
+  font-size: 16px;
+  line-height: 1;
+  text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
-  animation: cue-rise 2.6s ease-out forwards;
+  animation: cue-rise 2.6s steps(12, end) forwards;
 }
 .board-map .cue-good {
-  background: #4ade80;
-  color: #052e16;
+  color: var(--osrs-green);
 }
 .board-map .cue-bad {
-  background: #f87171;
-  color: #450a0a;
+  color: var(--osrs-red);
 }
 .board-map .cue-info {
-  background: #e2e8f0;
-  color: #0f172a;
+  color: var(--osrs-yellow);
 }
 .board-map .cue-gem {
-  background: linear-gradient(90deg, #a855f7, #3b82f6, #22c55e);
-  color: white;
+  color: var(--osrs-cyan);
+  font-size: 32px;
+  text-shadow:
+    2px 2px 0 #000,
+    0 0 8px var(--osrs-cyan);
 }
 .board-map .cue-card {
   position: absolute;
@@ -857,24 +905,26 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   inset: 0;
   display: grid;
   place-items: center;
-  border-radius: 4px;
+  border: 2px solid #000;
   backface-visibility: hidden;
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.5);
+  box-shadow: 2px 2px 0 #000;
 }
 .board-map .cue-card .mini-back {
-  border: 2px solid #f8fafc;
-  background: repeating-linear-gradient(45deg, #6d28d9 0 3px, #7c3aed 3px 6px);
+  background: var(--brown-2);
+  box-shadow:
+    inset 0 0 0 2px var(--stone-hi),
+    2px 2px 0 #000;
   transform: rotateY(180deg);
 }
 .board-map .cue-card .mini-face {
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #0f172a;
-  font-size: 12px;
-  font-weight: 900;
+  background: #e8dcb8;
+  color: #000;
+  font-family: var(--font-bold);
+  font-size: 16px;
+  line-height: 1;
 }
 .board-map .cue-card.red .mini-face {
-  color: #dc2626;
+  color: #b00000;
 }
 @keyframes cue-card-flip {
   from {

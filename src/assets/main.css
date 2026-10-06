@@ -1,12 +1,126 @@
 @import 'tailwindcss';
+@import './tt/styles.css';
 
-@layer base {
-  html {
-    color-scheme: dark;
-  }
+/*
+ * Tailwind is for layout only (flex, grid, gaps, sizes). Colours, type, frames and shadows come
+ * from the Tweetea design system in ./tt: pixel fonts at 16px steps, hard shadows, no rounding.
+ */
 
-  body {
-    @apply min-h-screen bg-slate-950 text-slate-100 antialiased;
-    background-image: radial-gradient(ellipse at top, rgb(30 41 59 / 0.6), transparent 60%);
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* The tokens default body text to 32px; this site is dense, so plain text is 16px. */
+  font-size: var(--fs-1);
+  line-height: var(--lh-ui);
+  text-shadow: var(--text-shadow-1);
+  background:
+    linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.55)),
+    url('./tt/img/borders/background.png') center repeat var(--surface-page);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+  text-shadow: inherit;
+}
+
+/* Text sizes for plain markup, matching TtText sizes 1 and 2. */
+.tt-1 {
+  font-family: var(--font-small);
+  font-size: 16px;
+  line-height: 1.125;
+  text-shadow: 1px 1px 0 #000;
+}
+.tt-2 {
+  font-family: var(--font-small);
+  font-size: 32px;
+  line-height: 1.125;
+  text-shadow: 2px 2px 0 #000;
+}
+.tt-bold {
+  font-family: var(--font-bold);
+}
+
+/* Inputs and selects: a recessed dark box, like the inside of a display box. */
+.tt-input {
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 3px 9px;
+  border: 3px solid #000;
+  background: var(--brown-deep);
+  box-shadow: inset 3px 3px 0 rgb(0 0 0 / 0.5);
+  color: var(--osrs-white);
+  font-family: var(--font-small);
+  font-size: 16px;
+  caret-color: var(--osrs-yellow);
+  outline: none;
+}
+.tt-input:focus {
+  border-color: var(--osrs-orange);
+}
+.tt-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+.tt-input option,
+.tt-input optgroup {
+  background: var(--brown-deep);
+  color: var(--osrs-white);
+  text-shadow: none;
+}
+
+/* A link-like text button: orange, yellow on hover, like OSRS links. */
+.tt-link {
+  color: var(--text-link);
+  cursor: pointer;
+}
+.tt-link:hover,
+.tt-link:focus-visible {
+  color: var(--text-link-hover);
+  outline: none;
+}
+
+/* A dark overlay that centres a modal panel over the map. */
+.tt-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgb(0 0 0 / 0.55);
+}
+
+/* Square team swatch with a black outline, as on the example map. */
+.tt-swatch {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 3px solid #000;
+}
+
+* {
+  scrollbar-color: var(--stone-hi) var(--brown-deep);
+}
+
+:focus-visible {
+  outline: 3px solid var(--osrs-yellow);
+  outline-offset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01s !important;
+    transition-duration: 0.01s !important;
   }
 }

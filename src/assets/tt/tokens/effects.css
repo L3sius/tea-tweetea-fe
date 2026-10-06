@@ -1,0 +1,23 @@
+/* Effects: hard drop shadows, pixel outlines, glow/bloom and tints. */
+:root {
+  --shadow-hard-1: drop-shadow(3px 3px 0 #000); /* @kind shadow */
+  --shadow-hard-2: drop-shadow(6px 6px 0 #000); /* @kind shadow */
+  --box-shadow-hard: 6px 6px 0 #000; /* @kind shadow */
+  --outline-px: drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000) drop-shadow(0 3px 0 #000)
+    drop-shadow(0 -3px 0 #000); /* @kind shadow */
+  --glow-yellow: drop-shadow(0 0 0 #ffff00) drop-shadow(0 0 6px rgba(255, 255, 0, 0.65)); /* @kind shadow */
+  --glow-white: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7)); /* @kind shadow */
+  --bloom-gold: drop-shadow(0 0 12px rgba(255, 152, 31, 0.55)); /* @kind shadow */
+  --hover-brighten: brightness(1.18); /* @kind other */
+  --press-darken: brightness(0.82); /* @kind other */
+  --disabled-filter: grayscale(1) brightness(0.6); /* @kind other */
+  /* Tints for recolouring brown/stone sprites (CSS filter presets) */
+  --tint-iron: grayscale(1) brightness(0.7); /* @kind other */
+  --tint-red: sepia(1) saturate(4) hue-rotate(-40deg) brightness(0.85); /* @kind other */
+  --tint-blue: sepia(1) saturate(3) hue-rotate(180deg) brightness(0.8); /* @kind other */
+  --tint-green: sepia(1) saturate(3) hue-rotate(60deg) brightness(0.8); /* @kind other */
+  --tint-gold: sepia(1) saturate(3.5) hue-rotate(5deg) brightness(1.05); /* @kind other */
+  --tint-purple: sepia(1) saturate(3) hue-rotate(230deg) brightness(0.8); /* @kind other */
+  --ease-step: steps(4, end); /* @kind other */
+  --dur-frame: 120ms; /* @kind other */
+}

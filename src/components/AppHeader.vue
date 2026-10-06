@@ -1,17 +1,20 @@
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useGameStore } from '@/stores/game'
+import { TtButton, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const { state, connection } = storeToRefs(game)
+const wide = useMediaQuery('(min-width: 1024px)')
 
 const CONNECTION = {
-  connecting: { label: 'Connecting', dot: 'bg-slate-400' },
-  live: { label: 'Live', dot: 'bg-emerald-400 animate-pulse' },
-  reconnecting: { label: 'Reconnecting', dot: 'bg-amber-400 animate-pulse' },
-  offline: { label: 'Not live', dot: 'bg-slate-500' },
+  connecting: { label: 'Connecting', color: 'var(--text-muted)' },
+  live: { label: 'Live', color: 'var(--osrs-green)' },
+  reconnecting: { label: 'Reconnecting', color: 'var(--osrs-orange)' },
+  offline: { label: 'Not live', color: 'var(--osrs-red)' },
 } as const
 const badge = computed(() => CONNECTION[connection.value])
 
@@ -26,34 +29,42 @@ const LINKS = [
 
 <template>
   <header
-    class="relative z-[1100] flex h-12 shrink-0 items-center gap-3 border-b border-slate-800 bg-slate-950/95 px-3 sm:px-4"
+    class="tt-frame-iron relative z-[1100] flex shrink-0 flex-wrap items-center justify-center gap-x-6 gap-y-1.5 px-3 py-0.5"
   >
-    <RouterLink to="/" class="flex items-center gap-2">
-      <span class="text-lg" aria-hidden="true">🐤</span>
-      <h1 class="text-base font-bold tracking-tight whitespace-nowrap text-amber-200 sm:text-lg">
-        Tweetea<span class="hidden sm:inline"> and the Magic Gems</span>
-      </h1>
+    <RouterLink to="/" class="whitespace-nowrap">
+      <TtText as="h1" :size="wide ? 3 : 2" font="quill" color="orange" glow>
+        Tweetea and the Magic Gems
+      </TtText>
     </RouterLink>
-    <nav class="flex gap-1 text-sm" aria-label="Pages">
+    <nav class="flex flex-wrap justify-center gap-1.5" aria-label="Pages">
       <RouterLink
         v-for="link in LINKS"
         :key="link.to"
+        v-slot="{ navigate, isActive }"
         :to="link.to"
-        class="rounded-md px-2 py-1 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-        active-class="!bg-slate-800 !text-amber-200"
+        custom
       >
-        {{ link.label }}
+        <TtButton
+          size="sm"
+          :selected="isActive"
+          :aria-current="isActive ? 'page' : undefined"
+          @click="navigate"
+        >
+          {{ link.label }}
+        </TtButton>
       </RouterLink>
     </nav>
-    <span
-      v-if="state"
-      class="hidden rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300 md:inline"
-    >
-      {{ PHASES[state.phase] }}
-    </span>
-    <span class="ml-auto flex items-center gap-2 text-xs text-slate-400" role="status">
-      <span class="size-2 rounded-full" :class="badge.dot" aria-hidden="true" />
-      <span class="hidden sm:inline">{{ badge.label }}</span>
-    </span>
+    <div class="flex items-center gap-3 lg:ml-auto" role="status">
+      <TtText v-if="state" :size="1" color="white">{{ PHASES[state.phase] }}</TtText>
+      <span class="flex items-center gap-1.5">
+        <span
+          class="tt-swatch"
+          :class="{ 'animate-pulse': connection === 'live' || connection === 'reconnecting' }"
+          :style="{ background: badge.color }"
+          aria-hidden="true"
+        />
+        <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
+      </span>
+    </div>
   </header>
 </template>

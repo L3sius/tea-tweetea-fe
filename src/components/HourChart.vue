@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import type { StatRow } from '@/domain/activity'
 import { formatGp } from '@/ui/format'
+import { TtText } from '@/ui/tt'
 
 const props = defineProps<{ rows: readonly StatRow[]; measure: 'count' | 'value' }>()
 
@@ -31,12 +32,12 @@ const active = computed(() => (hovered.value === null ? null : points.value[hove
 </script>
 
 <template>
-  <div>
-    <p v-if="points.length === 0" class="py-4 text-sm text-slate-500">No activity yet.</p>
+  <div class="w-full">
+    <TtText v-if="points.length === 0" :size="1" color="muted">No activity yet.</TtText>
     <template v-else>
       <div class="relative">
         <div
-          class="flex h-40 items-end gap-[2px] border-b border-slate-700"
+          class="tt-sprite-display box-border flex h-48 items-end gap-[3px] !px-1.5 !pt-6 !pb-1"
           role="img"
           :aria-label="`Activity per hour, ${measure === 'value' ? 'gp value' : 'events'}`"
           @mouseleave="hovered = null"
@@ -48,50 +49,51 @@ const active = computed(() => (hovered.value === null ? null : points.value[hove
             @mouseenter="hovered = i"
           >
             <div
-              class="w-full rounded-t-[4px] transition-colors"
-              :class="hovered === i ? 'bg-amber-300' : 'bg-amber-500/80'"
-              :style="{ height: `${Math.max(1, (p[measure] / max) * 100)}%` }"
+              class="w-full border-2 border-b-0 border-black"
+              :style="{
+                height: `${Math.max(1, (p[measure] / max) * 100)}%`,
+                background: hovered === i ? 'var(--osrs-yellow)' : 'var(--osrs-orange)',
+              }"
             />
           </div>
         </div>
         <div
           v-if="active"
-          class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-xs shadow-lg"
+          class="pointer-events-none absolute top-1 left-1/2 flex -translate-x-1/2 gap-2 border-[3px] border-black bg-[var(--tooltip-bg)] px-1.5 whitespace-nowrap shadow-[3px_3px_0_#000]"
         >
-          <span class="text-slate-400">{{ when(active.at) }}</span>
-          <span class="ml-2 font-semibold text-slate-100">{{ active.count }} events</span>
-          <span class="ml-2 text-amber-300">{{ formatGp(active.value) }}</span>
+          <TtText :size="1" color="white">{{ when(active.at) }}</TtText>
+          <TtText :size="1">{{ active.count }} events</TtText>
+          <TtText :size="1" color="cash">{{ formatGp(active.value) }}</TtText>
         </div>
       </div>
-      <div class="relative mt-1 h-4 text-[10px] text-slate-500">
-        <span
+      <div class="relative mt-1 h-5">
+        <TtText
           v-for="t in ticks"
           :key="t.i"
+          :size="1"
+          color="muted"
           class="absolute"
           :style="{ left: `${(t.i / points.length) * 100}%` }"
-          >{{ t.label }}</span
         >
+          {{ t.label }}
+        </TtText>
       </div>
-      <button
-        type="button"
-        class="mt-1 text-xs text-slate-400 underline"
-        @click="showTable = !showTable"
-      >
+      <button type="button" class="tt-link tt-1 mt-1" @click="showTable = !showTable">
         {{ showTable ? 'Hide table' : 'Show as table' }}
       </button>
-      <table v-if="showTable" class="mt-2 w-full text-xs">
-        <thead class="text-slate-400">
+      <table v-if="showTable" class="tt-1 mt-2 w-full">
+        <thead style="color: var(--osrs-orange)">
           <tr>
-            <th class="text-left font-medium">Hour</th>
-            <th class="text-right font-medium">Events</th>
-            <th class="text-right font-medium">Value</th>
+            <th class="text-left font-normal">Hour</th>
+            <th class="text-right font-normal">Events</th>
+            <th class="text-right font-normal">Value</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="p in [...points].reverse()" :key="p.at.toISOString()" class="text-slate-300">
+        <tbody style="color: var(--osrs-white)">
+          <tr v-for="p in [...points].reverse()" :key="p.at.toISOString()">
             <td>{{ when(p.at) }}</td>
-            <td class="text-right tabular-nums">{{ p.count }}</td>
-            <td class="text-right tabular-nums">{{ formatGp(p.value) }}</td>
+            <td class="text-right">{{ p.count }}</td>
+            <td class="text-right" style="color: var(--osrs-yellow)">{{ formatGp(p.value) }}</td>
           </tr>
         </tbody>
       </table>

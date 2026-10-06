@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
 import { INVENTORY_LIMIT, ITEM_INFO, SHOP_PRICES, inventorySize } from '@/domain/items'
 import { ITEMS, type Item } from '@/domain/vocabulary'
+import { TtButton, TtDisplayBox, TtPanel, TtText } from '@/ui/tt'
+import ItemSlot from './ItemSlot.vue'
 
 const props = defineProps<{
   /** The shopping team, when this browser manages one that can buy here now. */
@@ -26,53 +28,66 @@ const rows = computed(() =>
     return [{ item, name: itemName(item), text: ITEM_INFO[item].text, price, why }]
   }),
 )
+
+const picked = ref<Item | null>(null)
+const current = computed(() => rows.value.find((r) => r.item === picked.value) ?? null)
 </script>
 
 <template>
-  <section class="flex min-h-0 flex-col">
-    <header class="flex items-center gap-3 border-b border-slate-800 px-4 py-3">
-      <span
-        class="size-5 rounded-[3px] border-2 border-amber-950"
-        style="background: linear-gradient(#f59e0b 0 45%, #fde68a 45%)"
-        aria-hidden="true"
-      />
-      <h2 class="font-semibold text-amber-200">Shop</h2>
-      <span v-if="buyer" class="ml-auto text-sm text-amber-300 tabular-nums">
-        {{ buyer.gold }} gold
-      </span>
-      <button
-        type="button"
-        class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-800"
-        :class="buyer ? '' : 'ml-auto'"
-        aria-label="Close the shop"
-        @click="emit('close')"
-      >
-        ✕
-      </button>
-    </header>
-    <p v-if="!buyer" class="px-4 pt-3 text-xs text-slate-400">
+  <TtPanel
+    variant="iron"
+    title="Shop"
+    width="min(720px, 100%)"
+    :padding="15"
+    :gap="12"
+    class="max-h-full"
+  >
+    <TtDisplayBox
+      v-if="buyer"
+      label="Your gold"
+      :value="buyer.gold"
+      value-color="var(--osrs-yellow)"
+      :width="180"
+    />
+    <TtText v-else :size="1" color="white" class="max-w-[480px]">
       Every shop sells the same items. Teams buy when they stop on or pass through a shop.
-    </p>
-    <ul class="min-h-0 flex-1 divide-y divide-slate-800/70 overflow-y-auto">
-      <li v-for="row in rows" :key="row.item" class="flex items-start gap-3 px-4 py-2.5">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-slate-100">{{ row.name }}</p>
-          <p class="text-xs text-slate-400">{{ row.text }}</p>
-        </div>
-        <div class="flex shrink-0 flex-col items-end gap-1">
-          <span class="text-sm font-semibold text-amber-300 tabular-nums"> {{ row.price }}g </span>
-          <button
-            v-if="buyer"
-            type="button"
-            class="rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-semibold text-slate-950 hover:bg-amber-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-            :disabled="pending || row.why !== null"
-            :title="row.why ?? undefined"
-            @click="emit('buy', row.item)"
-          >
-            Buy
-          </button>
-        </div>
+    </TtText>
+
+    <ul
+      class="grid max-h-[42dvh] w-full justify-center gap-x-1.5 gap-y-2 overflow-y-auto py-2"
+      style="grid-template-columns: repeat(auto-fill, 90px)"
+      aria-label="Items for sale"
+    >
+      <li v-for="row in rows" :key="row.item" class="flex flex-col items-center gap-1">
+        <ItemSlot
+          :item="row.item"
+          :selected="picked === row.item"
+          :dim="row.why !== null"
+          @click="picked = row.item"
+        />
+        <TtText :size="1" :color="row.why === 'Not enough gold' ? 'red' : 'yellow'">
+          {{ row.price }} gold
+        </TtText>
       </li>
     </ul>
-  </section>
+
+    <div v-if="current" class="flex min-h-[96px] flex-col items-center gap-1.5">
+      <TtText :size="2">{{ current.name }}</TtText>
+      <TtText :size="1" color="white" class="max-w-[480px]">{{ current.text }}</TtText>
+      <TtButton
+        v-if="buyer"
+        size="sm"
+        :disabled="pending || current.why !== null"
+        :title="current.why ?? undefined"
+        @click="emit('buy', current.item)"
+      >
+        {{ current.why ?? `Buy for ${current.price} gold` }}
+      </TtButton>
+    </div>
+    <TtText v-else :size="1" color="muted" class="min-h-[96px]">
+      Click an item to see what it does.
+    </TtText>
+
+    <TtButton @click="emit('close')">Close shop</TtButton>
+  </TtPanel>
 </template>

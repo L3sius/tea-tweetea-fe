@@ -1,0 +1,34 @@
+/* Typography. All RuneScape fonts are pixel fonts: use sizes in 16px steps only (1x, 2x, 3x…). */
+:root {
+  --font-small: 'RuneScape Small', 'RuneScape Plain 11', monospace;
+  --font-plain: 'RuneScape', 'RuneScape Plain 12', monospace;
+  --font-bold: 'RuneScape Bold', 'RuneScape Bold 12', monospace;
+  --font-quill: 'RuneScape Quill', 'RuneScape Quill 8', serif;
+  --font-quill-caps: 'RuneScape Quill Caps', serif;
+  --font-barbarian: 'RuneScape Barbarian Assault', monospace;
+  --font-ui: var(--font-small);
+  --font-body: var(--font-small);
+  --font-heading: var(--font-bold);
+  --font-display: var(--font-quill);
+
+  --fs-1: 16px;
+  --fs-2: 32px;
+  --fs-3: 48px;
+  --fs-4: 64px;
+  --fs-6: 96px;
+  --lh-tight: 1; /* @kind font */
+  --lh-ui: 1.125; /* @kind font */
+  --lh-body: 1.25; /* @kind font */
+
+  /* Hard text shadow, lower right, no blur. Shadow offset = one font pixel (font-size / 16). */
+  --text-shadow-1: 1px 1px 0 var(--text-shadow-color, #000);
+  --text-shadow-2: 2px 2px 0 var(--text-shadow-color, #000);
+  --text-shadow-3: 3px 3px 0 var(--text-shadow-color, #000);
+  --text-shadow-4: 4px 4px 0 var(--text-shadow-color, #000);
+  --text-shadow-6: 6px 6px 0 var(--text-shadow-color, #000);
+
+  --text-ui-size: var(--fs-1);
+  --text-body-size: var(--fs-2);
+  --text-heading-size: var(--fs-3);
+  --text-display-size: var(--fs-4);
+}

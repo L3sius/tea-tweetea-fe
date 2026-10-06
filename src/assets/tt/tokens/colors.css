@@ -1,0 +1,102 @@
+/* Tweetea colour tokens. Sampled from the OSRS asset kit (Thumbnail_Assets) and the OSRS colour sheet. */
+:root {
+  /* OSRS text palette (assets/reference/OSRS_Colours.png) */
+  --osrs-yellow: #ffff00;
+  --osrs-orange: #ff981f;
+  --osrs-red: #ff0000;
+  --osrs-green: #00ff00;
+  --osrs-cash: #00ff80;
+  --osrs-white: #ffffff;
+  --osrs-black: #000000;
+  --osrs-cyan: #00ffff;
+  /* Stone frame (borders/panel_*, border-with_background) */
+  --stone-outline: #000001;
+  --stone-hi: #77705f;
+  --stone-1: #6c6453;
+  --stone-2: #60594a;
+  --stone-3: #575040;
+  --stone-4: #4f4836;
+  --stone-lo: #312a1b;
+  --stone-lo-2: #2a2415;
+  --stone-ornament: #b5b3ab;
+  --stone-ornament-2: #a29a8c;
+  /* Brown panel fill (borders/background) */
+  --brown-1: #494034;
+  --brown-2: #483e33;
+  --brown-3: #463d32;
+  --brown-shade: #363026;
+  --brown-deep: #28231d;
+  /* Button face (boxes/button) */
+  --button-hi: #7e6f5c;
+  --button-2: #6a5d4d;
+  --button-face: #645748;
+  --button-lo: #484136;
+  --button-lo-2: #413a2f;
+  /* Display box (boxes/display_box) */
+  --display-hi: #5c5041;
+  --display-face: #463d31;
+  --display-ornament: #9e9d8e;
+  --display-ornament-2: #88877a;
+  /* Slot tile, grey stone (boxes/slot_tile) */
+  --slot-outline: #2d2b24;
+  --slot-hi: #726451;
+  --slot-1: #62625d;
+  --slot-2: #595a55;
+  --slot-3: #52524d;
+  --slot-4: #4d4d49;
+  --slot-5: #454542;
+  /* Iron rivets (borders/iron_rivets_*) */
+  --iron-0: #0d0d0b;
+  --iron-1: #121210;
+  --iron-2: #252522;
+  --iron-3: #36332c;
+  --iron-4: #555551;
+  /* Prayer glow (prayers/activated_background) */
+  --prayer-glow: #958a6d;
+  /* Gem sprites: base = dominant mid-tone of the wiki sprite, glow = bright tint for bloom */
+  --gem-blue: #12158d;
+  --gem-blue-glow: #4a5cff;
+  --gem-green: #0f7e13;
+  --gem-green-glow: #3cbc27;
+  --gem-red: #6f180c;
+  --gem-red-glow: #ff3a1f;
+  --gem-white: #a8a5a5;
+  --gem-white-glow: #ffffff;
+  --gem-purple: #610f7e;
+  --gem-purple-glow: #b45cff;
+  --gem-yellow: #2a2727;
+  --gem-yellow-glow: #ffff00;
+  --gem-orange: #a24813;
+  --gem-orange-glow: #ff981f;
+  --gem-pink: #a31363;
+  --gem-pink-glow: #ff4fb0;
+  /* Teams in the sample game (Red, Blue, Green, Gold) */
+  --team-red: #ff0000;
+  --team-blue: #4a5cff;
+  --team-green: #00ff00;
+  --team-gold: #ffb000;
+
+  /* Semantic aliases */
+  --text-primary: var(--osrs-yellow);
+  --text-secondary: var(--osrs-white);
+  --text-title: var(--osrs-orange);
+  --text-positive: var(--osrs-green);
+  --text-negative: var(--osrs-red);
+  --text-muted: #c8c0a8;
+  --text-link: var(--osrs-orange);
+  --text-link-hover: var(--osrs-yellow);
+  --text-shadow-color: var(--osrs-black);
+  --stack-low: var(--osrs-yellow); /* < 100k */
+  --stack-mid: var(--osrs-white); /* 100k – 9,999,999 */
+  --stack-high: var(--osrs-cash); /* 10M+ */
+  --surface-page: #1b1814;
+  --surface-panel: var(--brown-2);
+  --surface-sunken: var(--brown-deep);
+  --surface-raised: var(--button-face);
+  --surface-slot: var(--slot-3);
+  --line-dark: var(--osrs-black);
+  --line-stone: var(--stone-3);
+  --hp-full: var(--osrs-green);
+  --hp-empty: var(--osrs-red);
+  --tooltip-bg: #5d5447;
+}

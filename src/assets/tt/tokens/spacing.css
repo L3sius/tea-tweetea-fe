@@ -1,0 +1,25 @@
+/* Spacing and sizing. The art pixel is 3px: the kit's stone frames are drawn at 3x and the 4x boxes are shown at 0.75 so every sprite shares one pixel grid. */
+:root {
+  --px: 3px;
+  --sp-1: 3px;
+  --sp-2: 6px;
+  --sp-3: 12px;
+  --sp-4: 18px;
+  --sp-5: 24px;
+  --sp-6: 36px;
+  --sp-7: 48px;
+  --sp-8: 72px;
+  --sp-9: 96px;
+  --frame-stone: 21px; /* 7 art px */
+  --frame-iron: 24px; /* 6 art px at 4x */
+  --frame-button: 12px; /* 4 art px */
+  --frame-slot: 15px;
+  --frame-display: 18px;
+  --slot-size: 108px; /* 36 art px, matches slot_tile at 0.75 */
+  --gem-1x: 21px;
+  --gem-2x: 42px;
+  --gem-3x: 63px;
+  --icon-size: 48px;
+  --radius: 0; /* never round corners in CSS; corners come from sprites */
+  --max-content: 1440px;
+}

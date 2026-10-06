@@ -6,6 +6,7 @@ import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
 import { teamColor } from '@/ui/colors'
 import { formatGp } from '@/ui/format'
+import { TtPanel, TtText, stack } from '@/ui/tt'
 
 const game = useGameStore()
 const stats = useStatsStore()
@@ -49,57 +50,52 @@ const rosters = computed(() =>
 
 <template>
   <div class="h-full overflow-y-auto">
-    <div class="mx-auto flex max-w-6xl flex-col gap-5 p-4 lg:p-6">
-      <h2 class="text-xl font-bold text-slate-100">Teams and rosters</h2>
-      <p class="-mt-3 text-sm text-slate-400">
-        Every account a player’s Dink reports come from counts for their team, alts included.
-      </p>
-      <div class="grid gap-5 md:grid-cols-2">
-        <article
-          v-for="r in rosters"
-          :key="r.team.id"
-          class="rounded-xl border border-slate-800 bg-slate-900/70 p-4"
-          :style="{ borderTopColor: r.color, borderTopWidth: '4px' }"
-        >
-          <header class="flex flex-wrap items-center gap-3">
-            <h3 class="text-lg font-bold" :style="{ color: r.color }">{{ r.team.name }}</h3>
-            <GemRow :gems="r.team.gems" />
-            <span class="ml-auto text-xs text-slate-400">
-              {{ r.members.length }} players · {{ r.accounts }} accounts ·
-              <span class="text-amber-300">{{ formatGp(r.value) }}</span>
-            </span>
-          </header>
-          <table class="mt-3 w-full text-sm">
-            <thead class="text-xs text-slate-400">
+    <div class="mx-auto flex max-w-[1440px] flex-col gap-1.5">
+      <TtPanel variant="iron" :padding="6" :gap="3">
+        <TtText as="h2" :size="3" font="quill" color="orange" glow>Teams and rosters</TtText>
+        <TtText :size="1" color="white">
+          Every account a player's Dink reports come from counts for their team, alts included.
+        </TtText>
+      </TtPanel>
+      <div class="grid gap-1.5 md:grid-cols-2">
+        <TtPanel v-for="r in rosters" :key="r.team.id" :padding="12" :gap="9">
+          <template #title>
+            <span :style="{ color: r.color }">{{ r.team.name }}</span>
+          </template>
+          <GemRow :gems="r.team.gems" />
+          <TtText :size="1" color="white">
+            {{ r.members.length }} players · {{ r.accounts }} accounts ·
+            <span :style="{ color: stack(r.value).color }">{{ formatGp(r.value) }}</span>
+          </TtText>
+          <table class="tt-1 w-full">
+            <thead style="color: var(--osrs-orange)">
               <tr>
-                <th class="text-left font-medium">Player / account</th>
-                <th class="text-right font-medium">Events</th>
-                <th class="text-right font-medium">Loot</th>
+                <th class="text-left font-normal">Player / account</th>
+                <th class="text-right font-normal">Events</th>
+                <th class="text-right font-normal">Loot</th>
               </tr>
             </thead>
             <tbody>
               <template v-for="m in r.members" :key="m.name">
-                <tr class="border-t border-slate-800">
-                  <td class="py-1.5 font-semibold text-slate-100">{{ m.name }}</td>
-                  <td class="text-right tabular-nums">{{ m.count }}</td>
-                  <td class="text-right text-amber-300 tabular-nums">{{ formatGp(m.value) }}</td>
-                </tr>
-                <tr v-for="a in m.accounts" :key="a.rsn" class="text-xs text-slate-400">
-                  <td class="py-0.5 pl-4">
-                    {{ a.rsn }}
-                    <span
-                      v-if="a.alt"
-                      class="ml-1 rounded bg-slate-800 px-1 text-[10px] text-slate-300 uppercase"
-                      >alt</span
-                    >
+                <tr style="color: var(--osrs-yellow)">
+                  <td class="tt-bold pt-1.5 text-left">{{ m.name }}</td>
+                  <td class="text-right">{{ m.count }}</td>
+                  <td class="text-right" :style="{ color: stack(m.value).color }">
+                    {{ formatGp(m.value) }}
                   </td>
-                  <td class="text-right tabular-nums">{{ a.count }}</td>
-                  <td class="text-right tabular-nums">{{ formatGp(a.value) }}</td>
+                </tr>
+                <tr v-for="a in m.accounts" :key="a.rsn" style="color: var(--text-muted)">
+                  <td class="pl-4 text-left">
+                    {{ a.rsn }}
+                    <span v-if="a.alt" style="color: var(--osrs-cyan)">(alt)</span>
+                  </td>
+                  <td class="text-right">{{ a.count }}</td>
+                  <td class="text-right">{{ formatGp(a.value) }}</td>
                 </tr>
               </template>
             </tbody>
           </table>
-        </article>
+        </TtPanel>
       </div>
     </div>
   </div>

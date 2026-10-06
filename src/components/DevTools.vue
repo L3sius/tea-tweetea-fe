@@ -8,6 +8,7 @@ import { useDevStore } from '@/stores/dev'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
 import { teamColor } from '@/ui/colors'
+import { TtButton, TtDivider } from '@/ui/tt'
 
 const dev = useDevStore()
 const game = useGameStore()
@@ -69,33 +70,25 @@ async function playAs(name: string) {
 
 <template>
   <div class="pointer-events-auto flex flex-col items-end gap-2">
-    <button
-      type="button"
-      class="rounded-lg border px-2.5 py-1.5 text-xs font-bold shadow-lg"
-      :class="
-        open
-          ? 'border-fuchsia-400 bg-fuchsia-600 text-white'
-          : 'border-fuchsia-500/60 bg-slate-950/90 text-fuchsia-300 hover:bg-slate-900'
-      "
-      :aria-expanded="open"
-      @click="open = !open"
-    >
-      🛠 Dev{{ dev.riggedCard ? ` · next: ${cardLabel(dev.riggedCard)}` : '' }}
-    </button>
+    <TtButton size="sm" :selected="open" :aria-expanded="open" @click="open = !open">
+      <span :style="{ color: 'var(--gem-purple-glow)' }">Dev</span>
+      <template v-if="dev.riggedCard">: next {{ cardLabel(dev.riggedCard) }}</template>
+    </TtButton>
 
     <section
       v-if="open"
-      class="flex max-h-[min(70dvh,620px)] w-[min(360px,calc(100vw-1rem))] flex-col gap-3 overflow-y-auto rounded-xl border border-fuchsia-500/40 bg-slate-950/95 p-3 text-xs shadow-2xl backdrop-blur"
+      class="tt-frame-iron tt-1 flex max-h-[min(70dvh,620px)] w-[min(380px,calc(100vw-1rem))] flex-col gap-3 overflow-y-auto p-1.5"
+      style="color: var(--osrs-white)"
       aria-label="Dev tools"
     >
       <header class="flex items-center gap-2">
-        <h2 class="font-bold text-fuchsia-300">Play-testing tools</h2>
+        <h2 class="tt-bold" style="color: var(--gem-purple-glow)">Play-testing tools</h2>
         <input
           v-model="dev.adminCode"
           type="password"
           placeholder="Admin code"
           aria-label="Admin code"
-          class="ml-auto w-28 rounded border border-slate-700 bg-slate-900 px-2 py-1"
+          class="tt-input ml-auto w-32"
         />
       </header>
 
@@ -107,11 +100,11 @@ async function playAs(name: string) {
             v-for="t in teams"
             :key="t.id"
             type="button"
-            class="rounded-md border px-2 py-1 font-semibold"
+            class="dev-btn tt-bold"
             :style="{
-              borderColor: teamColor(t),
-              color: dev.teamId === t.id ? '#0f172a' : teamColor(t),
-              background: dev.teamId === t.id ? teamColor(t) : 'transparent',
+              color: dev.teamId === t.id ? '#000' : teamColor(t),
+              background: dev.teamId === t.id ? teamColor(t) : undefined,
+              textShadow: dev.teamId === t.id ? 'none' : undefined,
             }"
             @click="dev.teamId = t.id"
           >
@@ -119,11 +112,11 @@ async function playAs(name: string) {
           </button>
         </div>
         <template v-if="team">
-          <p class="mt-1.5 text-slate-400">{{ statusLine }}</p>
+          <p class="mt-1.5" style="color: var(--text-muted)">{{ statusLine }}</p>
           <button
             v-if="my.teamId !== team.id"
             type="button"
-            class="mt-1 text-sky-300 underline"
+            class="tt-link mt-1"
             title="Logs in with the team name as the code, as in the sample game"
             @click="playAs(team.name)"
           >
@@ -139,7 +132,8 @@ async function playAs(name: string) {
           <div class="flex flex-wrap gap-1.5">
             <button
               type="button"
-              class="dev-btn !border-fuchsia-500/60"
+              class="dev-btn"
+              style="color: var(--gem-purple-glow)"
               :disabled="dev.pending"
               title="From any state: thaw, leave a drawn card or walk, complete the tile"
               @click="dev.makeReady()"
@@ -157,7 +151,7 @@ async function playAs(name: string) {
             <button
               type="button"
               class="dev-btn"
-              :class="dev.pickingTile ? '!border-orange-400 !text-orange-200' : ''"
+              :class="{ 'dev-btn-on': dev.pickingTile }"
               :disabled="dev.pending"
               @click="dev.pickingTile = !dev.pickingTile"
             >
@@ -193,7 +187,7 @@ async function playAs(name: string) {
         <div>
           <p class="dev-label">Give an item</p>
           <div class="flex gap-1.5">
-            <select v-model="item" class="dev-input min-w-0 flex-1" aria-label="Item">
+            <select v-model="item" class="tt-input min-w-0 flex-1" aria-label="Item">
               <optgroup v-for="g in itemsByGroup" :key="g.label" :label="g.label">
                 <option v-for="i in g.items" :key="i" :value="i">{{ itemName(i) }}</option>
               </optgroup>
@@ -215,13 +209,13 @@ async function playAs(name: string) {
           <div class="flex gap-1.5">
             <select
               v-model.number="rank"
-              class="dev-input"
+              class="tt-input"
               aria-label="Rank"
               :disabled="suit === 'joker'"
             >
               <option v-for="r in RANKS" :key="r" :value="r">{{ RANK_LABEL[r] ?? r }}</option>
             </select>
-            <select v-model="suit" class="dev-input" aria-label="Suit">
+            <select v-model="suit" class="tt-input" aria-label="Suit">
               <option v-for="s in SUITS" :key="s" :value="s">{{ SUIT_SYMBOL[s] }} {{ s }}</option>
               <option value="joker">🃏 Joker</option>
             </select>
@@ -257,7 +251,8 @@ async function playAs(name: string) {
       </template>
 
       <!-- Undo -->
-      <div class="border-t border-slate-800 pt-2">
+      <div class="flex flex-col gap-1">
+        <TtDivider variant="iron" />
         <button
           type="button"
           class="dev-btn w-full text-left"
@@ -265,9 +260,9 @@ async function playAs(name: string) {
           @click="dev.undo()"
         >
           ↶ Undo
-          <span v-if="last" class="text-slate-400">#{{ last.seq }}: {{ last.text }}</span>
+          <span v-if="last" style="color: var(--osrs-white)">#{{ last.seq }}: {{ last.text }}</span>
         </button>
-        <p class="mt-1 text-[11px] text-slate-500">
+        <p style="color: var(--text-muted)">
           Undo removes the newest journal entry and replays the rest. To start over, restart the
           backend: it copies the sample game again.
         </p>
@@ -276,7 +271,7 @@ async function playAs(name: string) {
       <p
         v-if="dev.message"
         role="status"
-        :class="dev.message.tone === 'ok' ? 'text-emerald-300' : 'text-red-300'"
+        :style="{ color: dev.message.tone === 'ok' ? 'var(--osrs-green)' : 'var(--osrs-red)' }"
       >
         {{ dev.message.text }}
       </p>
@@ -285,15 +280,33 @@ async function playAs(name: string) {
 </template>
 
 <style scoped>
-@reference '../assets/main.css';
-
 .dev-label {
-  @apply mb-1 text-[10px] font-semibold tracking-wide text-slate-500 uppercase;
+  margin-bottom: 3px;
+  color: var(--osrs-orange);
 }
+/* A small flat stone button: the TtButton look at a size that fits many to a row. */
 .dev-btn {
-  @apply rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-slate-200 hover:border-fuchsia-500/60 hover:bg-slate-800 disabled:opacity-50;
+  border: 3px solid #000;
+  background: var(--button-face);
+  box-shadow:
+    inset 3px 3px 0 var(--button-hi),
+    inset -3px -3px 0 var(--button-lo);
+  padding: 3px 9px;
+  color: var(--osrs-yellow);
+  cursor: pointer;
 }
-.dev-input {
-  @apply rounded border border-slate-700 bg-slate-900 px-2 py-1;
+.dev-btn:hover:not(:disabled) {
+  color: var(--osrs-white);
+  filter: var(--hover-brighten);
+}
+.dev-btn:disabled {
+  cursor: default;
+  filter: var(--disabled-filter);
+}
+.dev-btn-on {
+  color: var(--osrs-orange);
+  box-shadow:
+    inset 3px 3px 0 var(--button-lo),
+    inset -3px -3px 0 var(--button-hi);
 }
 </style>

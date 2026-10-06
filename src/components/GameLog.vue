@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { describeEvent, type Names } from '@/domain/describe'
 import type { JournalEntry } from '@/domain/events'
 import { timeFrom } from '@/ui/format'
+import { TtDivider, TtPanel, TtText } from '@/ui/tt'
 
 const props = defineProps<{
   log: readonly JournalEntry[]
@@ -31,22 +32,18 @@ const lines = computed(() => {
 </script>
 
 <template>
-  <section class="flex min-h-0 flex-col rounded-xl border border-slate-700/60 bg-slate-900/70">
-    <h2 class="border-b border-slate-800 px-4 py-3 font-semibold">Game log</h2>
-    <p v-if="lines.length === 0" class="px-4 py-6 text-sm text-slate-500">
-      Nothing has happened yet.
-    </p>
-    <ol v-else class="min-h-0 flex-1 divide-y divide-slate-800/70 overflow-y-auto">
-      <li v-for="line in lines" :key="line.key" class="flex gap-3 px-4 py-2 text-sm">
-        <span class="flex-1 text-slate-200">{{ line.text }}</span>
-        <time
-          class="shrink-0 text-xs text-slate-500"
-          :datetime="line.at.toISOString()"
-          :title="line.at.toLocaleString()"
-        >
-          {{ timeFrom(line.at, now) }}
-        </time>
+  <TtPanel title="Game log" width="100%" :padding="12" :gap="6" class="min-h-full">
+    <TtText v-if="lines.length === 0" :size="1" color="muted">Nothing has happened yet.</TtText>
+    <ol v-else class="flex w-full flex-col gap-1.5">
+      <li v-for="(line, i) in lines" :key="line.key" class="flex flex-col items-center gap-1.5">
+        <p class="flex flex-wrap items-baseline justify-center gap-x-2">
+          <time :datetime="line.at.toISOString()" :title="line.at.toLocaleString()">
+            <TtText :size="1" color="muted">{{ timeFrom(line.at, now) }}</TtText>
+          </time>
+          <TtText :size="1" color="white">{{ line.text }}</TtText>
+        </p>
+        <TtDivider v-if="i < lines.length - 1" length="80%" style="opacity: 0.6" />
       </li>
     </ol>
-  </section>
+  </TtPanel>
 </template>

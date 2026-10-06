@@ -34,15 +34,16 @@ function rects(rows: string[], top: number, colors: Record<string, string>): str
 /** Pixel-art bird: `--team` colours its body. Feet alternate while `.walking`. */
 export function spriteElement(color: string, label: string): HTMLElement {
   const colors = {
-    X: '#0f172a',
+    X: '#000000',
     B: color,
-    D: 'color-mix(in srgb, ' + color + ' 60%, #0f172a)',
-    W: '#f8fafc',
-    K: '#0f172a',
-    O: '#f59e0b',
+    D: 'color-mix(in srgb, ' + color + ' 60%, #000000)',
+    W: '#ffffff',
+    K: '#000000',
+    O: '#ff981f',
   }
   const root = document.createElement('div')
   root.className = 'sprite'
+  root.style.setProperty('--team', color)
   root.innerHTML =
     `<div class="sprite-shadow"></div>` +
     `<div class="sprite-body">` +

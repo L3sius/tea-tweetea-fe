@@ -14,20 +14,27 @@ const red = computed(
 
 <template>
   <div
-    class="card-flip grid shrink-0 place-items-center rounded-lg border-2 border-slate-300 bg-slate-50 font-black shadow-lg"
-    :class="[
-      size === 'sm' ? 'h-12 w-9 text-sm' : 'h-24 w-16 text-2xl',
-      red ? 'text-red-600' : 'text-slate-900',
-    ]"
+    class="playing-card grid shrink-0 place-items-center"
+    :class="[size === 'sm' ? 'h-12 w-9 text-base' : 'h-24 w-16 text-[32px]', { red }]"
     :aria-label="cardLabel(card)"
   >
-    {{ card.kind === 'joker' ? '🃏' : cardLabel(card) }}
+    {{ card.kind === 'joker' ? 'Joker' : cardLabel(card) }}
   </div>
 </template>
 
 <style scoped>
-.card-flip {
-  animation: card-flip 0.6s ease-out;
+.playing-card {
+  border: 3px solid #000;
+  background: #e8dcb8;
+  box-shadow: 3px 3px 0 #000;
+  color: #000;
+  font-family: var(--font-bold);
+  line-height: 1;
+  text-shadow: none;
+  animation: card-flip 0.6s steps(6, end);
+}
+.playing-card.red {
+  color: #b00000;
 }
 @keyframes card-flip {
   from {
