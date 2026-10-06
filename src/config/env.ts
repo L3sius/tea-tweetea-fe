@@ -1,0 +1,21 @@
+import { z } from 'zod'
+
+const Env = z
+  .object({
+    VITE_API_MODE: z.enum(['http', 'fixtures']).default('http'),
+    VITE_API_BASE_URL: z.url().optional(),
+  })
+  .refine((env) => env.VITE_API_MODE === 'fixtures' || env.VITE_API_BASE_URL !== undefined, {
+    message: 'VITE_API_BASE_URL is required when VITE_API_MODE is "http"',
+    path: ['VITE_API_BASE_URL'],
+  })
+
+export type AppConfig = { api: { mode: 'fixtures' } | { mode: 'http'; baseUrl: string } }
+
+/** Reads public build-time config. Fails fast so a misconfigured build never half-works. */
+export function readConfig(env: Record<string, unknown> = import.meta.env): AppConfig {
+  const parsed = Env.safeParse(env)
+  if (!parsed.success) throw new Error(`Invalid environment:\n${z.prettifyError(parsed.error)}`)
+  const { VITE_API_MODE: mode, VITE_API_BASE_URL: baseUrl } = parsed.data
+  return { api: mode === 'http' && baseUrl ? { mode, baseUrl } : { mode: 'fixtures' } }
+}

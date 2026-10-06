@@ -1,0 +1,10 @@
+{
+  "image": "world.png",
+  "width": 1472,
+  "height": 864,
+  "tiles_per_pixel": 2,
+  "x_min": 1024,
+  "y_max": 4224,
+  "note": "pixel (px, py) covers world x in [x_min + px*t, x_min + (px+1)*t) and y in (y_max - (py+1)*t, y_max - py*t], t = tiles_per_pixel",
+  "source": "Explv osrs_map_tiles, plane 0, zoom 7"
+}

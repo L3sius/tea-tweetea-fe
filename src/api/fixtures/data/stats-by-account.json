@@ -1,0 +1,82 @@
+[
+  {
+    "key": "Blue Mage",
+    "count": 79,
+    "value": 213308640
+  },
+  {
+    "key": "Red Mage",
+    "count": 59,
+    "value": 199816400
+  },
+  {
+    "key": "Green Tank",
+    "count": 101,
+    "value": 199463640
+  },
+  {
+    "key": "Blue Archer",
+    "count": 83,
+    "value": 195610200
+  },
+  {
+    "key": "Green Mage",
+    "count": 82,
+    "value": 176610440
+  },
+  {
+    "key": "Blue Alt",
+    "count": 79,
+    "value": 166512360
+  },
+  {
+    "key": "Blue Tank",
+    "count": 89,
+    "value": 158217800
+  },
+  {
+    "key": "Gold Tank",
+    "count": 78,
+    "value": 148412880
+  },
+  {
+    "key": "Gold Alt",
+    "count": 66,
+    "value": 140959080
+  },
+  {
+    "key": "Green Archer",
+    "count": 88,
+    "value": 122807320
+  },
+  {
+    "key": "Gold Mage",
+    "count": 62,
+    "value": 114914680
+  },
+  {
+    "key": "Red Tank",
+    "count": 40,
+    "value": 84015120
+  },
+  {
+    "key": "Gold Archer",
+    "count": 62,
+    "value": 74409480
+  },
+  {
+    "key": "Red Archer",
+    "count": 57,
+    "value": 72965840
+  },
+  {
+    "key": "Red Alt",
+    "count": 49,
+    "value": 68011840
+  },
+  {
+    "key": "Green Alt",
+    "count": 69,
+    "value": 63160680
+  }
+]
