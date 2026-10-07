@@ -43,3 +43,6 @@ playwright-report/
 
 # Design system reference: we copy what we use into src/, never import from here
 tweetea-design-system/
+
+# Explv map tiles downloaded by scripts/terrain-scenes.py
+.cache/
