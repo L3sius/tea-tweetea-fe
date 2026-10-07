@@ -1,7 +1,15 @@
 import type { GameEvent, JournalEntry } from '@/domain/events'
 import { challengeId, instanceId, matchId, minigameId, teamId, tileId } from '@/domain/ids'
 import type { WireEvent, WirePublished } from '../wire/events'
-import { toBlocker, toCard, toEffect, toItemTarget, toPayout, toScoring } from './game'
+import {
+  toBlocker,
+  toCard,
+  toEffect,
+  toItemTarget,
+  toPayout,
+  toScoring,
+  toTeamProgress,
+} from './game'
 import { toDate } from './shared'
 
 export function toGameEvent(wire: WireEvent): GameEvent {
@@ -65,15 +73,14 @@ export function toGameEvent(wire: WireEvent): GameEvent {
         trap: toBlocker(wire.trap),
         to: tileId(wire.to),
       }
-    case 'tile_restarted':
-      return { kind: wire.type, teamId: teamId(wire.team), instanceId: instanceId(wire.instance) }
     case 'progress':
       return {
         kind: wire.type,
         instanceId: instanceId(wire.instance),
         teamId: teamId(wire.team),
-        key: wire.key,
-        total: wire.total,
+        key: wire.key || null,
+        amount: wire.amount,
+        progress: toTeamProgress(wire.progress),
       }
     case 'tile_completed':
       return { kind: wire.type, teamId: teamId(wire.team), tileId: tileId(wire.tile) }
@@ -85,7 +92,7 @@ export function toGameEvent(wire: WireEvent): GameEvent {
         tileId: tileId(wire.tile),
       }
     case 'gem_lost':
-    case 'bell_used':
+    case 'necklace_used':
       return { kind: wire.type, teamId: teamId(wire.team), gem: wire.gem }
     case 'gem_stolen':
       return { kind: wire.type, from: teamId(wire.from), to: teamId(wire.to), gem: wire.gem }
@@ -123,16 +130,8 @@ export function toGameEvent(wire: WireEvent): GameEvent {
       }
     case 'blocker_removed':
       return { kind: wire.type, tileId: tileId(wire.tile) }
-    case 'boot_started':
-      return {
-        kind: wire.type,
-        owner: teamId(wire.owner),
-        suit: wire.suit,
-        until: toDate(wire.until),
-      }
-    case 'boot_ended':
-      return { kind: wire.type }
     case 'frozen':
+    case 'shielded':
       return { kind: wire.type, teamId: teamId(wire.team), until: toDate(wire.until) }
     case 'random_event':
       return {

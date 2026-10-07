@@ -25,6 +25,7 @@ async function allEvents() {
 const files = {
   'board.json': () => get('/board'),
   'challenges.json': () => get('/challenges'),
+  'items.json': () => get('/items'),
   'state.json': () => get('/state'),
   'events.json': allEvents,
   'feed.json': () => get('/feed?limit=200'),

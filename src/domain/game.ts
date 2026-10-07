@@ -20,7 +20,7 @@ export type Effect =
 export type Effects = {
   /** Factor applied to the next move (1 = none). */
   moveMultiplier: number
-  /** A rival's Harp to Call Rain halves the next move. */
+  /** A rival's Harp of Rain halves the next move. */
   nextMoveHalved: boolean
   /** Draws of this suit pay gold, for this many more draws. */
   suitGold: { suit: Suit; drawsLeft: number } | null
@@ -74,6 +74,8 @@ export type Team = {
   status: TeamStatus
   /** Frozen and in-match sit on top of the status; the status resumes when they end. */
   frozenUntil: Date | null
+  /** Hostile items can't target the team before then; every hit starts a new shield. */
+  shieldUntil: Date | null
   matchId: MatchId | null
   gems: Set<Gem>
   gold: number
@@ -85,11 +87,12 @@ export type Team = {
   version: number
 }
 
+/**
+ * Traps trigger once: a banana or a harpie bug swarm when walked over, a snake charmer when landed
+ * on. A Wilderness web blocks its tile until it expires.
+ */
 export type Blocker =
-  { kind: 'banana' } | { kind: 'bees' } | { kind: 'snake' } | { kind: 'rock'; until: Date }
-
-/** A Diamond or Spade Boot: other teams only move on that suit until it ends. */
-export type Boot = { owner: TeamId; suit: Suit; until: Date }
+  { kind: 'banana' } | { kind: 'swarm' } | { kind: 'snake' } | { kind: 'web'; until: Date }
 
 export type InstanceScope =
   | { kind: 'tile'; teamId: TeamId; tileId: TileId }
@@ -102,10 +105,21 @@ export type Instance = {
   challengeId: ChallengeId
   startedAt: Date
   scope: InstanceScope
-  /** Contributions per team, per progress key. */
-  progress: Map<TeamId, Map<string, number>>
+  /** Every team that can contribute: the tile's team, both match teams, or all teams. */
+  progress: Map<TeamId, TeamProgress>
   /** Teams that have completed the challenge. */
   done: Set<TeamId>
+}
+
+/** One team's standing on an instance, as the server reports it; never recomputed here. */
+export type TeamProgress = {
+  /** Contributions per key (item, boss, pet, task …); goal `each` lists every key from the start. */
+  counts: Map<string, number>
+  /** Towards `target`; the task is complete when they are equal. */
+  done: number
+  target: number
+  /** The challenge's effort: a count, or seconds for `best_time`; null until something counted. */
+  effort: number | null
 }
 
 export type Scoring =
@@ -152,7 +166,6 @@ export type GameState = {
   /** Where each gem currently sits. */
   gemTiles: Map<Gem, TileId>
   blockers: Map<TileId, Blocker>
-  boot: Boot | null
   /** Active tile instances plus every minigame and match instance. */
   instances: Map<InstanceId, Instance>
   minigames: Map<MinigameId, Minigame>

@@ -3,7 +3,7 @@ import { WirePublished } from '../wire/events'
 import { toJournalEntry } from './events'
 
 // The recorded game (see contract.spec.ts) covers most event types. These are the ones it never
-// produced: matches, boots, stolen gems and the end of the game.
+// produced: matches, shields, stolen gems and the end of the game.
 
 const at = '2026-10-05T12:00:00Z'
 const deadline = '2026-10-05T18:00:00Z'
@@ -47,18 +47,31 @@ describe('events missing from the recorded game', () => {
       { kind: 'gem_lost', teamId: 1, gem: 'red' },
     ],
     [
-      { type: 'bell_used', team: 1, gem: 'pink' },
-      { kind: 'bell_used', teamId: 1, gem: 'pink' },
+      { type: 'necklace_used', team: 1, gem: 'pink' },
+      { kind: 'necklace_used', teamId: 1, gem: 'pink' },
     ],
     [
-      { type: 'tile_restarted', team: 2, instance: 9 },
-      { kind: 'tile_restarted', teamId: 2, instanceId: 9 },
+      { type: 'shielded', team: 3, until: deadline },
+      { kind: 'shielded', teamId: 3, until: new Date(deadline) },
     ],
     [
-      { type: 'boot_started', owner: 3, suit: 'diamonds', until: deadline },
-      { kind: 'boot_started', owner: 3, suit: 'diamonds', until: new Date(deadline) },
+      {
+        type: 'progress',
+        instance: 4,
+        team: 1,
+        key: null,
+        amount: 0,
+        progress: { counts: {}, done: 0, target: 1, effort: 7 },
+      },
+      {
+        kind: 'progress',
+        instanceId: 4,
+        teamId: 1,
+        key: null,
+        amount: 0,
+        progress: { counts: new Map(), done: 0, target: 1, effort: 7 },
+      },
     ],
-    [{ type: 'boot_ended' }, { kind: 'boot_ended' }],
     [
       { type: 'game_ended', winner: null, ranking: [2, 0, 1, 3] },
       { kind: 'game_ended', winner: null, ranking: [2, 0, 1, 3] },
@@ -79,13 +92,13 @@ describe('journal entries', () => {
       mapOne({
         type: 'item_used',
         team: 0,
-        item: 'sleeping_potion',
+        item: 'ice_barrage',
         target: { target: 'team', id: 2 },
       }),
     ).toEqual({
       kind: 'item_used',
       teamId: 0,
-      item: 'sleeping_potion',
+      item: 'ice_barrage',
       target: { kind: 'team', teamId: 2 },
     })
   })

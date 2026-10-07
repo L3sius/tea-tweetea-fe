@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { useIntervalFn, useNow } from '@vueuse/core'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { cardLabel, challengeProgress, clock, effectText, itemName } from '@/domain/describe'
-import type { GameState } from '@/domain/game'
+import {
+  cardLabel,
+  challengeProgress,
+  clock,
+  effectText,
+  effortText,
+  itemName,
+} from '@/domain/describe'
+import type { GameState, Team } from '@/domain/game'
 import { whyNotUsable } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
@@ -75,14 +82,19 @@ const task = computed(() => {
   const instance = state.value.instances.get(t.status.instanceId)
   const challenge = instance && game.challenges.get(instance.challengeId)
   if (!challenge) return null
-  return { challenge, ...challengeProgress(challenge, instance, t.id) }
+  const effort = effortText(challenge, instance, instance.progress.get(t.id), now.value)
+  return { challenge, effort, ...challengeProgress(challenge, instance, t.id) }
 })
+
+/** The tile the team stands on. */
+const here = computed(() => (team.value ? game.board?.tiles.get(team.value.position) : undefined))
 
 const usableCount = computed(() => {
   const t = team.value
   if (!t) return 0
-  return [...t.items].filter(([item, n]) => n > 0 && whyNotUsable(t, item, now.value) === null)
-    .length
+  return [...t.items].filter(
+    ([item, n]) => n > 0 && whyNotUsable(t, item, now.value, here.value) === null,
+  ).length
 })
 
 /** The item used on this tile, from the log: the latest `item_used` since the team arrived. */
@@ -112,9 +124,6 @@ const drawEffects = computed(() => {
       text: `${t.effects.suitGold.suit} pay gold (${t.effects.suitGold.drawsLeft} draws)`,
       tone: 'good',
     })
-  const boot = state.value.boot
-  if (boot && boot.owner !== t.id && boot.until > now.value)
-    out.push({ text: `${game.names.team(boot.owner)}'s boot: only ${boot.suit} move`, tone: 'bad' })
   return out
 })
 
@@ -175,12 +184,7 @@ const outcomeLines = computed(() => {
   const o = my.lastDraw
   if (!o) return []
   const lines: { text: string; tone: 'good' | 'bad' | 'info' }[] = []
-  if (o.restarted)
-    lines.push({
-      text: "Wrong suit under a rival's boot: no move, and your tile restarts.",
-      tone: 'bad',
-    })
-  else if (o.joker)
+  if (o.joker)
     lines.push({
       text: `Joker! Your team ${effectText(o.joker)}. Then move ${o.steps}.`,
       tone: 'info',
@@ -202,10 +206,16 @@ const baseSteps = computed(() => {
 
 // --- Other actions ---
 
-const rivals = computed(() =>
+/**
+ * Rivals a team-targeted item can hit. Every such item is hostile, and a team hit by one is
+ * shielded from them for a while, so shielded teams are left out and listed apart.
+ */
+const isShielded = (t: Team) => t.shieldUntil !== null && t.shieldUntil > now.value
+const others = computed(() =>
   [...state.value.teams.values()].filter((t) => t.id !== team.value?.id),
 )
-const routeSteps = computed(() => (my.route ? my.route.length - 1 : 0))
+const rivals = computed(() => others.value.filter((t) => !isShielded(t)))
+const shieldedRivals = computed(() => others.value.filter(isShielded))
 
 /** Using an item goes back to the power-up step, where targeting shows. */
 function use(item: Item) {
@@ -260,7 +270,7 @@ async function login() {
       <span :style="{ color }">Team {{ team.name }}</span>
     </template>
 
-    <TtGemTracker :held="team.gems" :scale="1" />
+    <TtGemTracker :held="team.gems" :scale="1" class="max-w-[260px]" />
     <div class="flex flex-wrap justify-center gap-1.5">
       <TtDisplayBox label="Gold" :value="team.gold" value-color="var(--osrs-yellow)" :width="117" />
       <TtDisplayBox label="Cards left" :value="team.cardsLeft" :width="117" />
@@ -325,7 +335,7 @@ async function login() {
       <template v-else-if="blocker === 'frozen' && frozen">
         <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
         <TtText :size="1" color="white" class="max-w-[340px]">
-          You can't draw or use power-ups while frozen. Hold a Monk's Pendant to block the next
+          You can't draw or use power-ups while frozen. Hold Protect from Magic to block the next
           freeze.
         </TtText>
       </template>
@@ -353,6 +363,7 @@ async function login() {
           :width="330"
           class="max-w-full"
         />
+        <TtText v-if="task.effort" :size="1" color="cyan">{{ task.effort }}</TtText>
       </template>
       <TtText :size="1" color="muted" class="max-w-[340px]">
         Tiles complete automatically from Dink drops. Power-ups unlock when the tile is done.
@@ -373,7 +384,9 @@ async function login() {
       >
         <TtText :size="1" color="orange">Using {{ itemName(my.targeting.item) }}</TtText>
         <template v-if="my.targeting.kind === 'team'">
-          <TtText :size="1" color="white">Pick a rival team.</TtText>
+          <TtText :size="1" color="white">
+            {{ rivals.length ? 'Pick a rival team.' : 'Every rival is shielded right now.' }}
+          </TtText>
           <div class="flex flex-wrap justify-center gap-1.5">
             <TtButton
               v-for="rival in rivals"
@@ -385,6 +398,9 @@ async function login() {
               <span :style="{ color: teamColor(rival) }">{{ rival.name }}</span>
             </TtButton>
           </div>
+          <TtText v-for="t in shieldedRivals" :key="t.id" :size="1" color="muted">
+            {{ t.name }} is shielded until {{ clock(t.shieldUntil!) }}.
+          </TtText>
         </template>
         <TtText v-else :size="1" color="white">
           Click one of the orange-ringed tiles on the map (within 10 steps of you).
@@ -394,6 +410,7 @@ async function login() {
 
       <PowerUpPicker
         :team="team"
+        :here="here"
         :now="now"
         :pending="my.pending"
         @use="my.useItem"
@@ -461,16 +478,14 @@ async function login() {
           {{ line.text }}
         </TtText>
         <TtText
-          v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps && !my.lastDraw.restarted"
+          v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps"
           :size="1"
           color="white"
         >
           {{ cardLabel(my.lastDraw.card) }} is worth {{ baseSteps }}; your effects made it
           {{ my.lastDraw.steps }}.
         </TtText>
-        <TtButton class="mt-1.5" @click="my.finishDraw()">
-          {{ my.lastDraw.restarted ? 'Back to your tile' : 'Choose a path' }}
-        </TtButton>
+        <TtButton class="mt-1.5" @click="my.finishDraw()"> Choose a path </TtButton>
       </div>
     </div>
 
@@ -486,17 +501,31 @@ async function login() {
             </TtText>
           </div>
         </div>
-        <TtText :size="1" color="white" class="max-w-[340px]">
-          Point at the map to pick a route; yellow squares mark where you can end. Click to lock it.
+        <TtDisplayBox
+          label="Steps left"
+          :value="my.stepsLeft"
+          :value-color="my.stepsLeft === 0 ? 'var(--osrs-green)' : 'var(--osrs-yellow)'"
+          :width="150"
+        />
+        <TtText v-if="my.stepsLeft > 0" :size="1" color="white" class="max-w-[340px]">
+          Click nodes on the map to walk there, one checkpoint at a time. Yellow squares are one
+          step away.
         </TtText>
-        <TtText v-if="my.route" :size="1" :color="my.routeLocked ? 'green' : 'yellow'">
-          {{ my.routeLocked ? 'Route locked' : 'Previewing' }}: {{ routeSteps }} steps to tile #{{
-            my.route.at(-1)
-          }}
+        <TtText v-else :size="1" color="green">Route complete. Press Go! to walk it.</TtText>
+        <TtText v-if="my.route" :size="1" color="muted" class="max-w-[340px]">
+          Click back along your route to undo steps, or a node off it to reroute from there.
         </TtText>
-        <div class="flex gap-1.5">
-          <TtButton :disabled="!my.route || my.pending" @click="my.confirmRoute()">Go!</TtButton>
-          <TtButton :disabled="!my.route" @click="my.clearRoute()">Clear</TtButton>
+        <div class="flex flex-wrap justify-center gap-1.5">
+          <TtButton
+            :disabled="my.stepsLeft !== 0 || !my.route || my.pending"
+            @click="my.confirmRoute()"
+          >
+            Go!
+          </TtButton>
+          <TtButton size="sm" :disabled="!my.checkpoints.length" @click="my.undoCheckpoint()">
+            Undo
+          </TtButton>
+          <TtButton size="sm" :disabled="!my.route" @click="my.clearRoute()">Clear</TtButton>
         </div>
       </template>
       <template v-else-if="pause?.kind === 'shop'">
@@ -539,6 +568,7 @@ async function login() {
       <TtDivider />
       <PowerUpPicker
         :team="team"
+        :here="here"
         :now="now"
         :pending="my.pending"
         :locked="step === 'tile'"

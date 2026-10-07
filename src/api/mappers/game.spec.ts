@@ -10,10 +10,11 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   position: 40,
   status: { status: 'ready' },
   frozen_until: null,
+  shield_until: null,
   match_id: null,
   gems: ['blue', 'white'],
   gold: 55,
-  items: { owls_feather: 2 },
+  items: { bronze_feather: 2 },
   cards_left: 30,
   effects: {
     multiplier: 1,
@@ -76,7 +77,7 @@ describe('teams', () => {
   it('turns collections into sets and maps', () => {
     const team = toTeam(wireTeam())
     expect(team.gems).toEqual(new Set(['blue', 'white']))
-    expect(team.items).toEqual(new Map([['owls_feather', 2]]))
+    expect(team.items).toEqual(new Map([['bronze_feather', 2]]))
   })
 
   it('names the suit-gold tuple', () => {
@@ -98,14 +99,13 @@ describe('game state', () => {
     teams: [wireTeam()],
     tiles: ['a', 'b', 'c'],
     gems: [0, 1, 2, 0, 1, 2, 0, 1],
-    blockers: { '1': { blocker: 'rock', until: '2026-10-05T14:00:00Z' } },
-    boot: null,
+    blockers: { '1': { blocker: 'web', until: '2026-10-05T14:00:00Z' } },
     instances: {
       '17': {
         challenge: 'a',
         started: '2026-10-05T11:00:00Z',
         scope: { scope: 'tile', team: 2, tile: 0 },
-        progress: { '2': { 'Dragon pickaxe': 1 } },
+        progress: { '2': { counts: { 'Dragon pickaxe': 1 }, done: 1, target: 1, effort: 40 } },
         done: [],
       },
     },
@@ -116,12 +116,17 @@ describe('game state', () => {
   it('keys maps by numeric id', () => {
     const state = toGameState(WireState.parse(wireState))
     expect(state.blockers.get(tileId(1))).toEqual({
-      kind: 'rock',
+      kind: 'web',
       until: new Date('2026-10-05T14:00:00Z'),
     })
     const instance = state.instances.get(instanceId(17))
     expect(instance?.id).toBe(17)
-    expect(instance?.progress.get(teamId(2))).toEqual(new Map([['Dragon pickaxe', 1]]))
+    expect(instance?.progress.get(teamId(2))).toEqual({
+      counts: new Map([['Dragon pickaxe', 1]]),
+      done: 1,
+      target: 1,
+      effort: 40,
+    })
   })
 
   it('indexes tile challenges by tile id and gem tiles by gem', () => {
@@ -136,7 +141,7 @@ describe('game state', () => {
   })
 
   it('rejects non-numeric map keys', () => {
-    const blockers = { first: { blocker: 'bees' } }
+    const blockers = { first: { blocker: 'swarm' } }
     expect(WireState.safeParse({ ...wireState, blockers }).success).toBe(false)
   })
 })

@@ -12,25 +12,30 @@ import {
   layerGroup,
   map as createMap,
   marker,
+  point,
   polyline,
-  tileLayer,
+  tooltip,
   type LatLng,
   type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
 } from 'leaflet'
-import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
-import type { Board } from '@/domain/board'
+import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
+import type { Board, Tile } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
-import { blockerName, cardLabel, challengeProgress, type Names } from '@/domain/describe'
-import type { Card, GameState, Team } from '@/domain/game'
+import { blockerName, cardLabel, challengeProgress, clock, type Names } from '@/domain/describe'
+import type { Blocker, Card, GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import type { Choreography, Placement } from '@/domain/motion'
-import { nearestTile } from '@/domain/paths'
+import { nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
 import { spriteElement } from '@/map/sprite'
-import { CRS_ORIGIN, explvTileUrl, imageBounds, tileCentre, worldMap } from '@/map/world'
+import { itemEntry } from '@/domain/items'
+import type { Item } from '@/domain/vocabulary'
+import { tileTheme } from '@/map/tileTheme'
+import { CRS_ORIGIN, imageBounds, terrainScene, tileCentre, worldMap } from '@/map/world'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
-import { GEM_NAMES, TtClickMarker } from '@/ui/tt'
+import { TtClickMarker } from '@/ui/tt'
+import TileScene, { type TileView } from './TileScene.vue'
 
 const props = defineProps<{
   board: Board
@@ -43,21 +48,27 @@ const props = defineProps<{
   follow: boolean
   /** The team this browser manages; its route and targets are drawn in its colour. */
   myTeam: Team | null
+  /** The walk being built, start tile first; null when the team isn't picking a walk. */
   route: readonly TileId[] | null
-  reach: { onAnyWalk: ReadonlySet<TileId>; ends: ReadonlySet<TileId> } | null
+  /** Route lengths after each checkpoint, to mark the checkpoints. */
+  checkpoints: readonly number[]
+  /** The route a click on the hovered node would leave, start tile first. */
+  preview: readonly TileId[] | null
+  stepsLeft: number
+  /** Where the next checkpoint can go. */
+  options: WalkOptions | null
   targetTiles: ReadonlySet<TileId> | null
   /** Skip callouts for this team, whose captain is watching their draw in the panel. */
   hideCuesFor: TeamId | null
 }>()
 
 const emit = defineEmits<{
-  hover: [tile: TileId]
+  /** The pickable node under the pointer, or null when it leaves one. */
+  hover: [tile: TileId | null]
   pick: [tile: TileId]
-  select: [team: TeamId]
-  /** The viewer dragged the map, which ends following. */
+  /** The viewer dragged the map or went to the overview, which ends following. */
   freeRoam: []
   view: [bounds: { south: number; west: number; north: number; east: number }]
-  openShop: [tile: TileId]
 }>()
 
 const container = useTemplateRef<HTMLDivElement>('container')
@@ -71,12 +82,14 @@ const cueLayer = layerGroup()
 const teamMarkers = new Map<TeamId, { marker: Marker; el: HTMLElement; pose: string }>()
 const cueMarkers = new Map<string, Marker>()
 
-/** Zoom at which the detailed OSRS map takes over from the pixel art. */
-const DETAIL_ZOOM = 1.5
-/** How close, in screen pixels, the pointer must be to a tile to pick it. */
-const PICK_RADIUS = 56
+/**
+ * How close, in screen pixels, the pointer must be to a node to hover or pick it. Nodes keep the
+ * same pixel size at every zoom, so this always matches what is drawn; neighbouring tiles sit
+ * about 46px apart at zoom 0, where the map goes when a walk starts.
+ */
+const PICK_RADIUS = 20
 
-const BLOCKER_ICONS = { banana: '🍌', bees: '🐝', snake: '🐍', rock: '🪨' } as const
+const BLOCKER_ICONS = { banana: '🍌', swarm: '🐝', snake: '🐍', web: '🕸️' } as const
 
 /** Blockers with a kit sprite draw it; the rest fall back to their emoji. */
 const blockerHtml = (kind: keyof typeof BLOCKER_ICONS) =>
@@ -94,49 +107,73 @@ function tileLatLng(tile: TileId): LatLng | null {
 
 const tileGems = () => new Map([...props.state.gemTiles].map(([gem, tile]) => [tile, gem]))
 
-/** Tile popups are built when opened, so they always show the latest state. */
-function tilePopup(tile: TileId): HTMLElement {
-  const info = props.board.tiles.get(tile)
-  const root = document.createElement('div')
-  root.className = 'tile-popup'
-  const kind =
-    info?.kind === 'red' ? 'Minigame tile' : info?.kind === 'shop' ? 'Shop' : 'Board tile'
-  add(root, 'strong', `${kind} · #${tile}`)
-
-  const challengeId = props.state.tileChallenges.get(tile)
-  const challenge = challengeId && props.challenges.get(challengeId)
-  if (challenge && info?.kind !== 'shop') {
-    add(root, 'p', challenge.name).className = 'tile-popup-title'
-    add(root, 'p', challenge.description)
-  }
-  const gem = tileGems().get(tile)
-  if (gem) add(root, 'p', `The ${GEM_NAMES[gem]} (${gem} gem) is here`).className = 'tile-popup-gem'
-  const blocker = props.state.blockers.get(tile)
-  if (blocker) add(root, 'p', blockerName(blocker)).className = 'tile-popup-bad'
-
-  for (const team of props.state.teams.values()) {
-    if (team.position !== tile) continue
-    const line = add(root, 'p', `${team.name} is here`)
-    line.style.color = teamColor(team)
-    if (team.status.kind === 'working' && challenge) {
-      const instance = props.state.instances.get(team.status.instanceId)
-      const { done, needed } = challengeProgress(challenge, instance, team.id)
-      line.textContent += `: ${done}/${needed}`
-    }
-  }
-  if (info?.kind === 'shop') {
-    const button = add(root, 'button', 'See what’s for sale')
-    button.className = 'tile-popup-button'
-    button.addEventListener('click', () => emit('openShop', tile))
-  }
-  return root
+/** Each blocker's item, for its picture, and what it does to whoever meets it. */
+const BLOCKERS: Record<Blocker['kind'], { item: Item; text: (b: Blocker) => string }> = {
+  banana: { item: 'banana', text: () => 'slips the next team over it back a tile, frozen.' },
+  swarm: { item: 'harpie_bug_swarm', text: () => 'stops the next team that walks over it.' },
+  snake: { item: 'snake_charmer', text: () => 'sends the next team to land here back 5 tiles.' },
+  web: {
+    item: 'wilderness_web',
+    text: (b) => (b.kind === 'web' ? `blocks the way until ${clock(b.until)}.` : ''),
+  },
 }
 
-function add<K extends keyof HTMLElementTagNameMap>(parent: HTMLElement, tag: K, text: string) {
-  const el = document.createElement(tag)
-  el.textContent = text
-  parent.append(el)
-  return el
+/**
+ * What is on a tile, for its tooltip scene: the task, a gem, a blocker, the teams standing there.
+ * Rebuilt each time it is shown, so it is always current.
+ */
+function tileView(tile: Tile): TileView {
+  const continent = props.board.continents.find((c) => c.gem === tile.continent)
+  // Every tile has its task, the one a team landing here must complete to move on. The minigame
+  // a red tile starts is drawn at random on landing, so the theme only tells of its coming.
+  const challengeId = props.state.tileChallenges.get(tile.id)
+  const challenge = challengeId ? props.challenges.get(challengeId) : undefined
+  const blocker = props.state.blockers.get(tile.id)
+  const teams = [...props.state.teams.values()]
+    .filter((team) => team.position === tile.id)
+    .map((team) => {
+      const { status } = team
+      const instance =
+        status.kind === 'working' ? props.state.instances.get(status.instanceId) : undefined
+      const progress =
+        status.kind === 'working' && challenge
+          ? challengeProgress(challenge, instance, team.id)
+          : null
+      return {
+        name: team.name,
+        colour: teamColor(team),
+        done: progress?.done ?? null,
+        needed: progress?.needed ?? null,
+        finished: status.kind === 'ready' || status.kind === 'drawn',
+      }
+    })
+  return {
+    regionName: continent?.name ?? 'Uncharted lands',
+    regionGem: continent?.gem ?? null,
+    terrain: tile.sea ? null : terrainScene(tile),
+    task: challenge ? { name: challenge.name, description: challenge.description } : null,
+    gemHere: tileGems().get(tile.id) ?? null,
+    blocker: blocker
+      ? {
+          name: blockerName(blocker),
+          icon: itemEntry(BLOCKERS[blocker.kind].item).icon,
+          text: BLOCKERS[blocker.kind].text(blocker),
+          web: blocker.kind === 'web',
+        }
+      : null,
+    teams,
+  }
+}
+
+/** The tooltip's scene, drawn by Vue into an element Leaflet shows. */
+const sceneRoot = document.createElement('div')
+
+function drawScene(tile: Tile) {
+  const continent = props.board.continents.find((c) => c.gem === tile.continent)
+  render(
+    h(TileScene, { theme: tileTheme(tile, continent?.name ?? ''), view: tileView(tile) }),
+    sceneRoot,
+  )
 }
 
 function drawBoard(map: LeafletMap) {
@@ -146,8 +183,8 @@ function drawBoard(map: LeafletMap) {
     const to = tileLatLng(b)
     return from && to ? [[from, to]] : []
   })
-  polyline(roads, { color: '#000', weight: 4, opacity: 0.85, interactive: false }).addTo(map)
-  polyline(roads, { color: '#c8b98a', weight: 1.5, opacity: 0.95, interactive: false }).addTo(map)
+  polyline(roads, { color: '#000', weight: 5.5, opacity: 0.85, interactive: false }).addTo(map)
+  polyline(roads, { color: '#c8b98a', weight: 2.5, opacity: 0.95, interactive: false }).addTo(map)
   for (const tile of props.board.tiles.values()) {
     const at = tileLatLng(tile.id)
     if (!at) continue
@@ -158,21 +195,18 @@ function drawBoard(map: LeafletMap) {
           html: '<span class="tt-sprite tt-icon-coins"></span>',
           iconSize: [24, 24],
         }),
-        title: 'Shop',
-      })
-        .bindPopup(() => tilePopup(tile.id))
-        .addTo(map)
+        interactive: false,
+      }).addTo(map)
       continue
     }
     circleMarker(at, {
-      radius: tile.kind === 'red' ? 5 : 3,
+      radius: tile.kind === 'red' ? 8 : 6,
       color: '#000',
       weight: 1.5,
       fillColor: TILE_COLORS[tile.kind],
       fillOpacity: 1,
-    })
-      .bindPopup(() => tilePopup(tile.id))
-      .addTo(map)
+      interactive: false,
+    }).addTo(map)
   }
 }
 
@@ -188,11 +222,9 @@ function drawPieces() {
         html: `<div class="gem-marker tt-sprite tt-gem-${gem}" style="--gem:var(--gem-${gem}-glow)"></div>`,
         iconSize: [21, 23],
       }),
-      title: `${GEM_NAMES[gem]} (${gem} gem)`,
       zIndexOffset: 500,
-    })
-      .bindPopup(() => tilePopup(tile))
-      .addTo(pieces)
+      interactive: false,
+    }).addTo(pieces)
   }
   for (const [tile, blocker] of props.state.blockers) {
     const at = tileLatLng(tile)
@@ -203,18 +235,18 @@ function drawPieces() {
         html: blockerHtml(blocker.kind),
         iconSize: [20, 20],
       }),
-      title: blockerName(blocker),
       zIndexOffset: 400,
-    })
-      .bindPopup(() => tilePopup(tile))
-      .addTo(pieces)
+      interactive: false,
+    }).addTo(pieces)
   }
 }
 
-/** Highlights where a drawn card can take the team, or where an item can be placed. */
+/**
+ * Highlights where an item can be placed, or the walk's next steps as yellow squares. Further
+ * checkpoints and where the walk can finish are left for the player to work out.
+ */
 function drawReach() {
   reachLayer.clearLayers()
-  const color = props.myTeam ? teamColor(props.myTeam) : '#ffff00'
   if (props.targetTiles) {
     for (const tile of props.targetTiles) {
       const at = tileLatLng(tile)
@@ -229,71 +261,128 @@ function drawReach() {
     }
     return
   }
-  if (!props.reach) return
-  for (const tile of props.reach.onAnyWalk) {
-    if (props.reach.ends.has(tile)) continue
-    const at = tileLatLng(tile)
-    if (at)
-      circleMarker(at, {
-        radius: 4,
-        color,
-        weight: 1,
-        opacity: 0.5,
-        fillOpacity: 0.25,
-        interactive: false,
-      }).addTo(reachLayer)
-  }
-  for (const tile of props.reach.ends) {
+  const options = props.options
+  if (!options) return
+  for (const tile of options.near) {
     const at = tileLatLng(tile)
     if (!at) continue
     marker(at, {
-      icon: divIcon({
-        className: '',
-        html: '<div class="dest-ring"></div>',
-        iconSize: [18, 18],
-      }),
+      icon: divIcon({ className: '', html: '<div class="dest-ring"></div>', iconSize: [20, 20] }),
       interactive: false,
+      zIndexOffset: 800,
     }).addTo(reachLayer)
   }
 }
 
+const toPoints = (tiles: readonly TileId[]) =>
+  tiles.map(tileLatLng).filter((p): p is LatLng => p !== null)
+
+/** A square on the map holding a number: the steps still to walk. */
+function counter(at: LatLng, text: string, color: string, ghost = false) {
+  return marker(at, {
+    icon: divIcon({
+      className: '',
+      html: `<div class="route-end${ghost ? ' ghost' : ''}" style="--team:${color}">${text}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 40],
+    }),
+    interactive: false,
+    // Above the team pieces (1000), which sit on the start tile.
+    zIndexOffset: ghost ? 1600 : 1500,
+  })
+}
+
+/**
+ * The walk being built: a solid line through the checkpoints so far, the stretch a click would add
+ * as a dashed preview, and the steps left in a square over the end of each.
+ */
 function drawRoute() {
   routeLayer.clearLayers()
   const route = props.route
-  if (!route || route.length < 2) return
-  const points = route.map(tileLatLng).filter((p): p is LatLng => p !== null)
+  if (!route) return
   const color = props.myTeam ? teamColor(props.myTeam) : '#ffff00'
-  polyline(points, { color: '#000', weight: 8, opacity: 0.7, interactive: false }).addTo(routeLayer)
-  polyline(points, {
-    color,
-    weight: 4,
-    dashArray: '8 6',
-    className: 'route-line',
-    interactive: false,
-  }).addTo(routeLayer)
+  const points = toPoints(route)
+  if (points.length >= 2) {
+    polyline(points, { color: '#000', weight: 11, opacity: 0.75, interactive: false }).addTo(
+      routeLayer,
+    )
+    polyline(points, { color, weight: 7, interactive: false }).addTo(routeLayer)
+  }
+  for (const n of props.checkpoints) {
+    const tile = route[n - 1]
+    const at = tile === undefined ? null : tileLatLng(tile)
+    if (at)
+      marker(at, {
+        icon: divIcon({
+          className: '',
+          html: '<div class="checkpoint"></div>',
+          iconSize: [14, 14],
+        }),
+        interactive: false,
+        zIndexOffset: 850,
+      }).addTo(routeLayer)
+  }
+  const preview = props.preview
   const end = points.at(-1)
-  if (!end) return
-  marker(end, {
-    icon: divIcon({
-      className: '',
-      html: `<div class="route-end" style="--team:${color}">${route.length - 1}</div>`,
-      iconSize: [26, 26],
-    }),
-    interactive: false,
-    zIndexOffset: 900,
-  }).addTo(routeLayer)
+  if (preview) {
+    const kept = sharedLength(route, preview)
+    const dropped = toPoints(route.slice(kept - 1))
+    if (dropped.length >= 2)
+      polyline(dropped, { color: '#000', weight: 8, opacity: 0.7, interactive: false }).addTo(
+        routeLayer,
+      )
+    const ghost = toPoints(preview.slice(kept - 1))
+    if (ghost.length >= 2) {
+      polyline(ghost, { color: '#000', weight: 9, opacity: 0.5, interactive: false }).addTo(
+        routeLayer,
+      )
+      polyline(ghost, {
+        color,
+        weight: 5,
+        dashArray: '6 6',
+        className: 'route-line',
+        interactive: false,
+      }).addTo(routeLayer)
+    }
+    const tip = ghost.at(-1)
+    const left = props.stepsLeft + route.length - preview.length
+    if (tip) counter(tip, String(left), color, true).addTo(routeLayer)
+  }
+  if (end) counter(end, String(props.stepsLeft), color).addTo(routeLayer)
 }
 
-/** Tiles the pointer can pick: item targets, or anywhere a walk can go. */
+/**
+ * Tiles the pointer can pick: item targets, the next checkpoints, the route (to walk back along
+ * it), or tiles reached by walking back first.
+ */
 function pickable(): Iterable<TileId> | null {
   if (props.targetTiles) return props.targetTiles
-  if (props.reach) return [...props.reach.onAnyWalk, ...props.reach.ends]
+  const o = props.options
+  if (o) return [...o.near, ...o.far, ...o.reroute, ...(props.route ?? [])]
   return null
+}
+
+/**
+ * A click while picking: the nearest pickable node within reach. Otherwise it shows what is on
+ * the nearest node, for touch screens that can't hover.
+ */
+function onClick(e: LeafletMouseEvent) {
+  if (!pickable()) return showInfo(tileNear(e, props.board.tiles.keys()))
+  const tile = tileUnder(e)
+  const { x, y } = e.containerPoint
+  click.value = { x, y, key: Date.now(), color: tile === null ? 'red' : 'yellow' }
+  showInfo(tile)
+  if (tile !== null) emit('pick', tile)
 }
 
 function tileUnder(e: LeafletMouseEvent): TileId | null {
   const candidates = pickable()
-  if (!candidates || !leaflet) return null
+  return candidates ? tileNear(e, candidates) : null
+}
+
+/** The nearest of `candidates` within reach of the pointer. */
+function tileNear(e: LeafletMouseEvent, candidates: Iterable<TileId>): TileId | null {
+  if (!leaflet) return null
   const map = leaflet
   const position = (tile: TileId) => {
     const at = tileLatLng(tile)
@@ -305,6 +394,36 @@ function tileUnder(e: LeafletMouseEvent): TileId | null {
   return tile
 }
 
+/** The node whose contents the tooltip shows, so it is only rebuilt when that changes. */
+let infoTile: TileId | null = null
+const infoTip = tooltip({ direction: 'top', offset: [0, -10], className: 'tile-tip', opacity: 1 })
+
+function showInfo(tile: TileId | null, refresh = false) {
+  if (tile === infoTile && !refresh) return
+  infoTile = tile
+  const at = tile === null ? null : tileLatLng(tile)
+  if (!leaflet || tile === null || !at) return void infoTip.remove()
+  // Clear of what marks the tile: the shop's coins stand taller than a node.
+  const lift = props.board.tiles.get(tile)?.kind === 'shop' ? 16 : 10
+  infoTip.options.direction = 'top'
+  infoTip.options.offset = point(0, -lift)
+  const info = props.board.tiles.get(tile)
+  if (!info) return void infoTip.remove()
+  drawScene(info)
+  infoTip.setLatLng(at).setContent(sceneRoot)
+  if (!leaflet.hasLayer(infoTip)) infoTip.addTo(leaflet)
+  // Near the top edge it would run under the standings strip, so it hangs below the node instead.
+  const height = infoTip.getElement()?.offsetHeight ?? 0
+  if (leaflet.latLngToContainerPoint(at).y - lift - height < TIP_TOP_CLEARANCE) {
+    infoTip.options.direction = 'bottom'
+    infoTip.options.offset = point(0, lift)
+    infoTip.update()
+  }
+}
+
+/** Room the standings strip takes along the top of the map, plus the tooltip's pointer. */
+const TIP_TOP_CLEARANCE = 76
+
 // --- Team pieces, animated every frame from the choreography. ---
 
 function ensureTeamMarker(map: LeafletMap, team: Team) {
@@ -313,11 +432,11 @@ function ensureTeamMarker(map: LeafletMap, team: Team) {
   const el = spriteElement(teamColor(team), team.name)
   const m = marker(latLng(0, 0), {
     icon: divIcon({ className: 'sprite-icon', html: el, iconSize: [32, 38], iconAnchor: [16, 34] }),
-    title: team.name,
     zIndexOffset: 1000,
-    keyboard: true,
+    // Clicks go through to the node underneath, so a piece never hides its tile. Teams are
+    // followed from the standings and the inset map instead.
+    interactive: false,
   })
-  m.on('click', () => emit('select', team.id))
   m.addTo(map)
   entry = { marker: m, el, pose: '' }
   teamMarkers.set(team.id, entry)
@@ -433,8 +552,9 @@ function renderFrame() {
     } else m.setLatLng(at)
   }
 
-  // Follow camera: ease towards the selected team instead of jumping.
-  if (props.follow && props.selected !== null) {
+  // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
+  // moving the view would cut the flight short.
+  if (props.follow && props.selected !== null && !flying) {
     const target = placed.get(props.selected)
     if (target) {
       const centre = map.getCenter()
@@ -476,67 +596,94 @@ onMounted(() => {
   const map = createMap(container.value, {
     crs,
     minZoom: -3,
-    maxZoom: 5,
+    // The pixel-art map only: past zoom 2 one of its pixels would cover more than 8 screen pixels.
+    maxZoom: 2,
     zoomSnap: 0.25,
     zoomDelta: 0.5,
     wheelPxPerZoomLevel: 90,
-    maxBounds: bounds.pad(0.15),
-    maxBoundsViscosity: 0.8,
+    maxBounds: bounds,
+    maxBoundsViscosity: 1,
     attributionControl: false,
     zoomControl: false,
     preferCanvas: true,
   })
-  // Pixel art at the bottom, the detailed map above it once zoomed in, then the board.
-  map.createPane('detail').style.zIndex = '250'
+  // Always the pixel-art map; the board is drawn over it at fixed pixel sizes.
   imageOverlay(worldMap.imageUrl, bounds, { className: 'pixel-map', pane: 'tilePane' }).addTo(map)
-  const detail = tileLayer('', {
-    pane: 'detail',
-    minZoom: DETAIL_ZOOM,
-    maxZoom: 5,
-    minNativeZoom: -2,
-    maxNativeZoom: 5,
-    noWrap: true,
-    bounds,
-    className: 'detail-map',
-  })
-  detail.getTileUrl = explvTileUrl
-  detail.addTo(map)
 
-  map.fitBounds(bounds)
+  // The map always fills the view: zooming out stops where it just covers it, and panning stops at
+  // its edges, so no background ever shows. Fully zoomed out it centres itself, as "All" does.
+  const fillView = () => map.setMinZoom(map.getBoundsZoom(bounds, true))
+  fillView()
+  map.on('resize', fillView)
+  map.setView(bounds.getCenter(), map.getMinZoom())
+  // Only zooming out lands in the overview; a flight to a team never does. Every wheel tick stops
+  // a running glide, even at full zoom-out, so the overview waits until the wheel is quiet, and
+  // scrolling out further there brings it back if a tick cut it short.
+  const atMin = () => map.getZoom() <= map.getMinZoom() + 0.001
+  let overviewTimer: ReturnType<typeof setTimeout> | undefined
+  const overviewSoon = () => {
+    clearTimeout(overviewTimer)
+    overviewTimer = setTimeout(() => atMin() && showAll(), OVERVIEW_QUIET_MS)
+  }
+  let zoomedFrom = map.getZoom()
+  map.on('zoomstart', () => (zoomedFrom = map.getZoom()))
+  map.on('zoomend', () => {
+    if (!flying && atMin() && zoomedFrom > map.getZoom()) overviewSoon()
+  })
+  container.value.addEventListener(
+    'wheel',
+    (e) => {
+      if (e.deltaY > 0 && atMin()) overviewSoon()
+    },
+    { passive: true },
+  )
   drawBoard(map)
   reachLayer.addTo(map)
   routeLayer.addTo(map)
   pieces.addTo(map)
   cueLayer.addTo(map)
   drawPieces()
+  drawReach()
+  drawRoute()
 
   map.on('dragstart', () => emit('freeRoam'))
   map.on('moveend zoomend', emitView)
+  // Hover reports only changes, and null as soon as the pointer is off every node.
+  let hovered: TileId | null = null
+  const hover = (tile: TileId | null) => {
+    if (tile === hovered) return
+    hovered = tile
+    emit('hover', tile)
+  }
   map.on('mousemove', (e: LeafletMouseEvent) => {
     const tile = tileUnder(e)
-    if (tile !== null) emit('hover', tile)
+    hover(tile)
+    map.getContainer().style.cursor = tile === null ? '' : 'pointer'
+    showInfo(tile ?? tileNear(e, props.board.tiles.keys()))
   })
-  map.on('click', (e: LeafletMouseEvent) => {
-    const tile = tileUnder(e)
-    if (pickable()) {
-      const { x, y } = e.containerPoint
-      click.value = { x, y, key: Date.now(), color: tile === null ? 'red' : 'yellow' }
-    }
-    if (tile !== null) emit('pick', tile)
+  map.on('mouseout', () => {
+    hover(null)
+    showInfo(null)
   })
-  // While picking a route or a target, a click picks instead of opening tile details.
-  map.on('popupopen', () => {
-    if (pickable()) map.closePopup()
-  })
+  map.on('click', onClick)
   DomEvent.disableScrollPropagation(container.value)
   leaflet = map
   emitView()
   frame = requestAnimationFrame(renderFrame)
 })
 
-watch(() => props.state, drawPieces)
-watch(() => [props.reach, props.targetTiles, props.myTeam?.id], drawReach)
-watch(() => props.route, drawRoute)
+watch(
+  () => props.state,
+  () => {
+    drawPieces()
+    if (infoTile !== null) showInfo(infoTile, true)
+  },
+)
+watch(() => [props.options, props.targetTiles, props.myTeam?.id], drawReach)
+watch(
+  () => [props.route, props.preview, props.checkpoints, props.stepsLeft, props.myTeam?.id],
+  drawRoute,
+)
 watch(
   () => props.selected,
   () => {
@@ -545,6 +692,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  render(null, sceneRoot)
   cancelAnimationFrame(frame)
   teamMarkers.clear()
   cueMarkers.clear()
@@ -552,10 +700,35 @@ onBeforeUnmount(() => {
   leaflet = null
 })
 
-/** Pans and zooms to a tile. */
+/** How long the wheel must rest before zooming out all the way glides to the overview. */
+const OVERVIEW_QUIET_MS = 200
+
+/** How far past the full zoom-out a flight to a tile goes at least, so the piece reads clearly. */
+const LOCATE_ZOOM_IN = 1.5
+
+/** Pans and zooms to a tile, never zooming out. */
 function locate(tile: TileId, zoom = 1) {
+  const map = leaflet
   const at = tileLatLng(tile)
-  if (at) leaflet?.flyTo(at, Math.max(zoom, leaflet.getZoom()), { duration: 0.8 })
+  if (!map || !at) return
+  const target = Math.max(zoom, map.getMinZoom() + LOCATE_ZOOM_IN, map.getZoom())
+  fly(map, at, Math.min(target, map.getMaxZoom()))
+}
+
+/**
+ * A flight is on: the follow camera holds off, and its zoom changes are not the viewer zooming out
+ * (a flight dips out on its way, which would otherwise read as reaching the overview).
+ */
+let flying = false
+
+function fly(map: LeafletMap, at: LatLng, zoom: number) {
+  flying = true
+  // Ends the flight's way: arriving, or cut short by a drag.
+  map.once('moveend', () => (flying = false))
+  // At the same zoom it glides instead: a flight dips below the full zoom-out on its way, and the
+  // wheel ticks still coming in would then zoom back and cut it short.
+  if (Math.abs(zoom - map.getZoom()) < 0.001) map.panTo(at, { duration: 0.8 })
+  else map.flyTo(at, zoom, { duration: 0.8 })
 }
 
 /** Pans to a world position without changing zoom. */
@@ -567,8 +740,18 @@ function zoomBy(delta: number) {
   leaflet?.setZoom(leaflet.getZoom() + delta)
 }
 
+/**
+ * The overview: fully zoomed out and centred, from "All" or from zooming out as far as it goes. It
+ * ends following, which would otherwise pull the view off centre again.
+ */
 function showAll() {
-  leaflet?.flyToBounds(latLngBounds(imageBounds(worldMap)), { duration: 0.8 })
+  const map = leaflet
+  if (!map) return
+  const centre = latLngBounds(imageBounds(worldMap)).getCenter()
+  const off = map.latLngToContainerPoint(centre).distanceTo(map.getSize().divideBy(2))
+  if (off < 2 && map.getZoom() <= map.getMinZoom() + 0.001) return
+  emit('freeRoam')
+  fly(map, centre, map.getMinZoom())
 }
 
 defineExpose({ locate, panTo, zoomBy, showAll })
@@ -584,6 +767,7 @@ defineExpose({ locate, panTo, zoomBy, showAll })
       :x="click.x"
       :y="click.y"
       :play-key="click.key"
+      @done="click = null"
     />
   </div>
 </template>
@@ -596,68 +780,16 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 .board-map .pixel-map {
   image-rendering: pixelated;
 }
-.board-map .detail-map {
-  image-rendering: pixelated;
-}
-/* Popups read like the OSRS examine/right-click box. */
-.board-map .leaflet-popup-content-wrapper {
-  border: 3px solid #000;
-  border-radius: 0;
-  background: var(--tooltip-bg);
-  color: var(--osrs-white);
-  box-shadow: 6px 6px 0 #000;
-}
-.board-map .leaflet-popup-tip {
-  border: 3px solid #000;
-  background: var(--tooltip-bg);
+/* The tile tooltip is all scene (TileScene draws its own frame): no box, no pointer. */
+.board-map .leaflet-tooltip.tile-tip {
+  padding: 0;
+  border: 0;
+  background: none;
   box-shadow: none;
+  white-space: normal;
 }
-.board-map .leaflet-popup-content {
-  margin: 6px 9px;
-  font-family: var(--font-small);
-  font-size: 16px;
-  line-height: 1.125;
-  text-align: center;
-  text-shadow: 1px 1px 0 #000;
-}
-.board-map .leaflet-popup-content strong {
-  font-family: var(--font-bold);
-  font-weight: normal;
-  color: var(--osrs-orange);
-}
-.board-map .leaflet-popup-content p {
-  margin: 3px 0 0;
-}
-.board-map .leaflet-popup-close-button {
-  color: var(--osrs-yellow) !important;
-  font-family: var(--font-bold);
-}
-.board-map .tile-popup-title {
-  color: var(--osrs-yellow);
-}
-.board-map .tile-popup-gem {
-  color: var(--osrs-cyan);
-}
-.board-map .tile-popup-bad {
-  color: var(--osrs-red);
-}
-.board-map .tile-popup-button {
-  margin-top: 6px;
-  border: 3px solid #000;
-  background: var(--button-face);
-  box-shadow:
-    inset 3px 3px 0 var(--button-hi),
-    inset -3px -3px 0 var(--button-lo);
-  padding: 3px 9px;
-  color: var(--osrs-yellow);
-  font-family: var(--font-small);
-  font-size: 16px;
-  text-shadow: 1px 1px 0 #000;
-  cursor: pointer;
-}
-.board-map .tile-popup-button:hover {
-  color: var(--osrs-white);
-  filter: brightness(1.18);
+.board-map .leaflet-tooltip.tile-tip::before {
+  display: none;
 }
 .board-map .gem-marker {
   width: 21px;
@@ -689,8 +821,8 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 /* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   box-sizing: border-box;
   border: 3px solid var(--osrs-yellow);
   box-shadow:
@@ -712,10 +844,11 @@ defineExpose({ locate, panTo, zoomBy, showAll })
     stroke-dashoffset: -14;
   }
 }
+/* Steps left, in a square floating over the end of the route. */
 .board-map .route-end {
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   box-sizing: border-box;
   place-items: center;
   border: 3px solid #000;
@@ -725,10 +858,24 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   font-family: var(--font-bold);
   font-size: 16px;
 }
+/* The same square over the end of the hover preview: what would be left after that click. */
+.board-map .route-end.ghost {
+  background: var(--tooltip-bg);
+  color: var(--osrs-yellow);
+  text-shadow: 1px 1px 0 #000;
+  opacity: 0.9;
+}
+.board-map .checkpoint {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 3px solid #000;
+  background: var(--osrs-white);
+}
 
-/* Team pieces */
+/* Team pieces: clicks pass through to the node underneath. */
 .board-map .sprite-icon {
-  pointer-events: auto;
+  pointer-events: none;
 }
 .board-map .sprite {
   position: relative;
@@ -736,7 +883,6 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   height: 38px;
   transform: translateX(calc(var(--slot, 0) * 20px));
   transition: transform 0.3s;
-  cursor: pointer;
 }
 .board-map .sprite-body {
   position: absolute;

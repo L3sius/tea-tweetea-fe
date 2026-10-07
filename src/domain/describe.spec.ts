@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { Challenge } from './challenge'
-import { cardLabel, challengeProgress, describeEvent, itemName, observationText } from './describe'
+import {
+  cardLabel,
+  challengeProgress,
+  describeEvent,
+  effortText,
+  itemName,
+  observationText,
+} from './describe'
 import type { Instance } from './game'
 import { challengeId, instanceId, teamId, type ChallengeId, type TeamId } from './ids'
 
@@ -20,16 +27,17 @@ function challenge(goal: Challenge['goal'], bosses: string[]): Challenge {
     tags: [],
     criterion: { kind: 'kill_count', bosses },
     goal,
+    effort: { kind: 'kills', bosses },
   }
 }
 
-function instance(counts: Record<string, number>): Instance {
+function instance(done: number, target: number, effort: number | null = null): Instance {
   return {
     id: instanceId(1),
     challengeId: challengeId('c'),
     startedAt: new Date(0),
     scope: { kind: 'tile', teamId: red, tileId: 0 as never },
-    progress: new Map([[red, new Map(Object.entries(counts))]]),
+    progress: new Map([[red, { counts: new Map(), done, target, effort }]]),
     done: new Set(),
   }
 }
@@ -43,29 +51,53 @@ describe('cardLabel', () => {
 })
 
 describe('itemName', () => {
-  it('uses the rulebook spelling where it differs from the id', () => {
-    expect(itemName('owls_feather')).toBe("Owl's Feather")
-    expect(itemName('migrant_bird')).toBe('Migrant Bird')
+  it('uses the catalogue name', () => {
+    expect(itemName('bronze_feather')).toBe('Bronze feather')
+    expect(itemName('harp_of_rain')).toBe('Harp of Rain')
   })
 })
 
 describe('challengeProgress', () => {
-  it('caps a total goal at what it needs', () => {
-    const c = challenge({ kind: 'total', n: 5 }, ['Vorkath', 'Zulrah'])
-    expect(challengeProgress(c, instance({ Vorkath: 4, Zulrah: 3 }), red)).toEqual({
-      done: 5,
-      needed: 5,
-    })
+  it('takes the server’s own done and target', () => {
+    const c = challenge({ kind: 'each', n: 2 }, ['Vorkath', 'Zulrah'])
+    expect(challengeProgress(c, instance(3, 4), red)).toEqual({ done: 3, needed: 4 })
   })
 
-  it('counts every key of an each goal separately', () => {
+  it('needs every key of an each goal before the team has a standing', () => {
     const c = challenge({ kind: 'each', n: 2 }, ['Vorkath', 'Zulrah'])
-    expect(challengeProgress(c, instance({ Vorkath: 3 }), red)).toEqual({ done: 2, needed: 4 })
+    expect(challengeProgress(c, undefined, red)).toEqual({ done: 0, needed: 4 })
   })
 
   it('starts at zero without progress', () => {
     const c = challenge({ kind: 'total', n: 3 }, [])
     expect(challengeProgress(c, undefined, red)).toEqual({ done: 0, needed: 3 })
+  })
+})
+
+describe('effortText', () => {
+  const now = new Date(3 * 3_600_000 + 12 * 60_000)
+
+  it('counts kills, and shows nothing before an instance exists', () => {
+    const c = challenge({ kind: 'total', n: 1 }, ['Kalphite Queen'])
+    const i = instance(0, 1, 312)
+    expect(effortText(c, i, i.progress.get(red), now)).toBe('312 kills')
+    expect(effortText(c, undefined, undefined, now)).toBeNull()
+  })
+
+  it('shows the best time against the limit', () => {
+    const c: Challenge = {
+      ...challenge({ kind: 'total', n: 1 }, []),
+      criterion: { kind: 'timed_kill', boss: 'TzTok-Jad', maxSeconds: 26 * 60 },
+      effort: { kind: 'best_time', boss: 'TzTok-Jad' },
+    }
+    const i = instance(0, 1, 27 * 60 + 14)
+    expect(effortText(c, i, i.progress.get(red), now)).toBe('best 27:14 / 26:00')
+    expect(effortText(c, instance(0, 1), undefined, now)).toBe('no time yet')
+  })
+
+  it('counts time on the task for elapsed effort', () => {
+    const c: Challenge = { ...challenge({ kind: 'total', n: 1 }, []), effort: { kind: 'elapsed' } }
+    expect(effortText(c, instance(0, 1), undefined, now)).toBe('working 3h 12m')
   })
 })
 
@@ -105,8 +137,8 @@ describe('observationText', () => {
 describe('articles', () => {
   it('uses "an" before a vowel', () => {
     expect(
-      describeEvent({ kind: 'item_used', teamId: red, item: 'owls_feather', target: null }, names),
-    ).toBe("Red used an Owl's Feather")
+      describeEvent({ kind: 'item_used', teamId: red, item: 'ice_barrage', target: null }, names),
+    ).toBe('Red used an Ice Barrage')
     expect(observationText({ kind: 'clue', tier: 'elite', items: [], region: null })).toBe(
       'opened an elite clue casket',
     )

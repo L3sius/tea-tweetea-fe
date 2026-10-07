@@ -105,15 +105,15 @@ export const useDevStore = defineStore('dev', () => {
       (t) => ({ kind: 'dev_draw_card', teamId: t, card }),
       () => `${name()} drew the chosen card.`,
     )
-  /** A held Monk's Pendant blocks the freeze and is used up, as with any other freeze. */
+  /** A held Protect from Magic blocks the freeze and is used up, as with any other freeze. */
   const freeze = (hours: number) => {
     const t = teamId.value === null ? null : game.state?.teams.get(teamId.value)
-    const pendant = (t?.items.get('monks_pendant') ?? 0) > 0
+    const protect = (t?.items.get('protect_from_magic') ?? 0) > 0
     return withTeam(
       (id) => ({ kind: 'dev_freeze', teamId: id, hours }),
       () =>
-        pendant
-          ? `${name()}’s Monk’s Pendant blocked the freeze.`
+        protect
+          ? `${name()}’s Protect from Magic blocked the freeze.`
           : `${name()} is frozen for ${hours}h.`,
     )
   }

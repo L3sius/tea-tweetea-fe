@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { CLUE_TIERS, GEMS, ITEMS, PHASES, SUITS, TILE_KINDS } from '@/domain/vocabulary'
+import { CA_TIERS, CLUE_TIERS, GEMS, ITEMS, PHASES, SUITS, TILE_KINDS } from '@/domain/vocabulary'
 
 export const Id = z.int().nonnegative()
 export const Timestamp = z.iso.datetime()
@@ -10,6 +10,7 @@ export const Item = z.enum(ITEMS)
 export const TileKind = z.enum(TILE_KINDS)
 export const Phase = z.enum(PHASES)
 export const ClueTier = z.enum(CLUE_TIERS)
+export const CaTier = z.enum(CA_TIERS)
 
 /**
  * JSON object keys are always strings, so maps keyed by a numeric id arrive as `{ "17": ... }`.

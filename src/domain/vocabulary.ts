@@ -17,34 +17,46 @@ export type Phase = (typeof PHASES)[number]
 export const CLUE_TIERS = ['any', 'beginner', 'easy', 'medium', 'hard', 'elite', 'master'] as const
 export type ClueTier = (typeof CLUE_TIERS)[number]
 
+export const CA_TIERS = ['easy', 'medium', 'hard', 'elite', 'master', 'grandmaster'] as const
+export type CaTier = (typeof CA_TIERS)[number]
+
 export const ITEMS = [
-  'owls_feather',
-  'migrant_bird',
-  'phoenix_feather',
+  'bronze_feather',
+  'silver_feather',
+  'gold_feather',
   'harp_of_rain',
-  'bird_whistle',
-  'whale_whistle',
-  'turtle_whistle',
-  'royal_ring',
-  'banana_peel',
-  'bee_whistle',
-  'snake_whistle',
-  'giants_lamp',
-  'sleeping_potion',
-  'monks_ring',
-  'monks_pendant',
-  'club_hat',
-  'heart_glove',
-  'diamond_boot',
-  'spade_boot',
-  'blue_bell',
-  'green_bell',
-  'purple_bell',
-  'red_bell',
-  'yellow_bell',
-  'orange_bell',
-  'pink_bell',
-  'white_bell',
+  'quetzal_whistle',
+  'ogre_boat',
+  'group_teleport',
+  'banana',
+  'harpie_bug_swarm',
+  'snake_charmer',
+  'wilderness_web',
+  'ice_barrage',
+  'entangle',
+  'protect_from_magic',
+  'leprechaun_hat',
+  'saturated_heart',
+  'sapphire_necklace',
+  'emerald_necklace',
+  'dragon_necklace',
+  'ruby_necklace',
+  'gold_necklace',
+  'zenyte_necklace',
+  'topaz_necklace',
+  'diamond_necklace',
   'mystery_box',
 ] as const
 export type Item = (typeof ITEMS)[number]
+
+/** The necklace that protects each gem in a lost match, in gem order. */
+export const NECKLACES = {
+  blue: 'sapphire_necklace',
+  green: 'emerald_necklace',
+  purple: 'dragon_necklace',
+  red: 'ruby_necklace',
+  yellow: 'gold_necklace',
+  orange: 'zenyte_necklace',
+  pink: 'topaz_necklace',
+  white: 'diamond_necklace',
+} as const satisfies Record<Gem, Item>

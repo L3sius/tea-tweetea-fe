@@ -2,9 +2,10 @@
 import type { Drop, Observation } from './activity'
 import type { Challenge, Criterion } from './challenge'
 import type { GameEvent } from './events'
-import type { Blocker, Card, Effect, Instance, Team } from './game'
+import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
-import type { Item, Suit } from './vocabulary'
+import { itemEntry } from './items'
+import { NECKLACES, type Item, type Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   clubs: '♣',
@@ -20,36 +21,19 @@ export function cardLabel(card: Card): string {
   return `${FACES[card.rank] ?? String(card.rank)}${SUIT_SYMBOLS[card.suit]}`
 }
 
-/** Names as the rulebook gives them; the rest are the item id in title case. */
-const ITEM_NAMES: Partial<Record<Item, string>> = {
-  owls_feather: "Owl's Feather",
-  phoenix_feather: "Phoenix's Feather",
-  harp_of_rain: 'Harp to Call Rain',
-  bird_whistle: 'Whistle to Call a Bird',
-  whale_whistle: 'Whistle to Call a Whale',
-  turtle_whistle: "Turtle Handler's Whistle",
-  royal_ring: "Royal Family's Ring",
-  bee_whistle: 'Whistle to Call a Bee',
-  snake_whistle: 'Whistle to Call a Snake',
-  giants_lamp: "Giant's Lamp",
-  monks_ring: "Monk's Ring",
-  monks_pendant: "Monk's Pendant",
-}
-
-export function itemName(item: Item): string {
-  return ITEM_NAMES[item] ?? titleCase(item.replaceAll('_', ' '))
-}
+/** The item's name from the server's catalogue. */
+export const itemName = (item: Item): string => itemEntry(item).name
 
 export function blockerName(blocker: Blocker): string {
   switch (blocker.kind) {
     case 'banana':
-      return 'Banana peel'
-    case 'bees':
-      return 'Bees'
+      return 'Banana'
+    case 'swarm':
+      return 'Harpie bug swarm'
     case 'snake':
-      return 'Snake'
-    case 'rock':
-      return 'Rock'
+      return 'Snake charmer'
+    case 'web':
+      return 'Wilderness web'
   }
 }
 
@@ -90,7 +74,7 @@ function progressKeys(criterion: Criterion): string[] {
     case 'pet':
       return criterion.pets
     case 'combat_achievement':
-      return criterion.tasks
+      return criterion.tasks.map((task) => task.name)
     case 'timed_kill':
       return [criterion.boss]
   }
@@ -98,23 +82,56 @@ function progressKeys(criterion: Criterion): string[] {
 
 export type Progress = { done: number; needed: number }
 
-/** How far a team is through a challenge, counting each contribution up to what the goal needs. */
+/**
+ * How far a team is through a challenge: the server's own `done / target`. Before the team has a
+ * standing on the instance, nothing is done and the goal says what is needed.
+ */
 export function challengeProgress(
   challenge: Challenge,
   instance: Instance | undefined,
   team: TeamId,
 ): Progress {
-  const counts = instance?.progress.get(team) ?? new Map<string, number>()
+  const standing = instance?.progress.get(team)
+  if (standing) return { done: standing.done, needed: standing.target }
   const { goal } = challenge
-  if (goal.kind === 'total') {
-    const sum = [...counts.values()].reduce((a, b) => a + b, 0)
-    return { done: Math.min(sum, goal.n), needed: goal.n }
+  const keys = goal.kind === 'each' ? progressKeys(challenge.criterion).length : 1
+  return { done: 0, needed: goal.n * Math.max(keys, 1) }
+}
+
+/**
+ * The effort a team has spent on a task, as a short label ("312 kills", "best 27:14 / 26:00",
+ * "working 3h 12m"), or null when there is no instance to measure. It never decides completion.
+ */
+export function effortText(
+  challenge: Challenge,
+  instance: Instance | undefined,
+  standing: TeamProgress | undefined,
+  now: Date,
+): string | null {
+  if (!instance) return null
+  const effort = standing?.effort ?? null
+  const { criterion } = challenge
+  switch (challenge.effort.kind) {
+    case 'kills':
+    case 'loots':
+      return plural(effort ?? 0, 'kill')
+    case 'caskets':
+      return plural(effort ?? 0, 'casket')
+    case 'best_time': {
+      const limit = criterion.kind === 'timed_kill' ? ` / ${duration(criterion.maxSeconds)}` : ''
+      return effort === null ? 'no time yet' : `best ${duration(effort)}${limit}`
+    }
+    case 'elapsed':
+      return `working ${elapsed(now.getTime() - instance.startedAt.getTime())}`
   }
-  const keys = progressKeys(challenge.criterion)
-  const counted = keys.length > 0 ? keys : [...counts.keys()]
-  const needed = goal.n * Math.max(counted.length, 1)
-  const done = counted.reduce((sum, key) => sum + Math.min(counts.get(key) ?? 0, goal.n), 0)
-  return { done, needed }
+}
+
+const plural = (n: number, noun: string) => `${n} ${noun}${n === 1 ? '' : 's'}`
+
+const elapsed = (ms: number) => {
+  const minutes = Math.max(0, Math.floor(ms / 60_000))
+  const hours = Math.floor(minutes / 60)
+  return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`
 }
 
 /** What a team is doing right now, in a few words. */
@@ -184,8 +201,6 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.teamId)} was teleported`
     case 'trap_triggered':
       return `${team(event.teamId)} hit ${a(blockerName(event.trap).toLowerCase())}`
-    case 'tile_restarted':
-      return `${team(event.teamId)} has to restart its tile`
     case 'tile_completed':
       return `${team(event.teamId)} completed a tile`
     case 'gem_collected':
@@ -194,8 +209,8 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.teamId)} lost the ${event.gem} gem`
     case 'gem_stolen':
       return `${team(event.to)} stole the ${event.gem} gem from ${team(event.from)}`
-    case 'bell_used':
-      return `${team(event.teamId)} rang the ${event.gem} bell`
+    case 'necklace_used':
+      return `${team(event.teamId)}’s ${itemName(NECKLACES[event.gem])} saved the ${event.gem} gem`
     case 'shop_opened':
       return `${team(event.teamId)} entered a shop`
     case 'bought':
@@ -203,9 +218,18 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'item_gained':
       return `${team(event.teamId)} got ${a(itemName(event.item))}`
     case 'item_lost':
-      return event.reason === 'blocked a freeze'
-        ? `${team(event.teamId)}’s ${itemName(event.item)} blocked a freeze`
-        : `${team(event.teamId)} lost ${a(itemName(event.item))}`
+      switch (event.reason) {
+        case 'blocked a freeze':
+          return `${team(event.teamId)}’s ${itemName(event.item)} blocked a freeze`
+        case 'inventory full':
+          return `${team(event.teamId)}’s inventory was full, so ${a(itemName(event.item))} was lost`
+        // Told by `item_used` and `necklace_used`.
+        case 'used':
+        case 'protected a gem':
+          return null
+        default:
+          return `${team(event.teamId)} lost ${a(itemName(event.item))}`
+      }
     case 'item_used':
       return `${team(event.teamId)} used ${a(itemName(event.item))}`
     case 'gold_changed':
@@ -216,12 +240,10 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.by)} placed ${a(blockerName(event.blocker).toLowerCase())}`
     case 'blocker_removed':
       return null
-    case 'boot_started':
-      return `${team(event.owner)} put on a ${event.suit} boot until ${clock(event.until)}`
-    case 'boot_ended':
-      return 'The boot wore off'
     case 'frozen':
       return `${team(event.teamId)} is frozen until ${clock(event.until)}`
+    case 'shielded':
+      return `${team(event.teamId)} is shielded from hostile items until ${clock(event.until)}`
     case 'thawed':
       return `${team(event.teamId)} thawed out`
     case 'random_event':
@@ -280,5 +302,3 @@ export const clock = (date: Date) =>
 
 /** "a" or "an", by how the word is spelled, which covers every name in the game. */
 const a = (word: string) => `${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`
-
-const titleCase = (text: string) => text.replace(/\b\w/g, (c) => c.toUpperCase())

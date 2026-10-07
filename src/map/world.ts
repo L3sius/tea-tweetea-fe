@@ -56,3 +56,10 @@ export function toMapPixel(map: WorldMap, x: number, y: number): { px: number; p
   const t = map.tilesPerPixel
   return { px: (x + 0.5 - map.xMin) / t, py: (map.yMax + 0.5 - y) / t }
 }
+
+/**
+ * The map around a land tile, cut ahead of time by `scripts/terrain-scenes.py` and served with the
+ * app: one small image per tile, fetched the first time its tooltip shows.
+ */
+export const terrainScene = (tile: { x: number; y: number }) =>
+  `${import.meta.env.BASE_URL}terrain/${tile.x}_${tile.y}.webp`

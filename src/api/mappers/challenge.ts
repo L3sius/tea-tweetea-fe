@@ -1,4 +1,11 @@
-import type { Challenge, ClueFilter, Criterion, LootFilter, Sources } from '@/domain/challenge'
+import type {
+  Challenge,
+  ClueFilter,
+  Criterion,
+  Effort,
+  LootFilter,
+  Sources,
+} from '@/domain/challenge'
 import { challengeId, type ChallengeId } from '@/domain/ids'
 import type { WireChallenge, WireChallenges } from '../wire/challenge'
 
@@ -47,12 +54,21 @@ function toCriterion(wire: WireCriterion): Criterion {
       return { kind: 'clue', tier: wire.tier, filter: toClueFilter(wire.filter) }
     case 'timed_kill':
       return { kind: 'timed_kill', boss: wire.boss, maxSeconds: wire.max_seconds }
+    case 'combat_achievement':
+      return {
+        kind: 'combat_achievement',
+        tasks: wire.tasks.map((task) => ({ ...task, monster: task.monster ?? null })),
+      }
     case 'kill_count':
     case 'slayer':
     case 'pet':
-    case 'combat_achievement':
       return wire
   }
+}
+
+function toEffort(wire: WireChallenge['effort']): Effort {
+  if (!wire) return { kind: 'elapsed' }
+  return wire.kind === 'loots' ? { kind: 'loots', sources: toSources(wire.sources) } : wire
 }
 
 export function toChallenge(wire: WireChallenge): Challenge {
@@ -64,6 +80,7 @@ export function toChallenge(wire: WireChallenge): Challenge {
     tags: wire.tags ?? [],
     criterion: toCriterion(wire.criterion),
     goal: wire.goal,
+    effort: toEffort(wire.effort),
   }
 }
 

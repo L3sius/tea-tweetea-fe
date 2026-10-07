@@ -24,9 +24,9 @@ export type WireEffect = z.infer<typeof WireEffect>
 
 export const WireBlocker = z.discriminatedUnion('blocker', [
   z.object({ blocker: z.literal('banana') }),
-  z.object({ blocker: z.literal('bees') }),
+  z.object({ blocker: z.literal('swarm') }),
   z.object({ blocker: z.literal('snake') }),
-  z.object({ blocker: z.literal('rock'), until: Timestamp }),
+  z.object({ blocker: z.literal('web'), until: Timestamp }),
 ])
 export type WireBlocker = z.infer<typeof WireBlocker>
 
@@ -80,6 +80,7 @@ export const WireTeam = z.object({
   position: Id,
   status: Status,
   frozen_until: Timestamp.nullable(),
+  shield_until: Timestamp.nullable(),
   match_id: Id.nullable(),
   gems: z.array(Gem),
   gold: z.number(),
@@ -102,11 +103,20 @@ const Scope = z.discriminatedUnion('scope', [
   z.object({ scope: z.literal('match'), id: Id }),
 ])
 
+/** One team's standing on an instance, sent whole in every `progress` event. */
+export const WireTeamProgress = z.object({
+  counts: z.record(z.string(), z.number()),
+  done: z.number(),
+  target: z.number(),
+  effort: z.number().nullable(),
+})
+export type WireTeamProgress = z.infer<typeof WireTeamProgress>
+
 export const WireInstance = z.object({
   challenge: z.string(),
   started: Timestamp,
   scope: Scope,
-  progress: idKeyed(z.record(z.string(), z.number())),
+  progress: idKeyed(WireTeamProgress),
   done: z.array(Id),
 })
 export type WireInstance = z.infer<typeof WireInstance>
@@ -156,7 +166,6 @@ export const WireState = z.object({
   /** Gem tile per gem, indexed in gem order. */
   gems: z.array(Id).length(GEMS.length),
   blockers: idKeyed(WireBlocker),
-  boot: z.object({ owner: Id, suit: Suit, until: Timestamp }).nullable(),
   instances: idKeyed(WireInstance),
   minigames: idKeyed(WireMinigame),
   matches: idKeyed(WireMatch),

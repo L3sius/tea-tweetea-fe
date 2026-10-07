@@ -7,6 +7,10 @@ export type Tile = {
   x: number
   y: number
   kind: TileKind
+  /** The gem of the continent the tile belongs to. */
+  continent: Gem
+  /** On water: the Ogre boat works here, the Quetzal whistle doesn't. */
+  sea: boolean
 }
 
 export type Road = readonly [TileId, TileId]

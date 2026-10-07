@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ClueTier } from './primitives'
+import { CaTier, ClueTier } from './primitives'
 
 const Sources = z.union([z.literal('any'), z.array(z.string())])
 
@@ -33,7 +33,25 @@ const Criterion = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('timed_kill'), boss: z.string(), max_seconds: z.number() }),
   z.object({ kind: z.literal('slayer'), tasks: z.array(z.string()) }),
   z.object({ kind: z.literal('pet'), pets: z.array(z.string()) }),
-  z.object({ kind: z.literal('combat_achievement'), tasks: z.array(z.string()) }),
+  z.object({
+    kind: z.literal('combat_achievement'),
+    tasks: z.array(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        tier: CaTier,
+        monster: z.string().nullish(),
+      }),
+    ),
+  }),
+])
+
+const Effort = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('kills'), bosses: z.array(z.string()) }),
+  z.object({ kind: z.literal('loots'), sources: Sources }),
+  z.object({ kind: z.literal('caskets'), tier: ClueTier }),
+  z.object({ kind: z.literal('best_time'), boss: z.string() }),
+  z.object({ kind: z.literal('elapsed') }),
 ])
 
 const Goal = z.discriminatedUnion('kind', [
@@ -49,6 +67,8 @@ export const WireChallenge = z.object({
   tags: z.array(z.string()).optional(),
   criterion: Criterion,
   goal: Goal,
+  /** `/challenges` always fills it in. */
+  effort: Effort.nullish(),
 })
 export type WireChallenge = z.infer<typeof WireChallenge>
 

@@ -1,7 +1,7 @@
-import type { Blocker, Card, Effect, Payout, Scoring } from './game'
+import type { Blocker, Card, Effect, Payout, Scoring, TeamProgress } from './game'
 import type { ChallengeId, InstanceId, MatchId, MinigameId, TeamId, TileId } from './ids'
 import type { ItemTarget } from './commands'
-import type { Gem, Item, Suit } from './vocabulary'
+import type { Gem, Item } from './vocabulary'
 
 /** Something that happened in the game, in the order it happened within one command. */
 export type GameEvent =
@@ -19,15 +19,24 @@ export type GameEvent =
   | { kind: 'landed'; teamId: TeamId; tileId: TileId; instanceId: InstanceId }
   | { kind: 'teleported'; teamId: TeamId; from: TileId; to: TileId }
   | { kind: 'trap_triggered'; teamId: TeamId; tileId: TileId; trap: Blocker; to: TileId }
-  | { kind: 'tile_restarted'; teamId: TeamId; instanceId: InstanceId }
   // Tasks
-  | { kind: 'progress'; instanceId: InstanceId; teamId: TeamId; key: string; total: number }
+  | {
+      kind: 'progress'
+      instanceId: InstanceId
+      teamId: TeamId
+      /** What counted and how much; null with `amount` 0 when only the effort changed. */
+      key: string | null
+      amount: number
+      /** The team's whole standing after it, to replace the old one. */
+      progress: TeamProgress
+    }
   | { kind: 'tile_completed'; teamId: TeamId; tileId: TileId }
   // Gems
   | { kind: 'gem_collected'; teamId: TeamId; gem: Gem; tileId: TileId }
   | { kind: 'gem_lost'; teamId: TeamId; gem: Gem }
   | { kind: 'gem_stolen'; from: TeamId; to: TeamId; gem: Gem }
-  | { kind: 'bell_used'; teamId: TeamId; gem: Gem }
+  /** A necklace kept the gem in a lost match; it is used up. */
+  | { kind: 'necklace_used'; teamId: TeamId; gem: Gem }
   // Shops and items
   | { kind: 'shop_opened'; teamId: TeamId; tileId: TileId }
   | { kind: 'shop_closed'; teamId: TeamId }
@@ -39,9 +48,8 @@ export type GameEvent =
   // Board effects
   | { kind: 'blocker_placed'; tileId: TileId; blocker: Blocker; by: TeamId }
   | { kind: 'blocker_removed'; tileId: TileId }
-  | { kind: 'boot_started'; owner: TeamId; suit: Suit; until: Date }
-  | { kind: 'boot_ended' }
   | { kind: 'frozen'; teamId: TeamId; until: Date }
+  | { kind: 'shielded'; teamId: TeamId; until: Date }
   | { kind: 'thawed'; teamId: TeamId }
   | {
       kind: 'random_event'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toMapPixel, worldMap } from './world'
+import { terrainScene, toMapPixel, worldMap } from './world'
 
 describe('toMapPixel', () => {
   it('puts the top-left world tile at the top-left corner', () => {
@@ -16,5 +16,11 @@ describe('toMapPixel', () => {
     expect(py).toBeGreaterThan(0)
     expect(py).toBeLessThan(worldMap.height)
     expect(Math.floor(px)).toBe((3222 - worldMap.xMin) / worldMap.tilesPerPixel)
+  })
+})
+
+describe('terrainScene', () => {
+  it('names the cut by the tile’s world position', () => {
+    expect(terrainScene({ x: 2386, y: 3747 })).toMatch(/terrain\/2386_3747\.webp$/)
   })
 })

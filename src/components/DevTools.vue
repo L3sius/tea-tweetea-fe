@@ -15,7 +15,7 @@ const game = useGameStore()
 const my = useTeamStore()
 
 const open = ref(false)
-const item = ref<Item>('owls_feather')
+const item = ref<Item>('bronze_feather')
 const rank = ref(7)
 const suit = ref<Suit | 'joker'>('diamonds')
 

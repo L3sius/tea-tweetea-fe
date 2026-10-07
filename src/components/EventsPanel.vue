@@ -44,6 +44,8 @@ function bars(
 
 function minigameRow(m: Minigame) {
   const { challenge, bars: list } = bars(m.instanceId)
+  // Contribution minigames count up to the per-team cap rather than to the task's target.
+  const cap = m.scoring.kind === 'contribution' ? m.scoring.cap : null
   const places = new Map(m.finished.map((id, i) => [props.names.team(id), i + 1]))
   return {
     key: `minigame-${m.id}`,
@@ -58,6 +60,7 @@ function minigameRow(m: Minigame) {
     deadline: m.deadline,
     bars: list.map((b) => ({
       ...b,
+      ...(cap === null ? {} : { done: Math.min(b.done, cap), needed: cap }),
       note: places.get(b.name) !== undefined ? `#${places.get(b.name)}` : b.note,
     })),
     result: m.payouts
@@ -111,22 +114,14 @@ const past = computed(() =>
       .map(matchRow),
   ].sort((a, b) => b.deadline.getTime() - a.deadline.getTime()),
 )
-
-const boot = computed(() => props.state.boot)
 </script>
 
 <template>
   <TtPanel title="Events" width="100%" :padding="12" :gap="12" class="min-h-full">
     <TtText as="h3" :size="2" color="orange">Happening now</TtText>
-    <TtText v-if="live.length === 0 && !boot" :size="1" color="muted">
+    <TtText v-if="live.length === 0" :size="1" color="muted">
       No minigames or matches right now. Landing on a red tile opens one.
     </TtText>
-    <div v-if="boot" class="tt-sprite-display flex w-full flex-col items-center gap-1 px-2">
-      <TtText :size="2" color="cyan">{{ names.team(boot.owner) }}'s {{ boot.suit }} boot</TtText>
-      <TtText :size="1" color="white">
-        Other teams only move on {{ boot.suit }}. Ends {{ timeFrom(boot.until, now) }}.
-      </TtText>
-    </div>
     <ul class="flex w-full flex-col gap-2">
       <li
         v-for="row in live"

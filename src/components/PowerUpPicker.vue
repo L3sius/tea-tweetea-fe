@@ -2,12 +2,13 @@
 import { onClickOutside } from '@vueuse/core'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { itemName } from '@/domain/describe'
+import type { Tile } from '@/domain/board'
 import type { Team } from '@/domain/game'
 import {
   INVENTORY_LIMIT,
   ITEM_GROUP,
   ITEM_GROUPS,
-  ITEM_INFO,
+  itemEntry,
   inventorySize,
   whyNotUsable,
 } from '@/domain/items'
@@ -18,6 +19,8 @@ import ItemSlot from './ItemSlot.vue'
 
 const props = defineProps<{
   team: Team
+  /** The tile the team stands on, for items that only work on land or at sea. */
+  here?: Tile
   now: Date
   pending: boolean
   /** Locked items are listed but the menu says why they can't be used yet. */
@@ -38,10 +41,10 @@ const items = computed(() =>
         item,
         count,
         name: itemName(item),
-        text: ITEM_INFO[item].text,
+        text: itemEntry(item).description,
         group: ITEM_GROUPS[group],
         held: group === 'held',
-        why: whyNotUsable(props.team, item, props.now),
+        why: whyNotUsable(props.team, item, props.now, props.here),
       }
     }),
 )

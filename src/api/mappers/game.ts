@@ -13,6 +13,7 @@ import type {
   Pause,
   Scoring,
   Team,
+  TeamProgress,
   TeamStatus,
 } from '@/domain/game'
 import {
@@ -38,6 +39,7 @@ import type {
   WireStatus,
   WireTarget,
   WireTeam,
+  WireTeamProgress,
 } from '../wire/game'
 import { byGemOrder, mapIdKeyed, toDate, toDateOrNull } from './shared'
 
@@ -60,7 +62,7 @@ export function toEffect(wire: WireEffect): Effect {
 }
 
 export const toBlocker = (wire: WireBlocker): Blocker =>
-  wire.blocker === 'rock' ? { kind: 'rock', until: toDate(wire.until) } : { kind: wire.blocker }
+  wire.blocker === 'web' ? { kind: 'web', until: toDate(wire.until) } : { kind: wire.blocker }
 
 export const toScoring = (wire: WireScoring): Scoring =>
   wire.type === 'race'
@@ -131,6 +133,7 @@ export function toTeam(wire: WireTeam): Team {
     position: tileId(wire.position),
     status: toStatus(wire.status),
     frozenUntil: toDateOrNull(wire.frozen_until),
+    shieldUntil: toDateOrNull(wire.shield_until),
     matchId: wire.match_id === null ? null : matchId(wire.match_id),
     gems: new Set(wire.gems),
     gold: wire.gold,
@@ -159,13 +162,20 @@ function toScope(wire: WireInstance['scope']): InstanceScope {
   }
 }
 
+export const toTeamProgress = (wire: WireTeamProgress): TeamProgress => ({
+  counts: new Map(Object.entries(wire.counts)),
+  done: wire.done,
+  target: wire.target,
+  effort: wire.effort,
+})
+
 export function toInstance(wire: WireInstance, id: InstanceId): Instance {
   return {
     id,
     challengeId: challengeId(wire.challenge),
     startedAt: toDate(wire.started),
     scope: toScope(wire.scope),
-    progress: mapIdKeyed(wire.progress, teamId, (keys) => new Map(Object.entries(keys))),
+    progress: mapIdKeyed(wire.progress, teamId, toTeamProgress),
     done: new Set(wire.done.map(teamId)),
   }
 }
@@ -220,11 +230,6 @@ export function toGameState(wire: WireState): GameState {
     tileChallenges: new Map(wire.tiles.map((id, index) => [tileId(index), challengeId(id)])),
     gemTiles: new Map([...byGemOrder(wire.gems)].map(([gem, id]) => [gem, tileId(id)])),
     blockers: mapIdKeyed(wire.blockers, tileId, toBlocker),
-    boot: wire.boot && {
-      owner: teamId(wire.boot.owner),
-      suit: wire.boot.suit,
-      until: toDate(wire.boot.until),
-    },
     instances: mapIdKeyed(wire.instances, instanceId, (value, id) =>
       toInstance(value, instanceId(id)),
     ),

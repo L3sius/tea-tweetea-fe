@@ -115,8 +115,11 @@ watch(
   },
 )
 
-function onHover(tile: TileId) {
-  if (!my.targeting) my.previewRoute(tile)
+/** The walk is shown while the captain picks checkpoints, not while an item waits for a target. */
+const picking = computed(() => !my.targeting && !dev.pickingTile && my.drawPhase === 'idle')
+
+function onHover(tile: TileId | null) {
+  my.previewTo(picking.value ? tile : null)
 }
 
 /** Every tile, while the dev tools wait for a teleport destination. */
@@ -125,7 +128,7 @@ const allTiles = computed(() => new Set(board.value?.tiles.keys() ?? []))
 function onPick(tile: TileId) {
   if (dev.pickingTile) void dev.teleport(tile)
   else if (my.targeting?.kind === 'tile') void my.useOn({ kind: 'tile', tileId: tile })
-  else my.previewRoute(tile, true)
+  else my.checkpoint(tile)
 }
 
 /** The shopping team, when this browser manages one that can buy right now. */
@@ -171,16 +174,17 @@ function locateMine() {
         :selected="selected"
         :follow="follow"
         :my-team="my.team"
-        :route="my.route"
-        :reach="my.targeting || my.drawPhase !== 'idle' ? null : my.reach"
+        :route="picking ? my.path : null"
+        :checkpoints="my.checkpoints"
+        :preview="picking ? my.preview : null"
+        :steps-left="my.stepsLeft"
+        :options="picking ? my.options : null"
         :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
         @hover="onHover"
         @pick="onPick"
-        @select="selectTeam"
         @free-roam="freeRoam"
         @view="view = $event"
-        @open-shop="openShop"
       />
 
       <!-- Standings strip -->
@@ -217,7 +221,11 @@ function locateMine() {
 
       <!-- Alerts -->
       <div class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3">
-        <AlertToasts :alerts="alerts" @dismiss="game.dismiss" />
+        <AlertToasts
+          :alerts="alerts"
+          @dismiss="game.dismiss"
+          @open-events="(id) => (game.dismiss(id), openTab('events'))"
+        />
       </div>
 
       <!-- Follow / free roam -->
@@ -262,7 +270,7 @@ function locateMine() {
           <TtButton
             size="sm"
             class="map-btn"
-            title="Show the whole map"
+            title="Zoom all the way out"
             @click="boardMap?.showAll()"
           >
             All

@@ -1,6 +1,14 @@
 import { z } from 'zod'
-import { WireBlocker, WireCard, WireEffect, WirePayout, WireScoring, WireTarget } from './game'
-import { Gem, Id, Item, Suit, Timestamp } from './primitives'
+import {
+  WireBlocker,
+  WireCard,
+  WireEffect,
+  WirePayout,
+  WireScoring,
+  WireTarget,
+  WireTeamProgress,
+} from './game'
+import { Gem, Id, Item, Timestamp } from './primitives'
 
 const event = <T extends string, S extends z.ZodRawShape>(type: T, shape: S) =>
   z.object({ type: z.literal(type), ...shape })
@@ -18,13 +26,19 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('landed', { team: Id, tile: Id, instance: Id }),
   event('teleported', { team: Id, from: Id, to: Id }),
   event('trap_triggered', { team: Id, tile: Id, trap: WireBlocker, to: Id }),
-  event('tile_restarted', { team: Id, instance: Id }),
-  event('progress', { instance: Id, team: Id, key: z.string(), total: z.number() }),
+  // `key` is empty (null or "") and `amount` 0 when only the effort changed.
+  event('progress', {
+    instance: Id,
+    team: Id,
+    key: z.string().nullable(),
+    amount: z.number(),
+    progress: WireTeamProgress,
+  }),
   event('tile_completed', { team: Id, tile: Id }),
   event('gem_collected', { team: Id, gem: Gem, tile: Id }),
   event('gem_lost', { team: Id, gem: Gem }),
   event('gem_stolen', { from: Id, to: Id, gem: Gem }),
-  event('bell_used', { team: Id, gem: Gem }),
+  event('necklace_used', { team: Id, gem: Gem }),
   event('shop_opened', { team: Id, tile: Id }),
   event('shop_closed', { team: Id }),
   event('bought', { team: Id, item: Item, price: z.number() }),
@@ -34,9 +48,8 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('gold_changed', { team: Id, delta: z.number(), total: z.number(), reason: z.string() }),
   event('blocker_placed', { tile: Id, blocker: WireBlocker, by: Id }),
   event('blocker_removed', { tile: Id }),
-  event('boot_started', { owner: Id, suit: Suit, until: Timestamp }),
-  event('boot_ended', {}),
   event('frozen', { team: Id, until: Timestamp }),
+  event('shielded', { team: Id, until: Timestamp }),
   event('thawed', { team: Id }),
   event('random_event', {
     team: Id,

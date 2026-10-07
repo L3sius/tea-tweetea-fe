@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
-import { INVENTORY_LIMIT, ITEM_INFO, SHOP_PRICES, inventorySize } from '@/domain/items'
+import { INVENTORY_LIMIT, SHOP_PRICES, inventorySize, itemEntry } from '@/domain/items'
 import { ITEMS, type Item } from '@/domain/vocabulary'
 import { TtButton, TtDisplayBox, TtPanel, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
@@ -25,7 +25,7 @@ const rows = computed(() =>
         : inventorySize(props.buyer) >= INVENTORY_LIMIT
           ? 'Inventory full'
           : null
-    return [{ item, name: itemName(item), text: ITEM_INFO[item].text, price, why }]
+    return [{ item, name: itemName(item), text: itemEntry(item).description, price, why }]
   }),
 )
 

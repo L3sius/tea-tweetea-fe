@@ -13,6 +13,7 @@ function team(status: TeamStatus, overrides: Partial<Team> = {}): Team {
     position: tileId(1),
     status,
     frozenUntil: null,
+    shieldUntil: null,
     matchId: null,
     gems: new Set(),
     gold: 100,
@@ -34,13 +35,13 @@ const ready = team({ kind: 'ready' })
 
 describe('whyNotUsable', () => {
   it('allows power-ups between finishing the tile and drawing', () => {
-    expect(whyNotUsable(ready, 'owls_feather', NOW)).toBeNull()
-    expect(whyNotUsable(ready, 'sleeping_potion', NOW)).toBeNull()
+    expect(whyNotUsable(ready, 'bronze_feather', NOW)).toBeNull()
+    expect(whyNotUsable(ready, 'ice_barrage', NOW)).toBeNull()
   })
 
   it('locks power-ups while the tile is unfinished', () => {
     const working = team({ kind: 'working', instanceId: instanceId(1) })
-    expect(whyNotUsable(working, 'owls_feather', NOW)).toBe('Finish your tile first')
+    expect(whyNotUsable(working, 'bronze_feather', NOW)).toBe('Finish your tile first')
   })
 
   it('is too late once the card is drawn, even though the server would allow a feather', () => {
@@ -51,23 +52,39 @@ describe('whyNotUsable', () => {
       length: 4,
       destinations: [],
     })
-    expect(whyNotUsable(drawn, 'owls_feather', NOW)).toBe('Too late: the card is drawn')
+    expect(whyNotUsable(drawn, 'bronze_feather', NOW)).toBe('Too late: the card is drawn')
   })
 
   it('allows one item per tile', () => {
     const used = team({ kind: 'ready' }, { effects: { ...ready.effects, itemUsedHere: true } })
-    expect(whyNotUsable(used, 'owls_feather', NOW)).toMatch(/Already used/)
+    expect(whyNotUsable(used, 'bronze_feather', NOW)).toMatch(/Already used/)
   })
 
   it('locks everything while frozen or in a match, even when ready', () => {
     const frozen = team({ kind: 'ready' }, { frozenUntil: new Date(NOW.getTime() + 60_000) })
-    expect(whyNotUsable(frozen, 'owls_feather', NOW)).toBe('Not while frozen')
+    expect(whyNotUsable(frozen, 'bronze_feather', NOW)).toBe('Not while frozen')
     const fighting = team({ kind: 'ready' }, { matchId: matchId(1) })
-    expect(whyNotUsable(fighting, 'owls_feather', NOW)).toBe('Not during a match')
+    expect(whyNotUsable(fighting, 'bronze_feather', NOW)).toBe('Not during a match')
   })
 
-  it('treats bells and the Monk’s Pendant as kept, not used', () => {
-    expect(whyNotUsable(ready, 'blue_bell', NOW)).toBe('Works while held')
-    expect(whyNotUsable(ready, 'monks_pendant', NOW)).toBe('Works while held')
+  it('treats necklaces and Protect from Magic as kept, not used', () => {
+    expect(whyNotUsable(ready, 'sapphire_necklace', NOW)).toBe('Works while held')
+    expect(whyNotUsable(ready, 'protect_from_magic', NOW)).toBe('Works while held')
+  })
+
+  it('lets the Quetzal whistle work on land and the Ogre boat at sea only', () => {
+    const land = {
+      id: tileId(1),
+      x: 0,
+      y: 0,
+      kind: 'normal',
+      continent: 'blue',
+      sea: false,
+    } as const
+    const sea = { ...land, sea: true }
+    expect(whyNotUsable(ready, 'quetzal_whistle', NOW, land)).toBeNull()
+    expect(whyNotUsable(ready, 'quetzal_whistle', NOW, sea)).toBe('Only works on land')
+    expect(whyNotUsable(ready, 'ogre_boat', NOW, sea)).toBeNull()
+    expect(whyNotUsable(ready, 'ogre_boat', NOW, land)).toBe('Only works at sea')
   })
 })

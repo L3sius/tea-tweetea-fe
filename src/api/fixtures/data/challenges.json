@@ -1,20 +1,4 @@
 {
-  "ca-noxious-foe": {
-    "id": "ca-noxious-foe",
-    "name": "Noxious Foe",
-    "description": "Complete the Noxious Foe combat achievement",
-    "est_hours": 0.5,
-    "criterion": {
-      "kind": "combat_achievement",
-      "tasks": [
-        "Noxious Foe"
-      ]
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    }
-  },
   "beginner-clue-9-cabbage": {
     "id": "beginner-clue-9-cabbage",
     "name": "Cabbages",
@@ -32,25 +16,10 @@
     "goal": {
       "kind": "total",
       "n": 1
-    }
-  },
-  "elite-clue-150k-200k": {
-    "id": "elite-clue-150k-200k",
-    "name": "Clue Value Reward",
-    "description": "Complete an elite clue worth between 150k and 200k",
-    "est_hours": 2.5,
-    "criterion": {
-      "kind": "clue",
-      "tier": "elite",
-      "filter": {
-        "by": "value",
-        "min_gp": 150000,
-        "max_gp": 200000
-      }
     },
-    "goal": {
-      "kind": "total",
-      "n": 1
+    "effort": {
+      "kind": "caskets",
+      "tier": "beginner"
     }
   },
   "dagannoth-task": {
@@ -67,6 +36,9 @@
     "goal": {
       "kind": "total",
       "n": 1
+    },
+    "effort": {
+      "kind": "elapsed"
     }
   },
   "any-drop-1m": {
@@ -86,37 +58,86 @@
     "goal": {
       "kind": "total",
       "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": "any"
     }
   },
-  "fight-caves-26m": {
-    "id": "fight-caves-26m",
-    "name": "Fight Caves",
-    "description": "Complete the Fight Caves in under 26 minutes",
-    "est_hours": 1.5,
+  "elite-clue-150k-200k": {
+    "id": "elite-clue-150k-200k",
+    "name": "Clue Value Reward",
+    "description": "Complete an elite clue worth between 150k and 200k",
+    "est_hours": 2.5,
     "criterion": {
-      "kind": "timed_kill",
-      "boss": "TzTok-Jad",
-      "max_seconds": 1560
+      "kind": "clue",
+      "tier": "elite",
+      "filter": {
+        "by": "value",
+        "min_gp": 150000,
+        "max_gp": 200000
+      }
     },
     "goal": {
       "kind": "total",
       "n": 1
+    },
+    "effort": {
+      "kind": "caskets",
+      "tier": "elite"
     }
   },
-  "sire-50": {
-    "id": "sire-50",
-    "name": "Abyssal Sire",
-    "description": "Kill the Abyssal Sire 50 times",
-    "est_hours": 2,
+  "any-raid-pet": {
+    "id": "any-raid-pet",
+    "name": "Raid Pet",
+    "description": "Obtain any raid pet",
+    "est_hours": 400,
     "criterion": {
-      "kind": "kill_count",
-      "bosses": [
-        "Abyssal Sire"
+      "kind": "pet",
+      "pets": [
+        "Olmlet",
+        "Lil' zik",
+        "Tumeken's guardian"
       ]
     },
     "goal": {
       "kind": "total",
-      "n": 50
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Chambers of Xeric",
+        "Theatre of Blood",
+        "Tombs of Amascut"
+      ]
+    }
+  },
+  "ca-noxious-foe": {
+    "id": "ca-noxious-foe",
+    "name": "Noxious Foe",
+    "description": "Complete the Noxious Foe combat achievement",
+    "est_hours": 0.5,
+    "criterion": {
+      "kind": "combat_achievement",
+      "tasks": [
+        {
+          "name": "Noxious Foe",
+          "description": "Kill an Aberrant Spectre.",
+          "tier": "easy",
+          "monster": "Aberrant Spectre"
+        }
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Aberrant spectre"
+      ]
     }
   },
   "kq-dragon-pickaxe": {
@@ -145,24 +166,12 @@
     "goal": {
       "kind": "total",
       "n": 1
-    }
-  },
-  "any-raid-pet": {
-    "id": "any-raid-pet",
-    "name": "Raid Pet",
-    "description": "Obtain any raid pet",
-    "est_hours": 400,
-    "criterion": {
-      "kind": "pet",
-      "pets": [
-        "Olmlet",
-        "Lil' zik",
-        "Tumeken's guardian"
-      ]
     },
-    "goal": {
-      "kind": "total",
-      "n": 1
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Kalphite Queen"
+      ]
     }
   },
   "malediction-ward": {
@@ -199,6 +208,55 @@
     "goal": {
       "kind": "each",
       "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Chaos Fanatic",
+        "Crazy archaeologist",
+        "Scorpia"
+      ]
+    }
+  },
+  "sire-50": {
+    "id": "sire-50",
+    "name": "Abyssal Sire",
+    "description": "Kill the Abyssal Sire 50 times",
+    "est_hours": 2,
+    "criterion": {
+      "kind": "kill_count",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 50
+    },
+    "effort": {
+      "kind": "kills",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    }
+  },
+  "fight-caves-26m": {
+    "id": "fight-caves-26m",
+    "name": "Fight Caves",
+    "description": "Complete the Fight Caves in under 26 minutes",
+    "est_hours": 1.5,
+    "criterion": {
+      "kind": "timed_kill",
+      "boss": "TzTok-Jad",
+      "max_seconds": 1560
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "best_time",
+      "boss": "TzTok-Jad"
     }
   }
 }

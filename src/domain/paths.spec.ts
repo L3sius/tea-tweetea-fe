@@ -21,13 +21,13 @@ const adj = adjacency([
 const none = new Set<TileId>()
 
 /** Checks a path follows the server's rule. */
-function isValid(path: TileId[], length: number, rocks = none) {
+function isValid(path: TileId[], length: number, webs = none) {
   if (path.length !== length + 1) return false
   for (const [i, tile] of path.entries()) {
     if (i === 0) continue
     if (!adj.get(path[i - 1] ?? tile)?.includes(tile)) return false
     if (i >= 2 && tile === path[i - 2]) return false
-    if (rocks.has(tile)) return false
+    if (webs.has(tile)) return false
   }
   return true
 }
@@ -59,12 +59,93 @@ describe('Walks', () => {
     expect(isValid(path ?? [], 5)).toBe(true)
   })
 
-  it('routes around rocks', () => {
-    const rocks = new Set(t(4))
-    const walks = new Walks(adj, rocks, tileId(0), 4)
+  it('routes around webs', () => {
+    const webs = new Set(t(4))
+    const walks = new Walks(adj, webs, tileId(0), 4)
     const path = walks.through(tileId(6))
     expect(path).toEqual(t(0, 1, 2, 3, 6))
     expect(walks.through(tileId(4))).toBeNull()
+  })
+})
+
+describe('Walks checkpoints', () => {
+  it('offers the next step, further checkpoints and where the walk can end', () => {
+    const { near, far, ends } = new Walks(adj, none, tileId(0), 3).options(t(0))
+    expect([...near]).toEqual(t(1))
+    expect([...far].sort()).toEqual(t(2, 3, 4, 5, 7).sort())
+    expect([...ends].sort()).toEqual(t(3, 5, 7).sort())
+  })
+
+  it('never offers turning straight back', () => {
+    const { near } = new Walks(adj, none, tileId(0), 4).options(t(0, 1, 2))
+    expect(near.has(tileId(1))).toBe(false)
+  })
+
+  it('leaves out tiles that would strand the walk', () => {
+    // Two steps left at 2: the dead end 7 has nowhere to go for the last step.
+    const { near, far } = new Walks(adj, none, tileId(0), 4).options(t(0, 1, 2))
+    expect([...near]).toEqual(t(3))
+    expect(far.has(tileId(7))).toBe(false)
+  })
+
+  it('fills in the shortest stretch to a far checkpoint', () => {
+    const walks = new Walks(adj, none, tileId(0), 3)
+    expect(walks.extend(t(0), tileId(5))).toEqual(t(1, 4, 5))
+    expect(walks.extend(t(0), tileId(6))).toBeNull()
+  })
+
+  it('allows going round a loop back onto a visited tile', () => {
+    const walks = new Walks(adj, none, tileId(0), 7)
+    const path = t(0, 1, 2, 3, 6, 5, 4)
+    expect(walks.extend(path, tileId(1))).toEqual(t(1))
+    const full = [...path, tileId(1)]
+    expect(walks.stepsLeft(full)).toBe(0)
+    expect(isValid(full, 7)).toBe(true)
+  })
+
+  it('offers nothing once a walk cannot be finished', () => {
+    // At the dead end 7 with steps left: no way on.
+    const { near, far } = new Walks(adj, none, tileId(0), 5).options(t(0, 1, 2, 7))
+    expect(near.size + far.size).toBe(0)
+  })
+})
+
+describe('Walks.walkTo', () => {
+  it('extends forward like a checkpoint', () => {
+    const walks = new Walks(adj, none, tileId(0), 4)
+    expect(walks.walkTo(t(0), tileId(2))).toEqual(t(0, 1, 2))
+  })
+
+  it('undoes steps when walking back along the route', () => {
+    const walks = new Walks(adj, none, tileId(0), 4)
+    expect(walks.walkTo(t(0, 1, 2, 3), tileId(1))).toEqual(t(0, 1))
+    expect(walks.walkTo(t(0, 1, 2, 3), tileId(0))).toEqual(t(0))
+  })
+
+  it('backs up and branches off when that is the shortest way', () => {
+    // From 0-1-2, 4 is two clicks away by undoing 2; going on round the loop would be too long.
+    const walks = new Walks(adj, none, tileId(0), 4)
+    expect(walks.walkTo(t(0, 1, 2), tileId(4))).toEqual(t(0, 1, 4))
+    expect(walks.options(t(0, 1, 2)).reroute.has(tileId(4))).toBe(true)
+  })
+
+  it('never leaves a route that cannot be finished', () => {
+    // 0-1-2-7 is a dead end with steps left over, so it is not offered even though it is close.
+    const walks = new Walks(adj, none, tileId(0), 5)
+    expect(walks.walkTo(t(0, 1, 2, 3), tileId(7))).toBeNull()
+    expect(walks.options(t(0, 1, 2, 3)).reroute.has(tileId(7))).toBe(false)
+  })
+
+  it('does not reroute through webs', () => {
+    const walks = new Walks(adj, new Set(t(4)), tileId(0), 5)
+    expect(walks.walkTo(t(0, 1, 2), tileId(5))).toEqual(t(0, 1, 2, 3, 6, 5))
+  })
+
+  it('goes round a loop onto a route tile when that is shorter than walking back', () => {
+    const walks = new Walks(adj, none, tileId(0), 7)
+    const path = walks.walkTo(t(0, 1, 4, 5, 6, 3), tileId(1))
+    expect(path).toEqual(t(0, 1, 4, 5, 6, 3, 2, 1))
+    expect(isValid(path ?? [], 7)).toBe(true)
   })
 })
 

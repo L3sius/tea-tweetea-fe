@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { Alert } from '@/stores/game'
-import { TtText } from '@/ui/tt'
+import { TtButton, TtText } from '@/ui/tt'
 
 defineProps<{ alerts: readonly Alert[] }>()
-const emit = defineEmits<{ dismiss: [id: string] }>()
+const emit = defineEmits<{ dismiss: [id: string]; openEvents: [id: string] }>()
 
 const TITLE_COLOR = {
   minigame: 'var(--osrs-orange)',
   match: 'var(--osrs-red)',
   gem: 'var(--gem-purple-glow)',
   end: 'var(--osrs-green)',
+  item: 'var(--osrs-yellow)',
 } as const
 </script>
 
@@ -30,9 +31,15 @@ const TITLE_COLOR = {
     >
       <TtText :size="2" :color="TITLE_COLOR[alert.tone]" glow>{{ alert.title }}</TtText>
       <TtText :size="1" color="white">{{ alert.text }}</TtText>
+      <!-- A minigame alert stays until the viewer acts on it. -->
+      <div v-if="alert.sticky" class="mt-1 flex flex-wrap justify-center gap-1.5">
+        <TtButton size="sm" @click="emit('openEvents', alert.id)">Go to Events</TtButton>
+        <TtButton size="sm" @click="emit('dismiss', alert.id)">Dismiss</TtButton>
+      </div>
       <button
+        v-else
         type="button"
-        class="tt-link tt-1 absolute -top-2 -right-2"
+        class="tt-link tt-1 absolute top-0 right-1.5"
         aria-label="Dismiss"
         @click="emit('dismiss', alert.id)"
       >

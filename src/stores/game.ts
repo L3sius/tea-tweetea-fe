@@ -4,11 +4,13 @@ import { describeProblem, isApiError, type StreamConnection, type StreamMessage 
 import type { FeedItem } from '@/domain/activity'
 import type { Board } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
-import type { Names } from '@/domain/describe'
+import { itemName, type Names } from '@/domain/describe'
 import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId } from '@/domain/ids'
+import { useItemCatalogue } from '@/domain/items'
 import { Choreography } from '@/domain/motion'
+import { NECKLACES } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 
 /** Journal entries kept for the game log; also how far back a reload looks for walks to resume. */
@@ -27,7 +29,26 @@ export type Alert = {
   id: string
   title: string
   text: string
-  tone: 'minigame' | 'match' | 'gem' | 'end'
+  tone: 'minigame' | 'match' | 'gem' | 'end' | 'item'
+  /** Stays until dismissed, or until the next sticky alert replaces it (a minigame opening). */
+  sticky?: boolean
+}
+
+const MAX_ALERTS = 4
+
+/**
+ * The alert list with `alert` added: a sticky alert replaces the previous sticky one, and only
+ * passing alerts are dropped (oldest first) to stay within MAX_ALERTS.
+ */
+export function withAlert(alerts: readonly Alert[], alert: Alert): Alert[] {
+  const kept = alert.sticky ? alerts.filter((a) => !a.sticky) : [...alerts]
+  const next = [...kept, alert]
+  while (next.length > MAX_ALERTS) {
+    const oldest = next.findIndex((a) => !a.sticky)
+    if (oldest < 0 || oldest === next.length - 1) break
+    next.splice(oldest, 1)
+  }
+  return next
 }
 
 /**
@@ -71,12 +92,16 @@ export const useGameStore = defineStore('game', () => {
     loading.value = true
     error.value = null
     try {
-      const [loadedBoard, loadedChallenges, loadedState, loadedFeed] = await Promise.all([
-        api.getBoard(),
-        api.getChallenges(),
-        api.getState(),
-        api.getFeed({ limit: FEED_LIMIT }),
-      ])
+      const [loadedBoard, loadedChallenges, loadedItems, loadedState, loadedFeed] =
+        await Promise.all([
+          api.getBoard(),
+          api.getChallenges(),
+          // Items still read well from the built-in copy if the catalogue can't be had.
+          api.getItems().catch(() => null),
+          api.getState(),
+          api.getFeed({ limit: FEED_LIMIT }),
+        ])
+      if (loadedItems) useItemCatalogue(loadedItems)
       board.value = loadedBoard
       challenges.value = loadedChallenges
       feed.value = loadedFeed
@@ -156,8 +181,8 @@ export const useGameStore = defineStore('game', () => {
           ? 0
           : Math.max(0, choreography.value.settlesAt(found.team) - serverNow())
       setTimeout(() => {
-        alerts.value = [...alerts.value, alert].slice(-4)
-        setTimeout(() => dismiss(alert.id), ALERT_MS)
+        alerts.value = withAlert(alerts.value, alert)
+        if (!alert.sticky) setTimeout(() => dismiss(alert.id), ALERT_MS)
       }, wait)
     }
   }
@@ -224,6 +249,7 @@ function alertFor(
           title: 'A minigame has opened!',
           text: `${names.team(event.initiator)} landed on a red tile: ${names.challenge(event.challengeId)}. Every team can join in.`,
           tone: 'minigame',
+          sticky: true,
         },
       }
     case 'minigame_closed':
@@ -270,8 +296,27 @@ function alertFor(
       return {
         team: event.teamId,
         alert: {
-          title: `The ${event.gem} gem is taken`,
-          text: `${names.team(event.teamId)} picked up the ${event.gem} gem.`,
+          title: `${names.team(event.teamId)} has the ${event.gem} gem`,
+          text: `${names.team(event.teamId)} collected its ${event.gem} gem.`,
+          tone: 'gem',
+        },
+      }
+    case 'item_lost':
+      if (event.reason !== 'inventory full') return null
+      return {
+        team: event.teamId,
+        alert: {
+          title: 'Inventory full',
+          text: `${names.team(event.teamId)} had no room, so ${itemName(event.item)} was lost.`,
+          tone: 'item',
+        },
+      }
+    case 'necklace_used':
+      return {
+        team: null,
+        alert: {
+          title: 'Saved by a necklace',
+          text: `${names.team(event.teamId)}'s ${itemName(NECKLACES[event.gem])} kept the ${event.gem} gem safe.`,
           tone: 'gem',
         },
       }

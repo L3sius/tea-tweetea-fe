@@ -21,13 +21,13 @@ describe('team requests', () => {
 
   it('includes an item target only when there is one', () => {
     const onTile = toWireTeamRequest(
-      { kind: 'use_item', item: 'banana_peel', target: { kind: 'tile', tileId: tileId(12) } },
+      { kind: 'use_item', item: 'banana', target: { kind: 'tile', tileId: tileId(12) } },
       1,
       'k',
     )
     expect(onTile).toMatchObject({ target: { target: 'tile', id: 12 } })
 
-    const onSelf = toWireTeamRequest({ kind: 'use_item', item: 'owls_feather' }, 1, 'k')
+    const onSelf = toWireTeamRequest({ kind: 'use_item', item: 'bronze_feather' }, 1, 'k')
     expect(onSelf).not.toHaveProperty('target')
   })
 })

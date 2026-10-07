@@ -9,7 +9,8 @@ import { ApiError } from '../errors'
 // of the main bundle.
 const files = import.meta.glob<string>('./data/*.json', { query: '?raw', import: 'default' })
 
-type FixtureName = 'board' | 'challenges' | 'state' | 'events' | 'feed' | `stats-by-${StatsGroup}`
+type FixtureName =
+  'board' | 'challenges' | 'items' | 'state' | 'events' | 'feed' | `stats-by-${StatsGroup}`
 
 export const FIXTURE_ADMIN_CODE = 'admin'
 const JOURNAL_PAGE_LIMIT = 500
@@ -55,6 +56,9 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
         endpoints.challenges.map,
         await load('challenges'),
       ),
+
+    getItems: async () =>
+      decode('fixture:items', endpoints.items.schema, endpoints.items.map, await load('items')),
 
     getState,
 

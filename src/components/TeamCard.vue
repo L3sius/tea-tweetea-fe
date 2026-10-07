@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Challenge } from '@/domain/challenge'
-import { challengeProgress, itemName, teamStatusText, type Names } from '@/domain/describe'
+import {
+  challengeProgress,
+  effortText,
+  itemName,
+  teamStatusText,
+  type Names,
+} from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId } from '@/domain/ids'
 import { GEMS } from '@/domain/vocabulary'
@@ -33,7 +39,8 @@ const task = computed(() => {
   const instance = props.state.instances.get(status.instanceId)
   const challenge = instance && props.challenges.get(instance.challengeId)
   if (!challenge) return null
-  return { challenge, ...challengeProgress(challenge, instance, id) }
+  const effort = effortText(challenge, instance, instance.progress.get(id), props.now)
+  return { challenge, effort, ...challengeProgress(challenge, instance, id) }
 })
 
 const items = computed(() =>
@@ -77,6 +84,7 @@ const items = computed(() =>
         :height="24"
         class="max-w-full"
       />
+      <TtText v-if="task.effort" :size="1" color="muted">{{ task.effort }}</TtText>
     </template>
 
     <TtText v-if="items.length" :size="1" color="cyan" aria-label="Items">

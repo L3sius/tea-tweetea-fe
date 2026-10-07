@@ -1,82 +1,82 @@
 [
   {
-    "key": "Blue Mage",
-    "count": 79,
-    "value": 213308640
-  },
-  {
-    "key": "Red Mage",
-    "count": 59,
-    "value": 199816400
-  },
-  {
-    "key": "Green Tank",
-    "count": 101,
-    "value": 199463640
-  },
-  {
-    "key": "Blue Archer",
-    "count": 83,
-    "value": 195610200
-  },
-  {
-    "key": "Green Mage",
-    "count": 82,
-    "value": 176610440
-  },
-  {
-    "key": "Blue Alt",
-    "count": 79,
-    "value": 166512360
-  },
-  {
-    "key": "Blue Tank",
-    "count": 89,
-    "value": 158217800
-  },
-  {
-    "key": "Gold Tank",
-    "count": 78,
-    "value": 148412880
-  },
-  {
-    "key": "Gold Alt",
-    "count": 66,
-    "value": 140959080
-  },
-  {
-    "key": "Green Archer",
-    "count": 88,
-    "value": 122807320
-  },
-  {
     "key": "Gold Mage",
-    "count": 62,
-    "value": 114914680
+    "count": 52,
+    "value": 249512640
   },
   {
     "key": "Red Tank",
-    "count": 40,
-    "value": 84015120
+    "count": 70,
+    "value": 197823920
+  },
+  {
+    "key": "Green Tank",
+    "count": 107,
+    "value": 196156640
+  },
+  {
+    "key": "Gold Tank",
+    "count": 53,
+    "value": 174413800
+  },
+  {
+    "key": "Green Archer",
+    "count": 106,
+    "value": 156159160
+  },
+  {
+    "key": "Gold Alt",
+    "count": 47,
+    "value": 144216680
+  },
+  {
+    "key": "Blue Mage",
+    "count": 76,
+    "value": 136957320
+  },
+  {
+    "key": "Blue Alt",
+    "count": 95,
+    "value": 118416040
   },
   {
     "key": "Gold Archer",
-    "count": 62,
-    "value": 74409480
+    "count": 52,
+    "value": 112167520
+  },
+  {
+    "key": "Green Mage",
+    "count": 106,
+    "value": 102312600
+  },
+  {
+    "key": "Green Alt",
+    "count": 102,
+    "value": 95757800
   },
   {
     "key": "Red Archer",
     "count": 57,
-    "value": 72965840
+    "value": 81615000
+  },
+  {
+    "key": "Blue Archer",
+    "count": 80,
+    "value": 70963520
+  },
+  {
+    "key": "Red Mage",
+    "count": 48,
+    "value": 66910640
+  },
+  {
+    "key": "Blue Tank",
+    "count": 64,
+    "value": 65760640
   },
   {
     "key": "Red Alt",
-    "count": 49,
-    "value": 68011840
-  },
-  {
-    "key": "Green Alt",
-    "count": 69,
-    "value": 63160680
+    "count": 35,
+    "value": 63411840
   }
 ]

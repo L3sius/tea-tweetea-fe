@@ -195,9 +195,19 @@ function cueFor(event: GameEvent): { team: TeamId; text: string; tone: CueTone }
     case 'item_gained':
       return { team: event.teamId, text: `+ ${itemName(event.item)}`, tone: 'good' }
     case 'item_lost':
-      return event.reason === 'blocked a freeze'
-        ? { team: event.teamId, text: `${itemName(event.item)} blocked a freeze!`, tone: 'good' }
-        : null
+      if (event.reason === 'blocked a freeze')
+        return {
+          team: event.teamId,
+          text: `${itemName(event.item)} blocked a freeze!`,
+          tone: 'good',
+        }
+      if (event.reason === 'inventory full')
+        return { team: event.teamId, text: `No room: ${itemName(event.item)} lost`, tone: 'bad' }
+      return null
+    case 'necklace_used':
+      return { team: event.teamId, text: 'A necklace saved the gem!', tone: 'good' }
+    case 'shielded':
+      return { team: event.teamId, text: 'Shielded', tone: 'info' }
     case 'item_used':
       return { team: event.teamId, text: itemName(event.item), tone: 'info' }
     case 'frozen':

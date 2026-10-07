@@ -7,8 +7,8 @@ import { drawOutcome, type DrawOutcome } from '@/domain/draw'
 import type { JournalEntry } from '@/domain/events'
 import type { Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
-import { BLOCKER_RANGE, ITEM_INFO } from '@/domain/items'
-import { adjacency, rockTiles, tilesWithin, Walks } from '@/domain/paths'
+import { BLOCKER_RANGE, ITEM_TARGET } from '@/domain/items'
+import { adjacency, webTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 import { useDevStore } from './dev'
@@ -33,9 +33,14 @@ export const useTeamStore = defineStore('team', () => {
   const pending = ref(false)
   const error = ref<string | null>(null)
 
-  /** The route shown on the map; `locked` once clicked or tapped, so hovering stops changing it. */
+  /**
+   * The walk the captain is building, start tile first. It changes by clicking checkpoints;
+   * `checkpoints` holds the route's length after each one, so Undo removes a whole checkpoint.
+   */
   const route = shallowRef<TileId[] | null>(null)
-  const routeLocked = ref(false)
+  const checkpoints = shallowRef<number[]>([])
+  /** The route a click on the hovered node would leave; null when not hovering a node. */
+  const preview = shallowRef<TileId[] | null>(null)
   const targeting = ref<Targeting | null>(null)
   /** The captain chose to draw without using a power-up on this tile. */
   const skippedPowerup = ref(false)
@@ -55,24 +60,33 @@ export const useTeamStore = defineStore('team', () => {
 
   /** The walks open to the team after a draw. */
   /**
-   * Rocks still standing, as a string so it only changes when a rock appears or expires. The clock
+   * Webs still standing, as a string so it only changes when a web appears or expires. The clock
    * ticks every few seconds; without this the search and the map's rings would redo themselves
    * on every tick.
    */
-  const rockKey = computed(() =>
-    game.state ? [...rockTiles(game.state, now.value)].sort((a, b) => a - b).join(',') : '',
+  const webKey = computed(() =>
+    game.state ? [...webTiles(game.state, now.value)].sort((a, b) => a - b).join(',') : '',
   )
 
   const walks = computed(() => {
     const t = team.value
     if (!t || t.status.kind !== 'drawn' || !game.state || t.frozenUntil || t.matchId !== null)
       return null
-    const rocks = new Set(
-      rockKey.value ? rockKey.value.split(',').map((r) => tileId(Number(r))) : [],
-    )
-    return new Walks(adj.value, rocks, t.position, t.status.length)
+    const webs = new Set(webKey.value ? webKey.value.split(',').map((r) => tileId(Number(r))) : [])
+    return new Walks(adj.value, webs, t.position, t.status.length)
   })
-  const reach = computed(() => walks.value?.reach() ?? null)
+  /** The route so far, or just the start tile before the first checkpoint. */
+  const path = computed<TileId[] | null>(() => {
+    const w = walks.value
+    return w ? (route.value ?? [w.start]) : null
+  })
+  const stepsLeft = computed(() =>
+    walks.value && path.value ? walks.value.stepsLeft(path.value) : 0,
+  )
+  /** Where the next checkpoint can go. */
+  const options = computed(() =>
+    walks.value && path.value ? walks.value.options(path.value) : null,
+  )
 
   /** Tiles a tile-targeted item may go on: in range, not a shop, free of teams, gems and blockers. */
   const targetableTiles = computed(() => {
@@ -187,7 +201,7 @@ export const useTeamStore = defineStore('team', () => {
 
   /**
    * Draws a card and reports what came of it, read from the journal entry the draw produced so the
-   * reveal shows exactly what the server dealt (free item, Joker, boot).
+   * reveal shows exactly what the server dealt (free item, Joker, suit gold).
    */
   async function draw(): Promise<DrawOutcome | null> {
     const id = team.value?.id
@@ -206,7 +220,6 @@ export const useTeamStore = defineStore('team', () => {
           freeItem: null,
           suitGold: 0,
           joker: null,
-          restarted: false,
         }
       : null
   }
@@ -265,29 +278,56 @@ export const useTeamStore = defineStore('team', () => {
     })
   }
 
-  /** Shows the walk the pointer points at: one ending on the tile if possible, else one through it. */
-  function previewRoute(tile: TileId, lock = false) {
+  /** Shows the route a click on `tile` would leave, or nothing when the pointer isn't on a node. */
+  function previewTo(tile: TileId | null) {
     const w = walks.value
-    if (!w || (routeLocked.value && !lock)) return
-    const path = w.endingAt(tile) ?? w.through(tile)
-    if (!path) return
-    route.value = path
-    routeLocked.value = lock
+    const from = path.value
+    const next = w && from && tile !== null ? w.walkTo(from, tile) : null
+    preview.value = next && from && !sameRoute(next, from) ? next : null
+  }
+
+  /**
+   * A click on a node: the walk goes there the shortest way and it becomes a checkpoint. Steps
+   * that go back along the route take those steps off it, so walking back is how to undo.
+   */
+  function checkpoint(tile: TileId) {
+    const w = walks.value
+    const from = path.value
+    const next = w && from ? w.walkTo(from, tile) : null
+    if (!next || !from || sameRoute(next, from)) return
+    if (next.length === 1) return clearRoute()
+    const kept = sharedLength(from, next)
+    route.value = next
+    checkpoints.value = [
+      ...checkpoints.value.filter((n) => n <= kept && n !== next.length),
+      next.length,
+    ]
+    preview.value = null
+  }
+
+  /** Removes the last checkpoint and the stretch leading to it. */
+  function undoCheckpoint() {
+    const kept = checkpoints.value.slice(0, -1)
+    const length = kept.at(-1)
+    checkpoints.value = kept
+    route.value = length === undefined ? null : (route.value?.slice(0, length) ?? null)
+    preview.value = null
   }
 
   function clearRoute() {
     route.value = null
-    routeLocked.value = false
+    checkpoints.value = []
+    preview.value = null
   }
 
   async function confirmRoute() {
-    if (!route.value) return
+    if (!route.value || stepsLeft.value !== 0) return
     if ((await act({ kind: 'confirm_path', path: route.value })) !== null) clearRoute()
   }
 
   /** Uses an item at once, or waits for a target if it needs one. */
   async function useItem(item: Item) {
-    const kind = ITEM_INFO[item].target
+    const kind = ITEM_TARGET[item]
     if (kind === 'none') return void (await act({ kind: 'use_item', item }))
     targeting.value = { item, kind }
   }
@@ -305,10 +345,13 @@ export const useTeamStore = defineStore('team', () => {
     pending,
     error,
     route,
-    routeLocked,
+    path,
+    checkpoints,
+    preview,
+    stepsLeft,
+    options,
     targeting,
     walks,
-    reach,
     targetableTiles,
     login,
     restore,
@@ -320,13 +363,18 @@ export const useTeamStore = defineStore('team', () => {
     pickCard,
     cardRevealed,
     finishDraw,
-    previewRoute,
+    previewTo,
+    checkpoint,
+    undoCheckpoint,
     clearRoute,
     confirmRoute,
     useItem,
     useOn,
   }
 })
+
+const sameRoute = (a: readonly TileId[], b: readonly TileId[]) =>
+  a.length === b.length && sharedLength(a, b) === a.length
 
 function messageOf(error: unknown): string {
   if (isApiError(error)) return describeProblem(error.problem)
