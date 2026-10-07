@@ -7,7 +7,7 @@ import type { Team } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
 import { teamColor } from '@/ui/colors'
 import { formatGp, timeFrom } from '@/ui/format'
-import { TtButton, TtDivider, TtPanel, TtText, stack } from '@/ui/tt'
+import { TtButton, TtPanel, TtText, stack } from '@/ui/tt'
 
 const props = defineProps<{
   feed: readonly FeedItem[]
@@ -111,7 +111,7 @@ function reset() {
           <span :style="{ color: colorOf(row.teamId) }">{{ row.rsn }}</span
           >: {{ row.hidden.length }} more
         </button>
-        <TtDivider v-if="i < rows.length - 1" length="80%" style="opacity: 0.6" />
+        <div v-if="i < rows.length - 1" class="tt-rule w-4/5" />
       </li>
     </ol>
   </TtPanel>

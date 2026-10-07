@@ -49,7 +49,7 @@ const active = computed(() => (hovered.value === null ? null : points.value[hove
             @mouseenter="hovered = i"
           >
             <div
-              class="w-full border-2 border-b-0 border-black"
+              class="w-full"
               :style="{
                 height: `${Math.max(1, (p[measure] / max) * 100)}%`,
                 background: hovered === i ? 'var(--osrs-yellow)' : 'var(--osrs-orange)',

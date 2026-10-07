@@ -11,6 +11,8 @@ defineProps({
   /** Change to replay the 4-frame animation. */
   playKey: { type: [String, Number], default: undefined },
 })
+/** The four frames have played; the animation holds the last one, so the parent removes it. */
+const emit = defineEmits<{ done: [] }>()
 </script>
 
 <template>
@@ -26,5 +28,6 @@ defineProps({
         ? { position: 'absolute', left: `${x - size / 2}px`, top: `${y - size / 2}px` }
         : {}),
     }"
+    @animationend="emit('done')"
   />
 </template>

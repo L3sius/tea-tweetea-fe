@@ -40,7 +40,7 @@ const max = computed(() => Math.max(1, ...props.rows.map((r) => r.value)))
       </TtText>
       <span class="h-[18px]" aria-hidden="true">
         <span
-          class="block h-full border-[3px] border-black shadow-[3px_3px_0_#000] transition-[width] duration-500 ease-[steps(6)]"
+          class="block h-full border-2 border-black transition-[width] duration-500 ease-[steps(6)]"
           :style="{
             width: `max(9px, ${(row.value / max) * 100}%)`,
             background: row.color ?? 'var(--osrs-orange)',

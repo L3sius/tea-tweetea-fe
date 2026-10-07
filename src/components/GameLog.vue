@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { describeEvent, type Names } from '@/domain/describe'
 import type { JournalEntry } from '@/domain/events'
 import { timeFrom } from '@/ui/format'
-import { TtDivider, TtPanel, TtText } from '@/ui/tt'
+import { TtPanel, TtText } from '@/ui/tt'
 
 const props = defineProps<{
   log: readonly JournalEntry[]
@@ -42,7 +42,7 @@ const lines = computed(() => {
           </time>
           <TtText :size="1" color="white">{{ line.text }}</TtText>
         </p>
-        <TtDivider v-if="i < lines.length - 1" length="80%" style="opacity: 0.6" />
+        <div v-if="i < lines.length - 1" class="tt-rule w-4/5" />
       </li>
     </ol>
   </TtPanel>

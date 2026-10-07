@@ -46,7 +46,8 @@ const style = computed(() => {
         ? 'var(--osrs-white)'
         : 'var(--osrs-yellow)',
     textShadow: sm ? '1px 1px 0 #000' : '2px 2px 0 #000',
-    boxShadow: props.selected ? '0 0 0 3px #000, 0 0 12px rgba(255,255,0,.5)' : undefined,
+    // A soft glow marks the selected button; the sprite already has its own dark edge.
+    boxShadow: props.selected ? '0 0 9px rgba(255,255,0,.3)' : undefined,
   }
 })
 </script>
