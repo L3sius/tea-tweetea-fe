@@ -13,13 +13,12 @@ import type { ChallengeId } from '@/domain/ids'
 import { itemEntry } from '@/domain/items'
 import { GEMS, type Item } from '@/domain/vocabulary'
 import { teamColor } from '@/ui/colors'
-import { TtButton, TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
+import { TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 
 const props = defineProps<{
   team: Team
-  rank: number
   state: GameState
   challenges: ReadonlyMap<ChallengeId, Challenge>
   names: Names
@@ -29,7 +28,6 @@ const props = defineProps<{
   /** The team's piece is still walking on the map; its new status would spoil where it ends. */
   moving?: boolean
 }>()
-const emit = defineEmits<{ locate: [team: Team] }>()
 
 const color = computed(() => teamColor(props.team))
 const statusText = computed(() =>
@@ -63,7 +61,6 @@ const items = computed(() =>
 <template>
   <article class="flex w-full flex-col items-center gap-1.5">
     <header class="flex flex-wrap items-baseline justify-center gap-x-3">
-      <TtText :size="2" color="orange">{{ rank }}.</TtText>
       <TtText as="h3" :size="2" font="bold" :color="color" class="[overflow-wrap:anywhere]">
         {{ team.name }}
       </TtText>
@@ -84,8 +81,9 @@ const items = computed(() =>
       <TtText :size="1">{{ statusText }}</TtText>
     </div>
     <template v-if="task">
-      <TtText :size="1" color="white" :title="task.challenge.description">
-        {{ task.challenge.name }}
+      <TtText :size="1" color="white">{{ task.challenge.name }}</TtText>
+      <TtText v-if="task.challenge.description" :size="1" color="muted">
+        {{ task.challenge.description }}
       </TtText>
       <TtProgressBar
         :value="task.done"
@@ -115,7 +113,6 @@ const items = computed(() =>
         </span>
       </li>
     </ul>
-    <TtButton size="sm" @click="emit('locate', team)">Follow</TtButton>
   </article>
 </template>
 

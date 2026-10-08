@@ -119,9 +119,6 @@ function watchedTeam(): TeamId | null {
 
 /** The team the overview shows: the one followed, else the captain's own, else the leader. */
 const focus = computed(() => followed.value ?? my.team ?? standings.value[0] ?? null)
-const focusRank = computed(() =>
-  focus.value ? standings.value.findIndex((t) => t.id === focus.value?.id) + 1 : 0,
-)
 
 /** A team picked on the map: follow it and show it in the overview. */
 function showTeam(id: TeamId) {
@@ -435,14 +432,12 @@ async function buy(item: Item) {
             <TeamCard
               v-if="focus"
               :team="focus"
-              :rank="focusRank"
               :items="my.team?.id === focus.id ? my.items : null"
               :state="state"
               :challenges="challenges"
               :names="game.names"
               :now="now"
               :moving="isAnimating(focus.id)"
-              @locate="selectTeam(focus.id)"
             />
           </TtPanel>
           <EventsPanel :state="state" :challenges="challenges" :names="game.names" :now="now" />
