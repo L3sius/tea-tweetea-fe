@@ -8,8 +8,11 @@ export type DrawOutcome = {
   card: Card
   /** Tiles to walk after multipliers and rain. */
   steps: number
-  /** 7s and Aces give a free item (lost if the inventory is full). */
-  freeItem: Item | null
+  /**
+   * 7s and Aces give a free item (lost if the inventory is full). The journal blanks which item it
+   * was, so `item` is null until the team's inventory tells.
+   */
+  freeItem: { item: Item | null } | null
   /** Gold from a Club Hat or Heart Glove. */
   suitGold: number
   joker: Effect | null
@@ -30,7 +33,7 @@ export function drawOutcome(entry: JournalEntry, team: TeamId): DrawOutcome | nu
     }
     if (!outcome) continue
     if (event.kind === 'item_gained' && event.teamId === team && event.reason === 'free card')
-      outcome.freeItem = event.item
+      outcome.freeItem = { item: event.item }
     else if (event.kind === 'gold_changed' && event.teamId === team && event.reason === 'suit item')
       outcome.suitGold += event.delta
     else if (event.kind === 'joker_effect' && event.teamId === team) outcome.joker = event.effect

@@ -4,7 +4,7 @@ import type { Team } from './game'
 import { ITEMS, NECKLACES, type Item } from './vocabulary'
 
 const TARGETS: Partial<Record<Item, ItemTargetKind>> = {
-  harp_of_rain: 'team',
+  morrigans_throwing_axe: 'team',
   ice_barrage: 'team',
   entangle: 'team',
   banana: 'tile',
@@ -26,7 +26,7 @@ export const ITEM_TARGET: Record<Item, ItemTargetKind> = Object.fromEntries(
 
 /** Hostile items: their target is shielded from further hostile items for a while after a hit. */
 export const HOSTILE_ITEMS: ReadonlySet<Item> = new Set<Item>([
-  'harp_of_rain',
+  'morrigans_throwing_axe',
   'ice_barrage',
   'entangle',
 ])
@@ -59,11 +59,11 @@ const FALLBACK_CATALOGUE: Record<Item, ItemEntry> = {
     description: 'Your next move is 2.5 times as long (rounded).',
     icon: null,
   },
-  harp_of_rain: {
-    name: 'Harp of Rain',
+  morrigans_throwing_axe: {
+    name: "Morrigan's throwing axe",
     description:
       "Halves a rival team's next move. Hostile: the target is then shielded for 12 hours.",
-    icon: null,
+    icon: 'https://oldschool.runescape.wiki/images/Morrigan%27s_throwing_axe.png',
   },
   quetzal_whistle: {
     name: 'Quetzal whistle',
@@ -148,10 +148,10 @@ const FALLBACK_CATALOGUE: Record<Item, ItemEntry> = {
     description: 'Passive: protects your red gem when you lose a match.',
     icon: 'https://oldschool.runescape.wiki/images/Ruby_necklace.png',
   },
-  gold_necklace: {
-    name: 'Gold necklace',
+  onyx_necklace: {
+    name: 'Onyx necklace',
     description: 'Passive: protects your yellow gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Gold_necklace.png',
+    icon: 'https://oldschool.runescape.wiki/images/Onyx_necklace.png',
   },
   zenyte_necklace: {
     name: 'Zenyte necklace',
@@ -198,7 +198,7 @@ export const SHOP_PRICES: Partial<Record<Item, number>> = {
   bronze_feather: 40,
   silver_feather: 80,
   gold_feather: 100,
-  harp_of_rain: 30,
+  morrigans_throwing_axe: 30,
   quetzal_whistle: 20,
   ogre_boat: 20,
   group_teleport: 50,
@@ -215,7 +215,7 @@ export const SHOP_PRICES: Partial<Record<Item, number>> = {
   emerald_necklace: 30,
   dragon_necklace: 30,
   ruby_necklace: 30,
-  gold_necklace: 30,
+  onyx_necklace: 30,
   zenyte_necklace: 30,
   topaz_necklace: 30,
   diamond_necklace: 30,
@@ -224,7 +224,17 @@ export const SHOP_PRICES: Partial<Record<Item, number>> = {
 
 export const INVENTORY_LIMIT = 10
 
-export const inventorySize = (team: Team) => [...team.items.values()].reduce((a, b) => a + b, 0)
+export const inventorySize = (items: ReadonlyMap<Item, number>) =>
+  [...items.values()].reduce((a, b) => a + b, 0)
+
+/** The item an inventory gained between two readings, if one did. */
+export function gainedItem(
+  before: ReadonlyMap<Item, number>,
+  after: ReadonlyMap<Item, number>,
+): Item | null {
+  for (const [item, count] of after) if (count > (before.get(item) ?? 0)) return item
+  return null
+}
 
 /** What an item acts on, so captains can see at a glance what a power-up is for. */
 export type ItemGroup = 'draw' | 'you' | 'rival' | 'board' | 'everyone' | 'held'
@@ -242,7 +252,7 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
   bronze_feather: 'draw',
   silver_feather: 'draw',
   gold_feather: 'draw',
-  harp_of_rain: 'rival',
+  morrigans_throwing_axe: 'rival',
   quetzal_whistle: 'you',
   ogre_boat: 'you',
   group_teleport: 'everyone',
@@ -259,7 +269,7 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
   emerald_necklace: 'held',
   dragon_necklace: 'held',
   ruby_necklace: 'held',
-  gold_necklace: 'held',
+  onyx_necklace: 'held',
   zenyte_necklace: 'held',
   topaz_necklace: 'held',
   diamond_necklace: 'held',

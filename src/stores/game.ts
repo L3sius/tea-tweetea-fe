@@ -79,9 +79,13 @@ export const useGameStore = defineStore('game', () => {
 
   const standings = computed(() => [...(state.value?.teams.values() ?? [])].sort(byStanding))
 
+  /** The team this browser is logged in as (the team store keeps it): it alone sees its items. */
+  const viewer = ref<TeamId | null>(null)
+
   const names: Names = {
     team: (id) => state.value?.teams.get(id)?.name ?? `Team ${id}`,
     challenge: (id) => challenges.value.get(id)?.name ?? id,
+    seesItems: (id) => viewer.value === id,
   }
 
   let closeStream: (() => void) | null = null
@@ -151,7 +155,7 @@ export const useGameStore = defineStore('game', () => {
         const last = log.value.at(-1)
         if (last && message.entry.seq <= last.seq) return
         log.value = [...log.value, message.entry].slice(-LOG_LENGTH)
-        choreography.value.apply(message.entry)
+        choreography.value.apply(message.entry, names.seesItems)
         triggerRef(choreography)
         raiseAlerts(message.entry.events)
         stateRefresh.schedule()
@@ -216,6 +220,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   return {
+    viewer,
     board,
     challenges,
     state,
@@ -307,7 +312,7 @@ function alertFor(
         team: event.teamId,
         alert: {
           title: 'Inventory full',
-          text: `${names.team(event.teamId)} had no room, so ${itemName(event.item)} was lost.`,
+          text: `${names.team(event.teamId)} had no room, so ${event.item && names.seesItems(event.teamId) ? itemName(event.item) : 'an item'} was lost.`,
           tone: 'item',
         },
       }

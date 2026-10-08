@@ -35,10 +35,26 @@ describe('drawOutcome', () => {
       red,
     )
     expect(outcome).toMatchObject({
-      freeItem: 'bronze_feather',
+      freeItem: { item: 'bronze_feather' },
       suitGold: 14,
       joker: { kind: 'teleport' },
     })
+  })
+
+  it('notes a free item the journal keeps private', () => {
+    const outcome = drawOutcome(
+      entry([
+        {
+          kind: 'card_drawn',
+          teamId: red,
+          card: { kind: 'suited', rank: 7, suit: 'clubs' },
+          steps: 7,
+        },
+        { kind: 'item_gained', teamId: red, item: null, reason: 'free card' },
+      ]),
+      red,
+    )
+    expect(outcome?.freeItem).toEqual({ item: null })
   })
 
   it('is null for an entry without the team’s draw', () => {

@@ -1,82 +1,82 @@
 [
   {
-    "key": "Gold Mage",
-    "count": 52,
-    "value": 249512640
-  },
-  {
-    "key": "Red Tank",
-    "count": 70,
-    "value": 197823920
-  },
-  {
-    "key": "Green Tank",
-    "count": 107,
-    "value": 196156640
-  },
-  {
-    "key": "Gold Tank",
-    "count": 53,
-    "value": 174413800
-  },
-  {
-    "key": "Green Archer",
-    "count": 106,
-    "value": 156159160
-  },
-  {
-    "key": "Gold Alt",
-    "count": 47,
-    "value": 144216680
-  },
-  {
-    "key": "Blue Mage",
-    "count": 76,
-    "value": 136957320
-  },
-  {
-    "key": "Blue Alt",
-    "count": 95,
-    "value": 118416040
-  },
-  {
     "key": "Gold Archer",
-    "count": 52,
-    "value": 112167520
-  },
-  {
-    "key": "Green Mage",
-    "count": 106,
-    "value": 102312600
-  },
-  {
-    "key": "Green Alt",
-    "count": 102,
-    "value": 95757800
-  },
-  {
-    "key": "Red Archer",
-    "count": 57,
-    "value": 81615000
+    "count": 99,
+    "value": 259811880
   },
   {
     "key": "Blue Archer",
-    "count": 80,
-    "value": 70963520
+    "count": 122,
+    "value": 215412480
+  },
+  {
+    "key": "Blue Alt",
+    "count": 93,
+    "value": 212611040
   },
   {
     "key": "Red Mage",
-    "count": 48,
-    "value": 66910640
+    "count": 87,
+    "value": 205304960
   },
   {
     "key": "Blue Tank",
-    "count": 64,
-    "value": 65760640
+    "count": 103,
+    "value": 183160960
+  },
+  {
+    "key": "Gold Alt",
+    "count": 113,
+    "value": 178016120
+  },
+  {
+    "key": "Gold Tank",
+    "count": 103,
+    "value": 160563680
+  },
+  {
+    "key": "Green Tank",
+    "count": 67,
+    "value": 140404760
+  },
+  {
+    "key": "Green Alt",
+    "count": 90,
+    "value": 121756200
+  },
+  {
+    "key": "Blue Mage",
+    "count": 102,
+    "value": 120157080
+  },
+  {
+    "key": "Red Tank",
+    "count": 108,
+    "value": 114412120
+  },
+  {
+    "key": "Gold Mage",
+    "count": 115,
+    "value": 111960280
+  },
+  {
+    "key": "Green Archer",
+    "count": 80,
+    "value": 92165960
   },
   {
     "key": "Red Alt",
-    "count": 35,
-    "value": 63411840
+    "count": 97,
+    "value": 91613960
+  },
+  {
+    "key": "Green Mage",
+    "count": 66,
+    "value": 76205240
+  },
+  {
+    "key": "Red Archer",
+    "count": 85,
+    "value": 47962720
   }
 ]

@@ -78,7 +78,7 @@ export function createHttpClient({
           limit: query.limit,
         },
       }),
-    identifyTeam: (teamCode) => send(endpoints.me, { headers: { 'X-Team-Code': teamCode } }),
+    getMe: (teamCode) => send(endpoints.me, { headers: { 'X-Team-Code': teamCode } }),
     sendTeamCommand: ({ teamCode, version, command, idempotencyKey }) =>
       send(
         endpoints.teamAction,

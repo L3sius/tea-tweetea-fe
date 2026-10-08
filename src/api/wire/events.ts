@@ -41,9 +41,11 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('necklace_used', { team: Id, gem: Gem }),
   event('shop_opened', { team: Id, tile: Id }),
   event('shop_closed', { team: Id }),
-  event('bought', { team: Id, item: Item, price: z.number() }),
-  event('item_gained', { team: Id, item: Item, reason: z.string() }),
-  event('item_lost', { team: Id, item: Item, reason: z.string() }),
+  // Inventories are private: the public journal blanks the item here, except for items lost in
+  // plain sight (used, blocked a freeze, protected a gem).
+  event('bought', { team: Id, item: Item.nullable(), price: z.number() }),
+  event('item_gained', { team: Id, item: Item.nullable(), reason: z.string() }),
+  event('item_lost', { team: Id, item: Item.nullable(), reason: z.string() }),
   event('item_used', { team: Id, item: Item, target: WireTarget.nullable() }),
   event('gold_changed', { team: Id, delta: z.number(), total: z.number(), reason: z.string() }),
   event('blocker_placed', { tile: Id, blocker: WireBlocker, by: Id }),

@@ -5,7 +5,7 @@ import { toChallenges } from './mappers/challenge'
 import { toJournalEntry } from './mappers/events'
 import { toGameState } from './mappers/game'
 import { toItemCatalogue } from './mappers/items'
-import { toAccepted, toAdminReply, toTeamIdentity } from './mappers/server'
+import { toAccepted, toAdminReply, toMe } from './mappers/server'
 import { WireFeedItem, WireStatRow } from './wire/activity'
 import { WireBoard } from './wire/board'
 import { WireChallenges } from './wire/challenge'
@@ -31,7 +31,7 @@ export const endpoints = {
   journal: endpoint('/events', z.array(WirePublished), (entries) => entries.map(toJournalEntry)),
   feed: endpoint('/feed', z.array(WireFeedItem), (items) => items.map(toFeedItem)),
   stats: endpoint('/stats', z.array(WireStatRow), (rows) => rows.map(toStatRow)),
-  me: endpoint('/team/me', WireMe, toTeamIdentity),
+  me: endpoint('/team/me', WireMe, toMe),
   teamAction: endpoint('/team/action', WireAccepted, toAccepted),
   adminAction: endpoint('/admin/action', WireAdminReply, toAdminReply),
 }

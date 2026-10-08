@@ -1,12 +1,13 @@
-// Records every public endpoint of a running game API into src/api/fixtures/data/.
+// Records every public endpoint of a running game API into src/api/fixtures/data/, plus the red
+// team's private inventory (the sample game's team code is `red`).
 // Usage: npm run fixtures:refresh [-- http://localhost:8080]
 import { mkdir, writeFile } from 'node:fs/promises'
 
 const base = (process.argv[2] ?? 'http://localhost:8080').replace(/\/+$/, '')
 const outDir = new URL('../src/api/fixtures/data/', import.meta.url)
 
-async function get(path) {
-  const response = await fetch(base + path)
+async function get(path, headers = {}) {
+  const response = await fetch(base + path, { headers })
   if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`)
   return response.json()
 }
@@ -33,6 +34,7 @@ const files = {
   'stats-by-team.json': () => get('/stats?by=team'),
   'stats-by-subject.json': () => get('/stats?by=subject'),
   'stats-by-hour.json': () => get('/stats?by=hour'),
+  'me-red.json': () => get('/team/me', { 'X-Team-Code': 'red' }),
 }
 
 await mkdir(outDir, { recursive: true })

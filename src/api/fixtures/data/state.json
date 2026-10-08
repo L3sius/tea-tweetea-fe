@@ -1,6 +1,6 @@
 {
-  "seq": 1122,
-  "server_time": "2026-10-07T09:45:49.223653700Z",
+  "seq": 1488,
+  "server_time": "2026-10-08T07:58:04.928494700Z",
   "phase": "running",
   "teams": [
     {
@@ -27,43 +27,26 @@
           ]
         }
       ],
-      "position": 333,
+      "position": 207,
       "status": {
-        "status": "drawn",
-        "card": {
-          "rank": 2,
-          "suit": "spades"
-        },
-        "steps": 2,
-        "length": 2,
-        "destinations": [
-          54,
-          63,
-          332,
-          458
-        ]
+        "status": "working",
+        "instance": 126
       },
       "frozen_until": null,
       "shield_until": null,
       "match_id": null,
       "gems": [
-        "blue",
-        "purple",
-        "red"
+        "yellow"
       ],
-      "gold": 62,
-      "items": {
-        "gold_feather": 1
-      },
-      "cards_left": 28,
+      "gold": 138,
       "effects": {
         "multiplier": 1,
-        "rain": false,
+        "halved": false,
         "suit_gold": null,
         "item_used_here": false
       },
-      "tiles_completed": 26,
-      "version": 98
+      "tiles_completed": 24,
+      "version": 97
     },
     {
       "id": 1,
@@ -89,32 +72,24 @@
           ]
         }
       ],
-      "position": 426,
+      "position": 72,
       "status": {
-        "status": "ready"
+        "status": "working",
+        "instance": 127
       },
       "frozen_until": null,
       "shield_until": null,
       "match_id": null,
-      "gems": [
-        "green",
-        "orange",
-        "pink"
-      ],
-      "gold": 146,
-      "items": {
-        "banana": 1,
-        "ruby_necklace": 1
-      },
-      "cards_left": 29,
+      "gems": [],
+      "gold": 140,
       "effects": {
         "multiplier": 1,
-        "rain": false,
+        "halved": false,
         "suit_gold": null,
         "item_used_here": false
       },
-      "tiles_completed": 26,
-      "version": 103
+      "tiles_completed": 19,
+      "version": 84
     },
     {
       "id": 2,
@@ -140,30 +115,29 @@
           ]
         }
       ],
-      "position": 260,
+      "position": 37,
       "status": {
-        "status": "ready"
+        "status": "working",
+        "instance": 128
       },
       "frozen_until": null,
       "shield_until": null,
       "match_id": null,
-      "gems": [],
-      "gold": 159,
-      "items": {
-        "bronze_feather": 4,
-        "banana": 1,
-        "protect_from_magic": 1,
-        "gold_necklace": 1
-      },
-      "cards_left": 34,
+      "gems": [
+        "blue",
+        "purple",
+        "red",
+        "white"
+      ],
+      "gold": 144,
       "effects": {
         "multiplier": 1,
-        "rain": false,
+        "halved": false,
         "suit_gold": null,
         "item_used_here": false
       },
-      "tiles_completed": 21,
-      "version": 86
+      "tiles_completed": 31,
+      "version": 129
     },
     {
       "id": 3,
@@ -189,35 +163,27 @@
           ]
         }
       ],
-      "position": 78,
+      "position": 390,
       "status": {
         "status": "working",
-        "instance": 107
+        "instance": 124
       },
       "frozen_until": null,
       "shield_until": null,
       "match_id": null,
       "gems": [
-        "green",
-        "red"
+        "blue",
+        "green"
       ],
-      "gold": 152,
-      "items": {
-        "bronze_feather": 3,
-        "banana": 2,
-        "harpie_bug_swarm": 1,
-        "wilderness_web": 1,
-        "protect_from_magic": 1
-      },
-      "cards_left": 31,
+      "gold": 364,
       "effects": {
         "multiplier": 1,
-        "rain": false,
+        "halved": false,
         "suit_gold": null,
         "item_used_here": false
       },
-      "tiles_completed": 23,
-      "version": 88
+      "tiles_completed": 20,
+      "version": 83
     }
   ],
   "tiles": [
@@ -732,20 +698,20 @@
     71
   ],
   "blockers": {
-    "134": {
+    "315": {
       "blocker": "banana"
     },
-    "205": {
+    "378": {
       "blocker": "banana"
     }
   },
   "instances": {
-    "14": {
+    "17": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-04T17:15:31.590411024Z",
+      "started": "2026-10-05T08:00:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 13
+        "id": 16
       },
       "progress": {
         "0": {
@@ -754,19 +720,163 @@
           },
           "done": 1,
           "target": 1,
-          "effort": 4
+          "effort": 2
         },
         "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        }
+      },
+      "done": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "23": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-05T09:40:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 22
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "2": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        }
+      },
+      "done": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "29": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-05T11:00:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 28
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "3": {
           "counts": {
             "value": 2
           },
           "done": 1,
           "target": 1,
           "effort": 3
+        }
+      },
+      "done": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "35": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-05T15:40:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 34
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 5
+        },
+        "1": {
+          "counts": {
+            "value": 6
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 8
         },
         "2": {
           "counts": {
-            "value": 3
+            "value": 1
           },
           "done": 1,
           "target": 1,
@@ -778,7 +888,7 @@
           },
           "done": 1,
           "target": 1,
-          "effort": 5
+          "effort": 4
         }
       },
       "done": [
@@ -788,211 +898,33 @@
         3
       ]
     },
-    "31": {
+    "43": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-05T06:35:31.590411024Z",
+      "started": "2026-10-05T19:20:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 30
+        "id": 42
       },
       "progress": {
         "0": {
           "counts": {
             "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "1": {
+          "counts": {
+            "value": 3
           },
           "done": 1,
           "target": 1,
           "effort": 3
         },
-        "1": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
-        },
         "2": {
           "counts": {
-            "value": 3
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 4
-        },
-        "3": {
-          "counts": {
-            "value": 3
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 5
-        }
-      },
-      "done": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "36": {
-      "challenge": "sire-50",
-      "started": "2026-10-05T07:55:31.590411024Z",
-      "scope": {
-        "scope": "minigame",
-        "id": 35
-      },
-      "progress": {
-        "0": {
-          "counts": {},
-          "done": 0,
-          "target": 50,
-          "effort": null
-        },
-        "1": {
-          "counts": {
-            "Abyssal Sire": 16
-          },
-          "done": 16,
-          "target": 50,
-          "effort": 16
-        },
-        "2": {
-          "counts": {
-            "Abyssal Sire": 8
-          },
-          "done": 8,
-          "target": 50,
-          "effort": 8
-        },
-        "3": {
-          "counts": {
-            "Abyssal Sire": 8
-          },
-          "done": 8,
-          "target": 50,
-          "effort": 8
-        }
-      },
-      "done": []
-    },
-    "46": {
-      "challenge": "sire-50",
-      "started": "2026-10-05T16:35:31.590411024Z",
-      "scope": {
-        "scope": "minigame",
-        "id": 45
-      },
-      "progress": {
-        "0": {
-          "counts": {
-            "Abyssal Sire": 24
-          },
-          "done": 24,
-          "target": 50,
-          "effort": 24
-        },
-        "1": {
-          "counts": {
-            "Abyssal Sire": 24
-          },
-          "done": 24,
-          "target": 50,
-          "effort": 24
-        },
-        "2": {
-          "counts": {
-            "Abyssal Sire": 8
-          },
-          "done": 8,
-          "target": 50,
-          "effort": 8
-        },
-        "3": {
-          "counts": {},
-          "done": 0,
-          "target": 50,
-          "effort": null
-        }
-      },
-      "done": []
-    },
-    "74": {
-      "challenge": "any-drop-1m",
-      "started": "2026-10-06T11:35:31.590411024Z",
-      "scope": {
-        "scope": "minigame",
-        "id": 73
-      },
-      "progress": {
-        "0": {
-          "counts": {
-            "value": 3
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 4
-        },
-        "1": {
-          "counts": {
-            "value": 2
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 2
-        },
-        "2": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
-        },
-        "3": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
-        }
-      },
-      "done": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "78": {
-      "challenge": "any-drop-1m",
-      "started": "2026-10-06T12:15:31.590411024Z",
-      "scope": {
-        "scope": "minigame",
-        "id": 77
-      },
-      "progress": {
-        "0": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
-        },
-        "1": {
-          "counts": {
-            "value": 2
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 5
-        },
-        "2": {
-          "counts": {
-            "value": 3
+            "value": 4
           },
           "done": 1,
           "target": 1,
@@ -1000,7 +932,7 @@
         },
         "3": {
           "counts": {
-            "value": 2
+            "value": 1
           },
           "done": 1,
           "target": 1,
@@ -1014,101 +946,58 @@
         3
       ]
     },
-    "84": {
+    "47": {
       "challenge": "sire-50",
-      "started": "2026-10-06T14:55:31.590411024Z",
+      "started": "2026-10-05T20:20:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 83
+        "id": 46
       },
       "progress": {
         "0": {
           "counts": {
-            "Abyssal Sire": 8
+            "Abyssal Sire": 24
           },
-          "done": 8,
+          "done": 24,
           "target": 50,
-          "effort": 8
+          "effort": 24
         },
         "1": {
+          "counts": {
+            "Abyssal Sire": 56
+          },
+          "done": 50,
+          "target": 50,
+          "effort": 56
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 56
+          },
+          "done": 50,
+          "target": 50,
+          "effort": 56
+        },
+        "3": {
           "counts": {
             "Abyssal Sire": 48
           },
           "done": 48,
           "target": 50,
           "effort": 48
-        },
-        "2": {
-          "counts": {},
-          "done": 0,
-          "target": 50,
-          "effort": null
-        },
-        "3": {
-          "counts": {
-            "Abyssal Sire": 24
-          },
-          "done": 24,
-          "target": 50,
-          "effort": 24
-        }
-      },
-      "done": []
-    },
-    "89": {
-      "challenge": "any-drop-1m",
-      "started": "2026-10-06T17:15:31.590411024Z",
-      "scope": {
-        "scope": "minigame",
-        "id": 88
-      },
-      "progress": {
-        "0": {
-          "counts": {
-            "value": 2
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 2
-        },
-        "1": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
-        },
-        "2": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 2
-        },
-        "3": {
-          "counts": {
-            "value": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 1
         }
       },
       "done": [
-        0,
         1,
-        2,
-        3
+        2
       ]
     },
-    "94": {
+    "50": {
       "challenge": "sire-50",
-      "started": "2026-10-06T19:15:31.590411024Z",
+      "started": "2026-10-05T22:00:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 93
+        "id": 49
       },
       "progress": {
         "0": {
@@ -1121,39 +1010,37 @@
         },
         "1": {
           "counts": {
-            "Abyssal Sire": 16
+            "Abyssal Sire": 48
           },
-          "done": 16,
+          "done": 48,
           "target": 50,
-          "effort": 16
+          "effort": 48
         },
         "2": {
           "counts": {
-            "Abyssal Sire": 72
+            "Abyssal Sire": 40
           },
-          "done": 50,
+          "done": 40,
           "target": 50,
-          "effort": 72
+          "effort": 40
         },
         "3": {
           "counts": {
-            "Abyssal Sire": 16
+            "Abyssal Sire": 48
           },
-          "done": 16,
+          "done": 48,
           "target": 50,
-          "effort": 16
+          "effort": 48
         }
       },
-      "done": [
-        2
-      ]
+      "done": []
     },
-    "99": {
+    "53": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-06T20:35:31.590411024Z",
+      "started": "2026-10-05T22:00:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 98
+        "id": 52
       },
       "progress": {
         "0": {
@@ -1166,27 +1053,27 @@
         },
         "1": {
           "counts": {
-            "value": 6
+            "value": 1
           },
           "done": 1,
           "target": 1,
-          "effort": 10
+          "effort": 2
         },
         "2": {
-          "counts": {
-            "value": 6
-          },
-          "done": 1,
-          "target": 1,
-          "effort": 7
-        },
-        "3": {
           "counts": {
             "value": 2
           },
           "done": 1,
           "target": 1,
           "effort": 3
+        },
+        "3": {
+          "counts": {
+            "value": 5
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 6
         }
       },
       "done": [
@@ -1196,15 +1083,21 @@
         3
       ]
     },
-    "103": {
+    "64": {
       "challenge": "sire-50",
-      "started": "2026-10-06T22:15:31.590411024Z",
+      "started": "2026-10-06T04:40:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 102
+        "id": 63
       },
       "progress": {
         "0": {
+          "counts": {},
+          "done": 0,
+          "target": 50,
+          "effort": null
+        },
+        "1": {
           "counts": {
             "Abyssal Sire": 24
           },
@@ -1212,64 +1105,75 @@
           "target": 50,
           "effort": 24
         },
-        "1": {
-          "counts": {
-            "Abyssal Sire": 16
-          },
-          "done": 16,
-          "target": 50,
-          "effort": 16
-        },
         "2": {
           "counts": {
-            "Abyssal Sire": 48
+            "Abyssal Sire": 8
           },
-          "done": 48,
+          "done": 8,
           "target": 50,
-          "effort": 48
+          "effort": 8
         },
         "3": {
+          "counts": {
+            "Abyssal Sire": 8
+          },
+          "done": 8,
+          "target": 50,
+          "effort": 8
+        }
+      },
+      "done": []
+    },
+    "85": {
+      "challenge": "sire-50",
+      "started": "2026-10-06T20:40:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 84
+      },
+      "progress": {
+        "0": {
           "counts": {
             "Abyssal Sire": 40
           },
           "done": 40,
           "target": 50,
           "effort": 40
-        }
-      },
-      "done": []
-    },
-    "107": {
-      "challenge": "malediction-ward",
-      "started": "2026-10-06T23:35:31.590411024Z",
-      "scope": {
-        "scope": "tile",
-        "team": 3,
-        "tile": 78
-      },
-      "progress": {
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 40
+          },
+          "done": 40,
+          "target": 50,
+          "effort": 40
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 8
+          },
+          "done": 8,
+          "target": 50,
+          "effort": 8
+        },
         "3": {
-          "counts": {
-            "Malediction shard 1": 5,
-            "Malediction shard 2": 0,
-            "Malediction shard 3": 6
-          },
-          "done": 2,
-          "target": 3,
-          "effort": 11
+          "counts": {},
+          "done": 0,
+          "target": 50,
+          "effort": null
         }
       },
       "done": []
     },
-    "110": {
+    "94": {
       "challenge": "dagannoth-task",
-      "started": "2026-10-07T01:15:31.590411024Z",
+      "started": "2026-10-07T03:20:35.920900809Z",
       "scope": {
         "scope": "match",
-        "id": 109
+        "id": 93
       },
       "progress": {
-        "1": {
+        "2": {
           "counts": {
             "Dagannoth": 1
           },
@@ -1277,7 +1181,7 @@
           "target": 1,
           "effort": null
         },
-        "2": {
+        "3": {
           "counts": {},
           "done": 0,
           "target": 1,
@@ -1285,42 +1189,15 @@
         }
       },
       "done": [
-        1
+        2
       ]
     },
-    "115": {
-      "challenge": "dagannoth-task",
-      "started": "2026-10-07T03:15:31.590411024Z",
-      "scope": {
-        "scope": "match",
-        "id": 114
-      },
-      "progress": {
-        "1": {
-          "counts": {
-            "Dagannoth": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": null
-        },
-        "2": {
-          "counts": {},
-          "done": 0,
-          "target": 1,
-          "effort": null
-        }
-      },
-      "done": [
-        1
-      ]
-    },
-    "123": {
+    "97": {
       "challenge": "sire-50",
-      "started": "2026-10-07T07:15:31.590411024Z",
+      "started": "2026-10-07T04:40:35.920900809Z",
       "scope": {
         "scope": "minigame",
-        "id": 122
+        "id": 96
       },
       "progress": {
         "0": {
@@ -1333,13 +1210,42 @@
         },
         "1": {
           "counts": {
-            "Abyssal Sire": 8
+            "Abyssal Sire": 24
           },
-          "done": 8,
+          "done": 24,
           "target": 50,
-          "effort": 8
+          "effort": 24
         },
         "2": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 56
+          },
+          "done": 50,
+          "target": 50,
+          "effort": 56
+        }
+      },
+      "done": [
+        3
+      ]
+    },
+    "103": {
+      "challenge": "sire-50",
+      "started": "2026-10-07T06:20:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 102
+      },
+      "progress": {
+        "0": {
           "counts": {
             "Abyssal Sire": 8
           },
@@ -1347,59 +1253,216 @@
           "target": 50,
           "effort": 8
         },
-        "3": {
-          "counts": {},
-          "done": 0,
+        "1": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
           "target": 50,
-          "effort": null
+          "effort": 16
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        }
+      },
+      "done": []
+    },
+    "112": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-07T10:20:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 111
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        }
+      },
+      "done": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "119": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-07T12:20:35.920900809Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 118
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        }
+      },
+      "done": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "124": {
+      "challenge": "sire-50",
+      "started": "2026-10-07T15:20:35.920900809Z",
+      "scope": {
+        "scope": "tile",
+        "team": 3,
+        "tile": 390
+      },
+      "progress": {
+        "3": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "126": {
+      "challenge": "sire-50",
+      "started": "2026-10-07T16:20:35.920900809Z",
+      "scope": {
+        "scope": "tile",
+        "team": 0,
+        "tile": 207
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        }
+      },
+      "done": []
+    },
+    "127": {
+      "challenge": "sire-50",
+      "started": "2026-10-07T18:00:35.920900809Z",
+      "scope": {
+        "scope": "tile",
+        "team": 1,
+        "tile": 72
+      },
+      "progress": {
+        "1": {
+          "counts": {
+            "Abyssal Sire": 24
+          },
+          "done": 24,
+          "target": 50,
+          "effort": 24
+        }
+      },
+      "done": []
+    },
+    "128": {
+      "challenge": "malediction-ward",
+      "started": "2026-10-07T18:20:35.920900809Z",
+      "scope": {
+        "scope": "tile",
+        "team": 2,
+        "tile": 37
+      },
+      "progress": {
+        "2": {
+          "counts": {
+            "Malediction shard 1": 2,
+            "Malediction shard 2": 0,
+            "Malediction shard 3": 0
+          },
+          "done": 1,
+          "target": 3,
+          "effort": 2
         }
       },
       "done": []
     }
   },
   "minigames": {
-    "13": {
-      "id": 13,
-      "instance": 14,
-      "scoring": {
-        "type": "race",
-        "payouts": [
-          20,
-          10,
-          5,
-          3
-        ]
-      },
-      "initiator": 2,
-      "deadline": "2026-10-04T23:15:31.590411024Z",
-      "finished": [
-        2,
-        3,
-        1,
-        0
-      ],
-      "gold": [
-        {
-          "team": 0,
-          "gold": 3
-        },
-        {
-          "team": 1,
-          "gold": 5
-        },
-        {
-          "team": 2,
-          "gold": 40
-        },
-        {
-          "team": 3,
-          "gold": 10
-        }
-      ]
-    },
-    "30": {
-      "id": 30,
-      "instance": 31,
+    "16": {
+      "id": 16,
+      "instance": 17,
       "scoring": {
         "type": "race",
         "payouts": [
@@ -1410,103 +1473,12 @@
         ]
       },
       "initiator": 1,
-      "deadline": "2026-10-05T12:35:31.590411024Z",
+      "deadline": "2026-10-05T14:00:35.920900809Z",
       "finished": [
         2,
-        3,
-        1,
-        0
-      ],
-      "gold": [
-        {
-          "team": 0,
-          "gold": 3
-        },
-        {
-          "team": 1,
-          "gold": 10
-        },
-        {
-          "team": 2,
-          "gold": 20
-        },
-        {
-          "team": 3,
-          "gold": 10
-        }
-      ]
-    },
-    "35": {
-      "id": 35,
-      "instance": 36,
-      "scoring": {
-        "type": "contribution",
-        "cap": 50,
-        "gold_per_unit": 1
-      },
-      "initiator": 1,
-      "deadline": "2026-10-05T11:55:31.590411024Z",
-      "finished": [],
-      "gold": [
-        {
-          "team": 1,
-          "gold": 32
-        },
-        {
-          "team": 2,
-          "gold": 8
-        },
-        {
-          "team": 3,
-          "gold": 8
-        }
-      ]
-    },
-    "45": {
-      "id": 45,
-      "instance": 46,
-      "scoring": {
-        "type": "contribution",
-        "cap": 50,
-        "gold_per_unit": 1
-      },
-      "initiator": 3,
-      "deadline": "2026-10-05T20:35:31.590411024Z",
-      "finished": [],
-      "gold": [
-        {
-          "team": 0,
-          "gold": 24
-        },
-        {
-          "team": 1,
-          "gold": 24
-        },
-        {
-          "team": 2,
-          "gold": 8
-        }
-      ]
-    },
-    "73": {
-      "id": 73,
-      "instance": 74,
-      "scoring": {
-        "type": "race",
-        "payouts": [
-          20,
-          10,
-          5,
-          3
-        ]
-      },
-      "initiator": 3,
-      "deadline": "2026-10-06T17:35:31.590411024Z",
-      "finished": [
-        1,
         0,
-        2,
-        3
+        3,
+        1
       ],
       "gold": [
         {
@@ -1515,21 +1487,21 @@
         },
         {
           "team": 1,
-          "gold": 20
-        },
-        {
-          "team": 2,
-          "gold": 5
-        },
-        {
-          "team": 3,
           "gold": 6
+        },
+        {
+          "team": 2,
+          "gold": 20
+        },
+        {
+          "team": 3,
+          "gold": 5
         }
       ]
     },
-    "77": {
-      "id": 77,
-      "instance": 78,
+    "22": {
+      "id": 22,
+      "instance": 23,
       "scoring": {
         "type": "race",
         "payouts": [
@@ -1540,7 +1512,85 @@
         ]
       },
       "initiator": 2,
-      "deadline": "2026-10-06T18:15:31.590411024Z",
+      "deadline": "2026-10-05T15:40:35.920900809Z",
+      "finished": [
+        3,
+        2,
+        0,
+        1
+      ],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 5
+        },
+        {
+          "team": 1,
+          "gold": 3
+        },
+        {
+          "team": 2,
+          "gold": 20
+        },
+        {
+          "team": 3,
+          "gold": 20
+        }
+      ]
+    },
+    "28": {
+      "id": 28,
+      "instance": 29,
+      "scoring": {
+        "type": "race",
+        "payouts": [
+          20,
+          10,
+          5,
+          3
+        ]
+      },
+      "initiator": 0,
+      "deadline": "2026-10-05T17:00:35.920900809Z",
+      "finished": [
+        0,
+        3,
+        1,
+        2
+      ],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 40
+        },
+        {
+          "team": 1,
+          "gold": 5
+        },
+        {
+          "team": 2,
+          "gold": 3
+        },
+        {
+          "team": 3,
+          "gold": 10
+        }
+      ]
+    },
+    "34": {
+      "id": 34,
+      "instance": 35,
+      "scoring": {
+        "type": "race",
+        "payouts": [
+          20,
+          10,
+          5,
+          3
+        ]
+      },
+      "initiator": 2,
+      "deadline": "2026-10-05T21:40:35.920900809Z",
       "finished": [
         2,
         3,
@@ -1566,35 +1616,9 @@
         }
       ]
     },
-    "83": {
-      "id": 83,
-      "instance": 84,
-      "scoring": {
-        "type": "contribution",
-        "cap": 50,
-        "gold_per_unit": 1
-      },
-      "initiator": 3,
-      "deadline": "2026-10-06T18:55:31.590411024Z",
-      "finished": [],
-      "gold": [
-        {
-          "team": 0,
-          "gold": 8
-        },
-        {
-          "team": 1,
-          "gold": 48
-        },
-        {
-          "team": 3,
-          "gold": 48
-        }
-      ]
-    },
-    "88": {
-      "id": 88,
-      "instance": 89,
+    "42": {
+      "id": 42,
+      "instance": 43,
       "scoring": {
         "type": "race",
         "payouts": [
@@ -1605,21 +1629,21 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-06T23:15:31.590411024Z",
+      "deadline": "2026-10-06T01:20:35.920900809Z",
       "finished": [
-        0,
-        2,
         1,
+        2,
+        0,
         3
       ],
       "gold": [
         {
           "team": 0,
-          "gold": 40
+          "gold": 10
         },
         {
           "team": 1,
-          "gold": 5
+          "gold": 20
         },
         {
           "team": 2,
@@ -1631,39 +1655,69 @@
         }
       ]
     },
-    "93": {
-      "id": 93,
-      "instance": 94,
+    "46": {
+      "id": 46,
+      "instance": 47,
       "scoring": {
         "type": "contribution",
         "cap": 50,
         "gold_per_unit": 1
       },
-      "initiator": 0,
-      "deadline": "2026-10-06T23:15:31.590411024Z",
+      "initiator": 2,
+      "deadline": "2026-10-06T00:20:35.920900809Z",
       "finished": [],
       "gold": [
         {
           "team": 0,
-          "gold": 64
+          "gold": 24
         },
         {
           "team": 1,
-          "gold": 16
-        },
-        {
-          "team": 2,
           "gold": 50
         },
         {
+          "team": 2,
+          "gold": 100
+        },
+        {
           "team": 3,
-          "gold": 16
+          "gold": 48
         }
       ]
     },
-    "98": {
-      "id": 98,
-      "instance": 99,
+    "49": {
+      "id": 49,
+      "instance": 50,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 1,
+      "deadline": "2026-10-06T02:00:35.920900809Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 32
+        },
+        {
+          "team": 1,
+          "gold": 96
+        },
+        {
+          "team": 2,
+          "gold": 40
+        },
+        {
+          "team": 3,
+          "gold": 48
+        }
+      ]
+    },
+    "52": {
+      "id": 52,
+      "instance": 53,
       "scoring": {
         "type": "race",
         "payouts": [
@@ -1673,30 +1727,112 @@
           3
         ]
       },
-      "initiator": 2,
-      "deadline": "2026-10-07T02:35:31.590411024Z",
+      "initiator": 3,
+      "deadline": "2026-10-06T04:00:35.920900809Z",
       "finished": [
-        1,
-        2,
         3,
-        0
+        2,
+        0,
+        1
       ],
       "gold": [
         {
           "team": 0,
-          "gold": 3
+          "gold": 5
         },
         {
           "team": 1,
-          "gold": 20
+          "gold": 3
         },
         {
           "team": 2,
-          "gold": 20
+          "gold": 10
         },
         {
           "team": 3,
-          "gold": 5
+          "gold": 40
+        }
+      ]
+    },
+    "63": {
+      "id": 63,
+      "instance": 64,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 0,
+      "deadline": "2026-10-06T08:40:35.920900809Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 1,
+          "gold": 24
+        },
+        {
+          "team": 2,
+          "gold": 8
+        },
+        {
+          "team": 3,
+          "gold": 8
+        }
+      ]
+    },
+    "84": {
+      "id": 84,
+      "instance": 85,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 2,
+      "deadline": "2026-10-07T00:40:35.920900809Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 40
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 16
+        }
+      ]
+    },
+    "96": {
+      "id": 96,
+      "instance": 97,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 1,
+      "deadline": "2026-10-07T08:40:35.920900809Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 16
+        },
+        {
+          "team": 1,
+          "gold": 48
+        },
+        {
+          "team": 2,
+          "gold": 16
+        },
+        {
+          "team": 3,
+          "gold": 50
         }
       ]
     },
@@ -1709,12 +1845,12 @@
         "gold_per_unit": 1
       },
       "initiator": 3,
-      "deadline": "2026-10-07T02:15:31.590411024Z",
+      "deadline": "2026-10-07T10:20:35.920900809Z",
       "finished": [],
       "gold": [
         {
           "team": 0,
-          "gold": 24
+          "gold": 8
         },
         {
           "team": 1,
@@ -1722,51 +1858,104 @@
         },
         {
           "team": 2,
-          "gold": 48
+          "gold": 16
         },
         {
           "team": 3,
-          "gold": 80
+          "gold": 96
         }
       ]
     },
-    "122": {
-      "id": 122,
-      "instance": 123,
+    "111": {
+      "id": 111,
+      "instance": 112,
       "scoring": {
-        "type": "contribution",
-        "cap": 50,
-        "gold_per_unit": 1
+        "type": "race",
+        "payouts": [
+          20,
+          10,
+          5,
+          3
+        ]
       },
-      "initiator": 1,
-      "deadline": "2026-10-07T11:15:31.590411024Z",
-      "finished": [],
-      "gold": null
+      "initiator": 3,
+      "deadline": "2026-10-07T16:20:35.920900809Z",
+      "finished": [
+        3,
+        0,
+        2,
+        1
+      ],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 3
+        },
+        {
+          "team": 2,
+          "gold": 5
+        },
+        {
+          "team": 3,
+          "gold": 40
+        }
+      ]
+    },
+    "118": {
+      "id": 118,
+      "instance": 119,
+      "scoring": {
+        "type": "race",
+        "payouts": [
+          20,
+          10,
+          5,
+          3
+        ]
+      },
+      "initiator": 3,
+      "deadline": "2026-10-07T18:20:35.920900809Z",
+      "finished": [
+        1,
+        2,
+        0,
+        3
+      ],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 5
+        },
+        {
+          "team": 1,
+          "gold": 20
+        },
+        {
+          "team": 2,
+          "gold": 10
+        },
+        {
+          "team": 3,
+          "gold": 6
+        }
+      ]
     }
   },
   "matches": {
-    "109": {
-      "id": 109,
-      "instance": 110,
-      "mover": 1,
-      "defender": 2,
-      "deadline": "2026-10-07T05:15:31.590411024Z",
+    "93": {
+      "id": 93,
+      "instance": 94,
+      "mover": 2,
+      "defender": 3,
+      "deadline": "2026-10-07T07:20:35.920900809Z",
       "outcome": {
         "outcome": "won",
-        "winner": 1,
-        "stolen": "green"
-      }
-    },
-    "114": {
-      "id": 114,
-      "instance": 115,
-      "mover": 1,
-      "defender": 2,
-      "deadline": "2026-10-07T07:15:31.590411024Z",
-      "outcome": {
-        "outcome": "won",
-        "winner": 1,
-        "stolen": "pink"
+        "winner": 2,
+        "stolen": null
       }
     }
   }

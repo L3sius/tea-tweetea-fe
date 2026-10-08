@@ -10,7 +10,7 @@ import {
 } from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId } from '@/domain/ids'
-import { GEMS } from '@/domain/vocabulary'
+import { GEMS, type Item } from '@/domain/vocabulary'
 import { teamColor } from '@/ui/colors'
 import { TtButton, TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
 import PlayingCard from './PlayingCard.vue'
@@ -22,6 +22,8 @@ const props = defineProps<{
   challenges: ReadonlyMap<ChallengeId, Challenge>
   names: Names
   now: Date
+  /** The team's items, which are private: only given to someone logged in as this team. */
+  items: ReadonlyMap<Item, number> | null
   /** The team's piece is still walking on the map; its new status would spoil where it ends. */
   moving?: boolean
 }>()
@@ -44,7 +46,7 @@ const task = computed(() => {
 })
 
 const items = computed(() =>
-  [...props.team.items]
+  [...(props.items ?? [])]
     .filter(([, count]) => count > 0)
     .map(([item, count]) => (count > 1 ? `${itemName(item)} x${count}` : itemName(item))),
 )
@@ -57,7 +59,7 @@ const items = computed(() =>
       <TtText as="h3" :size="2" font="bold" :color="color">{{ team.name }}</TtText>
       <TtText :size="1" color="white">
         {{ team.gems.size }} / {{ GEMS.length }} gems · {{ team.gold }} gold ·
-        {{ team.tilesCompleted }} tiles · {{ team.cardsLeft }} cards
+        {{ team.tilesCompleted }} tiles
       </TtText>
     </header>
 

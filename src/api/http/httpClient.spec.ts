@@ -88,7 +88,7 @@ describe('failures', () => {
 
   it('rejects a response that breaks the contract', async () => {
     const { client } = clientReturning(200, { team: 'red' })
-    expect(await problemOf(client.identifyTeam('red'))).toMatchObject({
+    expect(await problemOf(client.getMe('red'))).toMatchObject({
       kind: 'invalid_response',
       endpoint: '/team/me',
     })

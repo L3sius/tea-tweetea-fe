@@ -1,9 +1,93 @@
 [
   {
-    "id": 1150,
-    "at": "2026-10-07T08:15:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
+    "id": 1519,
+    "at": "2026-10-07T20:00:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1516,
+    "at": "2026-10-07T20:00:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1505,
+    "at": "2026-10-07T19:20:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1471,
+    "at": "2026-10-07T18:20:35.920900809Z",
+    "rsn": "Red Archer",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1453,
+    "at": "2026-10-07T18:00:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -21,24 +105,10 @@
     }
   },
   {
-    "id": 1138,
-    "at": "2026-10-07T07:55:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1137,
-    "at": "2026-10-07T07:55:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
+    "id": 1452,
+    "at": "2026-10-07T17:20:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
     "kind": "clue",
     "subject": "elite",
     "value": 150000,
@@ -57,10 +127,10 @@
     }
   },
   {
-    "id": 1105,
-    "at": "2026-10-07T06:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
+    "id": 1451,
+    "at": "2026-10-07T17:20:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -78,10 +148,10 @@
     }
   },
   {
-    "id": 1101,
-    "at": "2026-10-07T06:35:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
+    "id": 1442,
+    "at": "2026-10-07T17:00:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
     "kind": "loot",
     "subject": "Chambers of Xeric",
     "value": 30000000,
@@ -99,66 +169,94 @@
     }
   },
   {
-    "id": 1100,
-    "at": "2026-10-07T06:35:31.590411024Z",
-    "rsn": "Blue Tank",
+    "id": 1425,
+    "at": "2026-10-07T16:20:35.920900809Z",
+    "rsn": "Blue Alt",
     "team": 1,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
     }
   },
   {
-    "id": 1099,
-    "at": "2026-10-07T06:15:31.590411024Z",
+    "id": 1424,
+    "at": "2026-10-07T16:00:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1423,
+    "at": "2026-10-07T16:00:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1395,
+    "at": "2026-10-07T14:20:35.920900809Z",
     "rsn": "Gold Tank",
     "team": 3,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
+    "subject": "Vorkath",
+    "value": 1000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Zulrah",
+      "source": "Vorkath",
       "items": [
         {
-          "name": "Tanzanite fang",
+          "name": "Valuable drop",
           "quantity": 1,
-          "price_each": 1600000
+          "price_each": 1000000
         }
       ]
     }
   },
   {
-    "id": 1098,
-    "at": "2026-10-07T06:15:31.590411024Z",
+    "id": 1393,
+    "at": "2026-10-07T14:00:35.920900809Z",
     "rsn": "Red Mage",
     "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1097,
-    "at": "2026-10-07T05:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -176,71 +274,22 @@
     }
   },
   {
-    "id": 1096,
-    "at": "2026-10-07T05:55:31.590411024Z",
-    "rsn": "Green Alt",
+    "id": 1392,
+    "at": "2026-10-07T14:00:35.920900809Z",
+    "rsn": "Green Archer",
     "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
+      "kind": "slayer",
+      "task": "Dagannoth"
     }
   },
   {
-    "id": 1087,
-    "at": "2026-10-07T05:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1086,
-    "at": "2026-10-07T05:35:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1083,
-    "at": "2026-10-07T05:15:31.590411024Z",
+    "id": 1390,
+    "at": "2026-10-07T13:40:35.920900809Z",
     "rsn": "Green Tank",
     "team": 2,
     "kind": "loot",
@@ -260,10 +309,73 @@
     }
   },
   {
-    "id": 1074,
-    "at": "2026-10-07T05:15:31.590411024Z",
-    "rsn": "Red Tank",
+    "id": 1389,
+    "at": "2026-10-07T13:20:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1388,
+    "at": "2026-10-07T13:20:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1379,
+    "at": "2026-10-07T13:00:35.920900809Z",
+    "rsn": "Red Alt",
     "team": 0,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1367,
+    "at": "2026-10-07T12:20:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -281,10 +393,59 @@
     }
   },
   {
-    "id": 1073,
-    "at": "2026-10-07T05:15:31.590411024Z",
-    "rsn": "Blue Archer",
+    "id": 1366,
+    "at": "2026-10-07T12:20:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1365,
+    "at": "2026-10-07T12:20:35.920900809Z",
+    "rsn": "Blue Tank",
     "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1356,
+    "at": "2026-10-07T12:00:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1355,
+    "at": "2026-10-07T12:00:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -302,9 +463,30 @@
     }
   },
   {
-    "id": 1063,
-    "at": "2026-10-07T04:35:31.590411024Z",
-    "rsn": "Gold Alt",
+    "id": 1354,
+    "at": "2026-10-07T11:40:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1345,
+    "at": "2026-10-07T11:40:35.920900809Z",
+    "rsn": "Gold Archer",
     "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
@@ -323,29 +505,71 @@
     }
   },
   {
-    "id": 1062,
-    "at": "2026-10-07T04:35:31.590411024Z",
-    "rsn": "Blue Archer",
+    "id": 1344,
+    "at": "2026-10-07T11:20:35.920900809Z",
+    "rsn": "Blue Mage",
     "team": 1,
     "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "General Graardor",
+      "source": "Chambers of Xeric",
       "items": [
         {
-          "name": "Bandos chestplate",
+          "name": "Dexterous prayer scroll",
           "quantity": 1,
-          "price_each": 14000000
+          "price_each": 30000000
         }
       ]
     }
   },
   {
-    "id": 1060,
-    "at": "2026-10-07T04:35:31.590411024Z",
+    "id": 1343,
+    "at": "2026-10-07T11:20:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1342,
+    "at": "2026-10-07T11:00:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1341,
+    "at": "2026-10-07T10:40:35.920900809Z",
     "rsn": "Green Archer",
     "team": 2,
     "kind": "loot",
@@ -365,127 +589,8 @@
     }
   },
   {
-    "id": 1050,
-    "at": "2026-10-07T04:15:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1048,
-    "at": "2026-10-07T03:55:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1047,
-    "at": "2026-10-07T03:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1046,
-    "at": "2026-10-07T03:35:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1044,
-    "at": "2026-10-07T03:15:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1043,
-    "at": "2026-10-07T03:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1042,
-    "at": "2026-10-07T02:55:31.590411024Z",
+    "id": 1339,
+    "at": "2026-10-07T10:40:35.920900809Z",
     "rsn": "Red Tank",
     "team": 0,
     "kind": "loot",
@@ -505,66 +610,10 @@
     }
   },
   {
-    "id": 1039,
-    "at": "2026-10-07T02:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1038,
-    "at": "2026-10-07T02:15:31.590411024Z",
-    "rsn": "Gold Tank",
+    "id": 1338,
+    "at": "2026-10-07T10:40:35.920900809Z",
+    "rsn": "Gold Archer",
     "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1029,
-    "at": "2026-10-07T01:55:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1019,
-    "at": "2026-10-07T01:55:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
     "kind": "combat_achievement",
     "subject": "Noxious Foe",
     "value": 0,
@@ -575,8 +624,261 @@
     }
   },
   {
-    "id": 1017,
-    "at": "2026-10-07T01:35:31.590411024Z",
+    "id": 1336,
+    "at": "2026-10-07T10:20:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1335,
+    "at": "2026-10-07T10:20:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1333,
+    "at": "2026-10-07T10:00:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1328,
+    "at": "2026-10-07T09:20:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1327,
+    "at": "2026-10-07T09:00:35.920900809Z",
+    "rsn": "Gold Alt",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1318,
+    "at": "2026-10-07T09:00:35.920900809Z",
+    "rsn": "Red Archer",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1316,
+    "at": "2026-10-07T09:00:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1285,
+    "at": "2026-10-07T08:20:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1276,
+    "at": "2026-10-07T08:00:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1242,
+    "at": "2026-10-07T07:20:35.920900809Z",
+    "rsn": "Gold Alt",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1239,
+    "at": "2026-10-07T07:00:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1230,
+    "at": "2026-10-07T06:40:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 1228,
+    "at": "2026-10-07T06:40:35.920900809Z",
     "rsn": "Gold Alt",
     "team": 3,
     "kind": "loot",
@@ -596,8 +898,486 @@
     }
   },
   {
-    "id": 1006,
-    "at": "2026-10-07T01:15:31.590411024Z",
+    "id": 1218,
+    "at": "2026-10-07T06:20:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1217,
+    "at": "2026-10-07T06:20:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1214,
+    "at": "2026-10-07T05:40:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1212,
+    "at": "2026-10-07T05:40:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1195,
+    "at": "2026-10-07T05:20:35.920900809Z",
+    "rsn": "Blue Tank",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1175,
+    "at": "2026-10-07T04:40:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1172,
+    "at": "2026-10-07T04:00:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1171,
+    "at": "2026-10-07T04:00:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1170,
+    "at": "2026-10-07T03:40:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1169,
+    "at": "2026-10-07T03:20:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1168,
+    "at": "2026-10-07T03:20:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1167,
+    "at": "2026-10-07T03:20:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 1165,
+    "at": "2026-10-07T03:00:35.920900809Z",
+    "rsn": "Red Archer",
+    "team": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1161,
+    "at": "2026-10-07T02:20:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1160,
+    "at": "2026-10-07T02:20:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1159,
+    "at": "2026-10-07T02:20:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1158,
+    "at": "2026-10-07T02:20:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1156,
+    "at": "2026-10-07T01:40:35.920900809Z",
+    "rsn": "Green Mage",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1155,
+    "at": "2026-10-07T01:20:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1146,
+    "at": "2026-10-07T01:00:35.920900809Z",
+    "rsn": "Blue Alt",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1137,
+    "at": "2026-10-07T00:40:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 1116,
+    "at": "2026-10-07T00:00:35.920900809Z",
+    "rsn": "Blue Tank",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1115,
+    "at": "2026-10-06T23:40:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1106,
+    "at": "2026-10-06T23:20:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1086,
+    "at": "2026-10-06T22:40:35.920900809Z",
     "rsn": "Gold Mage",
     "team": 3,
     "kind": "loot",
@@ -617,36 +1397,489 @@
     }
   },
   {
-    "id": 980,
-    "at": "2026-10-07T00:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
+    "id": 1085,
+    "at": "2026-10-06T22:40:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
     "count": 1,
     "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
     }
   },
   {
-    "id": 978,
-    "at": "2026-10-07T00:15:31.590411024Z",
+    "id": 1074,
+    "at": "2026-10-06T22:20:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1039,
+    "at": "2026-10-06T20:40:35.920900809Z",
+    "rsn": "Gold Alt",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1038,
+    "at": "2026-10-06T20:40:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1020,
+    "at": "2026-10-06T20:00:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1017,
+    "at": "2026-10-06T19:40:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1007,
+    "at": "2026-10-06T19:00:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 998,
+    "at": "2026-10-06T18:40:35.920900809Z",
+    "rsn": "Blue Tank",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 988,
+    "at": "2026-10-06T17:40:35.920900809Z",
+    "rsn": "Red Archer",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 987,
+    "at": "2026-10-06T17:40:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 986,
+    "at": "2026-10-06T17:40:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 985,
+    "at": "2026-10-06T17:20:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 974,
+    "at": "2026-10-06T16:40:35.920900809Z",
+    "rsn": "Gold Alt",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 973,
+    "at": "2026-10-06T16:20:35.920900809Z",
     "rsn": "Red Mage",
     "team": 0,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
     "count": 1,
     "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
     }
   },
   {
-    "id": 969,
-    "at": "2026-10-07T00:15:31.590411024Z",
+    "id": 971,
+    "at": "2026-10-06T16:00:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 970,
+    "at": "2026-10-06T16:00:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 968,
+    "at": "2026-10-06T15:40:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 967,
+    "at": "2026-10-06T15:40:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 965,
+    "at": "2026-10-06T15:00:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 964,
+    "at": "2026-10-06T15:00:35.920900809Z",
+    "rsn": "Green Mage",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 963,
+    "at": "2026-10-06T15:00:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 962,
+    "at": "2026-10-06T15:00:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 953,
+    "at": "2026-10-06T14:40:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 952,
+    "at": "2026-10-06T14:20:35.920900809Z",
     "rsn": "Blue Archer",
     "team": 1,
     "kind": "loot",
@@ -666,51 +1899,30 @@
     }
   },
   {
-    "id": 968,
-    "at": "2026-10-07T00:15:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 965,
-    "at": "2026-10-06T23:55:31.590411024Z",
-    "rsn": "Blue Mage",
+    "id": 949,
+    "at": "2026-10-06T14:00:35.920900809Z",
+    "rsn": "Blue Alt",
     "team": 1,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
+    "subject": "General Graardor",
+    "value": 14000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Zulrah",
+      "source": "General Graardor",
       "items": [
         {
-          "name": "Tanzanite fang",
+          "name": "Bandos chestplate",
           "quantity": 1,
-          "price_each": 1600000
+          "price_each": 14000000
         }
       ]
     }
   },
   {
-    "id": 964,
-    "at": "2026-10-06T23:55:31.590411024Z",
-    "rsn": "Green Mage",
+    "id": 948,
+    "at": "2026-10-06T14:00:35.920900809Z",
+    "rsn": "Green Alt",
     "team": 2,
     "kind": "loot",
     "subject": "Vorkath",
@@ -729,8 +1941,331 @@
     }
   },
   {
-    "id": 963,
-    "at": "2026-10-06T23:55:31.590411024Z",
+    "id": 931,
+    "at": "2026-10-06T13:00:35.920900809Z",
+    "rsn": "Green Alt",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 930,
+    "at": "2026-10-06T12:40:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 927,
+    "at": "2026-10-06T12:00:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 926,
+    "at": "2026-10-06T11:40:35.920900809Z",
+    "rsn": "Blue Tank",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 915,
+    "at": "2026-10-06T11:00:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 914,
+    "at": "2026-10-06T10:40:35.920900809Z",
+    "rsn": "Gold Alt",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 876,
+    "at": "2026-10-06T09:40:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 863,
+    "at": "2026-10-06T08:40:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 852,
+    "at": "2026-10-06T08:20:35.920900809Z",
+    "rsn": "Green Mage",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 851,
+    "at": "2026-10-06T08:20:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 838,
+    "at": "2026-10-06T07:40:35.920900809Z",
+    "rsn": "Red Alt",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 837,
+    "at": "2026-10-06T07:40:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 826,
+    "at": "2026-10-06T07:20:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 825,
+    "at": "2026-10-06T07:00:35.920900809Z",
+    "rsn": "Red Mage",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 824,
+    "at": "2026-10-06T07:00:35.920900809Z",
+    "rsn": "Gold Mage",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 822,
+    "at": "2026-10-06T06:40:35.920900809Z",
+    "rsn": "Red Archer",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 819,
+    "at": "2026-10-06T05:40:35.920900809Z",
     "rsn": "Red Tank",
     "team": 0,
     "kind": "loot",
@@ -750,73 +2285,10 @@
     }
   },
   {
-    "id": 954,
-    "at": "2026-10-06T23:15:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 953,
-    "at": "2026-10-06T23:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 943,
-    "at": "2026-10-06T22:55:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 934,
-    "at": "2026-10-06T22:55:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
+    "id": 817,
+    "at": "2026-10-06T05:20:35.920900809Z",
+    "rsn": "Green Archer",
+    "team": 2,
     "kind": "slayer",
     "subject": "Dagannoth",
     "value": 0,
@@ -827,213 +2299,10 @@
     }
   },
   {
-    "id": 933,
-    "at": "2026-10-06T22:55:31.590411024Z",
-    "rsn": "Green Mage",
+    "id": 814,
+    "at": "2026-10-06T05:00:35.920900809Z",
+    "rsn": "Green Archer",
     "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 924,
-    "at": "2026-10-06T22:55:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 923,
-    "at": "2026-10-06T22:35:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 881,
-    "at": "2026-10-06T22:15:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 872,
-    "at": "2026-10-06T21:55:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 870,
-    "at": "2026-10-06T21:55:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 869,
-    "at": "2026-10-06T21:55:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 868,
-    "at": "2026-10-06T21:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 859,
-    "at": "2026-10-06T21:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 857,
-    "at": "2026-10-06T21:35:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 855,
-    "at": "2026-10-06T21:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -1051,94 +2320,66 @@
     }
   },
   {
-    "id": 854,
-    "at": "2026-10-06T21:15:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
+    "id": 805,
+    "at": "2026-10-06T05:00:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
-    "value": 1000000,
+    "value": 2400000,
     "count": 1,
     "observation": {
       "kind": "loot",
       "source": "Vorkath",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Dragonbone necklace",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 2400000
         }
       ]
     }
   },
   {
-    "id": 852,
-    "at": "2026-10-06T20:55:31.590411024Z",
+    "id": 804,
+    "at": "2026-10-06T05:00:35.920900809Z",
     "rsn": "Blue Archer",
     "team": 1,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 802,
+    "at": "2026-10-06T04:40:35.920900809Z",
+    "rsn": "Red Tank",
+    "team": 0,
     "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Vorkath",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Dragonbone necklace",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 2400000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 842,
-    "at": "2026-10-06T20:55:31.590411024Z",
-    "rsn": "Green Tank",
+    "id": 801,
+    "at": "2026-10-06T04:00:35.920900809Z",
+    "rsn": "Green Mage",
     "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 825,
-    "at": "2026-10-06T20:35:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 798,
-    "at": "2026-10-06T19:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 1000000,
@@ -1157,22 +2398,8 @@
   },
   {
     "id": 797,
-    "at": "2026-10-06T19:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 796,
-    "at": "2026-10-06T19:35:31.590411024Z",
-    "rsn": "Blue Tank",
+    "at": "2026-10-06T04:00:35.920900809Z",
+    "rsn": "Blue Archer",
     "team": 1,
     "kind": "loot",
     "subject": "General Graardor",
@@ -1191,72 +2418,72 @@
     }
   },
   {
-    "id": 786,
-    "at": "2026-10-06T19:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
+    "id": 794,
+    "at": "2026-10-06T03:40:35.920900809Z",
+    "rsn": "Gold Tank",
+    "team": 3,
     "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
+    "subject": "Cerberus",
+    "value": 28000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Vorkath",
+      "source": "Cerberus",
       "items": [
         {
-          "name": "Dragonbone necklace",
+          "name": "Primordial crystal",
           "quantity": 1,
-          "price_each": 2400000
+          "price_each": 28000000
         }
       ]
     }
   },
   {
-    "id": 759,
-    "at": "2026-10-06T18:35:31.590411024Z",
+    "id": 789,
+    "at": "2026-10-06T03:00:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 777,
+    "at": "2026-10-06T02:00:35.920900809Z",
     "rsn": "Red Tank",
     "team": 0,
     "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
+    "subject": "Vorkath",
+    "value": 2400000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Cerberus",
+      "source": "Vorkath",
       "items": [
         {
-          "name": "Primordial crystal",
+          "name": "Dragonbone necklace",
           "quantity": 1,
-          "price_each": 28000000
+          "price_each": 2400000
         }
       ]
     }
   },
   {
-    "id": 750,
-    "at": "2026-10-06T18:15:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 739,
-    "at": "2026-10-06T17:55:31.590411024Z",
-    "rsn": "Green Alt",
+    "id": 768,
+    "at": "2026-10-06T02:00:35.920900809Z",
+    "rsn": "Green Archer",
     "team": 2,
     "kind": "loot",
     "subject": "Vorkath",
@@ -1275,178 +2502,94 @@
     }
   },
   {
-    "id": 730,
-    "at": "2026-10-06T17:35:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
+    "id": 767,
+    "at": "2026-10-06T02:00:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
     "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Vorkath",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 729,
-    "at": "2026-10-06T17:35:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
+    "id": 758,
+    "at": "2026-10-06T01:40:35.920900809Z",
+    "rsn": "Green Tank",
+    "team": 2,
     "kind": "loot",
     "subject": "Vorkath",
-    "value": 1000000,
+    "value": 2400000,
     "count": 1,
     "observation": {
       "kind": "loot",
       "source": "Vorkath",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Dragonbone necklace",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 756,
+    "at": "2026-10-06T01:40:35.920900809Z",
+    "rsn": "Blue Mage",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 746,
+    "at": "2026-10-06T01:00:35.920900809Z",
+    "rsn": "Blue Archer",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
         }
       ]
     }
   },
   {
     "id": 727,
-    "at": "2026-10-06T17:15:31.590411024Z",
-    "rsn": "Blue Alt",
+    "at": "2026-10-06T00:20:35.920900809Z",
+    "rsn": "Blue Tank",
     "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 726,
-    "at": "2026-10-06T17:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 725,
-    "at": "2026-10-06T17:15:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 714,
-    "at": "2026-10-06T16:35:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 705,
-    "at": "2026-10-06T16:35:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 702,
-    "at": "2026-10-06T16:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 691,
-    "at": "2026-10-06T15:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
     "kind": "clue",
     "subject": "elite",
     "value": 150000,
@@ -1465,31 +2608,10 @@
     }
   },
   {
-    "id": 690,
-    "at": "2026-10-06T15:35:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 689,
-    "at": "2026-10-06T15:35:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
+    "id": 698,
+    "at": "2026-10-05T23:40:35.920900809Z",
+    "rsn": "Gold Archer",
+    "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -1507,415 +2629,50 @@
     }
   },
   {
-    "id": 687,
-    "at": "2026-10-06T15:15:31.590411024Z",
+    "id": 688,
+    "at": "2026-10-05T23:20:35.920900809Z",
+    "rsn": "Blue Tank",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 678,
+    "at": "2026-10-05T23:00:35.920900809Z",
     "rsn": "Gold Alt",
     "team": 3,
     "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
+    "subject": "General Graardor",
+    "value": 14000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Chambers of Xeric",
+      "source": "General Graardor",
       "items": [
         {
-          "name": "Dexterous prayer scroll",
+          "name": "Bandos chestplate",
           "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 685,
-    "at": "2026-10-06T15:15:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 675,
-    "at": "2026-10-06T14:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 674,
-    "at": "2026-10-06T14:35:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 669,
-    "at": "2026-10-06T13:55:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
+          "price_each": 14000000
         }
       ]
     }
   },
   {
     "id": 668,
-    "at": "2026-10-06T13:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 667,
-    "at": "2026-10-06T13:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 666,
-    "at": "2026-10-06T13:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 664,
-    "at": "2026-10-06T12:55:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 663,
-    "at": "2026-10-06T12:55:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 658,
-    "at": "2026-10-06T12:35:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 656,
-    "at": "2026-10-06T12:35:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 655,
-    "at": "2026-10-06T12:15:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 654,
-    "at": "2026-10-06T12:15:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 653,
-    "at": "2026-10-06T12:15:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 652,
-    "at": "2026-10-06T12:15:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 651,
-    "at": "2026-10-06T11:55:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 649,
-    "at": "2026-10-06T11:35:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 648,
-    "at": "2026-10-06T11:35:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 638,
-    "at": "2026-10-06T10:55:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 637,
-    "at": "2026-10-06T10:55:31.590411024Z",
+    "at": "2026-10-05T23:00:35.920900809Z",
     "rsn": "Green Archer",
     "team": 2,
     "kind": "loot",
@@ -1935,910 +2692,8 @@
     }
   },
   {
-    "id": 635,
-    "at": "2026-10-06T10:15:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 634,
-    "at": "2026-10-06T10:15:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 633,
-    "at": "2026-10-06T10:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 622,
-    "at": "2026-10-06T09:35:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 612,
-    "at": "2026-10-06T09:15:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 601,
-    "at": "2026-10-06T08:35:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 592,
-    "at": "2026-10-06T08:15:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 582,
-    "at": "2026-10-06T07:35:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 581,
-    "at": "2026-10-06T07:35:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 578,
-    "at": "2026-10-06T06:55:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 569,
-    "at": "2026-10-06T06:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 565,
-    "at": "2026-10-06T05:35:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 563,
-    "at": "2026-10-06T05:35:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 559,
-    "at": "2026-10-06T05:15:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 556,
-    "at": "2026-10-06T04:35:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 555,
-    "at": "2026-10-06T04:15:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 553,
-    "at": "2026-10-06T03:55:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 550,
-    "at": "2026-10-06T03:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 549,
-    "at": "2026-10-06T03:35:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 548,
-    "at": "2026-10-06T03:15:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 546,
-    "at": "2026-10-06T02:55:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 544,
-    "at": "2026-10-06T02:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 541,
-    "at": "2026-10-06T01:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 540,
-    "at": "2026-10-06T01:55:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 539,
-    "at": "2026-10-06T01:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 538,
-    "at": "2026-10-06T01:15:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 536,
-    "at": "2026-10-06T01:15:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 522,
-    "at": "2026-10-05T23:15:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 521,
-    "at": "2026-10-05T22:55:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 510,
-    "at": "2026-10-05T22:15:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 508,
-    "at": "2026-10-05T22:15:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 506,
-    "at": "2026-10-05T21:55:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 503,
-    "at": "2026-10-05T21:35:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 490,
-    "at": "2026-10-05T21:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 489,
-    "at": "2026-10-05T20:55:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 480,
-    "at": "2026-10-05T20:35:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 479,
-    "at": "2026-10-05T20:35:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 469,
-    "at": "2026-10-05T20:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 467,
-    "at": "2026-10-05T19:55:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 465,
-    "at": "2026-10-05T19:55:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 454,
-    "at": "2026-10-05T19:15:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 433,
-    "at": "2026-10-05T18:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 414,
-    "at": "2026-10-05T17:55:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 397,
-    "at": "2026-10-05T16:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 395,
-    "at": "2026-10-05T15:55:31.590411024Z",
+    "id": 618,
+    "at": "2026-10-05T22:20:35.920900809Z",
     "rsn": "Gold Alt",
     "team": 3,
     "kind": "loot",
@@ -2858,1182 +2713,9 @@
     }
   },
   {
-    "id": 390,
-    "at": "2026-10-05T14:55:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 389,
-    "at": "2026-10-05T14:55:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 387,
-    "at": "2026-10-05T14:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 386,
-    "at": "2026-10-05T14:35:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 385,
-    "at": "2026-10-05T14:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 382,
-    "at": "2026-10-05T14:35:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 380,
-    "at": "2026-10-05T13:55:31.590411024Z",
+    "id": 617,
+    "at": "2026-10-05T22:20:35.920900809Z",
     "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 374,
-    "at": "2026-10-05T13:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 373,
-    "at": "2026-10-05T13:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 372,
-    "at": "2026-10-05T13:15:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 369,
-    "at": "2026-10-05T12:35:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 368,
-    "at": "2026-10-05T12:35:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 362,
-    "at": "2026-10-05T11:15:31.590411024Z",
-    "rsn": "Red Alt",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 359,
-    "at": "2026-10-05T10:35:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 348,
-    "at": "2026-10-05T09:55:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 337,
-    "at": "2026-10-05T09:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 334,
-    "at": "2026-10-05T08:55:31.590411024Z",
-    "rsn": "Blue Mage",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 333,
-    "at": "2026-10-05T08:55:31.590411024Z",
-    "rsn": "Blue Tank",
-    "team": 1,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 332,
-    "at": "2026-10-05T08:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 323,
-    "at": "2026-10-05T08:35:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 322,
-    "at": "2026-10-05T08:35:31.590411024Z",
-    "rsn": "Red Mage",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 320,
-    "at": "2026-10-05T08:15:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 311,
-    "at": "2026-10-05T07:55:31.590411024Z",
-    "rsn": "Green Archer",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 309,
-    "at": "2026-10-05T07:35:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 308,
-    "at": "2026-10-05T07:35:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 307,
-    "at": "2026-10-05T07:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 303,
-    "at": "2026-10-05T06:55:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 302,
-    "at": "2026-10-05T06:55:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 299,
-    "at": "2026-10-05T06:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 297,
-    "at": "2026-10-05T06:15:31.590411024Z",
-    "rsn": "Green Alt",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 296,
-    "at": "2026-10-05T06:15:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 292,
-    "at": "2026-10-05T05:35:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 290,
-    "at": "2026-10-05T05:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 289,
-    "at": "2026-10-05T04:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 287,
-    "at": "2026-10-05T04:55:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 285,
-    "at": "2026-10-05T04:35:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 284,
-    "at": "2026-10-05T04:35:31.590411024Z",
-    "rsn": "Green Mage",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 283,
-    "at": "2026-10-05T04:15:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 282,
-    "at": "2026-10-05T04:15:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 280,
-    "at": "2026-10-05T04:15:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 227,
-    "at": "2026-10-04T23:55:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 226,
-    "at": "2026-10-04T23:35:31.590411024Z",
-    "rsn": "Red Tank",
-    "team": 0,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 225,
-    "at": "2026-10-04T23:35:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 224,
-    "at": "2026-10-04T22:55:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 221,
-    "at": "2026-10-04T22:35:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 218,
-    "at": "2026-10-04T21:55:31.590411024Z",
-    "rsn": "Blue Alt",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 216,
-    "at": "2026-10-04T21:35:31.590411024Z",
-    "rsn": "Gold Alt",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 214,
-    "at": "2026-10-04T21:15:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 213,
-    "at": "2026-10-04T20:55:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 210,
-    "at": "2026-10-04T20:35:31.590411024Z",
-    "rsn": "Green Tank",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 207,
-    "at": "2026-10-04T20:15:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 205,
-    "at": "2026-10-04T19:55:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 195,
-    "at": "2026-10-04T19:35:31.590411024Z",
-    "rsn": "Red Archer",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 194,
-    "at": "2026-10-04T19:15:31.590411024Z",
-    "rsn": "Gold Archer",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 193,
-    "at": "2026-10-04T19:15:31.590411024Z",
-    "rsn": "Gold Mage",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 191,
-    "at": "2026-10-04T19:15:31.590411024Z",
-    "rsn": "Blue Archer",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 165,
-    "at": "2026-10-04T18:35:31.590411024Z",
-    "rsn": "Gold Tank",
-    "team": 3,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 163,
-    "at": "2026-10-04T18:15:31.590411024Z",
-    "rsn": "Gold Archer",
     "team": 3,
     "kind": "loot",
     "subject": "Vorkath",

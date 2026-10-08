@@ -14,6 +14,7 @@ import TeamControls from '@/components/TeamControls.vue'
 import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
+import { inventorySize } from '@/domain/items'
 import { GEMS, type Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
@@ -354,6 +355,7 @@ function locateMine() {
             <TeamCard
               :team="team"
               :rank="i + 1"
+              :items="my.team?.id === team.id ? my.items : null"
               :state="state"
               :challenges="challenges"
               :names="game.names"
@@ -378,7 +380,13 @@ function locateMine() {
 
     <!-- The shop opens over everything, like the event site's shop modal -->
     <div v-if="shopOpen" class="tt-overlay" @click.self="shopOpen = false">
-      <ShopPanel :buyer="buyer" :pending="my.pending" @buy="buy" @close="shopOpen = false" />
+      <ShopPanel
+        :buyer="buyer"
+        :held="inventorySize(my.items)"
+        :pending="my.pending"
+        @buy="buy"
+        @close="shopOpen = false"
+      />
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Team, TeamStatus } from './game'
 import { instanceId, matchId, teamId, tileId } from './ids'
-import { whyNotUsable } from './items'
+import { gainedItem, whyNotUsable } from './items'
 
 const NOW = new Date('2026-10-06T12:00:00Z')
 
@@ -17,8 +17,6 @@ function team(status: TeamStatus, overrides: Partial<Team> = {}): Team {
     matchId: null,
     gems: new Set(),
     gold: 100,
-    items: new Map(),
-    cardsLeft: 50,
     effects: {
       moveMultiplier: 1,
       nextMoveHalved: false,
@@ -86,5 +84,27 @@ describe('whyNotUsable', () => {
     expect(whyNotUsable(ready, 'quetzal_whistle', NOW, sea)).toBe('Only works on land')
     expect(whyNotUsable(ready, 'ogre_boat', NOW, sea)).toBeNull()
     expect(whyNotUsable(ready, 'ogre_boat', NOW, land)).toBe('Only works at sea')
+  })
+})
+
+describe('gainedItem', () => {
+  it('finds the item whose count went up', () => {
+    const before = new Map([['banana', 1]] as const)
+    expect(gainedItem(before, new Map([['banana', 2]]))).toBe('banana')
+    expect(
+      gainedItem(
+        before,
+        new Map([
+          ['banana', 1],
+          ['ogre_boat', 1],
+        ]),
+      ),
+    ).toBe('ogre_boat')
+  })
+
+  it('is null when nothing was gained', () => {
+    const before = new Map([['banana', 1]] as const)
+    expect(gainedItem(before, before)).toBeNull()
+    expect(gainedItem(before, new Map())).toBeNull()
   })
 })

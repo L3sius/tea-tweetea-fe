@@ -1,6 +1,7 @@
 import type { AdminReply, CommandAccepted } from '@/domain/commands'
 import { teamId } from '@/domain/ids'
-import type { Hello, TeamIdentity } from '@/domain/server'
+import type { Hello, Me } from '@/domain/server'
+import type { Item } from '@/domain/vocabulary'
 import type { WireAdminReply, WireHello, WireMe } from '../wire/server'
 import { toDate } from './shared'
 
@@ -10,9 +11,12 @@ export const toHello = (wire: WireHello): Hello => ({
   seq: wire.seq,
 })
 
-export const toTeamIdentity = (wire: WireMe): TeamIdentity => ({
+export const toMe = (wire: WireMe): Me => ({
   teamId: teamId(wire.team),
   name: wire.name,
+  // The schema only admits item names as keys.
+  items: new Map(Object.entries(wire.items) as [Item, number][]),
+  seq: wire.seq,
 })
 
 export const toAccepted = (wire: { seq: number }): CommandAccepted => ({

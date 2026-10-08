@@ -19,6 +19,8 @@ import ItemSlot from './ItemSlot.vue'
 
 const props = defineProps<{
   team: Team
+  /** The team's private inventory. */
+  items: ReadonlyMap<Item, number>
   /** The tile the team stands on, for items that only work on land or at sea. */
   here?: Tile
   now: Date
@@ -33,7 +35,7 @@ const SLOT = 90
 const GAP = 3
 
 const items = computed(() =>
-  [...props.team.items]
+  [...props.items]
     .filter(([, n]) => n > 0)
     .map(([item, count]) => {
       const group = ITEM_GROUP[item]
@@ -114,7 +116,7 @@ onClickOutside(grid, () => (menuOpen.value = false))
 <template>
   <div class="flex w-full flex-col items-center gap-2">
     <TtText :size="1" color="orange">
-      Inventory ({{ inventorySize(team) }}/{{ INVENTORY_LIMIT }})
+      Inventory ({{ inventorySize(props.items) }}/{{ INVENTORY_LIMIT }})
     </TtText>
     <div
       ref="grid"

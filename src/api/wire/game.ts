@@ -15,7 +15,8 @@ export const WireEffect = z.discriminatedUnion('effect', [
   z.object({ effect: z.literal('halve_gold') }),
   z.object({ effect: z.literal('gold'), amount: z.number() }),
   z.object({ effect: z.literal('freeze'), hours: z.number() }),
-  z.object({ effect: z.literal('give_item'), item: Item }),
+  // Item names are private: the public journal blanks which item was given.
+  z.object({ effect: z.literal('give_item'), item: Item.nullable() }),
   z.object({ effect: z.literal('lose_random_item') }),
   z.object({ effect: z.literal('multiplier'), factor: z.number() }),
   z.object({ effect: z.literal('nothing') }),
@@ -84,11 +85,9 @@ export const WireTeam = z.object({
   match_id: Id.nullable(),
   gems: z.array(Gem),
   gold: z.number(),
-  items: z.partialRecord(Item, z.int().nonnegative()),
-  cards_left: z.int(),
   effects: z.object({
     multiplier: z.number(),
-    rain: z.boolean(),
+    halved: z.boolean(),
     suit_gold: z.tuple([Suit, z.int()]).nullable(),
     item_used_here: z.boolean(),
   }),

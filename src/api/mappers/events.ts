@@ -103,7 +103,9 @@ export function toGameEvent(wire: WireEvent): GameEvent {
       return { kind: wire.type, teamId: teamId(wire.team) }
     case 'bought':
       return { kind: wire.type, teamId: teamId(wire.team), item: wire.item, price: wire.price }
+    // Apart, since TypeScript stops matching a merged kind against the union past 25 item values.
     case 'item_gained':
+      return { kind: wire.type, teamId: teamId(wire.team), item: wire.item, reason: wire.reason }
     case 'item_lost':
       return { kind: wire.type, teamId: teamId(wire.team), item: wire.item, reason: wire.reason }
     case 'item_used':

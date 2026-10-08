@@ -2,7 +2,13 @@
 import { computed, ref, watch } from 'vue'
 import { cardLabel, itemName, teamStatusText } from '@/domain/describe'
 import type { Card } from '@/domain/game'
-import { ITEM_GROUP, ITEM_GROUPS, type ItemGroup } from '@/domain/items'
+import {
+  INVENTORY_LIMIT,
+  ITEM_GROUP,
+  ITEM_GROUPS,
+  inventorySize,
+  type ItemGroup,
+} from '@/domain/items'
 import { ITEMS, SUITS, type Item, type Suit } from '@/domain/vocabulary'
 import { useDevStore } from '@/stores/dev'
 import { useGameStore } from '@/stores/game'
@@ -53,9 +59,9 @@ const statusLine = computed(() => {
   const t = team.value
   if (!t) return ''
   const now = new Date(game.serverNow())
-  return `${teamStatusText(t, now, game.names)} · tile #${t.position} · ${t.gold}g · ${[
-    ...t.items.values(),
-  ].reduce((a, b) => a + b, 0)}/10 items`
+  const line = `${teamStatusText(t, now, game.names)} · tile #${t.position} · ${t.gold}g`
+  // Items are private: only the team this browser plays as shows its count.
+  return t.id === my.teamId ? `${line} · ${inventorySize(my.items)}/${INVENTORY_LIMIT} items` : line
 })
 
 const last = computed(() => {

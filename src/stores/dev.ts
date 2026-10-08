@@ -105,17 +105,20 @@ export const useDevStore = defineStore('dev', () => {
       (t) => ({ kind: 'dev_draw_card', teamId: t, card }),
       () => `${name()} drew the chosen card.`,
     )
-  /** A held Protect from Magic blocks the freeze and is used up, as with any other freeze. */
-  const freeze = (hours: number) => {
-    const t = teamId.value === null ? null : game.state?.teams.get(teamId.value)
-    const protect = (t?.items.get('protect_from_magic') ?? 0) > 0
-    return withTeam(
+  /**
+   * A held Protect from Magic blocks the freeze and is used up, as with any other freeze. Items are
+   * private, so whether one did is read from the state afterwards.
+   */
+  async function freeze(hours: number) {
+    const seq = await withTeam(
       (id) => ({ kind: 'dev_freeze', teamId: id, hours }),
-      () =>
-        protect
-          ? `${name()}’s Protect from Magic blocked the freeze.`
-          : `${name()} is frozen for ${hours}h.`,
+      () => `${name()} is frozen for ${hours}h.`,
     )
+    const t = teamId.value === null ? null : game.state?.teams.get(teamId.value)
+    const frozen = (t?.frozenUntil?.getTime() ?? 0) > game.serverNow()
+    if (seq !== null && t && !frozen)
+      message.value = { text: `${name()}’s Protect from Magic blocked the freeze.`, tone: 'ok' }
+    return seq
   }
   const thaw = () =>
     withTeam(

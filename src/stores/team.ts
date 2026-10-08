@@ -4,10 +4,10 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { describeProblem, isApiError } from '@/api'
 import type { ItemTarget, TeamCommand } from '@/domain/commands'
 import { drawOutcome, type DrawOutcome } from '@/domain/draw'
-import type { JournalEntry } from '@/domain/events'
+import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
-import { BLOCKER_RANGE, ITEM_TARGET } from '@/domain/items'
+import { BLOCKER_RANGE, ITEM_TARGET, gainedItem } from '@/domain/items'
 import { adjacency, webTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
@@ -30,6 +30,10 @@ export const useTeamStore = defineStore('team', () => {
 
   const code = ref<string | null>(null)
   const teamId = ref<TeamId | null>(null)
+  /** The team's inventory. It is private, so it comes from `/team/me` rather than the state. */
+  const items = shallowRef<ReadonlyMap<Item, number>>(new Map())
+  /** The journal entry `items` is current to. */
+  let itemsSeq = 0
   const pending = ref(false)
   const error = ref<string | null>(null)
 
@@ -51,6 +55,9 @@ export const useTeamStore = defineStore('team', () => {
    */
   const drawPhase = ref<'idle' | 'picking' | 'revealed'>('idle')
   const lastDraw = shallowRef<DrawOutcome | null>(null)
+
+  // Item names are private to their team: the game's texts name them only for this browser's team.
+  watch(teamId, (id) => (game.viewer = id), { immediate: true })
 
   const team = computed<Team | null>(() =>
     teamId.value === null ? null : (game.state?.teams.get(teamId.value) ?? null),
@@ -122,15 +129,55 @@ export const useTeamStore = defineStore('team', () => {
     },
   )
 
+  /** Refetches the inventory; a failure keeps the last one, as the state refreshes do. */
+  async function refreshItems() {
+    const entered = code.value
+    if (!entered) return
+    try {
+      const me = await api.getMe(entered)
+      if (code.value !== entered) return
+      items.value = me.items
+      itemsSeq = me.seq
+    } catch {
+      // The next change that names the team tries again.
+    }
+  }
+
+  // The journal says when the team's inventory changed but not how (the items are private), so a
+  // newer entry with such an event for the team means asking again.
+  watch(
+    () => game.log,
+    (log) => {
+      const id = teamId.value
+      if (id === null) return
+      const changed = log.some(
+        (entry) =>
+          entry.seq > itemsSeq &&
+          entry.events.some(
+            (e) => INVENTORY_EVENTS.has(e.kind) && 'teamId' in e && e.teamId === id,
+          ),
+      )
+      if (changed) itemsRefresh()
+    },
+  )
+  let itemsTimer: ReturnType<typeof setTimeout> | undefined
+  /** Entries come in bursts, so wait for a quiet moment as the game store does. */
+  function itemsRefresh() {
+    clearTimeout(itemsTimer)
+    itemsTimer = setTimeout(() => void refreshItems(), 300)
+  }
+
   async function login(entered: string) {
     const trimmed = entered.trim()
     if (!trimmed) return
     pending.value = true
     error.value = null
     try {
-      const identity = await api.identifyTeam(trimmed)
+      const me = await api.getMe(trimmed)
       code.value = trimmed
-      teamId.value = identity.teamId
+      teamId.value = me.teamId
+      items.value = me.items
+      itemsSeq = me.seq
       try {
         localStorage.setItem(CODE_KEY, trimmed)
       } catch {
@@ -160,6 +207,8 @@ export const useTeamStore = defineStore('team', () => {
   function logout() {
     code.value = null
     teamId.value = null
+    items.value = new Map()
+    itemsSeq = 0
     error.value = null
     clearRoute()
     targeting.value = null
@@ -188,7 +237,7 @@ export const useTeamStore = defineStore('team', () => {
         command,
         idempotencyKey: crypto.randomUUID(),
       })
-      await game.refreshState()
+      await Promise.all([game.refreshState(), refreshItems()])
       return accepted.seq
     } catch (e) {
       error.value = messageOf(e)
@@ -206,10 +255,16 @@ export const useTeamStore = defineStore('team', () => {
   async function draw(): Promise<DrawOutcome | null> {
     const id = team.value?.id
     if (id === undefined) return null
+    const before = items.value
     const seq = await sendDraw(id)
     if (seq === null) return null
     const entry = await waitForEntry(seq)
     const outcome = entry ? drawOutcome(entry, id) : null
+    // The journal keeps the free item private, even from its team: the inventory says which it was.
+    if (outcome?.freeItem && outcome.freeItem.item === null) {
+      await refreshItems()
+      outcome.freeItem.item = gainedItem(before, items.value)
+    }
     if (outcome) return outcome
     // No entry (offline fixtures or a slow stream): fall back to what the state says.
     const status = team.value?.status
@@ -342,6 +397,7 @@ export const useTeamStore = defineStore('team', () => {
     code,
     teamId,
     team,
+    items,
     pending,
     error,
     route,
@@ -372,6 +428,9 @@ export const useTeamStore = defineStore('team', () => {
     useOn,
   }
 })
+
+/** Events after which a team's inventory may differ. */
+const INVENTORY_EVENTS = new Set<GameEvent['kind']>(['bought', 'item_gained', 'item_lost'])
 
 const sameRoute = (a: readonly TileId[], b: readonly TileId[]) =>
   a.length === b.length && sharedLength(a, b) === a.length

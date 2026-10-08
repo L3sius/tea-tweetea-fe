@@ -14,11 +14,9 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   match_id: null,
   gems: ['blue', 'white'],
   gold: 55,
-  items: { bronze_feather: 2 },
-  cards_left: 30,
   effects: {
     multiplier: 1,
-    rain: false,
+    halved: false,
     suit_gold: null,
     item_used_here: false,
   },
@@ -74,10 +72,9 @@ describe('teams', () => {
     })
   })
 
-  it('turns collections into sets and maps', () => {
+  it('turns the gems into a set', () => {
     const team = toTeam(wireTeam())
     expect(team.gems).toEqual(new Set(['blue', 'white']))
-    expect(team.items).toEqual(new Map([['bronze_feather', 2]]))
   })
 
   it('names the suit-gold tuple', () => {

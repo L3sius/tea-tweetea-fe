@@ -40,9 +40,10 @@ export type GameEvent =
   // Shops and items
   | { kind: 'shop_opened'; teamId: TeamId; tileId: TileId }
   | { kind: 'shop_closed'; teamId: TeamId }
-  | { kind: 'bought'; teamId: TeamId; item: Item; price: number }
-  | { kind: 'item_gained'; teamId: TeamId; item: Item; reason: string }
-  | { kind: 'item_lost'; teamId: TeamId; item: Item; reason: string }
+  /** The item is null when it is private: the public journal names only items lost in plain sight. */
+  | { kind: 'bought'; teamId: TeamId; item: Item | null; price: number }
+  | { kind: 'item_gained'; teamId: TeamId; item: Item | null; reason: string }
+  | { kind: 'item_lost'; teamId: TeamId; item: Item | null; reason: string }
   | { kind: 'item_used'; teamId: TeamId; item: Item; target: ItemTarget | null }
   | { kind: 'gold_changed'; teamId: TeamId; delta: number; total: number; reason: string }
   // Board effects

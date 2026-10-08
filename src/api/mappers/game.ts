@@ -25,7 +25,6 @@ import {
   tileId,
   type InstanceId,
 } from '@/domain/ids'
-import type { Item } from '@/domain/vocabulary'
 import type {
   WireBlocker,
   WireCard,
@@ -137,12 +136,9 @@ export function toTeam(wire: WireTeam): Team {
     matchId: wire.match_id === null ? null : matchId(wire.match_id),
     gems: new Set(wire.gems),
     gold: wire.gold,
-    // The schema only admits item names as keys.
-    items: new Map(Object.entries(wire.items) as [Item, number][]),
-    cardsLeft: wire.cards_left,
     effects: {
       moveMultiplier: wire.effects.multiplier,
-      nextMoveHalved: wire.effects.rain,
+      nextMoveHalved: wire.effects.halved,
       suitGold: suitGold && { suit: suitGold[0], drawsLeft: suitGold[1] },
       itemUsedHere: wire.effects.item_used_here,
     },

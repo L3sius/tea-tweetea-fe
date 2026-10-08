@@ -10,7 +10,14 @@ import { ApiError } from '../errors'
 const files = import.meta.glob<string>('./data/*.json', { query: '?raw', import: 'default' })
 
 type FixtureName =
-  'board' | 'challenges' | 'items' | 'state' | 'events' | 'feed' | `stats-by-${StatsGroup}`
+  | 'board'
+  | 'challenges'
+  | 'items'
+  | 'state'
+  | 'events'
+  | 'feed'
+  | `stats-by-${StatsGroup}`
+  | `me-${string}`
 
 export const FIXTURE_ADMIN_CODE = 'admin'
 const JOURNAL_PAGE_LIMIT = 500
@@ -94,9 +101,13 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
         await load(`stats-by-${query.by}`),
       ),
 
-    async identifyTeam(teamCode) {
-      const { team } = await teamForCode(teamCode)
-      return { teamId: team.id, name: team.name }
+    // Only some teams' inventories are recorded; the others hold nothing.
+    async getMe(teamCode) {
+      const { team, seq } = await teamForCode(teamCode)
+      const name = `me-${teamCode}` as const
+      if (!files[`./data/${name}.json`])
+        return { teamId: team.id, name: team.name, items: new Map(), seq }
+      return decode(`fixture:${name}`, endpoints.me.schema, endpoints.me.map, await load(name))
     },
 
     async sendTeamCommand({ teamCode, version }) {

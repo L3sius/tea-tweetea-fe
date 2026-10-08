@@ -11,7 +11,8 @@ export type Effect =
   | { kind: 'halve_gold' }
   | { kind: 'gold'; amount: number }
   | { kind: 'freeze'; hours: number }
-  | { kind: 'give_item'; item: Item }
+  /** Null when the journal keeps which item private. */
+  | { kind: 'give_item'; item: Item | null }
   | { kind: 'lose_random_item' }
   | { kind: 'multiplier'; factor: number }
   | { kind: 'nothing' }
@@ -20,7 +21,7 @@ export type Effect =
 export type Effects = {
   /** Factor applied to the next move (1 = none). */
   moveMultiplier: number
-  /** A rival's Harp of Rain halves the next move. */
+  /** A rival's Morrigan's throwing axe halves the next move. */
   nextMoveHalved: boolean
   /** Draws of this suit pay gold, for this many more draws. */
   suitGold: { suit: Suit; drawsLeft: number } | null
@@ -79,8 +80,6 @@ export type Team = {
   matchId: MatchId | null
   gems: Set<Gem>
   gold: number
-  items: Map<Item, number>
-  cardsLeft: number
   effects: Effects
   tilesCompleted: number
   /** Quoted back on every action so two people acting at once cannot both succeed. */

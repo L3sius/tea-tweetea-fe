@@ -37,7 +37,8 @@ export function blockerName(blocker: Blocker): string {
   }
 }
 
-export function effectText(effect: Effect): string {
+/** `seesItems`: whether the viewer may know which item a gift was (its own team's only). */
+export function effectText(effect: Effect, seesItems = true): string {
   switch (effect.kind) {
     case 'lose_gem':
       return 'loses a gem'
@@ -50,7 +51,7 @@ export function effectText(effect: Effect): string {
     case 'freeze':
       return `is frozen for ${effect.hours}h`
     case 'give_item':
-      return `gets ${a(itemName(effect.item))}`
+      return `gets ${effect.item && seesItems ? a(itemName(effect.item)) : 'an item'}`
     case 'lose_random_item':
       return 'loses a random item'
     case 'multiplier':
@@ -166,6 +167,8 @@ export function teamStatusText(team: Team, now: Date, names: Names): string {
 export type Names = {
   team(id: TeamId): string
   challenge(id: ChallengeId): string
+  /** Whether the viewer may know what items this team holds: only its own players may. */
+  seesItems(id: TeamId): boolean
 }
 
 /**
@@ -174,6 +177,10 @@ export type Names = {
  */
 export function describeEvent(event: GameEvent, names: Names): string | null {
   const team = (id: TeamId) => names.team(id)
+  // What a team gains, buys or loses stays private: other viewers learn only that it was an item.
+  // Using one is public, since everyone sees what it does. The server blanks private items too.
+  const held = (id: TeamId, item: Item | null) =>
+    item && names.seesItems(id) ? a(itemName(item)) : 'an item'
   switch (event.kind) {
     case 'team_created':
       return `${event.name} joined the game`
@@ -214,21 +221,21 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'shop_opened':
       return `${team(event.teamId)} entered a shop`
     case 'bought':
-      return `${team(event.teamId)} bought ${a(itemName(event.item))} for ${event.price} gold`
+      return `${team(event.teamId)} bought ${held(event.teamId, event.item)} for ${event.price} gold`
     case 'item_gained':
-      return `${team(event.teamId)} got ${a(itemName(event.item))}`
+      return `${team(event.teamId)} got ${held(event.teamId, event.item)}`
     case 'item_lost':
       switch (event.reason) {
         case 'blocked a freeze':
-          return `${team(event.teamId)}’s ${itemName(event.item)} blocked a freeze`
+          return `${team(event.teamId)}’s ${event.item ? itemName(event.item) : 'item'} blocked a freeze`
         case 'inventory full':
-          return `${team(event.teamId)}’s inventory was full, so ${a(itemName(event.item))} was lost`
+          return `${team(event.teamId)}’s inventory was full, so ${held(event.teamId, event.item)} was lost`
         // Told by `item_used` and `necklace_used`.
         case 'used':
         case 'protected a gem':
           return null
         default:
-          return `${team(event.teamId)} lost ${a(itemName(event.item))}`
+          return `${team(event.teamId)} lost ${held(event.teamId, event.item)}`
       }
     case 'item_used':
       return `${team(event.teamId)} used ${a(itemName(event.item))}`
@@ -247,9 +254,9 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'thawed':
       return `${team(event.teamId)} thawed out`
     case 'random_event':
-      return `${event.title}: ${team(event.teamId)} ${effectText(event.effect)}`
+      return `${event.title}: ${team(event.teamId)} ${effectText(event.effect, names.seesItems(event.teamId))}`
     case 'joker_effect':
-      return `Joker! ${team(event.teamId)} ${effectText(event.effect)}`
+      return `Joker! ${team(event.teamId)} ${effectText(event.effect, names.seesItems(event.teamId))}`
     case 'minigame_opened':
       return `${team(event.initiator)} opened a minigame: ${names.challenge(event.challengeId)}`
     case 'minigame_finished':

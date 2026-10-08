@@ -92,7 +92,7 @@ const here = computed(() => (team.value ? game.board?.tiles.get(team.value.posit
 const usableCount = computed(() => {
   const t = team.value
   if (!t) return 0
-  return [...t.items].filter(
+  return [...my.items].filter(
     ([item, n]) => n > 0 && whyNotUsable(t, item, now.value, here.value) === null,
   ).length
 })
@@ -190,7 +190,11 @@ const outcomeLines = computed(() => {
       tone: 'info',
     })
   else lines.push({ text: `Move ${o.steps} ${o.steps === 1 ? 'tile' : 'tiles'}.`, tone: 'good' })
-  if (o.freeItem) lines.push({ text: `Free item: ${itemName(o.freeItem)}!`, tone: 'good' })
+  if (o.freeItem)
+    lines.push({
+      text: o.freeItem.item ? `Free item: ${itemName(o.freeItem.item)}!` : 'A free item!',
+      tone: 'good',
+    })
   else if (o.card.kind === 'suited' && (o.card.rank === 7 || o.card.rank === 14))
     lines.push({ text: 'A free item, but your inventory is full: it was lost.', tone: 'bad' })
   if (o.suitGold > 0) lines.push({ text: `+${o.suitGold} gold from your suit item.`, tone: 'good' })
@@ -273,7 +277,6 @@ async function login() {
     <TtGemTracker :held="team.gems" :scale="1" class="max-w-[260px]" />
     <div class="flex flex-wrap justify-center gap-1.5">
       <TtDisplayBox label="Gold" :value="team.gold" value-color="var(--osrs-yellow)" :width="117" />
-      <TtDisplayBox label="Cards left" :value="team.cardsLeft" :width="117" />
       <TtDisplayBox label="Tiles done" :value="team.tilesCompleted" :width="117" />
     </div>
     <div class="flex gap-1.5">
@@ -410,6 +413,7 @@ async function login() {
 
       <PowerUpPicker
         :team="team"
+        :items="my.items"
         :here="here"
         :now="now"
         :pending="my.pending"
@@ -455,7 +459,7 @@ async function login() {
         ref="cardDraw"
         class="w-full"
         :result="my.lastDraw?.card ?? null"
-        :disabled="my.pending || team.cardsLeft === 0 || my.drawPhase === 'revealed'"
+        :disabled="my.pending || my.drawPhase === 'revealed'"
         @pick="onPick"
         @revealed="my.cardRevealed()"
       />
@@ -568,6 +572,7 @@ async function login() {
       <TtDivider />
       <PowerUpPicker
         :team="team"
+        :items="my.items"
         :here="here"
         :now="now"
         :pending="my.pending"

@@ -114,7 +114,6 @@ const gameRows = computed(() =>
     gems: t.gems.size,
     tiles: t.tilesCompleted,
     gold: t.gold,
-    cards: t.cardsLeft,
   })),
 )
 </script>
@@ -173,7 +172,6 @@ const gameRows = computed(() =>
                 <th class="text-right font-normal">Gems</th>
                 <th class="text-right font-normal">Tiles</th>
                 <th class="text-right font-normal">Gold</th>
-                <th class="text-right font-normal">Cards left</th>
               </tr>
             </thead>
             <tbody style="color: var(--osrs-white)">
@@ -182,7 +180,6 @@ const gameRows = computed(() =>
                 <td class="text-right">{{ r.gems }}</td>
                 <td class="text-right">{{ r.tiles }}</td>
                 <td class="text-right" style="color: var(--osrs-yellow)">{{ r.gold }}</td>
-                <td class="text-right">{{ r.cards }}</td>
               </tr>
             </tbody>
           </table>

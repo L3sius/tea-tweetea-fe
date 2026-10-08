@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
-import { INVENTORY_LIMIT, SHOP_PRICES, inventorySize, itemEntry } from '@/domain/items'
+import { INVENTORY_LIMIT, SHOP_PRICES, itemEntry } from '@/domain/items'
 import { ITEMS, type Item } from '@/domain/vocabulary'
 import { TtButton, TtDisplayBox, TtPanel, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
@@ -10,6 +10,8 @@ import ItemSlot from './ItemSlot.vue'
 const props = defineProps<{
   /** The shopping team, when this browser manages one that can buy here now. */
   buyer: Team | null
+  /** How many items the buyer holds, against the inventory limit. */
+  held: number
   pending: boolean
 }>()
 const emit = defineEmits<{ buy: [item: Item]; close: [] }>()
@@ -22,7 +24,7 @@ const rows = computed(() =>
       ? null
       : price > props.buyer.gold
         ? 'Not enough gold'
-        : inventorySize(props.buyer) >= INVENTORY_LIMIT
+        : props.held >= INVENTORY_LIMIT
           ? 'Inventory full'
           : null
     return [{ item, name: itemName(item), text: itemEntry(item).description, price, why }]

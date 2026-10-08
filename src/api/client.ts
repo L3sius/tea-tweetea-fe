@@ -6,7 +6,7 @@ import type { JournalEntry } from '@/domain/events'
 import type { GameState } from '@/domain/game'
 import type { ItemEntry } from '@/domain/items'
 import type { ChallengeId } from '@/domain/ids'
-import type { Hello, TeamIdentity } from '@/domain/server'
+import type { Hello, Me } from '@/domain/server'
 import type { Item } from '@/domain/vocabulary'
 
 /** `live` while connected; `reconnecting` while the browser retries; `offline` when it gave up. */
@@ -56,8 +56,8 @@ export type ApiClient = {
   /** Feed items, newest first. */
   getFeed(query?: FeedQuery): Promise<FeedItem[]>
   getStats(query: StatsQuery): Promise<StatRow[]>
-  /** Checks a team code and says which team it belongs to. */
-  identifyTeam(teamCode: string): Promise<TeamIdentity>
+  /** Checks a team code and returns its team, with the team's private inventory. */
+  getMe(teamCode: string): Promise<Me>
   sendTeamCommand(request: TeamCommandRequest): Promise<CommandAccepted>
   sendAdminCommand(request: AdminCommandRequest): Promise<AdminReply>
   /** Live journal entries after `afterSeq`, in order. Returns a function that closes the stream. */

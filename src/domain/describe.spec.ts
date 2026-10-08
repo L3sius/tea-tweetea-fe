@@ -14,6 +14,7 @@ import { challengeId, instanceId, teamId, type ChallengeId, type TeamId } from '
 const names = {
   team: (id: TeamId) => ['Red', 'Blue'][id] ?? '?',
   challenge: (id: ChallengeId) => `challenge ${id}`,
+  seesItems: (id: TeamId) => id === red,
 }
 
 const red = teamId(0)
@@ -53,7 +54,7 @@ describe('cardLabel', () => {
 describe('itemName', () => {
   it('uses the catalogue name', () => {
     expect(itemName('bronze_feather')).toBe('Bronze feather')
-    expect(itemName('harp_of_rain')).toBe('Harp of Rain')
+    expect(itemName('morrigans_throwing_axe')).toBe("Morrigan's throwing axe")
   })
 })
 
@@ -131,6 +132,20 @@ describe('observationText', () => {
     expect(observationText({ kind: 'kill_count', boss: 'Zulrah', seconds: 65 })).toBe(
       'killed Zulrah in 1:05',
     )
+  })
+})
+
+describe('private items', () => {
+  it('names an item only to its own team', () => {
+    const gained = (teamId: TeamId) =>
+      describeEvent({ kind: 'item_gained', teamId, item: 'banana', reason: 'bought' }, names)
+    expect(gained(red)).toBe('Red got a Banana')
+    expect(gained(teamId(1))).toBe('Blue got an item')
+  })
+
+  it('still names an item a team uses, since its effect is public', () => {
+    const used = { kind: 'item_used', teamId: teamId(1), item: 'banana', target: null } as const
+    expect(describeEvent(used, names)).toBe('Blue used a Banana')
   })
 })
 

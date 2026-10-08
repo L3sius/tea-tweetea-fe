@@ -7,11 +7,17 @@ const client = createFixtureClient()
 
 describe('fixture client', () => {
   it('identifies a team by its lower-case name', async () => {
-    await expect(client.identifyTeam('blue')).resolves.toEqual({ teamId: 1, name: 'Blue' })
+    await expect(client.getMe('blue')).resolves.toMatchObject({ teamId: 1, name: 'Blue' })
+  })
+
+  it('serves the recorded inventory of red, and an empty one for teams without a recording', async () => {
+    const red = await client.getMe('red')
+    expect(red.items.size).toBeGreaterThan(0)
+    expect((await client.getMe('blue')).items.size).toBe(0)
   })
 
   it('rejects an unknown team code', async () => {
-    await expect(client.identifyTeam('purple')).rejects.toBeInstanceOf(ApiError)
+    await expect(client.getMe('purple')).rejects.toBeInstanceOf(ApiError)
   })
 
   it('accepts a command quoting the current version and rejects a stale one', async () => {

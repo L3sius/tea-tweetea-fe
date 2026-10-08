@@ -54,7 +54,8 @@ export class Choreography {
   private lastSeq = 0
 
   /** Adds an entry's movement and callouts. Entries must arrive in order; repeats are ignored. */
-  apply(entry: JournalEntry): void {
+  /** `seesItems`: whether the viewer may know which items a team gains (its own team's only). */
+  apply(entry: JournalEntry, seesItems: (team: TeamId) => boolean = () => true): void {
     if (entry.seq <= this.lastSeq) return
     this.lastSeq = entry.seq
     const at = entry.at.getTime()
@@ -108,7 +109,7 @@ export class Choreography {
           cue(event.teamId, `${blockerName(event.trap)}!`, 'bad', index)
           return move(event.teamId, event.to, 'slide')
       }
-      const callout = cueFor(event)
+      const callout = cueFor(event, seesItems)
       if (callout) cue(callout.team, callout.text, callout.tone, index)
     })
     this.reveal.set(entry.seq, Math.max(at, ...cursor.values()))
@@ -178,7 +179,10 @@ export class Choreography {
   }
 }
 
-function cueFor(event: GameEvent): { team: TeamId; text: string; tone: CueTone } | null {
+function cueFor(
+  event: GameEvent,
+  seesItems: (team: TeamId) => boolean,
+): { team: TeamId; text: string; tone: CueTone } | null {
   switch (event.kind) {
     case 'gem_collected':
       return { team: event.teamId, text: `${capital(event.gem)} gem!`, tone: 'gem' }
@@ -193,16 +197,27 @@ function cueFor(event: GameEvent): { team: TeamId; text: string; tone: CueTone }
         tone: event.delta >= 0 ? 'good' : 'bad',
       }
     case 'item_gained':
-      return { team: event.teamId, text: `+ ${itemName(event.item)}`, tone: 'good' }
+      return {
+        team: event.teamId,
+        text: event.item && seesItems(event.teamId) ? `+ ${itemName(event.item)}` : '+ Item',
+        tone: 'good',
+      }
     case 'item_lost':
       if (event.reason === 'blocked a freeze')
         return {
           team: event.teamId,
-          text: `${itemName(event.item)} blocked a freeze!`,
+          text: `${event.item ? itemName(event.item) : 'An item'} blocked a freeze!`,
           tone: 'good',
         }
       if (event.reason === 'inventory full')
-        return { team: event.teamId, text: `No room: ${itemName(event.item)} lost`, tone: 'bad' }
+        return {
+          team: event.teamId,
+          text:
+            event.item && seesItems(event.teamId)
+              ? `No room: ${itemName(event.item)} lost`
+              : 'No room: item lost',
+          tone: 'bad',
+        }
       return null
     case 'necklace_used':
       return { team: event.teamId, text: 'A necklace saved the gem!', tone: 'good' }
@@ -219,7 +234,11 @@ function cueFor(event: GameEvent): { team: TeamId; text: string; tone: CueTone }
     case 'random_event':
       return { team: event.teamId, text: event.title, tone: 'info' }
     case 'joker_effect':
-      return { team: event.teamId, text: `Joker: ${effectText(event.effect)}`, tone: 'info' }
+      return {
+        team: event.teamId,
+        text: `Joker: ${effectText(event.effect, seesItems(event.teamId))}`,
+        tone: 'info',
+      }
     case 'match_started':
       return { team: event.mover, text: 'Match!', tone: 'bad' }
     case 'match_won':
