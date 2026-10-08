@@ -78,11 +78,27 @@ describe('challengeProgress', () => {
 describe('effortText', () => {
   const now = new Date(3 * 3_600_000 + 12 * 60_000)
 
-  it('counts kills, and shows nothing before an instance exists', () => {
-    const c = challenge({ kind: 'total', n: 1 }, ['Kalphite Queen'])
+  it('counts kills for a drop task, and shows nothing before an instance exists', () => {
+    const c: Challenge = {
+      ...challenge({ kind: 'total', n: 1 }, []),
+      criterion: {
+        kind: 'loot',
+        filter: {
+          kind: 'items',
+          items: [{ name: 'Dragon pickaxe', aliases: [], sources: { kind: 'any' } }],
+        },
+      },
+      effort: { kind: 'loots', sources: { kind: 'listed', names: ['Kalphite Queen'] } },
+    }
     const i = instance(0, 1, 312)
     expect(effortText(c, i, i.progress.get(red), now)).toBe('312 kills')
     expect(effortText(c, undefined, undefined, now)).toBeNull()
+  })
+
+  it('leaves out kills for a kill-count task, which its progress bar already shows', () => {
+    const c = challenge({ kind: 'total', n: 50 }, ['Abyssal Sire'])
+    const i = instance(24, 50, 24)
+    expect(effortText(c, i, i.progress.get(red), now)).toBeNull()
   })
 
   it('shows the best time against the limit', () => {

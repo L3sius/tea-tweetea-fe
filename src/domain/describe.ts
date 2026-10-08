@@ -101,7 +101,9 @@ export function challengeProgress(
 
 /**
  * The effort a team has spent on a task, as a short label ("312 kills", "best 27:14 / 26:00",
- * "working 3h 12m"), or null when there is no instance to measure. It never decides completion.
+ * "working 3h 12m"). Null when there is no instance to measure, or when the effort counts the very
+ * thing the task counts (kills for a kill-count task, caskets for a casket count), since the
+ * progress bar already says it. It never decides completion.
  */
 export function effortText(
   challenge: Challenge,
@@ -112,6 +114,7 @@ export function effortText(
   if (!instance) return null
   const effort = standing?.effort ?? null
   const { criterion } = challenge
+  if (duplicatesProgress(challenge)) return null
   switch (challenge.effort.kind) {
     case 'kills':
     case 'loots':
@@ -125,6 +128,14 @@ export function effortText(
     case 'elapsed':
       return `working ${elapsed(now.getTime() - instance.startedAt.getTime())}`
   }
+}
+
+/** Whether a task's effort is the same count its progress bar shows. */
+function duplicatesProgress({ criterion, effort }: Challenge): boolean {
+  if (criterion.kind === 'kill_count') return effort.kind === 'kills'
+  if (criterion.kind === 'clue')
+    return effort.kind === 'caskets' && criterion.filter.kind === 'count'
+  return false
 }
 
 const plural = (n: number, noun: string) => `${n} ${noun}${n === 1 ? '' : 's'}`
