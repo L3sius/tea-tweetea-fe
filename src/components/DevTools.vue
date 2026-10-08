@@ -72,6 +72,13 @@ const last = computed(() => {
   return dev.lastEntry()
 })
 
+/** Plays the minigame pick for the chosen team, landing on a random real challenge. */
+function spinMinigame() {
+  const names = [...game.challenges.values()].map((c) => c.name)
+  const winner = names[Math.floor(Math.random() * names.length)] ?? 'Test minigame'
+  game.queueSpin({ teamId: dev.teamId ?? teams.value[0]?.id ?? null, winner, alert: null })
+}
+
 async function playAs(id: TeamId) {
   const code = SAMPLE_TEAM_CODES[id]
   if (code) await my.login(code)
@@ -267,6 +274,11 @@ async function playAs(id: TeamId) {
           </div>
         </div>
       </template>
+
+      <!-- The minigame slot machine, without waiting for a team to land on a red tile. -->
+      <button type="button" class="dev-btn w-full text-left" @click="spinMinigame">
+        🎰 Spin a minigame
+      </button>
 
       <!-- Undo -->
       <div class="flex flex-col gap-1">
