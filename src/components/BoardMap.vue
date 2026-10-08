@@ -1196,6 +1196,13 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 .board-map .sprite-teleport-in .sprite-body {
   animation: tp-in 0.55s ease-out;
 }
+/* A character arrives with its own landing animation, which starts out of sight. It stays hidden
+   while a bird would flash in, so it does not arrive twice. */
+.board-map .sprite-character.sprite-teleport-in .sprite-body,
+.board-map .sprite-character.sprite-teleport-in .sprite-shadow {
+  animation: none;
+  opacity: 0;
+}
 @keyframes tp-out {
   to {
     transform: scale(0.1, 2.4) translateY(-14px);
