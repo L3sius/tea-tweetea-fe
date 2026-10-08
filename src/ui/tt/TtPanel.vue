@@ -32,11 +32,24 @@ const iron = computed(() => props.variant === 'iron')
   >
     <div
       v-if="hasTitle"
-      style="width: 100%; display: flex; flex-direction: column; align-items: center"
+      style="
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      "
     >
       <TtText as="h2" :size="2" font="bold" color="orange" style="padding: 6px 12px 3px">
         <slot name="title">{{ title }}</slot>
       </TtText>
+      <!-- Controls for the whole panel, at the right end of the title row. -->
+      <div
+        v-if="slots.actions"
+        style="position: absolute; top: 3px; right: 6px; display: flex; gap: 3px"
+      >
+        <slot name="actions" />
+      </div>
       <div :class="iron ? 'tt-divider-iron-h' : 'tt-divider-h'" style="width: 100%" />
     </div>
     <div
