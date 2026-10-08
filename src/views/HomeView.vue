@@ -71,11 +71,14 @@ const TABS = computed(() => [
   { id: 'log' as const, label: 'Log' },
 ])
 
+/** The map's own markers: tiles and minigame tiles are nodes, a red one bigger; shops are coins. */
 const LEGEND = [
-  { color: TILE_COLORS.normal, label: 'Tile' },
-  { color: TILE_COLORS.red, label: 'Minigame' },
-  { color: TILE_COLORS.shop, label: 'Shop' },
+  { label: 'Tile', node: TILE_COLORS.normal, size: 12 },
+  { label: 'Minigame', node: TILE_COLORS.red, size: 16 },
+  { label: 'Shop', node: null, size: 20 },
 ]
+/** The map's legend and buttons stay folded away under a menu button until asked for. */
+const controlsOpen = ref(false)
 
 function openTab(id: Tab) {
   tab.value = id
@@ -294,45 +297,66 @@ async function buy(item: Item) {
         </TtButton>
       </div>
 
-      <!-- Map controls -->
+      <!-- Map controls, folded under a menu button -->
       <div class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1">
-        <div
-          class="tt-sprite-display flex flex-col gap-0.5 px-1 py-0 max-sm:hidden"
-          aria-label="Map legend"
+        <template v-if="controlsOpen">
+          <div class="tt-sprite-display flex flex-col gap-0.5 px-1 py-0" aria-label="Map legend">
+            <span v-for="l in LEGEND" :key="l.label" class="flex items-center gap-1.5">
+              <span class="grid size-5 place-items-center" aria-hidden="true">
+                <span
+                  v-if="l.node"
+                  class="legend-node"
+                  :style="{ background: l.node, width: `${l.size}px`, height: `${l.size}px` }"
+                />
+                <span v-else class="tt-sprite tt-icon-coins size-5" />
+              </span>
+              <TtText :size="1" color="white">{{ l.label }}</TtText>
+            </span>
+          </div>
+          <div class="flex gap-1">
+            <TtButton size="sm" class="map-btn" aria-label="Zoom in" @click="boardMap?.zoomBy(1)">
+              +
+            </TtButton>
+            <TtButton size="sm" class="map-btn" aria-label="Zoom out" @click="boardMap?.zoomBy(-1)">
+              -
+            </TtButton>
+          </div>
+          <div class="flex gap-1">
+            <TtButton
+              size="sm"
+              class="map-btn"
+              title="Zoom all the way out"
+              @click="boardMap?.showAll()"
+            >
+              All
+            </TtButton>
+            <TtButton
+              size="sm"
+              class="map-btn"
+              :selected="insetOpen"
+              :aria-pressed="insetOpen"
+              title="Toggle the overview map"
+              @click="insetOpen = !insetOpen"
+            >
+              Map
+            </TtButton>
+          </div>
+        </template>
+        <TtButton
+          size="sm"
+          class="map-btn"
+          :selected="controlsOpen"
+          :aria-expanded="controlsOpen"
+          :aria-label="controlsOpen ? 'Hide the map controls' : 'Show the map controls'"
+          :title="controlsOpen ? 'Hide the map controls' : 'Legend, zoom and overview'"
+          @click="controlsOpen = !controlsOpen"
         >
-          <span v-for="l in LEGEND" :key="l.label" class="flex items-center gap-1.5">
-            <span class="tt-swatch" :style="{ background: l.color }" />
-            <TtText :size="1" color="white">{{ l.label }}</TtText>
-          </span>
-        </div>
-        <div class="flex gap-1">
-          <TtButton size="sm" class="map-btn" aria-label="Zoom in" @click="boardMap?.zoomBy(1)">
-            +
-          </TtButton>
-          <TtButton size="sm" class="map-btn" aria-label="Zoom out" @click="boardMap?.zoomBy(-1)">
-            -
-          </TtButton>
-        </div>
-        <div class="flex gap-1">
-          <TtButton
-            size="sm"
-            class="map-btn"
-            title="Zoom all the way out"
-            @click="boardMap?.showAll()"
-          >
-            All
-          </TtButton>
-          <TtButton
-            size="sm"
-            class="map-btn"
-            :selected="insetOpen"
-            :aria-pressed="insetOpen"
-            title="Toggle the overview map"
-            @click="insetOpen = !insetOpen"
-          >
-            Map
-          </TtButton>
-        </div>
+          <svg class="menu-icon" viewBox="0 0 9 7" aria-hidden="true">
+            <rect y="0" width="9" height="1" />
+            <rect y="3" width="9" height="1" />
+            <rect y="6" width="9" height="1" />
+          </svg>
+        </TtButton>
       </div>
 
       <!-- Overview -->
@@ -457,5 +481,19 @@ async function buy(item: Item) {
 .map-btn {
   min-width: 48px !important;
   min-height: 42px !important;
+}
+/* Three bars, drawn on the pixel grid so they stay sharp. */
+.menu-icon {
+  width: 18px;
+  height: 14px;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+  filter: drop-shadow(1px 1px 0 #000);
+}
+/* A tile node as the map draws it: a filled circle with a thin black edge. */
+.legend-node {
+  box-sizing: border-box;
+  border: 2px solid #000;
+  border-radius: 50%;
 }
 </style>
