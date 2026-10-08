@@ -6,8 +6,16 @@ import { itemKitSprite, itemSprite } from '@/ui/items'
 import { TtSlot } from '@/ui/tt'
 
 const props = withDefaults(
-  defineProps<{ item: Item; count?: number; size?: number; selected?: boolean; dim?: boolean }>(),
-  { count: 1, size: 90 },
+  defineProps<{
+    item: Item
+    count?: number
+    size?: number
+    selected?: boolean
+    dim?: boolean
+    /** Hover text in place of the plain name, such as what the item does. */
+    hint?: string
+  }>(),
+  { count: 1, size: 90, hint: undefined },
 )
 
 /** The catalogue picture failed to load, so the kit sprite or the name stands in. */
@@ -19,6 +27,8 @@ watch(
 
 const sprite = computed(() => (broken.value ? itemKitSprite(props.item) : itemSprite(props.item)))
 const name = computed(() => itemName(props.item))
+/** The picture inside the slot's frame, in step with the slot from small to large. */
+const picture = computed(() => Math.round(props.size * 0.6))
 </script>
 
 <template>
@@ -29,7 +39,7 @@ const name = computed(() => itemName(props.item))
     :quantity="count"
     :selected="selected"
     :empty="dim"
-    :title="name"
+    :title="hint ?? name"
     :aria-label="count > 1 ? `${name} x${count}` : name"
   >
     <img
@@ -37,7 +47,7 @@ const name = computed(() => itemName(props.item))
       :src="sprite.url"
       alt=""
       class="item-picture"
-      :style="{ width: `${size - 36}px`, height: `${size - 36}px` }"
+      :style="{ width: `${picture}px`, height: `${picture}px` }"
       @error="broken = true"
     />
     <span

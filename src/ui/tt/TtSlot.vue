@@ -69,8 +69,8 @@ const gemScale = computed(() => (props.size >= 96 ? 3 : 2))
       v-if="icon"
       :class="['tt-sprite', `tt-icon-${icon}`]"
       :style="{
-        width: `${size - 36}px`,
-        height: `${size - 36}px`,
+        width: `${Math.round(size * 0.6)}px`,
+        height: `${Math.round(size * 0.6)}px`,
         backgroundSize: 'contain',
         filter: iconFilter,
       }"

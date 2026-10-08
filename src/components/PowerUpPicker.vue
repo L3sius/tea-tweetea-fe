@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside, useElementSize } from '@vueuse/core'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Tile } from '@/domain/board'
@@ -30,9 +30,17 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ use: [item: Item]; discard: [item: Item] }>()
 
-const COLUMNS = 4
-const SLOT = 90
+/** Five a row: the ten inventory slots make two full rows. */
+const COLUMNS = 5
 const GAP = 3
+/** As wide as the panel allows, up to a comfortable size. */
+const MAX_SLOT = 76
+
+const root = useTemplateRef('root')
+const { width } = useElementSize(root)
+const slot = computed(() =>
+  Math.max(48, Math.min(MAX_SLOT, Math.floor((width.value - (COLUMNS - 1) * GAP) / COLUMNS))),
+)
 
 const items = computed(() =>
   [...props.items]
@@ -50,10 +58,10 @@ const items = computed(() =>
       }
     }),
 )
-/** Item slots, then empty ones to fill the grid out to whole rows (two at least). */
+/** Item slots, then empty ones up to the inventory limit (and on to whole rows past it). */
 const empties = computed(() => {
   const n = items.value.length
-  return Math.max(COLUMNS * 2, Math.ceil(n / COLUMNS) * COLUMNS) - n
+  return Math.max(INVENTORY_LIMIT, Math.ceil(n / COLUMNS) * COLUMNS) - n
 })
 
 const selected = ref<Item | null>(null)
@@ -103,10 +111,11 @@ const menuStyle = computed(() => {
   const i = items.value.findIndex((r) => r.item === selected.value)
   const col = i % COLUMNS
   const row = Math.floor(i / COLUMNS)
-  const top = `${row * (SLOT + GAP) + SLOT * 0.66}px`
+  const size = slot.value
+  const top = `${row * (size + GAP) + size * 0.66}px`
   return col < COLUMNS / 2
-    ? { top, left: `${col * (SLOT + GAP) + SLOT / 3}px` }
-    : { top, right: `${(COLUMNS - 1 - col) * (SLOT + GAP) + SLOT / 3}px` }
+    ? { top, left: `${col * (size + GAP) + size / 3}px` }
+    : { top, right: `${(COLUMNS - 1 - col) * (size + GAP) + size / 3}px` }
 })
 
 const grid = useTemplateRef('grid')
@@ -114,21 +123,21 @@ onClickOutside(grid, () => (menuOpen.value = false))
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center gap-2">
+  <div ref="root" class="flex w-full flex-col items-center gap-2">
     <TtText :size="1" color="orange">
       Inventory ({{ inventorySize(props.items) }}/{{ INVENTORY_LIMIT }})
     </TtText>
     <div
       ref="grid"
       class="relative grid justify-center"
-      :style="{ gridTemplateColumns: `repeat(${COLUMNS}, ${SLOT}px)`, gap: `${GAP}px` }"
+      :style="{ gridTemplateColumns: `repeat(${COLUMNS}, ${slot}px)`, gap: `${GAP}px` }"
     >
       <ItemSlot
         v-for="r in items"
         :key="r.item"
         :item="r.item"
         :count="r.count"
-        :size="SLOT"
+        :size="slot"
         :selected="selected === r.item"
         @click="toggle(r.item)"
       />
@@ -136,7 +145,7 @@ onClickOutside(grid, () => (menuOpen.value = false))
         v-for="i in empties"
         :key="`e${i}`"
         class="tt-sprite-slot"
-        :style="{ width: `${SLOT}px`, height: `${SLOT}px`, filter: 'brightness(.7)' }"
+        :style="{ width: `${slot}px`, height: `${slot}px`, filter: 'brightness(.7)' }"
       />
       <div v-if="menuOpen && current" class="absolute z-10" :style="menuStyle">
         <TtContextMenu :options="menuOptions" @select="onSelect" />
