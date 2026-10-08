@@ -633,6 +633,7 @@ onMounted(() => {
   container.value.addEventListener(
     'wheel',
     (e) => {
+      stopFlight()
       if (e.deltaY > 0 && atMin()) overviewSoon()
     },
     { passive: true },
@@ -646,7 +647,10 @@ onMounted(() => {
   drawReach()
   drawRoute()
 
-  map.on('dragstart', () => emit('freeRoam'))
+  map.on('dragstart', () => {
+    stopFlight()
+    emit('freeRoam')
+  })
   map.on('moveend zoomend', emitView)
   // Hover reports only changes, and null as soon as the pointer is off every node.
   let hovered: TileId | null = null
@@ -692,6 +696,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  stopFlight()
   render(null, sceneRoot)
   cancelAnimationFrame(frame)
   teamMarkers.clear()
@@ -716,19 +721,50 @@ function locate(tile: TileId, zoom = 1) {
 }
 
 /**
- * A flight is on: the follow camera holds off, and its zoom changes are not the viewer zooming out
- * (a flight dips out on its way, which would otherwise read as reaching the overview).
+ * A flight is on: the follow camera holds off, and its zoom changes are not the viewer zooming out.
  */
 let flying = false
+let flight = 0
 
+const FLIGHT_MS = 800
+
+/**
+ * Glides the view to `at` at `zoom`, centre and zoom eased together a frame at a time through
+ * `setView`, so the map's limits hold the whole way. Leaflet's own `flyTo` dips out below the full
+ * zoom-out on a long flight and ignores the map's edges until it lands, which showed the black
+ * background around the map (worst when flying to a team at the edge right after loading). A drag,
+ * a wheel tick or a zoom button stops it where it is.
+ */
 function fly(map: LeafletMap, at: LatLng, zoom: number) {
+  stopFlight()
+  const from = map.getCenter()
+  const z0 = map.getZoom()
+  const z1 = Math.min(Math.max(zoom, map.getMinZoom()), map.getMaxZoom())
+  // Zoom snapping would turn the eased zoom into visible steps; it comes back when the flight ends.
+  const snap = map.options.zoomSnap
+  map.options.zoomSnap = 0
+  const start = performance.now()
   flying = true
-  // Ends the flight's way: arriving, or cut short by a drag.
-  map.once('moveend', () => (flying = false))
-  // At the same zoom it glides instead: a flight dips below the full zoom-out on its way, and the
-  // wheel ticks still coming in would then zoom back and cut it short.
-  if (Math.abs(zoom - map.getZoom()) < 0.001) map.panTo(at, { duration: 0.8 })
-  else map.flyTo(at, zoom, { duration: 0.8 })
+  const frame = (now: number) => {
+    const t = Math.min(1, (now - start) / FLIGHT_MS)
+    const e = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2
+    const centre = latLng(from.lat + (at.lat - from.lat) * e, from.lng + (at.lng - from.lng) * e)
+    map.setView(centre, z0 + (z1 - z0) * e, { animate: false })
+    if (t < 1) flight = requestAnimationFrame(frame)
+    else stopFlight()
+  }
+  flight = requestAnimationFrame(frame)
+  restoreSnap = () => (map.options.zoomSnap = snap)
+}
+
+let restoreSnap = () => {}
+
+function stopFlight() {
+  if (flight) cancelAnimationFrame(flight)
+  flight = 0
+  flying = false
+  restoreSnap()
+  restoreSnap = () => {}
 }
 
 /** Pans to a world position without changing zoom. */
@@ -737,6 +773,7 @@ function panTo(lat: number, lng: number) {
 }
 
 function zoomBy(delta: number) {
+  stopFlight()
   leaflet?.setZoom(leaflet.getZoom() + delta)
 }
 
