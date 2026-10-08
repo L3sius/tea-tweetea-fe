@@ -6,7 +6,7 @@ import type { GameState, Instance, Match, Minigame } from '@/domain/game'
 import type { ChallengeId, InstanceId } from '@/domain/ids'
 import { teamColor } from '@/ui/colors'
 import { timeFrom } from '@/ui/format'
-import { TtDivider, TtPanel, TtProgressBar, TtText } from '@/ui/tt'
+import { TtPanel, TtProgressBar, TtText } from '@/ui/tt'
 
 const props = defineProps<{
   state: GameState
@@ -17,6 +17,8 @@ const props = defineProps<{
 
 const open = ref<string | null>(null)
 const toggle = (key: string) => (open.value = open.value === key ? null : key)
+/** Finished minigames and matches stay out of the way until asked for. */
+const showResults = ref(false)
 
 type Bar = { name: string; color: string; done: number; needed: number; note: string | null }
 
@@ -117,8 +119,7 @@ const past = computed(() =>
 </script>
 
 <template>
-  <TtPanel title="Events" width="100%" :padding="12" :gap="12" class="min-h-full">
-    <TtText as="h3" :size="2" color="orange">Happening now</TtText>
+  <TtPanel title="Minigames" width="100%" :padding="12" :gap="12">
     <TtText v-if="live.length === 0" :size="1" color="muted">
       No minigames or matches right now. Landing on a red tile opens one.
     </TtText>
@@ -165,13 +166,16 @@ const past = computed(() =>
       </li>
     </ul>
 
-    <TtDivider />
-
-    <TtText as="h3" :size="2" color="orange">Results</TtText>
-    <TtText v-if="past.length === 0" :size="1" color="muted">
-      No finished minigames or matches yet.
-    </TtText>
-    <ul class="flex w-full flex-col gap-1">
+    <button
+      v-if="past.length"
+      type="button"
+      class="tt-link tt-1"
+      :aria-expanded="showResults"
+      @click="showResults = !showResults"
+    >
+      {{ showResults ? 'Hide' : 'Show' }} finished ({{ past.length }})
+    </button>
+    <ul v-if="showResults" class="flex w-full flex-col gap-1">
       <li v-for="row in past" :key="row.key" class="flex flex-col items-center">
         <button
           type="button"

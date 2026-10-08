@@ -15,12 +15,12 @@ import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
-import { GEMS, type Item } from '@/domain/vocabulary'
+import type { Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
-import { TtButton, TtDivider, TtPanel, TtText } from '@/ui/tt'
+import { TtButton, TtPanel, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -30,8 +30,12 @@ const { board, challenges, state, feed, log, loading, standings, alerts, choreog
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
 const boardMap = useTemplateRef('boardMap')
 
-type Tab = 'play' | 'teams' | 'events' | 'feed' | 'log'
-const tab = ref<Tab>('teams')
+/**
+ * The overview is all most players need: the followed team's tile and the minigames on now. The
+ * rest is for captains (play) and the curious (activity, log).
+ */
+type Tab = 'overview' | 'play' | 'feed' | 'log'
+const tab = ref<Tab>('overview')
 /** On phones the panel is a bottom sheet that can be tucked away to see more map. */
 const sheetOpen = ref(true)
 const shopOpen = ref(false)
@@ -53,9 +57,8 @@ const liveCount = computed(() => {
 })
 
 const TABS = computed(() => [
-  { id: 'play' as const, label: my.team ? 'My team' : 'Play' },
-  { id: 'teams' as const, label: 'Standings' },
-  { id: 'events' as const, label: 'Events', badge: liveCount.value },
+  { id: 'overview' as const, label: 'Overview', badge: liveCount.value },
+  { id: 'play' as const, label: 'Play' },
   { id: 'feed' as const, label: 'Activity' },
   { id: 'log' as const, label: 'Log' },
 ])
@@ -71,6 +74,9 @@ function openTab(id: Tab) {
   sheetOpen.value = true
 }
 
+/** The team this viewer last chose to follow, so the overview opens on it next time. */
+const WATCH_KEY = 'tweetea.watchTeam'
+
 /** Selecting a team starts following it; dragging the map switches to free roam. */
 function selectTeam(id: TeamId) {
   const team = state.value?.teams.get(id)
@@ -82,6 +88,34 @@ function selectTeam(id: TeamId) {
   selected.value = id
   follow.value = true
   boardMap.value?.locate(team.position, 0.5)
+  try {
+    localStorage.setItem(WATCH_KEY, String(id))
+  } catch {
+    // Storage blocked or full: it only saves picking the team again next time.
+  }
+}
+
+function watchedTeam(): TeamId | null {
+  try {
+    const saved = Number(localStorage.getItem(WATCH_KEY) ?? NaN)
+    return Number.isInteger(saved) && state.value?.teams.has(saved as TeamId)
+      ? (saved as TeamId)
+      : null
+  } catch {
+    return null
+  }
+}
+
+/** The team the overview shows: the one followed, else the captain's own, else the leader. */
+const focus = computed(() => followed.value ?? my.team ?? standings.value[0] ?? null)
+const focusRank = computed(() =>
+  focus.value ? standings.value.findIndex((t) => t.id === focus.value?.id) + 1 : 0,
+)
+
+/** A team picked on the map: follow it and show it in the overview. */
+function showTeam(id: TeamId) {
+  selectTeam(id)
+  openTab('overview')
 }
 
 function freeRoam() {
@@ -109,11 +143,16 @@ watch(
     if (show && my.team) boardMap.value?.locate(my.team.position, 0)
   },
 )
+// Open on a team to follow: the captain's own, else the one this viewer followed last time. It
+// waits for the map, which flies to the team.
 watch(
-  () => my.team?.id,
-  (id) => {
-    if (id !== undefined) openTab('play')
+  () => [my.team?.id, boardMap.value !== null, state.value !== null] as const,
+  ([mine, mapReady, loaded]) => {
+    if (!mapReady || !loaded || selected.value !== null) return
+    const id = mine ?? watchedTeam()
+    if (id !== null) selectTeam(id)
   },
+  { immediate: true },
 )
 
 /** The walk is shown while the captain picks checkpoints, not while an item waits for a target. */
@@ -150,10 +189,6 @@ function openShop() {
 async function buy(item: Item) {
   await my.act({ kind: 'buy', item })
 }
-
-function locateMine() {
-  if (my.team) selectTeam(my.team.id)
-}
 </script>
 
 <template>
@@ -188,26 +223,27 @@ function locateMine() {
         @view="view = $event"
       />
 
-      <!-- Standings strip -->
+      <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
         class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1 max-sm:hidden"
-        aria-label="Standings"
+        aria-label="Teams"
       >
-        <li v-for="(team, i) in standings" :key="team.id" class="pointer-events-auto">
+        <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
           <button
             type="button"
-            class="tt-sprite-display flex items-center gap-1.5 px-1 hover:brightness-[1.18]"
-            :style="{
-              boxShadow: selected === team.id ? `0 0 0 3px ${teamColor(team)}` : undefined,
-            }"
+            class="tt-sprite-display relative px-2 hover:brightness-[1.18]"
             :aria-pressed="selected === team.id"
             :title="`Follow ${team.name}`"
-            @click="selectTeam(team.id)"
+            @click="showTeam(team.id)"
           >
-            <TtText :size="1" color="orange">{{ i + 1 }}.</TtText>
             <TtText :size="1" font="bold" :color="teamColor(team)">{{ team.name }}</TtText>
-            <span class="tt-sprite tt-gem-white size-[14px]" aria-hidden="true" />
-            <TtText :size="1" color="white">{{ team.gems.size }}/{{ GEMS.length }}</TtText>
+            <!-- The followed team: its box's outline in its colour. -->
+            <span
+              v-if="selected === team.id"
+              class="tt-select-ring"
+              :style="{ '--ring-color': teamColor(team) }"
+              aria-hidden="true"
+            />
           </button>
         </li>
       </ol>
@@ -225,7 +261,7 @@ function locateMine() {
         <AlertToasts
           :alerts="alerts"
           @dismiss="game.dismiss"
-          @open-events="(id) => (game.dismiss(id), openTab('events'))"
+          @open-events="(id) => (game.dismiss(id), openTab('overview'))"
         />
       </div>
 
@@ -329,50 +365,55 @@ function locateMine() {
           {{ t.label }}
           <span v-if="t.badge" :style="{ color: 'var(--osrs-red)' }">({{ t.badge }})</span>
         </TtButton>
-        <TtButton
-          size="sm"
-          class="!min-w-0 shrink-0 lg:hidden"
-          :aria-label="sheetOpen ? 'Hide the panel' : 'Show the panel'"
-          @click="sheetOpen = !sheetOpen"
-        >
-          {{ sheetOpen ? 'Hide' : 'Show' }}
-        </TtButton>
+        <!-- Phones only: tuck the panel away for more map. -->
+        <div class="shrink-0 lg:hidden">
+          <TtButton
+            size="sm"
+            class="!min-w-0"
+            :aria-label="sheetOpen ? 'Hide the panel' : 'Show the panel'"
+            @click="sheetOpen = !sheetOpen"
+          >
+            {{ sheetOpen ? 'Hide' : 'Show' }}
+          </TtButton>
+        </div>
       </nav>
       <div
         v-if="sheetOpen"
         class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
       >
-        <TeamControls v-if="tab === 'play'" @open-shop="openShop" @locate="locateMine" />
-        <TtPanel
-          v-else-if="tab === 'teams'"
-          title="Standings"
-          width="100%"
-          :padding="12"
-          :gap="12"
-          class="min-h-full"
-        >
-          <template v-for="(team, i) in standings" :key="team.id">
+        <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
+          <TtPanel title="Current tile" width="100%" :padding="12" :gap="10">
+            <!-- Which team to watch; the map's standings strip does the same on wider screens. -->
+            <div class="flex flex-wrap justify-center gap-1" role="group" aria-label="Team">
+              <TtButton
+                v-for="team in standings"
+                :key="team.id"
+                size="sm"
+                class="!min-w-0"
+                :selected="focus?.id === team.id"
+                :aria-pressed="focus?.id === team.id"
+                :style="{ '--ring-color': teamColor(team) }"
+                @click="selectTeam(team.id)"
+              >
+                <span :style="{ color: teamColor(team) }">{{ team.name }}</span>
+              </TtButton>
+            </div>
             <TeamCard
-              :team="team"
-              :rank="i + 1"
-              :items="my.team?.id === team.id ? my.items : null"
+              v-if="focus"
+              :team="focus"
+              :rank="focusRank"
+              :items="my.team?.id === focus.id ? my.items : null"
               :state="state"
               :challenges="challenges"
               :names="game.names"
               :now="now"
-              :moving="isAnimating(team.id)"
-              @locate="selectTeam(team.id)"
+              :moving="isAnimating(focus.id)"
+              @locate="selectTeam(focus.id)"
             />
-            <TtDivider v-if="i < standings.length - 1" />
-          </template>
-        </TtPanel>
-        <EventsPanel
-          v-else-if="tab === 'events'"
-          :state="state"
-          :challenges="challenges"
-          :names="game.names"
-          :now="now"
-        />
+          </TtPanel>
+          <EventsPanel :state="state" :challenges="challenges" :names="game.names" :now="now" />
+        </div>
+        <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" />
         <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />
         <GameLog v-else :log="log" :names="game.names" :now="now" :revealed="revealed" />
       </div>

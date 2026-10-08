@@ -71,7 +71,7 @@ const items = computed(() =>
       </TtText>
     </header>
 
-    <TtGemTracker :held="team.gems" :scale="1" :slots="false" />
+    <TtGemTracker :held="team.gems" :scale="1.5" :slots="false" />
 
     <div class="flex items-center justify-center gap-3">
       <PlayingCard
