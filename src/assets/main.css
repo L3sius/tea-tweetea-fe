@@ -137,15 +137,15 @@ select {
 /*
  * The selection ring for a sprite button or display box: it recolours the sprite's own 3px outline,
  * stepped corners included, and stops short of the drop shadow baked into its right and bottom
- * edges. Set --ring-border to the sprite's border width and --ring-right / --ring-bottom to its
- * shadow; --ring-color picks the colour.
+ * edges. Set --ring-border to the sprite's border width and --shadow-right / --shadow-bottom to
+ * its shadow; --ring-color picks the colour.
  */
 .tt-select-ring {
   position: absolute;
   top: calc(-1 * var(--ring-border, 12px));
   left: calc(-1 * var(--ring-border, 12px));
-  right: calc(var(--ring-right, 3px) - var(--ring-border, 12px));
-  bottom: calc(var(--ring-bottom, 4px) - var(--ring-border, 12px));
+  right: calc(var(--shadow-right, 3px) - var(--ring-border, 12px));
+  bottom: calc(var(--shadow-bottom, 4px) - var(--ring-border, 12px));
   background: var(--ring-color, var(--osrs-yellow));
   pointer-events: none;
   clip-path: polygon(
@@ -187,8 +187,21 @@ select {
   );
 }
 /* Display boxes: an 18px border, a 4px shadow right and 5px below. */
+.tt-sprite-display {
+  --shadow-right: 4px;
+  --shadow-bottom: 5px;
+}
 .tt-sprite-display > .tt-select-ring {
   --ring-border: 18px;
-  --ring-right: 4px;
-  --ring-bottom: 5px;
+}
+
+/*
+ * A pressed sprite button: the whole face slides down and right into its own drop shadow, and the
+ * shadow goes, so the button sinks rather than just its label. `tt-press` sinks while held;
+ * `tt-pressed` keeps a selected toggle down, outline and all.
+ */
+.tt-press:active:not(:disabled),
+.tt-pressed {
+  transform: translate(var(--shadow-right, 3px), var(--shadow-bottom, 4px));
+  clip-path: inset(0 var(--shadow-right, 3px) var(--shadow-bottom, 4px) 0);
 }

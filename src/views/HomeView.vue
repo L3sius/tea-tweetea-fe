@@ -234,7 +234,8 @@ async function buy(item: Item) {
         <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
           <button
             type="button"
-            class="tt-sprite-display relative px-2 hover:brightness-[1.18]"
+            class="tt-sprite-display tt-press relative px-2 hover:brightness-[1.18]"
+            :class="{ 'tt-pressed': selected === team.id }"
             :aria-pressed="selected === team.id"
             :title="`Follow ${team.name}`"
             @click="showTeam(team.id)"

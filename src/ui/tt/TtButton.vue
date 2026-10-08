@@ -57,7 +57,8 @@ const style = computed(() => {
   <button
     :type="type"
     :disabled="disabled"
-    class="tt-sprite-button"
+    class="tt-sprite-button tt-press"
+    :class="{ 'tt-pressed': selected && !disabled }"
     :style="style"
     @click="(e: MouseEvent) => emit('click', e)"
     @mouseenter="hover = true"
@@ -73,7 +74,6 @@ const style = computed(() => {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '6px',
-        transform: down ? 'translate(3px,3px)' : undefined,
       }"
       ><slot
     /></span>
