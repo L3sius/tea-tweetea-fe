@@ -15,13 +15,14 @@ const name = computed(() => GEM_NAMES[props.gem])
 const style = computed(() => {
   const s = props.scale
   const f = [`drop-shadow(${s}px ${s}px 0 #000)`]
-  if (!props.held) f.unshift('grayscale(1) brightness(.35)')
+  // A gem not held yet is a flat grey silhouette, no trace of its own colour.
+  if (!props.held) f.unshift('brightness(0) invert(.42)')
   else if (props.glow) f.push(`drop-shadow(0 0 ${3 * s}px var(--gem-${props.gem}-glow))`)
   return {
     width: `${21 * s}px`,
     height: `${23 * s}px`,
     filter: f.join(' '),
-    opacity: props.held ? 1 : 0.8,
+    opacity: props.held ? 1 : 0.85,
   }
 })
 </script>
