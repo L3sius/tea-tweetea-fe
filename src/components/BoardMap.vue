@@ -21,6 +21,7 @@ import {
   type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
+  type Point,
   type ZoomAnimEvent,
 } from 'leaflet'
 import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
@@ -695,32 +696,45 @@ function renderFrame() {
 
   // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
   // moving the view would cut the flight short, and a zoom, which it would make jerk.
-  if (props.follow && props.selected !== null && !flying && !zooming) {
-    const target = placed.get(props.selected)
-    if (target) followStep(map, target)
+  if (props.follow && props.selected !== null && !flying && !zooming && !glideFrame) {
+    const want = followCentre(map, props.selected, map.getZoom())
+    if (want) followStep(map, want)
   }
+}
+
+/** Screen pixels from a team's tile up to the middle of its piece, at `zoom`. */
+function bodyLift(team: TeamId, zoom: number): number {
+  return teamMarkers.get(team)?.npc != null ? 38 * pieceScale(zoom) : 17
+}
+
+/**
+ * The view centre (in pixels at `zoom`) that puts a team's piece in the middle: its body, not
+ * its feet, as near as the map's edges allow.
+ */
+function followCentre(map: LeafletMap, team: TeamId, zoom: number): Point | null {
+  const at = placed.get(team)
+  if (!at) return null
+  const want = map.project(at, zoom).subtract(point(0, bodyLift(team, zoom)))
+  if (mapBounds) {
+    const half = map.getSize().divideBy(2)
+    const a = map.project(mapBounds.getNorthWest(), zoom)
+    const b = map.project(mapBounds.getSouthEast(), zoom)
+    want.x = clampCentre(want.x, Math.min(a.x, b.x) + half.x, Math.max(a.x, b.x) - half.x)
+    want.y = clampCentre(want.y, Math.min(a.y, b.y) + half.y, Math.max(a.y, b.y) - half.y)
+  }
+  return want
 }
 
 /** Share of the way to the followed team the camera moves each frame. */
 const FOLLOW_EASE = 0.12
 
 /**
- * Moves the view a step towards `target`, in whole pixels, as Leaflet pans. It aims for the
- * nearest centre the map's edges allow and stops within a pixel of it: every move redraws the
- * roads and reports the view, so a camera that keeps nudging at an edge or at a pixel's fraction
- * would do that every frame.
+ * Moves the view a step towards the centre `want` (pixels at the current zoom), in whole pixels,
+ * as Leaflet pans. It stops within a pixel of it: every move redraws the roads and reports the
+ * view, so a camera that keeps nudging at a pixel's fraction would do that every frame.
  */
-function followStep(map: LeafletMap, target: LatLng) {
-  const zoom = map.getZoom()
-  const half = map.getSize().divideBy(2)
-  const want = map.project(target, zoom)
-  if (mapBounds) {
-    const a = map.project(mapBounds.getNorthWest(), zoom)
-    const b = map.project(mapBounds.getSouthEast(), zoom)
-    want.x = clampCentre(want.x, Math.min(a.x, b.x) + half.x, Math.max(a.x, b.x) - half.x)
-    want.y = clampCentre(want.y, Math.min(a.y, b.y) + half.y, Math.max(a.y, b.y) - half.y)
-  }
-  const gap = want.subtract(map.project(map.getCenter(), zoom))
+function followStep(map: LeafletMap, want: Point) {
+  const gap = want.subtract(map.project(map.getCenter(), map.getZoom()))
   const step = point(stepToward(gap.x), stepToward(gap.y))
   if (step.x !== 0 || step.y !== 0) map.panBy(step, { animate: false })
 }
@@ -784,14 +798,17 @@ onMounted(() => {
   fillView()
   map.on('resize', fillView)
   map.setView(bounds.getCenter(), map.getMinZoom())
-  // Only zooming out lands in the overview; a flight to a team never does. Every wheel tick stops
-  // a running glide, even at full zoom-out, so the overview waits until the wheel is quiet, and
-  // scrolling out further there brings it back if a tick cut it short.
+  // In free roam, zooming all the way out lands in the overview; a flight to a team never does.
+  // While following a team, zooming out stays on the team: only a drag, "All" or Stop ends
+  // following. Every wheel tick stops a running glide, even at full zoom-out, so the overview
+  // waits until the wheel is quiet, and scrolling out further there brings it back if a tick cut
+  // it short.
   const atMin = () => map.getZoom() <= map.getMinZoom() + 0.001
   let overviewTimer: ReturnType<typeof setTimeout> | undefined
   const overviewSoon = () => {
     clearTimeout(overviewTimer)
-    overviewTimer = setTimeout(() => atMin() && showAll(), OVERVIEW_QUIET_MS)
+    if (props.follow) return
+    overviewTimer = setTimeout(() => !props.follow && atMin() && showAll(), OVERVIEW_QUIET_MS)
   }
   let zoomedFrom = map.getZoom()
   // Characters grow with the map when zoomed in close (see PIECE_FULL_ZOOM): at the start of an
@@ -828,8 +845,20 @@ onMounted(() => {
 
   map.on('dragstart', () => {
     stopFlight()
+    stopGlide()
     emit('freeRoam')
   })
+  // While following, the wheel glides on the team instead of Leaflet's zoom on the pointer.
+  container.value.addEventListener(
+    'wheel',
+    (e) => {
+      if (!props.follow || props.selected === null) return
+      e.preventDefault()
+      const px = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY
+      glideZoomBy(-px * WHEEL_ZOOM_PER_PX)
+    },
+    { passive: false },
+  )
   map.on('moveend zoomend', emitView)
   // Hover reports only changes, and null as soon as the pointer is off every node.
   let hovered: TileId | null = null
@@ -882,16 +911,23 @@ watch(() => props.follow, zoomAroundCentre)
  * then dragged it back, swinging the view.
  */
 function zoomAroundCentre(following: boolean) {
-  const options = leaflet?.options
-  if (!options) return
+  const map = leaflet
+  if (!map) return
   const on = following ? 'center' : true
-  options.scrollWheelZoom = on
-  options.doubleClickZoom = on
-  options.touchZoom = on
+  map.options.doubleClickZoom = on
+  map.options.touchZoom = on
+  // The wheel glides on the team while following (see glideZoomBy), and zooms on the pointer else.
+  if (following) map.scrollWheelZoom.disable()
+  else {
+    stopGlide()
+    followAtMin = false
+    map.scrollWheelZoom.enable()
+  }
 }
 
 onBeforeUnmount(() => {
   stopFlight()
+  stopGlide()
   render(null, sceneRoot)
   cancelAnimationFrame(frame)
   for (const entry of teamMarkers.values()) entry.piece?.dispose()
@@ -957,6 +993,82 @@ function fly(map: LeafletMap, at: LatLng, zoom: number) {
 
 let restoreSnap = () => {}
 
+// --- Zooming while following: a smooth glide centred on the team's piece ---
+
+/** Share of the way to the target zoom each frame: quick at first, gentle as it arrives. */
+const GLIDE_EASE = 0.15
+/** Zoom levels per pixel of wheel movement, about Leaflet's own feel for one notch. */
+const WHEEL_ZOOM_PER_PX = 0.75 / 120
+/** A wheel event this long after the last one starts a new gesture. */
+const GESTURE_GAP_MS = 250
+
+/** The zoom the glide is heading for, or null when it isn't gliding. */
+let glideTarget: number | null = null
+let glideFrame = 0
+let restoreGlideSnap = () => {}
+/** The view reached full zoom-out while following: a new gesture outward ends following. */
+let followAtMin = false
+let lastWheelOut = 0
+
+/**
+ * Zooms by `delta` levels while following: the map glides there frame by frame, always centred on
+ * the team's piece. Zooming out from full zoom-out, in a new gesture, shows the whole map and ends
+ * following instead, so one fast scroll can not end it by accident.
+ */
+function glideZoomBy(delta: number) {
+  const map = leaflet
+  if (!map || props.selected === null) return
+  const min = map.getMinZoom()
+  const from = glideTarget ?? map.getZoom()
+  if (delta < 0) {
+    const now = performance.now()
+    const newGesture = now - lastWheelOut > GESTURE_GAP_MS
+    lastWheelOut = now
+    if (from <= min + 0.001) {
+      if (followAtMin && newGesture) {
+        stopGlide()
+        showAll()
+      }
+      return
+    }
+  }
+  stopFlight()
+  // Quarter steps, as the map's own zoom snaps.
+  const target = Math.round(Math.min(map.getMaxZoom(), Math.max(min, from + delta)) * 4) / 4
+  glideTarget = Math.max(min, target)
+  followAtMin = false
+  if (glideFrame) return
+  const snap = map.options.zoomSnap
+  map.options.zoomSnap = 0
+  restoreGlideSnap = () => (map.options.zoomSnap = snap)
+  glideFrame = requestAnimationFrame(glideStep)
+}
+
+function glideStep() {
+  const map = leaflet
+  const team = props.selected
+  if (!map || glideTarget === null || team === null) return stopGlide()
+  const zoom = map.getZoom()
+  const next =
+    Math.abs(glideTarget - zoom) < 0.003 ? glideTarget : zoom + (glideTarget - zoom) * GLIDE_EASE
+  const centre = followCentre(map, team, next)
+  if (centre) map.setView(map.unproject(centre, next), next, { animate: false })
+  if (next !== glideTarget) {
+    glideFrame = requestAnimationFrame(glideStep)
+    return
+  }
+  followAtMin = next <= map.getMinZoom() + 0.001
+  stopGlide()
+}
+
+function stopGlide() {
+  if (glideFrame) cancelAnimationFrame(glideFrame)
+  glideFrame = 0
+  glideTarget = null
+  restoreGlideSnap()
+  restoreGlideSnap = () => {}
+}
+
 function stopFlight() {
   if (flight) cancelAnimationFrame(flight)
   flight = 0
@@ -971,6 +1083,7 @@ function panTo(lat: number, lng: number) {
 }
 
 function zoomBy(delta: number) {
+  if (props.follow && props.selected !== null) return glideZoomBy(delta)
   stopFlight()
   leaflet?.setZoom(leaflet.getZoom() + delta)
 }
