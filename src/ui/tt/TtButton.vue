@@ -10,7 +10,9 @@ const props = defineProps({
   disabled: Boolean,
   type: { type: String as PropType<'button' | 'submit'>, default: 'button' },
 })
+
 const emit = defineEmits<{ click: [e: MouseEvent] }>()
+
 const hover = ref(false)
 const down = ref(false)
 
@@ -21,6 +23,7 @@ const style = computed(() => {
     minWidth: sm ? '96px' : '144px',
     minHeight: sm ? '48px' : '66px',
     boxSizing: 'border-box' as const,
+    position: 'relative' as const,
     padding: sm ? '0 6px' : '0 12px',
     display: 'inline-flex',
     alignItems: 'center',
@@ -46,8 +49,6 @@ const style = computed(() => {
         ? 'var(--osrs-white)'
         : 'var(--osrs-yellow)',
     textShadow: sm ? '1px 1px 0 #000' : '2px 2px 0 #000',
-    // A soft glow marks the selected button; the sprite already has its own dark edge.
-    boxShadow: props.selected ? '0 0 9px rgba(255,255,0,.3)' : undefined,
   }
 })
 </script>
@@ -64,6 +65,8 @@ const style = computed(() => {
     @mousedown="down = true"
     @mouseup="down = false"
   >
+    <!-- Selected: the button's own outline turns yellow, its shadow left alone. -->
+    <span v-if="selected" class="tt-select-ring" aria-hidden="true" />
     <span
       :style="{
         display: 'inline-flex',

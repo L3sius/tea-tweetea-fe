@@ -133,3 +133,62 @@ select {
     transition-duration: 0.01s !important;
   }
 }
+
+/*
+ * The selection ring for a sprite button or display box: it recolours the sprite's own 3px outline,
+ * stepped corners included, and stops short of the drop shadow baked into its right and bottom
+ * edges. Set --ring-border to the sprite's border width and --ring-right / --ring-bottom to its
+ * shadow; --ring-color picks the colour.
+ */
+.tt-select-ring {
+  position: absolute;
+  top: calc(-1 * var(--ring-border, 12px));
+  left: calc(-1 * var(--ring-border, 12px));
+  right: calc(var(--ring-right, 3px) - var(--ring-border, 12px));
+  bottom: calc(var(--ring-bottom, 4px) - var(--ring-border, 12px));
+  background: var(--ring-color, var(--osrs-yellow));
+  pointer-events: none;
+  clip-path: polygon(
+    evenodd,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 6px),
+    0 calc(100% - 6px),
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px,
+    6px 0,
+    6px 3px,
+    6px 6px,
+    3px 6px,
+    3px calc(100% - 6px),
+    6px calc(100% - 6px),
+    6px calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) 6px,
+    calc(100% - 6px) 6px,
+    calc(100% - 6px) 3px,
+    6px 3px
+  );
+}
+/* Display boxes: an 18px border, a 4px shadow right and 5px below. */
+.tt-sprite-display > .tt-select-ring {
+  --ring-border: 18px;
+  --ring-right: 4px;
+  --ring-bottom: 5px;
+}
