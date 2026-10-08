@@ -9,7 +9,8 @@ import type { GameEvent, JournalEntry } from './events'
 import type { Card } from './game'
 import type { TeamId, TileId } from './ids'
 
-export const STEP_MS = 420
+/** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
+export const STEP_MS = 840
 export const TELEPORT_MS = 1100
 export const SLIDE_MS = 650
 /** How long an effect callout stays up. */
