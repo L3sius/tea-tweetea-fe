@@ -8,7 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
   /** `http` talks to a real server, `fixtures` serves recorded responses offline. */
   readonly VITE_API_MODE?: string
-  /** Where the OSRS character assets are served from; the site's own /osrs/ when unset. */
+  /** Where the OSRS character assets are served from; https://api.tea-osrs.com/osrs/ when unset. */
   readonly VITE_OSRS_ASSETS_URL?: string
 }
 

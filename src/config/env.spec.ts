@@ -5,13 +5,16 @@ describe('readConfig', () => {
   it('uses the given base URL in http mode', () => {
     expect(
       readConfig({ VITE_API_MODE: 'http', VITE_API_BASE_URL: 'http://localhost:8080' }),
-    ).toEqual({ api: { mode: 'http', baseUrl: 'http://localhost:8080' }, osrsAssetsUrl: null })
+    ).toEqual({
+      api: { mode: 'http', baseUrl: 'http://localhost:8080' },
+      osrsAssetsUrl: 'https://api.tea-osrs.com/osrs/',
+    })
   })
 
   it('needs no base URL in fixture mode', () => {
     expect(readConfig({ VITE_API_MODE: 'fixtures' })).toEqual({
       api: { mode: 'fixtures' },
-      osrsAssetsUrl: null,
+      osrsAssetsUrl: 'https://api.tea-osrs.com/osrs/',
     })
   })
 

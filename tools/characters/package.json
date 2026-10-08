@@ -6,7 +6,8 @@
   "scripts": {
     "export": "node export.mjs",
     "catalog": "node catalog.mjs",
-    "describe": "node describe.mjs"
+    "describe": "node describe.mjs",
+    "upload": "./upload.sh"
   },
   "dependencies": {
     "lodash": "4.17.21",

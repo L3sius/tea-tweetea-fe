@@ -6,11 +6,15 @@ Exports what the board needs to draw teams as OSRS characters, from the game cac
 building blocks. The browser merges and animates them like the game client does
 (`src/characters/model.ts`).
 
+The files stay out of git. They live on the backend droplet, where Caddy serves them at
+`https://api.tea-osrs.com/osrs/` (the app's default `VITE_OSRS_ASSETS_URL`).
+
 ## Use
 
 ```sh
 npm install --prefix tools/characters      # once
-npm run characters:export                  # write public/osrs/
+npm run characters:export                  # write tools/characters/out/osrs/
+npm run characters:upload                  # put it on the server (needs ssh to the droplet)
 npm run characters:describe -- 819 824     # name and check animations
 npm run characters:describe -- --search emote_
 npm run characters:catalog                 # out/human-npcs.tsv: every NPC rigged like a player
@@ -18,9 +22,14 @@ npm run characters:catalog                 # out/human-npcs.tsv: every NPC rigge
 
 - The cache is the newest one under `~/.qodat/downloads/`, or `OSRS_CACHE=/path/to/cache` (the
   folder holding `main_file_cache.dat2`).
-- `characters:export -- /some/dir` writes elsewhere, for example a CDN bucket. Point the app at it
-  with `VITE_OSRS_ASSETS_URL`.
-- Re-export after changing `src/characters/roster.json`, since only the animations it names ship.
+- Re-export and upload after changing `src/characters/roster.json`, since only the animations it
+  names ship. Pages pick up the new set within the hour (the files cache for an hour).
+- The upload copies the new set beside the live one and swaps it in, so no page sees half an
+  upload, and only changed files travel.
+- `characters:upload -- user@host` targets another server. To host the files elsewhere instead
+  (a CDN bucket, say), `characters:export -- /some/dir` and set `VITE_OSRS_ASSETS_URL`; the host
+  must send `Access-Control-Allow-Origin`.
+- Without a cache, nobody needs to export: the app loads the hosted copy.
 
 ## What it writes
 

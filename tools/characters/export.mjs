@@ -3,7 +3,7 @@
 // animations named in src/characters/roster.json. The browser merges and animates them like the
 // game client does (src/characters/model.ts).
 //
-// Usage: node export.mjs [out dir]   (default public/osrs/)
+// Usage: node export.mjs [out dir]   (default out/osrs/; upload.sh puts it on the server)
 //
 //   index.json        { revision, npcs: [{ id, name, combat, models, recolor?, scale? }] }
 //   anims.json        { "<id>": { name, ticks } }
@@ -26,7 +26,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url))
 const roster = JSON.parse(readFileSync(resolve(here, '../../src/characters/roster.json'), 'utf8'))
-const out = resolve(process.argv[2] ?? resolve(here, '../../public/osrs'))
+const out = resolve(process.argv[2] ?? resolve(here, 'out/osrs'))
 
 /** Every animation id the roster names. */
 function rosterAnimations() {

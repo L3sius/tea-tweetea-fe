@@ -17,6 +17,7 @@
     "format": "prettier --write src/ e2e/ scripts/ *.ts",
     "fixtures:refresh": "node scripts/refresh-fixtures.mjs",
     "characters:export": "npm --prefix tools/characters run export --",
+    "characters:upload": "npm --prefix tools/characters run upload --",
     "characters:catalog": "npm --prefix tools/characters run catalog --",
     "characters:describe": "npm --prefix tools/characters run describe --",
     "test": "vitest run"

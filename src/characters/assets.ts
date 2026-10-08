@@ -1,5 +1,5 @@
-// Loads the files tools/characters/export.mjs writes: the NPC index, model parts, skeletons and
-// animations. Each file is fetched once and shared by every piece that needs it. The binary layouts
+// Loads the files tools/characters/export.mjs writes and upload.sh puts on the server: the NPC index,
+// model parts, skeletons and animations. Each file is fetched once and shared by every piece that needs it. The binary layouts
 // are documented with the encoders in export.mjs.
 import { readConfig } from '@/config/env'
 import type { Animation, Framemap, ModelPart } from './model'
@@ -24,7 +24,7 @@ export type AnimationInfo = {
   ticks: number
 }
 
-const base = () => readConfig().osrsAssetsUrl ?? `${import.meta.env.BASE_URL}osrs/`
+const base = () => readConfig().osrsAssetsUrl
 
 async function fetchOk(path: string): Promise<Response> {
   const response = await fetch(base() + path)
