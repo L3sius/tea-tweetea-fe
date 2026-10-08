@@ -22,7 +22,17 @@ const CARD_CUE_GAP_MS = 1400
 export type SegmentKind = 'walk' | 'teleport' | 'slide'
 
 /** One move of a piece between two tiles, in server time (ms since the epoch). */
-export type Segment = { from: TileId; to: TileId; kind: SegmentKind; start: number; end: number }
+export type Segment = {
+  from: TileId
+  to: TileId
+  kind: SegmentKind
+  start: number
+  end: number
+  /** Steps in the whole walk this segment belongs to (1 for teleports and slides). */
+  steps: number
+  /** The journal entry it plays, so everyone watching can pick the same variations. */
+  seq: number
+}
 
 export type CueTone = 'good' | 'bad' | 'info' | 'gem' | 'card'
 
@@ -40,7 +50,21 @@ export type Cue = {
 /** Where to draw a piece at one moment. */
 export type Placement =
   | { kind: 'still'; tile: TileId }
-  | { kind: SegmentKind; from: TileId; to: TileId; progress: number }
+  | { kind: SegmentKind; from: TileId; to: TileId; progress: number; steps: number; seq: number }
+
+/** Moments a team's character reacts to, after any movement that comes first. */
+export type ReactionKind = 'celebrate' | 'despair' | 'arrive' | 'use_item' | 'slip'
+
+export type Reaction = {
+  id: string
+  teamId: TeamId
+  kind: ReactionKind
+  /** Server time it starts. */
+  at: number
+}
+
+/** How long reactions are kept after they start; longer than any reaction plays. */
+const REACTION_KEEP_MS = 15_000
 
 export class Choreography {
   private readonly segments = new Map<TeamId, Segment[]>()
@@ -49,9 +73,12 @@ export class Choreography {
   /** When each team's queued segments end; later entries queue behind them. */
   private readonly busyUntil = new Map<TeamId, number>()
   private cues: Cue[] = []
+  private reactions: Reaction[] = []
   /** When each entry's last animation ends, so text about it can wait until then. */
   private readonly reveal = new Map<number, number>()
   private lastSeq = 0
+  /** Length of each team's current walk, from its `move_confirmed`. */
+  private readonly walkSteps = new Map<TeamId, number>()
 
   /** Adds an entry's movement and callouts. Entries must arrive in order; repeats are ignored. */
   /** `seesItems`: whether the viewer may know which items a team gains (its own team's only). */
@@ -68,12 +95,21 @@ export class Choreography {
       }
       return t
     }
+    // How many steps each team's walk takes, so a piece can tell a stroll from a run: the whole
+    // path when the walk starts here, else the steps this entry holds (a walk resumed after a pause).
+    const steps = new Map<TeamId, number>()
+    for (const event of entry.events) {
+      if (event.kind === 'move_confirmed') this.walkSteps.set(event.teamId, event.path.length - 1)
+      if (event.kind === 'stepped') steps.set(event.teamId, (steps.get(event.teamId) ?? 0) + 1)
+    }
     const move = (team: TeamId, to: TileId, kind: SegmentKind) => {
       const from = this.lastTile.get(team) ?? to
       const start = now(team)
       const length = kind === 'walk' ? STEP_MS : kind === 'teleport' ? TELEPORT_MS : SLIDE_MS
       const end = start + length
-      if (from !== to) this.queue(team, { from, to, kind, start, end })
+      const walked = kind === 'walk' ? (this.walkSteps.get(team) ?? steps.get(team) ?? 1) : 1
+      if (from !== to)
+        this.queue(team, { from, to, kind, start, end, steps: walked, seq: entry.seq })
       cursor.set(team, end)
       this.busyUntil.set(team, Math.max(this.busyUntil.get(team) ?? 0, end))
       this.lastTile.set(team, to)
@@ -85,6 +121,9 @@ export class Choreography {
       cueTimes.set(team, time + (card ? CARD_CUE_GAP_MS : CUE_GAP_MS))
       this.cues.push({ id: `${entry.seq}.${index}`, teamId: team, text, tone, at: time, card })
     }
+
+    const react = (team: TeamId, kind: ReactionKind, index: number) =>
+      this.reactions.push({ id: `${entry.seq}.${index}`, teamId: team, kind, at: now(team) })
 
     entry.events.forEach((event, index) => {
       switch (event.kind) {
@@ -102,12 +141,21 @@ export class Choreography {
         case 'teleported':
           if (!this.lastTile.has(event.teamId)) this.lastTile.set(event.teamId, event.from)
           cue(event.teamId, 'Whoosh!', 'info', index)
-          return move(event.teamId, event.to, 'teleport')
+          move(event.teamId, event.to, 'teleport')
+          return react(event.teamId, 'arrive', index)
         case 'card_drawn':
+          if (event.card.kind === 'joker') react(event.teamId, 'despair', index)
           return cue(event.teamId, cardLabel(event.card), 'card', index, event.card)
         case 'trap_triggered':
           cue(event.teamId, `${blockerName(event.trap)}!`, 'bad', index)
+          react(event.teamId, 'slip', index)
           return move(event.teamId, event.to, 'slide')
+        case 'tile_completed':
+          react(event.teamId, 'celebrate', index)
+          break
+        case 'item_used':
+          react(event.teamId, 'use_item', index)
+          break
       }
       const callout = cueFor(event, seesItems)
       if (callout) cue(callout.team, callout.text, callout.tone, index)
@@ -147,6 +195,8 @@ export class Choreography {
         from: s.from,
         to: s.to,
         progress: (time - s.start) / (s.end - s.start),
+        steps: s.steps,
+        seq: s.seq,
       }
     }
     return { kind: 'still', tile: first.from }
@@ -162,6 +212,11 @@ export class Choreography {
     return this.busyUntil.get(team) ?? 0
   }
 
+  /** A team's reactions that have started by `time`, latest first. */
+  reactionsOf(team: TeamId, time: number): Reaction[] {
+    return this.reactions.filter((r) => r.teamId === team && r.at <= time).reverse()
+  }
+
   /** Callouts showing at `time`. */
   activeCues(time: number): Cue[] {
     return this.cues.filter((c) => time >= c.at && time < c.at + CUE_MS)
@@ -175,6 +230,7 @@ export class Choreography {
       else this.segments.set(team, live)
     }
     this.cues = this.cues.filter((c) => c.at + CUE_MS > time)
+    this.reactions = this.reactions.filter((r) => r.at + REACTION_KEEP_MS > time)
     for (const [seq, at] of this.reveal) if (at <= time) this.reveal.delete(seq)
   }
 }

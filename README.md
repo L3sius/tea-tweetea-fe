@@ -12,15 +12,16 @@ npm run dev        # offline, against recorded responses (see .env.development)
 
 To use a running game API instead, copy `.env.example` to `.env.development.local`.
 
-| Command                    | What it does                                        |
-| -------------------------- | --------------------------------------------------- |
-| `npm run dev`              | Dev server on http://localhost:5173                 |
-| `npm test`                 | Unit and component tests once (`test:unit` watches) |
-| `npm run test:e2e`         | Playwright end-to-end tests                         |
-| `npm run build`            | Type-check and production build                     |
-| `npm run lint`             | oxlint, then ESLint                                 |
-| `npm run format`           | Prettier                                            |
-| `npm run fixtures:refresh` | Re-record API responses from a running server       |
+| Command                     | What it does                                               |
+| --------------------------- | ---------------------------------------------------------- |
+| `npm run dev`               | Dev server on http://localhost:5173                        |
+| `npm test`                  | Unit and component tests once (`test:unit` watches)        |
+| `npm run test:e2e`          | Playwright end-to-end tests                                |
+| `npm run build`             | Type-check and production build                            |
+| `npm run lint`              | oxlint, then ESLint                                        |
+| `npm run format`            | Prettier                                                   |
+| `npm run fixtures:refresh`  | Re-record API responses from a running server              |
+| `npm run characters:export` | Export OSRS characters to public/osrs/ (tools/characters/) |
 
 ### Play-testing tools
 
@@ -44,6 +45,8 @@ src/
   config/   typed, validated public env config
   stores/   Pinia stores: the only code that calls the ApiClient (provided in main.ts)
   map/      the world map projection; the image is assets/map/, copied from the backend
+  characters/  OSRS characters as team pieces: the roster, the client's animation maths, what plays
+               when, and a three.js renderer
   ui/       colours and formatting shared by components
     tt/       the Tweetea design system's Vue components (Tt*), copied from tweetea-design-system/
   assets/tt/  its tokens, fonts and sprites (only what we use)
@@ -60,5 +63,16 @@ src/
   backend change, run `npm run fixtures:refresh` and the tests show what moved.
 - Tests sit next to the code as `*.spec.ts` and run in Node. A component test opts into a DOM with
   `// @vitest-environment jsdom` at the top of the file.
+
+### Characters
+
+A team's piece can be any OSRS NPC built like a player instead of a bird.
+
+- `tools/characters/` exports models and animations from a qodat cache into `public/osrs/` (see its
+  README). `VITE_OSRS_ASSETS_URL` serves them from elsewhere instead.
+- `src/characters/roster.json` lists the animations: the styles a team picks (idle, walk, run,
+  swim), reactions to moments on the board, and rare easter eggs.
+- `/characters` tries looks on any NPC. Admins save a team's look there (the `set_appearance` admin
+  action); the server keeps it on the team and every board picks it up.
 
 The game rules are in the rulebook; the API reference is `docs/api.md` in the backend repository.

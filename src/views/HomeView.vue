@@ -16,6 +16,7 @@ import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
+import { useCharacterStore } from '@/stores/characters'
 import { useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
@@ -25,6 +26,7 @@ import { TtButton, TtPanel, TtText } from '@/ui/tt'
 const game = useGameStore()
 const my = useTeamStore()
 const dev = useDevStore()
+const characters = useCharacterStore()
 const { board, challenges, state, feed, log, loading, standings, alerts, choreography } =
   storeToRefs(game)
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
@@ -217,6 +219,7 @@ async function buy(item: Item) {
         :options="picking ? my.options : null"
         :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
+        :appearance-of="characters.appearanceOf"
         @hover="onHover"
         @pick="onPick"
         @free-roam="freeRoam"
