@@ -37,7 +37,7 @@ const hi = ref(-1)
         background: #000;
         padding: 3px 6px;
         font-family: var(--font-bold);
-        font-size: 16px;
+        font-size: var(--fs-1);
         line-height: 1.125;
         color: var(--tooltip-bg);
         text-align: left;
@@ -55,7 +55,7 @@ const hi = ref(-1)
       style="
         padding: 3px 6px;
         font-family: var(--font-bold);
-        font-size: 16px;
+        font-size: var(--fs-1);
         line-height: 1.125;
         text-shadow: 1px 1px 0 #000;
         text-align: left;

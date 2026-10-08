@@ -20,7 +20,8 @@ const style = computed(() => {
   const sh = `${s}px ${s}px 0 #000`
   return {
     fontFamily: FONTS[props.font] ?? props.font,
-    fontSize: `${16 * s}px`,
+    // Size 1 is the readable small size (20px); larger sizes keep the font's 16px steps.
+    fontSize: s === 1 ? 'var(--fs-1)' : `${16 * s}px`,
     lineHeight: 1.125,
     color: c,
     textShadow: props.glow ? `${sh}, 0 0 ${4 * s}px ${c}` : sh,

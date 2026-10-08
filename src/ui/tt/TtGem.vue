@@ -47,7 +47,7 @@ const style = computed(() => {
       v-if="label"
       :style="{
         fontFamily: 'var(--font-small)',
-        fontSize: '16px',
+        fontSize: 'var(--fs-1)',
         lineHeight: 1,
         color: held ? 'var(--osrs-white)' : 'var(--text-muted)',
         textShadow: '1px 1px 0 #000',

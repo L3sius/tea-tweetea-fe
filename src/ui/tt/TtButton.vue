@@ -3,7 +3,7 @@ import { computed, ref, type PropType } from 'vue'
 import { px } from './util'
 
 const props = defineProps({
-  /** sm = 16px label, md = 32px label. */
+  /** sm = small label (20px), md = 32px label. */
   size: { type: String as PropType<'sm' | 'md'>, default: 'md' },
   width: { type: [Number, String], default: undefined },
   selected: Boolean,
@@ -37,7 +37,7 @@ const style = computed(() => {
           ? 'brightness(1.18)'
           : undefined,
     fontFamily: 'var(--font-small)',
-    fontSize: sm ? '16px' : '32px',
+    fontSize: sm ? 'var(--fs-1)' : '32px',
     lineHeight: 1,
     textAlign: 'center' as const,
     color: props.disabled

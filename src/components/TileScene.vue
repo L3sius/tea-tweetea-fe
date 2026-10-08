@@ -127,7 +127,7 @@ const frame = computed(() => ({
   width: 320px;
   color: var(--osrs-white);
   font-family: var(--font-small);
-  font-size: 16px;
+  font-size: var(--fs-1);
   line-height: 1.15;
   text-align: center;
   text-shadow: 1px 1px 0 #000;
@@ -299,7 +299,7 @@ const frame = computed(() => ({
   margin: 0;
   overflow: hidden;
   font-family: var(--font-quill);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: normal;
   line-height: 1;
   white-space: nowrap;
@@ -336,7 +336,7 @@ const frame = computed(() => ({
   gap: 8px;
   margin: 0;
   font-family: var(--font-quill);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: normal;
   line-height: 1.05;
   color: #ffd75e;

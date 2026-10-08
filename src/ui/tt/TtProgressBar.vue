@@ -58,7 +58,7 @@ const fill = computed(() =>
       style="
         position: relative;
         font-family: var(--font-small);
-        font-size: 16px;
+        font-size: var(--fs-1);
         line-height: 1;
         color: var(--osrs-white);
         text-shadow: 1px 1px 0 #000;

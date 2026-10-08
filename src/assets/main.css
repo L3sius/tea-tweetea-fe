@@ -33,7 +33,7 @@ select {
 /* Text sizes for plain markup, matching TtText sizes 1 and 2. */
 .tt-1 {
   font-family: var(--font-small);
-  font-size: 16px;
+  font-size: var(--fs-1);
   line-height: 1.125;
   text-shadow: 1px 1px 0 #000;
 }
@@ -57,7 +57,7 @@ select {
   box-shadow: inset 3px 3px 0 rgb(0 0 0 / 0.5);
   color: var(--osrs-white);
   font-family: var(--font-small);
-  font-size: 16px;
+  font-size: var(--fs-1);
   caret-color: var(--osrs-yellow);
   outline: none;
 }

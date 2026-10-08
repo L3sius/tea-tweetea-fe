@@ -910,7 +910,7 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   transform: translateX(-50%);
   color: var(--team);
   font-family: var(--font-bold);
-  font-size: 16px;
+  font-size: var(--fs-1);
   line-height: 1;
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
@@ -1009,7 +1009,7 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   position: absolute;
   transform: translateX(-50%);
   font-family: var(--font-bold);
-  font-size: 16px;
+  font-size: var(--fs-1);
   line-height: 1;
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;

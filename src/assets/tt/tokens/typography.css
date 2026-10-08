@@ -1,4 +1,7 @@
-/* Typography. All RuneScape fonts are pixel fonts: use sizes in 16px steps only (1x, 2x, 3x…). */
+/*
+ * Typography. All RuneScape fonts are pixel fonts, crispest in 16px steps (1x, 2x, 3x…). The small
+ * size is the exception: 20px (1.25x), because 16px read too small on screen. It stays clean enough.
+ */
 :root {
   --font-small: 'RuneScape Small', 'RuneScape Plain 11', monospace;
   --font-plain: 'RuneScape', 'RuneScape Plain 12', monospace;
@@ -11,7 +14,7 @@
   --font-heading: var(--font-bold);
   --font-display: var(--font-quill);
 
-  --fs-1: 16px;
+  --fs-1: 20px;
   --fs-2: 32px;
   --fs-3: 48px;
   --fs-4: 64px;
