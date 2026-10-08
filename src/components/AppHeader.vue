@@ -4,10 +4,13 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useGameStore } from '@/stores/game'
+import { useTeamStore } from '@/stores/team'
+import { teamColor } from '@/ui/colors'
 import { TtButton, TtText } from '@/ui/tt'
 
 const game = useGameStore()
-const { state, connection } = storeToRefs(game)
+const { connection } = storeToRefs(game)
+const my = useTeamStore()
 const wide = useMediaQuery('(min-width: 1024px)')
 
 const CONNECTION = {
@@ -17,8 +20,6 @@ const CONNECTION = {
   offline: { label: 'Not live', color: 'var(--osrs-red)' },
 } as const
 const badge = computed(() => CONNECTION[connection.value])
-
-const PHASES = { setup: 'Setting up', running: 'In progress', ended: 'Finished' } as const
 
 const LINKS = [
   { to: '/', label: 'Board' },
@@ -54,16 +55,30 @@ const LINKS = [
         </TtButton>
       </RouterLink>
     </nav>
-    <div class="flex items-center gap-3 lg:ml-auto" role="status">
-      <TtText v-if="state" :size="1" color="white">{{ PHASES[state.phase] }}</TtText>
-      <span class="flex items-center gap-1.5">
-        <span
-          class="tt-swatch"
-          :class="{ 'animate-pulse': connection === 'live' || connection === 'reconnecting' }"
-          :style="{ background: badge.color }"
-          aria-hidden="true"
-        />
-        <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
+    <div class="flex flex-wrap items-center justify-center gap-3 lg:ml-auto">
+      <!-- The team this browser plays for, and the way out. -->
+      <span v-if="my.team" class="flex items-center gap-2">
+        <TtText
+          :size="1"
+          font="bold"
+          :color="teamColor(my.team)"
+          class="max-w-48 truncate"
+          :title="my.team.name"
+        >
+          {{ my.team.name }}
+        </TtText>
+        <TtButton size="sm" @click="my.logout()">Log out</TtButton>
+      </span>
+      <span class="flex items-center gap-3" role="status">
+        <span class="flex items-center gap-1.5">
+          <span
+            class="tt-swatch"
+            :class="{ 'animate-pulse': connection === 'live' || connection === 'reconnecting' }"
+            :style="{ background: badge.color }"
+            aria-hidden="true"
+          />
+          <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
+        </span>
       </span>
     </div>
   </header>

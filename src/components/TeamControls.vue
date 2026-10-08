@@ -32,7 +32,7 @@ import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 import PowerUpPicker from './PowerUpPicker.vue'
 
-const emit = defineEmits<{ openShop: []; locate: [] }>()
+const emit = defineEmits<{ openShop: [] }>()
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -284,14 +284,13 @@ async function login() {
       <span :style="{ color }">Team {{ team.name }}</span>
     </template>
 
-    <TtGemTracker :held="team.gems" :scale="1" class="max-w-[260px]" />
-    <div class="flex flex-wrap justify-center gap-1.5">
-      <TtDisplayBox label="Gold" :value="team.gold" value-color="var(--osrs-yellow)" :width="117" />
-      <TtDisplayBox label="Tiles done" :value="team.tilesCompleted" :width="117" />
-    </div>
-    <div class="flex gap-1.5">
-      <TtButton size="sm" @click="emit('locate')">Find team</TtButton>
-      <TtButton size="sm" @click="my.logout()">Log out</TtButton>
+    <!-- What the team holds, on one line: its gems, then its gold. -->
+    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+      <TtGemTracker :held="team.gems" :scale="1" :slots="false" />
+      <span class="flex items-center gap-1" :title="`${team.gold} gold`">
+        <span class="tt-sprite tt-icon-coins size-6" aria-hidden="true" />
+        <TtText :size="2" color="yellow">{{ team.gold }}</TtText>
+      </span>
     </div>
 
     <TtText v-if="my.error" role="alert" :size="1" color="red">{{ my.error }}</TtText>
