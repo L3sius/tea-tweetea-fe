@@ -1171,7 +1171,9 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
-  filter: drop-shadow(0 1px 0 #0f172a);
+  /* A 1px black outline, so the character stands out from busy map ground. */
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000)
+    drop-shadow(0 -1px 0 #000);
 }
 .board-map .sprite-character .sprite-shadow {
   left: 15px;
