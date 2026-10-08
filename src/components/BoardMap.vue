@@ -193,7 +193,7 @@ function drawBoard(map: LeafletMap) {
         icon: divIcon({
           className: 'shop-marker',
           html: '<span class="tt-sprite tt-icon-coins"></span>',
-          iconSize: [24, 24],
+          iconSize: [36, 36],
         }),
         interactive: false,
       }).addTo(map)
@@ -220,7 +220,7 @@ function drawPieces() {
       icon: divIcon({
         className: '',
         html: `<div class="gem-marker tt-sprite tt-gem-${gem}" style="--gem:var(--gem-${gem}-glow)"></div>`,
-        iconSize: [21, 23],
+        iconSize: [32, 35],
       }),
       zIndexOffset: 500,
       interactive: false,
@@ -233,7 +233,7 @@ function drawPieces() {
       icon: divIcon({
         className: 'blocker-marker',
         html: blockerHtml(blocker.kind),
-        iconSize: [20, 20],
+        iconSize: [30, 30],
       }),
       zIndexOffset: 400,
       interactive: false,
@@ -404,7 +404,7 @@ function showInfo(tile: TileId | null, refresh = false) {
   const at = tile === null ? null : tileLatLng(tile)
   if (!leaflet || tile === null || !at) return void infoTip.remove()
   // Clear of what marks the tile: the shop's coins stand taller than a node.
-  const lift = props.board.tiles.get(tile)?.kind === 'shop' ? 16 : 10
+  const lift = props.board.tiles.get(tile)?.kind === 'shop' ? 22 : 10
   infoTip.options.direction = 'top'
   infoTip.options.offset = point(0, -lift)
   const info = props.board.tiles.get(tile)
@@ -791,9 +791,10 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 .board-map .leaflet-tooltip.tile-tip::before {
   display: none;
 }
+/* Gems, shops and blockers are landmarks: half again the size of their sprites, over the nodes. */
 .board-map .gem-marker {
-  width: 21px;
-  height: 23px;
+  width: 32px;
+  height: 35px;
   filter: drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px var(--gem));
   animation: gem-glint 2.4s steps(2, end) infinite;
 }
@@ -805,19 +806,19 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 .board-map .shop-marker span {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker {
-  font-size: 17px;
-  line-height: 20px;
+  font-size: 26px;
+  line-height: 30px;
   text-align: center;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker .tt-sprite {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 /* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
