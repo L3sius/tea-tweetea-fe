@@ -36,6 +36,8 @@ export function toWireTeamRequest(
       return { ...base, action: command.kind, opponent: command.opponent }
     case 'steal_gem':
       return { ...base, action: command.kind, gem: command.gem }
+    case 'set_appearance':
+      return { ...base, action: command.kind, appearance: command.appearance }
   }
 }
 

@@ -72,7 +72,7 @@ A team's piece can be any OSRS NPC built like a player instead of a bird.
   README). `VITE_OSRS_ASSETS_URL` serves them from elsewhere instead.
 - `src/characters/roster.json` lists the animations: the styles a team picks (idle, walk, run,
   swim), reactions to moments on the board, and rare easter eggs.
-- `/characters` tries looks on any NPC. Admins save a team's look there (the `set_appearance` admin
-  action); the server keeps it on the team and every board picks it up.
+- `/characters` tries looks on any NPC. A team logged in with its code saves its own look there (the
+  `set_appearance` team action); the server keeps it on the team and every board picks it up.
 
 The game rules are in the rulebook; the API reference is `docs/api.md` in the backend repository.

@@ -16,6 +16,8 @@ export type TeamCommand =
   | { kind: 'choose_opponent'; opponent: TeamId }
   | { kind: 'steal_gem'; gem: Gem }
   | { kind: 'discard'; item: Item }
+  /** Dress the team's own piece as an OSRS character, or back to the default piece with null. */
+  | { kind: 'set_appearance'; appearance: Appearance | null }
 
 export type AdminCommand =
   | { kind: 'create_team'; name: string; code: string }

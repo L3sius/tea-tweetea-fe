@@ -16,18 +16,16 @@ import {
 } from '@/characters/roster'
 import { teamId as toTeamId, type TeamId } from '@/domain/ids'
 import { useCharacterStore } from '@/stores/characters'
-import { useDevStore } from '@/stores/dev'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
 import { teamColor } from '@/ui/colors'
 import { TtButton, TtPanel, TtText } from '@/ui/tt'
 
 // How each team's piece looks: any OSRS NPC built like a player, and how it stands, walks, runs and
-// swims. Anyone can try looks on; admins save them for a team (the dev tools link here with
-// ?team=<id>).
+// swims. Anyone can look at teams and try looks on; a team logged in with its code saves its own.
+// The dev tools link here with ?team=<id>.
 
 const characters = useCharacterStore()
-const dev = useDevStore()
 const game = useGameStore()
 const my = useTeamStore()
 const route = useRoute()
@@ -36,6 +34,7 @@ const fromQuery = route.query.team === undefined ? NaN : Number(route.query.team
 const teamId = ref<TeamId | null>(Number.isInteger(fromQuery) ? toTeamId(fromQuery) : my.teamId)
 const team = computed(() => (teamId.value === null ? null : game.state?.teams.get(teamId.value)))
 const teams = computed(() => [...(game.state?.teams.values() ?? [])])
+const canSave = computed(() => characters.canDress(teamId.value))
 
 const saved = computed(() => (teamId.value === null ? null : characters.appearanceOf(teamId.value)))
 const draft = ref<Appearance>(defaultAppearance())
@@ -50,11 +49,10 @@ watch(
 const unsaved = computed(() => JSON.stringify(saved.value) !== JSON.stringify(draft.value))
 
 function save() {
-  if (teamId.value !== null) void characters.setAppearance(teamId.value, { ...draft.value })
+  if (canSave.value) void characters.setAppearance({ ...draft.value })
 }
 async function backToBird() {
-  if (teamId.value !== null && (await characters.setAppearance(teamId.value, null)))
-    draft.value = defaultAppearance()
+  if (canSave.value && (await characters.setAppearance(null))) draft.value = defaultAppearance()
 }
 
 const STYLE_TITLES: Record<Style, string> = {
@@ -80,8 +78,8 @@ const heading = ref<number>(HEADING.south)
         <TtText as="h2" :size="3" font="quill" color="orange" glow>Characters</TtText>
         <TtText :size="1" color="white">
           Pick any OSRS NPC built like a player, then how it stands, walks, runs and swims. On the
-          board it also cheers, sulks and fools around on its own. Anyone can try looks on here; an
-          admin saves them for a team.
+          board it also cheers, sulks and fools around on its own. Anyone can try looks on here; a
+          team logged in with its code saves its own.
         </TtText>
         <div class="flex flex-wrap gap-1.5">
           <TtButton
@@ -127,24 +125,23 @@ const heading = ref<number>(HEADING.south)
             </TtButton>
           </div>
           <NpcPicker :selected="draft.npc" @pick="draft.npc = $event" />
-          <form v-if="team" class="flex flex-wrap items-center gap-1.5" @submit.prevent="save">
-            <input
-              v-model="dev.adminCode"
-              type="password"
-              placeholder="Admin code"
-              aria-label="Admin code"
-              autocomplete="current-password"
-              class="tt-input w-32"
-            />
+          <form v-if="team && canSave" class="flex flex-wrap gap-1.5" @submit.prevent="save">
             <TtButton type="submit" :disabled="!unsaved || characters.saving">
-              Save for {{ team.name }}
+              Save {{ team.name }}’s look
             </TtButton>
             <TtButton v-if="saved" size="sm" :disabled="characters.saving" @click="backToBird">
               Back to a bird
             </TtButton>
           </form>
+          <TtText v-else :size="1" color="cyan">
+            {{
+              team
+                ? `Log in as ${team.name} to change its look.`
+                : 'Log in as your team to save a look.'
+            }}
+          </TtText>
           <TtText
-            v-if="characters.message"
+            v-if="canSave && characters.message"
             :size="1"
             :color="characters.message.tone === 'ok' ? 'green' : 'red'"
           >

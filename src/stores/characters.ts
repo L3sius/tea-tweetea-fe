@@ -1,52 +1,48 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { describeProblem, isApiError } from '@/api'
+import { computed, ref } from 'vue'
 import type { Appearance } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
-import { useApiClient } from './apiClient'
-import { useDevStore } from './dev'
 import { useGameStore } from './game'
+import { useTeamStore } from './team'
 
 /**
  * How each team's piece looks: an OSRS NPC and its idle, walk, run and swim, or null for the
- * default bird. The server keeps it with the team; only admins change it.
+ * default bird. The server keeps it with the team; a team logged in with its code changes its own.
  */
 export const useCharacterStore = defineStore('characters', () => {
-  const api = useApiClient()
   const game = useGameStore()
-  // The admin code is the one the dev tools use, kept for the browser session.
-  const dev = useDevStore()
+  const my = useTeamStore()
 
-  const saving = ref(false)
-  const message = ref<{ text: string; tone: 'ok' | 'error' } | null>(null)
+  const saved = ref<string | null>(null)
 
   function appearanceOf(team: TeamId): Appearance | null {
     return game.state?.teams.get(team)?.appearance ?? null
   }
 
-  /** Dresses `team` as `appearance`, or as a bird again with null. */
-  async function setAppearance(team: TeamId, appearance: Appearance | null): Promise<boolean> {
-    if (saving.value) return false
-    saving.value = true
-    message.value = null
-    try {
-      await api.sendAdminCommand({
-        adminCode: dev.adminCode,
-        command: { kind: 'set_appearance', teamId: team, appearance },
-      })
-      await game.refreshState()
-      message.value = { text: `Saved ${game.names.team(team)}’s look.`, tone: 'ok' }
-      return true
-    } catch (e) {
-      message.value = {
-        text: isApiError(e) ? describeProblem(e.problem) : String(e),
-        tone: 'error',
-      }
-      return false
-    } finally {
-      saving.value = false
-    }
+  /** Whether this browser may change `team`'s look: it is logged in as that team. */
+  const canDress = (team: TeamId | null) => team !== null && team === my.teamId
+
+  /** Dresses the logged-in team as `appearance`, or as a bird again with null. */
+  async function setAppearance(appearance: Appearance | null): Promise<boolean> {
+    saved.value = null
+    const seq = await my.act({ kind: 'set_appearance', appearance })
+    if (seq === null) return false
+    saved.value = appearance ? 'Saved your look.' : 'Back to a bird.'
+    return true
   }
 
-  return { saving, message, appearanceOf, setAppearance }
+  return {
+    appearanceOf,
+    canDress,
+    setAppearance,
+    saving: computed(() => my.pending),
+    /** What the last save did, or why it failed. */
+    message: computed(() =>
+      my.error
+        ? { text: my.error, tone: 'error' as const }
+        : saved.value
+          ? { text: saved.value, tone: 'ok' as const }
+          : null,
+    ),
+  }
 })

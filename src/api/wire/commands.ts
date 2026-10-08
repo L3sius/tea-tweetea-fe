@@ -13,6 +13,7 @@ type TeamAction =
   | { action: 'choose_opponent'; opponent: number }
   | { action: 'steal_gem'; gem: Gem }
   | { action: 'discard'; item: Item }
+  | { action: 'set_appearance'; appearance: WireAppearance | null }
 
 /** `POST /team/action`. `version` is the team's version from the latest state. */
 export type WireTeamRequest = { version: number; key?: string } & TeamAction
