@@ -32,7 +32,21 @@ const NAMED: Record<string, string> = {
   pink: '#ff4fb0',
 }
 
-const FALLBACK = ['#00ffff', '#00ff80', '#ff4fb0', '#b45cff', '#ff981f', '#ffffff']
+/**
+ * For teams not named after a colour, which is most real names: by id, in an order where the first
+ * teams differ most (red, blue, green, gold before the rest).
+ */
+const FALLBACK = [
+  '#ff3a1f',
+  '#4a8cff',
+  '#00ff00',
+  '#ffb000',
+  '#b45cff',
+  '#00ffff',
+  '#ff4fb0',
+  '#ff981f',
+  '#ffffff',
+]
 
 /** A team named after a colour wears it; any other team gets a stable colour by id. */
 export function teamColor(team: Pick<Team, 'id' | 'name'>): string {
