@@ -476,8 +476,13 @@ async function buy(item: Item) {
       >
         <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
           <TtPanel title="Current tile" width="100%" :padding="12" :gap="10">
-            <!-- Which team to watch; the map's standings strip does the same on wider screens. -->
-            <div class="flex flex-wrap justify-center gap-1" role="group" aria-label="Team">
+            <!-- Which team to watch, on phones only: wider screens pick it on the map's team strip,
+                 which phones hide to keep the small map clear. -->
+            <div
+              class="flex flex-wrap justify-center gap-1 sm:hidden"
+              role="group"
+              aria-label="Team"
+            >
               <TtButton
                 v-for="team in standings"
                 :key="team.id"
