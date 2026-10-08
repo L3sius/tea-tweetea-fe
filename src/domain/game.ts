@@ -84,7 +84,7 @@ export type Team = {
   tilesCompleted: number
   /** Quoted back on every action so two people acting at once cannot both succeed. */
   version: number
-  /** How the team's piece looks; null draws the default piece. Only admins change it. */
+  /** How the team's piece looks; null draws the default piece. The team or an admin changes it. */
   appearance: Appearance | null
 }
 
