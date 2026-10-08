@@ -455,6 +455,8 @@ const CHARACTER_SIZE = { width: 60, height: 80 }
  */
 const PIECE_FULL_ZOOM = 0.5
 const pieceScale = (zoom: number) => Math.max(1, 2 ** (zoom - PIECE_FULL_ZOOM))
+/** How far above the feet a card beside a character starts: its middle at the body's middle. */
+const CARD_BESIDE_LIFT = 59
 
 // three.js is big, so it only loads once some team plays as a character.
 let stage: Promise<typeof Stage> | null = null
@@ -646,10 +648,14 @@ function renderFrame() {
         el.textContent = cue.text
       }
       const character = teamMarkers.get(cue.teamId)?.npc != null
-      const lift = character ? CHARACTER_SIZE.height + 4 : 46
+      // A character's drawn card goes beside it, level with its body, so it never hides the
+      // character's reaction to it (a Joker makes it cry). Other callouts go over its head.
+      const beside = character && cue.card !== undefined
+      const lift = beside ? CARD_BESIDE_LIFT : character ? CHARACTER_SIZE.height + 4 : 46
+      const placement = beside ? ' cue-beside-character' : character ? ' cue-over-character' : ''
       m = marker(at, {
         icon: divIcon({
-          className: character ? 'cue-icon cue-over-character' : 'cue-icon',
+          className: `cue-icon${placement}`,
           html: el,
           iconSize: [0, 0],
           iconAnchor: [0, lift],
@@ -1214,6 +1220,10 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 /* Callouts over a grown character rise with its head. */
 .board-map .cue-over-character > * {
   translate: 0 calc((1 - var(--piece-scale, 1)) * 76px);
+}
+/* A drawn card stands to the right of the character, level with its body, as the character grows. */
+.board-map .cue-beside-character > * {
+  translate: calc(var(--piece-scale, 1) * 34px) calc((1 - var(--piece-scale, 1)) * 38px);
 }
 /* A character turns in 3D instead of mirroring, and animates itself instead of hopping. */
 .board-map .sprite-character .sprite-body {
