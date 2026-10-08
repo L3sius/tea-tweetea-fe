@@ -46,3 +46,6 @@ tweetea-design-system/
 
 # Explv map tiles downloaded by scripts/terrain-scenes.py
 .cache/
+
+# Catalogs written by tools/characters/catalog.mjs
+tools/characters/out/
