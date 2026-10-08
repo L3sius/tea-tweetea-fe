@@ -29,7 +29,8 @@ import type { Challenge } from '@/domain/challenge'
 import { blockerName, cardLabel, challengeProgress, clock, type Names } from '@/domain/describe'
 import type { Blocker, Card, GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
-import type { Choreography, Placement } from '@/domain/motion'
+import type { Choreography, Cue, Placement } from '@/domain/motion'
+import type { Replay } from '@/domain/replay'
 import { nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
 import { perform, ticksToMs } from '@/characters/acting'
 import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
@@ -68,6 +69,8 @@ const props = defineProps<{
   targetTiles: ReadonlySet<TileId> | null
   /** Skip callouts for this team, whose captain is watching their draw in the panel. */
   hideCuesFor: TeamId | null
+  /** A replay of past moves: the teams it moves are drawn from it instead of the live game. */
+  replay?: Replay | null
   /** How a team's piece looks as an OSRS character, or null to draw it as a bird. */
   appearanceOf: (team: TeamId) => Appearance | null
 }>()
@@ -532,6 +535,24 @@ const walkHeading = new Map<TeamId, number>()
 const placed = new Map<TeamId, LatLng>()
 let lastPrune = 0
 
+/**
+ * Where to draw a team at `time`: from a replay that moves it, staying where the replay left it
+ * until the replay ends, else from the live game.
+ */
+function placementOf(team: TeamId, time: number): Placement | null {
+  const replay = props.replay
+  if (!replay?.teams.has(team)) return props.choreography.placement(team, time)
+  const p = replay.choreography.placement(team, time)
+  const tile = replay.choreography.finalTile(team)
+  return p ?? (tile === null ? null : { kind: 'still', tile })
+}
+
+/** Where a team's movements come from: a replay that moves it, else the live game. */
+function choreographyOf(team: TeamId): Choreography {
+  const replay = props.replay
+  return replay?.teams.has(team) ? replay.choreography : props.choreography
+}
+
 /** Draws a team's character doing whatever it is doing at `time` (see characters/acting.ts). */
 function drawCharacter(
   piece: Stage.CharacterPiece,
@@ -549,7 +570,7 @@ function drawCharacter(
     placement: p,
     appearance,
     frozenUntil: frozenUntil !== null && frozenUntil > time ? frozenUntil : null,
-    reactions: props.choreography.reactionsOf(team.id, time),
+    reactions: choreographyOf(team.id).reactionsOf(team.id, time),
     isSea: (tile) => props.board.tiles.get(tile)?.sea ?? false,
     isOccupied: (tile) => (still.get(tile) ?? []).some((other) => other !== team.id),
     lengthOf: (anim) => {
@@ -581,7 +602,7 @@ function renderFrame() {
   const still = new Map<TileId, TeamId[]>()
   const placements = new Map<TeamId, Placement | null>()
   for (const team of props.state.teams.values()) {
-    const p = props.choreography.placement(team.id, time)
+    const p = placementOf(team.id, time)
     placements.set(team.id, p)
     const tile = p === null ? team.position : p.kind === 'still' ? p.tile : null
     if (tile !== null) still.set(tile, [...(still.get(tile) ?? []), team.id])
@@ -626,8 +647,15 @@ function renderFrame() {
     }
   }
 
-  // Callouts float above the piece they belong to.
-  const active = props.choreography.activeCues(time)
+  // Callouts float above the piece they belong to. A replayed team's callouts come from the
+  // replay (its live ones wait), and they are not hidden from its own captain.
+  const replay = props.replay
+  const active: Cue[] = [
+    ...props.choreography
+      .activeCues(time)
+      .filter((c) => !replay?.teams.has(c.teamId) && c.teamId !== props.hideCuesFor),
+    ...(replay?.choreography.activeCues(time) ?? []).map((c) => ({ ...c, id: `replay-${c.id}` })),
+  ]
   const live = new Set(active.map((c) => c.id))
   for (const [id, m] of cueMarkers) {
     if (!live.has(id)) {
@@ -638,8 +666,6 @@ function renderFrame() {
   for (const cue of active) {
     const at = placed.get(cue.teamId)
     if (!at) continue
-    // The captain watches their own draw in the panel; callouts on the map would spoil it.
-    if (cue.teamId === props.hideCuesFor) continue
     let m = cueMarkers.get(cue.id)
     if (!m) {
       const el = cue.card ? cardCue(cue.card) : document.createElement('div')

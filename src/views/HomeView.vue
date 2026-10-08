@@ -89,6 +89,18 @@ function openTab(id: Tab) {
 const WATCH_KEY = 'tweetea.watchTeam'
 
 /** Selecting a team starts following it; dragging the map switches to free roam. */
+// A replay moves the camera along: it flies in to each team as its replayed move starts (never
+// zooming out), then follows it.
+watch(
+  () => game.replayFocus,
+  (focus) => {
+    if (focus === null) return
+    selected.value = focus.team
+    follow.value = true
+    if (focus.tile !== null) boardMap.value?.locate(focus.tile, 0.5)
+  },
+)
+
 function selectTeam(id: TeamId) {
   const team = state.value?.teams.get(id)
   if (!team) return
@@ -225,6 +237,7 @@ async function buy(item: Item) {
         :options="picking ? my.options : null"
         :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
+        :replay="game.replay"
         :appearance-of="characters.appearanceOf"
         @hover="onHover"
         @pick="onPick"
@@ -275,23 +288,66 @@ async function buy(item: Item) {
         />
       </div>
 
-      <!-- Follow / free roam -->
+      <!-- Bars at the bottom middle, stacked so they never overlap: a replay (or moves to catch up
+           on), then who the camera follows. -->
       <div
-        v-if="followed"
-        class="tt-sprite-display absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 py-0 pr-0 pl-1"
+        v-if="game.replay || game.missedMoves > 0 || followed"
+        class="absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-1"
       >
-        <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
-          Following
-          <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span>
-        </TtText>
-        <TtText v-else :size="1" color="muted">Free roam</TtText>
-        <TtButton
-          size="sm"
-          class="!min-h-9"
-          @click="follow ? (follow = false) : selectTeam(followed.id)"
+        <div
+          v-if="game.replay || game.missedMoves > 0"
+          class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
+          role="status"
         >
-          {{ follow ? 'Stop' : 'Follow' }}
-        </TtButton>
+          <template v-if="game.replay">
+            <TtText :size="1" color="orange" class="whitespace-nowrap">Replay</TtText>
+            <TtText :size="1" color="white" class="whitespace-nowrap">{{
+              game.replayLabel
+            }}</TtText>
+            <TtText
+              v-if="game.replayCountdown !== null"
+              :size="1"
+              color="muted"
+              class="whitespace-nowrap"
+              aria-live="polite"
+            >
+              · Back to live in {{ game.replayCountdown }}
+            </TtText>
+            <TtButton size="sm" class="!min-h-9" @click="game.stopReplay()">Stop replay</TtButton>
+          </template>
+          <template v-else>
+            <TtText :size="1" color="white" class="whitespace-nowrap">
+              While you were away: {{ game.missedMoves }}
+              {{ game.missedMoves === 1 ? 'move' : 'moves' }}
+            </TtText>
+            <TtButton size="sm" class="!min-h-9" @click="game.catchUp()">Catch up</TtButton>
+            <button
+              type="button"
+              class="tt-link tt-1 pr-2"
+              aria-label="Dismiss"
+              title="Dismiss"
+              @click="game.dismissCatchUp()"
+            >
+              ✕
+            </button>
+          </template>
+        </div>
+
+        <!-- Follow / free roam -->
+        <div v-if="followed" class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1">
+          <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
+            Following
+            <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span>
+          </TtText>
+          <TtText v-else :size="1" color="muted">Free roam</TtText>
+          <TtButton
+            size="sm"
+            class="!min-h-9"
+            @click="follow ? (follow = false) : selectTeam(followed.id)"
+          >
+            {{ follow ? 'Stop' : 'Follow' }}
+          </TtButton>
+        </div>
       </div>
 
       <!-- Map controls, folded under a menu button -->
@@ -360,7 +416,13 @@ async function buy(item: Item) {
       <div
         v-if="insetOpen"
         class="absolute bottom-1.5 left-1.5 z-[1000] w-36 sm:w-52 lg:w-64"
-        :class="followed ? 'bottom-14 sm:bottom-1.5' : ''"
+        :class="
+          game.replay || game.missedMoves > 0
+            ? 'bottom-26 sm:bottom-1.5'
+            : followed
+              ? 'bottom-14 sm:bottom-1.5'
+              : ''
+        "
       >
         <InsetMap
           :board="board"
@@ -444,7 +506,14 @@ async function buy(item: Item) {
         </div>
         <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" />
         <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />
-        <GameLog v-else :log="log" :names="game.names" :now="now" :revealed="revealed" />
+        <GameLog
+          v-else
+          :log="log"
+          :names="game.names"
+          :now="now"
+          :revealed="revealed"
+          @watch="game.watchMove"
+        />
       </div>
     </aside>
 

@@ -12,18 +12,27 @@ const props = defineProps<{
   /** Hides entries until their animations have played, so the log never spoils a walk. */
   revealed?: (entry: JournalEntry) => boolean
 }>()
+const emit = defineEmits<{ watch: [seq: number] }>()
+
+/** Events that start a move worth watching again: a walk, a teleport, a trap. */
+const MOVE_STARTS = new Set(['move_confirmed', 'teleported', 'trap_triggered'])
 
 const MAX_LINES = 60
 
 /** Newest first, bookkeeping events left out. */
 const lines = computed(() => {
   void props.now // re-check what has been revealed as time passes
-  const out: { key: string; at: Date; text: string }[] = []
+  const out: { key: string; seq: number; at: Date; text: string; watch: boolean }[] = []
   for (const entry of [...props.log].reverse()) {
     if (props.revealed && !props.revealed(entry)) continue
+    // One Watch per entry, on the line where its move starts.
+    let watchable = true
     entry.events.forEach((event, i) => {
       const text = describeEvent(event, props.names)
-      if (text !== null) out.push({ key: `${entry.seq}.${i}`, at: entry.at, text })
+      if (text === null) return
+      const watch = watchable && MOVE_STARTS.has(event.kind)
+      if (watch) watchable = false
+      out.push({ key: `${entry.seq}.${i}`, seq: entry.seq, at: entry.at, text, watch })
     })
     if (out.length >= MAX_LINES) break
   }
@@ -41,6 +50,15 @@ const lines = computed(() => {
             <TtText :size="1" color="muted">{{ timeFrom(line.at, now) }}</TtText>
           </time>
           <TtText :size="1" color="white">{{ line.text }}</TtText>
+          <button
+            v-if="line.watch"
+            type="button"
+            class="tt-link tt-1"
+            title="Watch this move again on the map"
+            @click="emit('watch', line.seq)"
+          >
+            ▶ Watch
+          </button>
         </p>
         <div v-if="i < lines.length - 1" class="tt-rule w-4/5" />
       </li>

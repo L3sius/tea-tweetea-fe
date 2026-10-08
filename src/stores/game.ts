@@ -7,14 +7,26 @@ import type { Challenge } from '@/domain/challenge'
 import { itemName, type Names } from '@/domain/describe'
 import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { GameState, Team } from '@/domain/game'
-import type { ChallengeId, TeamId } from '@/domain/ids'
+import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import { useItemCatalogue } from '@/domain/items'
 import { Choreography } from '@/domain/motion'
+import {
+  RETURN_COUNTDOWN_S,
+  buildReplay,
+  catchUpEntries,
+  movesIn,
+  watchEntries,
+  type Replay,
+} from '@/domain/replay'
 import { NECKLACES } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 
 /** Journal entries kept for the game log; also how far back a reload looks for walks to resume. */
 const LOG_LENGTH = 120
+/** The newest journal entry this browser has seen, so a later visit can catch up from it. */
+const LAST_SEEN_KEY = 'tweetea.lastSeenSeq'
+/** A replay starts this long after it is asked for, so the camera can get there first. */
+const REPLAY_LEAD_MS = 600
 const FEED_LIMIT = 60
 /** Entries arrive in bursts (one per step of a walk), so refetches wait for a quiet moment. */
 const REFRESH_DELAY_MS = 300
@@ -186,6 +198,86 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  // --- Replays of past moves (see domain/replay.ts) ---
+
+  /** The replay playing now, drawn over the live board for the teams it moves. */
+  const replay = shallowRef<Replay | null>(null)
+  const replayLabel = ref('')
+  /** Seconds left before a finished replay goes back to live; null while it still plays. */
+  const replayCountdown = ref<number | null>(null)
+  /** The team the replayed entry is about, and where it stands then, for the camera. */
+  const replayFocus = shallowRef<{ team: TeamId; tile: TileId | null } | null>(null)
+  let replayTimers: ReturnType<typeof setTimeout>[] = []
+
+  /** The newest entry seen on an earlier visit; null on a first visit or once caught up. */
+  const lastSeen = ref<number | null>(readLastSeen())
+  /** Moves made since the last visit. */
+  const missedMoves = computed(() =>
+    lastSeen.value === null
+      ? 0
+      : log.value.filter((e) => e.seq > (lastSeen.value ?? 0) && movesIn(e).length > 0).length,
+  )
+
+  function startReplay(entries: JournalEntry[], label: string) {
+    stopReplay()
+    if (entries.length === 0) return
+    const r = buildReplay(log.value, entries, serverNow() + REPLAY_LEAD_MS, names.seesItems)
+    replay.value = r
+    replayLabel.value = label
+    const later = (at: number, run: () => void) =>
+      replayTimers.push(setTimeout(run, Math.max(0, at - serverNow())))
+    for (const f of r.focus)
+      later(f.at - REPLAY_LEAD_MS / 2, () => {
+        const p = r.choreography.placement(f.team, f.at)
+        const tile = p === null ? null : p.kind === 'still' ? p.tile : p.from
+        replayFocus.value = { team: f.team, tile }
+      })
+    // Once the pieces settle, count down so the end can be seen before the board goes back to live.
+    for (let s = RETURN_COUNTDOWN_S; s >= 1; s--)
+      later(r.endsAt - s * 1000, () => (replayCountdown.value = s))
+    later(r.endsAt, stopReplay)
+  }
+
+  /** Replays the move in entry `seq`, with the card drawn for it. */
+  function watchMove(seq: number) {
+    const entries = watchEntries(log.value, seq)
+    const entry = entries.find((e) => e.seq === seq)
+    const team = entry ? movesIn(entry)[0] : undefined
+    if (team === undefined) return
+    const name = names.team(team)
+    startReplay(entries, `${name}${name.endsWith('s') ? "'" : "'s"} move`)
+  }
+
+  /** Replays the moves made since the last visit, then counts them as seen. */
+  function catchUp() {
+    if (lastSeen.value === null) return
+    startReplay(catchUpEntries(log.value, lastSeen.value), 'While you were away')
+    lastSeen.value = null
+  }
+
+  function stopReplay() {
+    for (const t of replayTimers) clearTimeout(t)
+    replayTimers = []
+    replay.value = null
+    replayFocus.value = null
+    replayCountdown.value = null
+  }
+
+  /** Remembers the newest entry seen, for the next visit. */
+  function saveLastSeen() {
+    const newest = log.value.at(-1)?.seq
+    if (newest === undefined) return
+    try {
+      localStorage.setItem(LAST_SEEN_KEY, String(newest))
+    } catch {
+      // Storage blocked: the next visit just won't offer a catch-up.
+    }
+  }
+  window.addEventListener('pagehide', saveLastSeen)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveLastSeen()
+  })
+
   let alertCount = 0
   /** Headlines wait until the piece that caused them has finished moving, so they never spoil a walk. */
   function raiseAlerts(events: GameEvent[]) {
@@ -253,6 +345,15 @@ export const useGameStore = defineStore('game', () => {
 
   return {
     viewer,
+    replay,
+    replayLabel,
+    replayCountdown,
+    replayFocus,
+    missedMoves,
+    watchMove,
+    catchUp,
+    stopReplay,
+    dismissCatchUp: () => (lastSeen.value = null),
     spins,
     queueSpin,
     finishSpin,
@@ -389,5 +490,14 @@ function debounced(run: () => unknown) {
     cancel() {
       clearTimeout(timer)
     },
+  }
+}
+
+function readLastSeen(): number | null {
+  try {
+    const saved = Number(localStorage.getItem(LAST_SEEN_KEY) ?? NaN)
+    return Number.isInteger(saved) ? saved : null
+  } catch {
+    return null
   }
 }

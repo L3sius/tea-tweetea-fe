@@ -179,6 +179,11 @@ export class Choreography {
     return this.reveal.get(seq) ?? 0
   }
 
+  /** Where a team ends up once everything queued for it has played; null if it never moved. */
+  finalTile(team: TeamId): TileId | null {
+    return this.lastTile.get(team) ?? null
+  }
+
   /** Tells it where a team stands, for teams whose last move is older than the entries it saw. */
   know(team: TeamId, tile: TileId): void {
     if (!this.lastTile.has(team)) this.lastTile.set(team, tile)
