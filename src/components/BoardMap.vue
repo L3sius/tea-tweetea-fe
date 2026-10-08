@@ -4,6 +4,7 @@ import {
   DomEvent,
   Transformation,
   Util,
+  canvas,
   circleMarker,
   divIcon,
   imageOverlay,
@@ -710,7 +711,10 @@ onMounted(() => {
     maxBoundsViscosity: 1,
     attributionControl: false,
     zoomControl: false,
-    preferCanvas: true,
+    // Roads and nodes go on one canvas, redrawn only when a drag ends. Leaflet's default margin
+    // around the view (10%) ran out within a short drag and showed bare map until the redraw;
+    // half a view each way covers a normal drag.
+    renderer: canvas({ padding: 0.5 }),
   })
   // Always the pixel-art map; the board is drawn over it at fixed pixel sizes.
   imageOverlay(worldMap.imageUrl, bounds, { className: 'pixel-map', pane: 'tilePane' }).addTo(map)
