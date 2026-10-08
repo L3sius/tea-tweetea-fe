@@ -1,6 +1,6 @@
 import type { Gem, Item } from '@/domain/vocabulary'
 import type { WireObservation } from './activity'
-import type { WireCard, WireTarget } from './game'
+import type { WireAppearance, WireCard, WireTarget } from './game'
 
 // Request bodies are built by the client, never received, so they need types but no schemas.
 
@@ -22,6 +22,7 @@ export type WireAdminAction =
   | { action: 'create_team'; name: string; code: string }
   | { action: 'add_member'; team: number; name: string }
   | { action: 'add_account'; team: number; member: string; rsn: string }
+  | { action: 'set_appearance'; team: number; appearance: WireAppearance | null }
   | { action: 'start_game' }
   | { action: 'complete_tile'; team: number }
   | { action: 'contribute'; team: number; instance: number; key: string; amount: number }

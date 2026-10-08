@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  WireAppearance,
   WireBlocker,
   WireCard,
   WireEffect,
@@ -17,6 +18,7 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('team_created', { team: Id, name: z.string() }),
   event('member_added', { team: Id, member: z.string() }),
   event('account_added', { team: Id, member: z.string(), rsn: z.string() }),
+  event('appearance_set', { team: Id, appearance: WireAppearance.nullable() }),
   event('game_started', { tiles: z.array(z.string()), gems: z.array(Id), positions: z.array(Id) }),
   event('game_ended', { winner: Id.nullable(), ranking: z.array(Id) }),
   event('card_drawn', { team: Id, card: WireCard, steps: z.int() }),

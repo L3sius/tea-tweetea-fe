@@ -77,6 +77,8 @@ export function toWireAdminAction(command: AdminCommand): WireAdminAction {
         member: command.member,
         rsn: command.rsn,
       }
+    case 'set_appearance':
+      return { action: command.kind, team: command.teamId, appearance: command.appearance }
     case 'start_game':
       return { action: command.kind }
     case 'complete_tile':

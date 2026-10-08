@@ -1,4 +1,4 @@
-import type { Blocker, Card, Effect, Payout, Scoring, TeamProgress } from './game'
+import type { Appearance, Blocker, Card, Effect, Payout, Scoring, TeamProgress } from './game'
 import type { ChallengeId, InstanceId, MatchId, MinigameId, TeamId, TileId } from './ids'
 import type { ItemTarget } from './commands'
 import type { Gem, Item } from './vocabulary'
@@ -8,6 +8,7 @@ export type GameEvent =
   // Setup and end
   | { kind: 'team_created'; teamId: TeamId; name: string }
   | { kind: 'member_added'; teamId: TeamId; member: string }
+  | { kind: 'appearance_set'; teamId: TeamId; appearance: Appearance | null }
   | { kind: 'account_added'; teamId: TeamId; member: string; rsn: string }
   | { kind: 'game_started'; tileChallenges: ChallengeId[]; gemTiles: TileId[]; positions: TileId[] }
   | { kind: 'game_ended'; winner: TeamId | null; ranking: TeamId[] }

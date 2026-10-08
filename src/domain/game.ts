@@ -84,7 +84,15 @@ export type Team = {
   tilesCompleted: number
   /** Quoted back on every action so two people acting at once cannot both succeed. */
   version: number
+  /** How the team's piece looks; null draws the default piece. Only admins change it. */
+  appearance: Appearance | null
 }
+
+/**
+ * A team's piece as an OSRS character: the NPC it looks like and the animations (OSRS sequence
+ * ids) it stands, walks, runs and swims with.
+ */
+export type Appearance = { npc: number; idle: number; walk: number; run: number; swim: number }
 
 /**
  * Traps trigger once: a banana or a harpie bug swarm when walked over, a snake charmer when landed

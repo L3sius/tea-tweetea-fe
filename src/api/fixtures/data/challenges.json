@@ -1,57 +1,4 @@
 {
-  "kq-dragon-pickaxe": {
-    "id": "kq-dragon-pickaxe",
-    "name": "Dragon Pickaxe",
-    "description": "Obtain a Dragon pickaxe from the Kalphite Queen",
-    "est_hours": 6.4,
-    "tags": [
-      "desert",
-      "boss"
-    ],
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "items",
-        "items": [
-          {
-            "name": "Dragon pickaxe",
-            "sources": [
-              "Kalphite Queen"
-            ]
-          }
-        ]
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": [
-        "Kalphite Queen"
-      ]
-    }
-  },
-  "fight-caves-26m": {
-    "id": "fight-caves-26m",
-    "name": "Fight Caves",
-    "description": "Complete the Fight Caves in under 26 minutes",
-    "est_hours": 1.5,
-    "criterion": {
-      "kind": "timed_kill",
-      "boss": "TzTok-Jad",
-      "max_seconds": 1560
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "best_time",
-      "boss": "TzTok-Jad"
-    }
-  },
   "any-raid-pet": {
     "id": "any-raid-pet",
     "name": "Raid Pet",
@@ -103,6 +50,123 @@
       "sources": [
         "Aberrant spectre"
       ]
+    }
+  },
+  "kq-dragon-pickaxe": {
+    "id": "kq-dragon-pickaxe",
+    "name": "Dragon Pickaxe",
+    "description": "Obtain a Dragon pickaxe from the Kalphite Queen",
+    "est_hours": 6.4,
+    "tags": [
+      "desert",
+      "boss"
+    ],
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "items",
+        "items": [
+          {
+            "name": "Dragon pickaxe",
+            "sources": [
+              "Kalphite Queen"
+            ]
+          }
+        ]
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Kalphite Queen"
+      ]
+    }
+  },
+  "any-drop-1m": {
+    "id": "any-drop-1m",
+    "name": "Big Drop",
+    "description": "Receive any single item worth at least 1,000,000 gp",
+    "est_hours": 3,
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "value",
+        "min_gp": 1000000,
+        "per": "stack",
+        "sources": "any"
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": "any"
+    }
+  },
+  "sire-50": {
+    "id": "sire-50",
+    "name": "Abyssal Sire",
+    "description": "Kill the Abyssal Sire 50 times",
+    "est_hours": 2,
+    "criterion": {
+      "kind": "kill_count",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 50
+    },
+    "effort": {
+      "kind": "kills",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    }
+  },
+  "dagannoth-task": {
+    "id": "dagannoth-task",
+    "name": "Slayer Task",
+    "description": "Complete a dagannoth slayer task",
+    "est_hours": 1,
+    "criterion": {
+      "kind": "slayer",
+      "tasks": [
+        "Dagannoth"
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "elapsed"
+    }
+  },
+  "fight-caves-26m": {
+    "id": "fight-caves-26m",
+    "name": "Fight Caves",
+    "description": "Complete the Fight Caves in under 26 minutes",
+    "est_hours": 1.5,
+    "criterion": {
+      "kind": "timed_kill",
+      "boss": "TzTok-Jad",
+      "max_seconds": 1560
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "best_time",
+      "boss": "TzTok-Jad"
     }
   },
   "beginner-clue-9-cabbage": {
@@ -172,28 +236,6 @@
       ]
     }
   },
-  "sire-50": {
-    "id": "sire-50",
-    "name": "Abyssal Sire",
-    "description": "Kill the Abyssal Sire 50 times",
-    "est_hours": 2,
-    "criterion": {
-      "kind": "kill_count",
-      "bosses": [
-        "Abyssal Sire"
-      ]
-    },
-    "goal": {
-      "kind": "total",
-      "n": 50
-    },
-    "effort": {
-      "kind": "kills",
-      "bosses": [
-        "Abyssal Sire"
-      ]
-    }
-  },
   "elite-clue-150k-200k": {
     "id": "elite-clue-150k-200k",
     "name": "Clue Value Reward",
@@ -215,48 +257,6 @@
     "effort": {
       "kind": "caskets",
       "tier": "elite"
-    }
-  },
-  "any-drop-1m": {
-    "id": "any-drop-1m",
-    "name": "Big Drop",
-    "description": "Receive any single item worth at least 1,000,000 gp",
-    "est_hours": 3,
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "value",
-        "min_gp": 1000000,
-        "per": "stack",
-        "sources": "any"
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": "any"
-    }
-  },
-  "dagannoth-task": {
-    "id": "dagannoth-task",
-    "name": "Slayer Task",
-    "description": "Complete a dagannoth slayer task",
-    "est_hours": 1,
-    "criterion": {
-      "kind": "slayer",
-      "tasks": [
-        "Dagannoth"
-      ]
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "elapsed"
     }
   }
 }

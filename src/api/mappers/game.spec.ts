@@ -22,6 +22,7 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   },
   tiles_completed: 12,
   version: 7,
+  appearance: null,
   ...overrides,
 })
 
