@@ -175,3 +175,12 @@ describe('articles', () => {
     )
   })
 })
+
+describe('card draws', () => {
+  it('says "step" for one and "steps" for more', () => {
+    const drew = (steps: number) =>
+      describeEvent({ kind: 'card_drawn', teamId: red, card: { kind: 'joker' }, steps }, names)
+    expect(drew(1)).toMatch(/\(1 step\)$/)
+    expect(drew(4)).toMatch(/\(4 steps\)$/)
+  })
+})

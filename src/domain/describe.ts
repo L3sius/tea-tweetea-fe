@@ -16,6 +16,8 @@ const SUIT_SYMBOLS: Record<Suit, string> = {
 
 const FACES: Record<number, string> = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' }
 
+const stepCount = (n: number) => `${n} ${n === 1 ? 'step' : 'steps'}`
+
 export function cardLabel(card: Card): string {
   if (card.kind === 'joker') return 'Joker'
   return `${FACES[card.rank] ?? String(card.rank)}${SUIT_SYMBOLS[card.suit]}`
@@ -159,7 +161,7 @@ export function teamStatusText(team: Team, now: Date, names: Names): string {
     case 'working':
       return 'Working on a tile'
     case 'drawn':
-      return `Drew ${cardLabel(status.card)}, choosing where to go (${status.length} steps)`
+      return `Drew ${cardLabel(status.card)}, choosing where to go (${stepCount(status.length)})`
     case 'moving': {
       const pause = status.move.pauses[0]
       if (!pause) return 'On the move'
@@ -206,7 +208,7 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'game_ended':
       return event.winner === null ? 'The game has ended' : `${team(event.winner)} won the game!`
     case 'card_drawn':
-      return `${team(event.teamId)} drew ${cardLabel(event.card)} (${event.steps} steps)`
+      return `${team(event.teamId)} drew ${cardLabel(event.card)} (${stepCount(event.steps)})`
     case 'paths_offered':
     case 'stepped':
     case 'progress':
