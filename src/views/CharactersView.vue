@@ -125,28 +125,6 @@ const heading = ref<number>(HEADING.south)
             </TtButton>
           </div>
           <NpcPicker :selected="draft.npc" @pick="draft.npc = $event" />
-          <form v-if="team && canSave" class="flex flex-wrap gap-1.5" @submit.prevent="save">
-            <TtButton type="submit" :disabled="!unsaved || characters.saving">
-              Save {{ team.name }}’s look
-            </TtButton>
-            <TtButton v-if="saved" size="sm" :disabled="characters.saving" @click="backToBird">
-              Back to a bird
-            </TtButton>
-          </form>
-          <TtText v-else :size="1" color="cyan">
-            {{
-              team
-                ? `Log in as ${team.name} to change its look.`
-                : 'Log in as your team to save a look.'
-            }}
-          </TtText>
-          <TtText
-            v-if="canSave && characters.message"
-            :size="1"
-            :color="characters.message.tone === 'ok' ? 'green' : 'red'"
-          >
-            {{ characters.message.text }}
-          </TtText>
         </TtPanel>
 
         <TtPanel :padding="12" :gap="9">
@@ -161,6 +139,36 @@ const heading = ref<number>(HEADING.south)
           </section>
         </TtPanel>
       </div>
+
+      <!-- Saving takes the whole look: the character and every animation picked above. -->
+      <TtPanel :padding="9" :gap="6">
+        <form
+          v-if="team && canSave"
+          class="flex flex-wrap items-center justify-center gap-1.5"
+          @submit.prevent="save"
+        >
+          <TtButton type="submit" :disabled="!unsaved || characters.saving">
+            Save {{ team.name }}’s look
+          </TtButton>
+          <TtButton v-if="saved" size="sm" :disabled="characters.saving" @click="backToBird">
+            Back to a bird
+          </TtButton>
+        </form>
+        <TtText v-else :size="1" color="cyan">
+          {{
+            team
+              ? `Log in as ${team.name} to change its look.`
+              : 'Log in as your team to save a look.'
+          }}
+        </TtText>
+        <TtText
+          v-if="canSave && characters.message"
+          :size="1"
+          :color="characters.message.tone === 'ok' ? 'green' : 'red'"
+        >
+          {{ characters.message.text }}
+        </TtText>
+      </TtPanel>
 
       <TtPanel title="On its own" :padding="12" :gap="9">
         <TtText :size="1" color="white">
