@@ -22,7 +22,7 @@ const max = computed(() => Math.max(1, ...props.rows.map((r) => r.value)))
     <li
       v-for="(row, i) in rows"
       :key="row.key"
-      class="grid grid-cols-[1.75rem_minmax(0,9rem)_1fr_4.5rem] items-center gap-2"
+      class="grid grid-cols-[1.75rem_minmax(0,13rem)_1fr_4.5rem] items-center gap-2"
       :title="
         row.note ? `${row.label}: ${row.display} · ${row.note}` : `${row.label}: ${row.display}`
       "

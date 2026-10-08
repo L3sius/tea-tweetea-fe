@@ -64,7 +64,9 @@ const items = computed(() =>
   <article class="flex w-full flex-col items-center gap-1.5">
     <header class="flex flex-wrap items-baseline justify-center gap-x-3">
       <TtText :size="2" color="orange">{{ rank }}.</TtText>
-      <TtText as="h3" :size="2" font="bold" :color="color">{{ team.name }}</TtText>
+      <TtText as="h3" :size="2" font="bold" :color="color" class="[overflow-wrap:anywhere]">
+        {{ team.name }}
+      </TtText>
       <TtText :size="1" color="white">
         {{ team.gems.size }} / {{ GEMS.length }} gems · {{ team.gold }} gold ·
         {{ team.tilesCompleted }} tiles

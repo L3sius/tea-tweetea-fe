@@ -281,7 +281,7 @@ async function login() {
 
   <TtPanel v-else width="100%" :padding="15" :gap="12" class="min-h-full">
     <template #title>
-      <span :style="{ color }">Team {{ team.name }}</span>
+      <span class="[overflow-wrap:anywhere]" :style="{ color }">Team {{ team.name }}</span>
     </template>
 
     <!-- What the team holds, on one line: its gems, then its gold. -->

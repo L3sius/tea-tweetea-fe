@@ -60,7 +60,9 @@ const rosters = computed(() =>
       <div class="grid gap-1.5 md:grid-cols-2">
         <TtPanel v-for="r in rosters" :key="r.team.id" :padding="12" :gap="9">
           <template #title>
-            <span :style="{ color: r.color }">{{ r.team.name }}</span>
+            <span class="[overflow-wrap:anywhere]" :style="{ color: r.color }">{{
+              r.team.name
+            }}</span>
           </template>
           <GemRow :gems="r.team.gems" />
           <TtText :size="1" color="white">
