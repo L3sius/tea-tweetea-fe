@@ -19,6 +19,7 @@ import {
   type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
+  type ZoomAnimEvent,
 } from 'leaflet'
 import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
 import type { Board, Tile } from '@/domain/board'
@@ -209,7 +210,7 @@ function drawBoard(map: LeafletMap) {
         icon: divIcon({
           className: 'shop-marker',
           html: '<span class="tt-sprite tt-icon-coins"></span>',
-          iconSize: [36, 36],
+          iconSize: [34, 34],
         }),
         interactive: false,
       }).addTo(map)
@@ -236,7 +237,7 @@ function drawPieces() {
       icon: divIcon({
         className: '',
         html: `<div class="gem-marker tt-sprite tt-gem-${gem}" style="--gem:var(--gem-${gem}-glow)"></div>`,
-        iconSize: [32, 35],
+        iconSize: [30, 33],
       }),
       zIndexOffset: 500,
       interactive: false,
@@ -249,7 +250,7 @@ function drawPieces() {
       icon: divIcon({
         className: 'blocker-marker',
         html: blockerHtml(blocker.kind),
-        iconSize: [30, 30],
+        iconSize: [28, 28],
       }),
       zIndexOffset: 400,
       interactive: false,
@@ -443,7 +444,13 @@ const TIP_TOP_CLEARANCE = 76
 // --- Team pieces, animated every frame from the choreography. ---
 
 /** Canvas size of a character piece; the bird is 32 × 38. */
-const CHARACTER_SIZE = { width: 44, height: 60 }
+const CHARACTER_SIZE = { width: 60, height: 80 }
+/**
+ * The zoom a followed team is shown at. Characters keep their size up to here and grow with the map
+ * past it, so zooming in never leaves them small next to the board (about 2.8× at full zoom).
+ */
+const PIECE_FULL_ZOOM = 0.5
+const pieceScale = (zoom: number) => Math.max(1, 2 ** (zoom - PIECE_FULL_ZOOM))
 
 // three.js is big, so it only loads once some team plays as a character.
 let stage: Promise<typeof Stage> | null = null
@@ -634,8 +641,15 @@ function renderFrame() {
         el.className = `cue cue-${cue.tone}`
         el.textContent = cue.text
       }
+      const character = teamMarkers.get(cue.teamId)?.npc != null
+      const lift = character ? CHARACTER_SIZE.height + 4 : 46
       m = marker(at, {
-        icon: divIcon({ className: 'cue-icon', html: el, iconSize: [0, 0], iconAnchor: [0, 46] }),
+        icon: divIcon({
+          className: character ? 'cue-icon cue-over-character' : 'cue-icon',
+          html: el,
+          iconSize: [0, 0],
+          iconAnchor: [0, lift],
+        }),
         interactive: false,
         zIndexOffset: 2000,
       }).addTo(cueLayer)
@@ -717,6 +731,13 @@ onMounted(() => {
     overviewTimer = setTimeout(() => atMin() && showAll(), OVERVIEW_QUIET_MS)
   }
   let zoomedFrom = map.getZoom()
+  // Characters grow with the map when zoomed in close (see PIECE_FULL_ZOOM): at the start of an
+  // animated zoom, so they grow along with it, and on every other zoom change.
+  const scalePieces = (zoom: number) =>
+    map.getContainer().style.setProperty('--piece-scale', String(pieceScale(zoom)))
+  map.on('zoomanim', (e: ZoomAnimEvent) => scalePieces(e.zoom))
+  map.on('zoom', () => scalePieces(map.getZoom()))
+  scalePieces(map.getZoom())
   map.on('zoomstart', () => (zoomedFrom = map.getZoom()))
   map.on('zoomend', () => {
     if (!flying && atMin() && zoomedFrom > map.getZoom()) overviewSoon()
@@ -922,8 +943,8 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 /* Gems, shops and blockers are landmarks: half again the size of their sprites, over the nodes. */
 .board-map .gem-marker {
-  width: 32px;
-  height: 35px;
+  width: 30px;
+  height: 33px;
   filter: drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px var(--gem));
   animation: gem-glint 2.4s steps(2, end) infinite;
 }
@@ -935,19 +956,19 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 .board-map .shop-marker span {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker {
-  font-size: 26px;
-  line-height: 30px;
+  font-size: 24px;
+  line-height: 28px;
   text-align: center;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker .tt-sprite {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 }
 /* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
@@ -1126,8 +1147,20 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   }
 }
 .board-map .sprite-character {
-  width: 44px;
-  height: 60px;
+  width: 60px;
+  height: 80px;
+  transform: translateX(calc(var(--slot, 0) * 30px * var(--piece-scale, 1)));
+}
+/* Zoomed in close, the character and its shadow grow from the feet up, as the map does. */
+.board-map .sprite-character .sprite-body,
+.board-map .sprite-character .sprite-shadow {
+  scale: var(--piece-scale, 1);
+  transform-origin: 50% 100%;
+  transition: scale 0.25s;
+}
+/* Callouts over a grown character rise with its head. */
+.board-map .cue-over-character > * {
+  translate: 0 calc((1 - var(--piece-scale, 1)) * 76px);
 }
 /* A character turns in 3D instead of mirroring, and animates itself instead of hopping. */
 .board-map .sprite-character .sprite-body {
@@ -1141,8 +1174,8 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   filter: drop-shadow(0 1px 0 #0f172a);
 }
 .board-map .sprite-character .sprite-shadow {
-  left: 10px;
-  width: 24px;
+  left: 15px;
+  width: 30px;
 }
 .board-map .sprite-selected .sprite-shadow {
   background: rgb(255 255 0 / 0.55);
