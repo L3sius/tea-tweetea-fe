@@ -7,6 +7,7 @@ import {
   effortText,
   itemName,
   observationText,
+  teamParts,
 } from './describe'
 import type { Instance } from './game'
 import { challengeId, instanceId, teamId, type ChallengeId, type TeamId } from './ids'
@@ -173,6 +174,26 @@ describe('articles', () => {
     expect(observationText({ kind: 'clue', tier: 'elite', items: [], region: null })).toBe(
       'opened an elite clue casket',
     )
+  })
+})
+
+describe('teamParts', () => {
+  const teams = [
+    { id: teamId(0), name: 'Red' },
+    { id: teamId(1), name: 'Red Dragons' },
+  ]
+  it('splits out team names, the longest first', () => {
+    expect(teamParts('Red Dragons stole the blue gem from Red', teams)).toEqual([
+      { text: 'Red Dragons', team: 1 },
+      { text: ' stole the blue gem from ', team: null },
+      { text: 'Red', team: 0 },
+    ])
+  })
+
+  it('leaves a line without team names whole', () => {
+    expect(teamParts('The game has started!', teams)).toEqual([
+      { text: 'The game has started!', team: null },
+    ])
   })
 })
 

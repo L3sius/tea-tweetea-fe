@@ -510,6 +510,7 @@ async function buy(item: Item) {
           v-else
           :log="log"
           :names="game.names"
+          :teams="state.teams"
           :now="now"
           :revealed="revealed"
           @watch="game.watchMove"

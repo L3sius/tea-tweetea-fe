@@ -324,3 +324,24 @@ export const clock = (date: Date) =>
 
 /** "a" or "an", by how the word is spelled, which covers every name in the game. */
 const a = (word: string) => `${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`
+
+/** A piece of a line of text, naming a team or not. */
+export type TextPart = { text: string; team: TeamId | null }
+
+/**
+ * Splits `text` where it names a team, so each name can be drawn in the team's colour. Longer
+ * names win, so a name inside another one is not split out.
+ */
+export function teamParts(
+  text: string,
+  teams: readonly { id: TeamId; name: string }[],
+): TextPart[] {
+  const named = teams.filter((t) => t.name).sort((a, b) => b.name.length - a.name.length)
+  if (named.length === 0) return [{ text, team: null }]
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const pattern = new RegExp(`(${named.map((t) => escape(t.name)).join('|')})`)
+  return text
+    .split(pattern)
+    .filter((piece) => piece !== '')
+    .map((piece) => ({ text: piece, team: named.find((t) => t.name === piece)?.id ?? null }))
+}
