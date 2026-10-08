@@ -33,7 +33,7 @@ const TITLE_COLOR = {
       <TtText :size="1" color="white">{{ alert.text }}</TtText>
       <!-- A minigame alert stays until the viewer acts on it. -->
       <div v-if="alert.sticky" class="mt-1 flex flex-wrap justify-center gap-1.5">
-        <TtButton size="sm" @click="emit('openEvents', alert.id)">Go to Events</TtButton>
+        <TtButton size="sm" @click="emit('openEvents', alert.id)">Go to Overview</TtButton>
         <TtButton size="sm" @click="emit('dismiss', alert.id)">Dismiss</TtButton>
       </div>
       <button
