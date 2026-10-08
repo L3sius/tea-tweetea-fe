@@ -283,9 +283,9 @@ async function buy(item: Item) {
         v-if="followed"
         class="tt-sprite-display absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 py-0 pr-0 pl-1"
       >
-        <span class="tt-swatch" :style="{ background: teamColor(followed) }" />
         <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
-          Following {{ followed.name }}
+          Following
+          <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span>
         </TtText>
         <TtText v-else :size="1" color="muted">Free roam</TtText>
         <TtButton
