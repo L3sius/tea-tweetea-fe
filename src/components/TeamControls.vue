@@ -27,6 +27,8 @@ import {
   TtText,
 } from '@/ui/tt'
 import CardDraw from './CardDraw.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
+import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 import PowerUpPicker from './PowerUpPicker.vue'
 
@@ -227,9 +229,17 @@ function use(item: Item) {
   void my.useItem(item)
 }
 
-async function discard(item: Item) {
-  if (window.confirm(`Drop ${itemName(item)}? It's gone for good.`))
-    await my.act({ kind: 'discard', item })
+/** The item waiting on the drop dialog's answer. */
+const dropping = ref<Item | null>(null)
+
+function discard(item: Item) {
+  dropping.value = item
+}
+
+async function confirmDrop() {
+  const item = dropping.value
+  dropping.value = null
+  if (item) await my.act({ kind: 'discard', item })
 }
 
 async function login() {
@@ -581,6 +591,20 @@ async function login() {
         @discard="discard"
       />
     </template>
+
+    <ConfirmDialog
+      v-if="dropping"
+      title="Drop item"
+      :question="`Are you sure you want to drop the ${itemName(dropping)}?`"
+      note="It is gone for good: you can't pick it up again."
+      @confirm="confirmDrop"
+      @cancel="dropping = null"
+    >
+      <div class="flex flex-col items-center gap-1">
+        <ItemSlot :item="dropping" :size="76" />
+        <TtText :size="2" color="orange">{{ itemName(dropping) }}</TtText>
+      </div>
+    </ConfirmDialog>
   </TtPanel>
 </template>
 
