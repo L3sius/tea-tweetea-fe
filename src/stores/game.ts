@@ -37,6 +37,17 @@ export type Alert = {
 const MAX_ALERTS = 4
 
 /**
+ * A pick shown as a slot-machine spin before it is announced (a minigame opening). The server has
+ * already chosen `winner`; `alert` follows once the reel has stopped.
+ */
+export type Spin = {
+  id: string
+  teamId: TeamId | null
+  winner: string
+  alert: Alert | null
+}
+
+/**
  * The alert list with `alert` added: a sticky alert replaces the previous sticky one, and only
  * passing alerts are dropped (oldest first) to stay within MAX_ALERTS.
  */
@@ -66,6 +77,8 @@ export const useGameStore = defineStore('game', () => {
   /** Mutated in place; `triggerRef(choreography)` tells watchers it changed. */
   const choreography = shallowRef(new Choreography())
   const alerts = ref<Alert[]>([])
+  /** Spins waiting to play, oldest first; the board shows the first. */
+  const spins = ref<Spin[]>([])
 
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -184,11 +197,30 @@ export const useGameStore = defineStore('game', () => {
         found.team === null
           ? 0
           : Math.max(0, choreography.value.settlesAt(found.team) - serverNow())
-      setTimeout(() => {
-        alerts.value = withAlert(alerts.value, alert)
-        if (!alert.sticky) setTimeout(() => dismiss(alert.id), ALERT_MS)
-      }, wait)
+      // A minigame is "picked" on a slot machine first; its alert waits for the reel to stop.
+      const spin =
+        event.kind === 'minigame_opened'
+          ? { teamId: event.initiator, winner: names.challenge(event.challengeId) }
+          : null
+      setTimeout(() => (spin ? queueSpin({ ...spin, alert }) : raise(alert)), wait)
     }
+  }
+
+  function raise(alert: Alert) {
+    alerts.value = withAlert(alerts.value, alert)
+    if (!alert.sticky) setTimeout(() => dismiss(alert.id), ALERT_MS)
+  }
+
+  let spinCount = 0
+  function queueSpin(spin: Omit<Spin, 'id'>) {
+    spins.value = [...spins.value, { ...spin, id: `spin-${++spinCount}` }]
+  }
+
+  /** The shown spin has played out: announce its pick and start the next one. */
+  function finishSpin(id: string) {
+    const done = spins.value.find((s) => s.id === id)
+    spins.value = spins.value.filter((s) => s.id !== id)
+    if (done?.alert) raise(done.alert)
   }
 
   function dismiss(id: string) {
@@ -221,6 +253,9 @@ export const useGameStore = defineStore('game', () => {
 
   return {
     viewer,
+    spins,
+    queueSpin,
+    finishSpin,
     board,
     challenges,
     state,

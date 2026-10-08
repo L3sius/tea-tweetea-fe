@@ -8,6 +8,7 @@ import BoardMap from '@/components/BoardMap.vue'
 import EventsPanel from '@/components/EventsPanel.vue'
 import GameLog from '@/components/GameLog.vue'
 import InsetMap from '@/components/InsetMap.vue'
+import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
 import TeamControls from '@/components/TeamControls.vue'
@@ -41,6 +42,11 @@ const tab = ref<Tab>('overview')
 /** On phones the panel is a bottom sheet that can be tucked away to see more map. */
 const sheetOpen = ref(true)
 const shopOpen = ref(false)
+/** The minigame pick playing now, and the team that landed on the red tile. */
+const spin = computed(() => game.spins[0] ?? null)
+const spinTeam = computed(() =>
+  spin.value?.teamId == null ? null : (state.value?.teams.get(spin.value.teamId) ?? null),
+)
 /** The overview starts closed on phones, where it would cover most of the map. */
 const insetOpen = ref(!useMediaQuery('(max-width: 639px)').value)
 
@@ -431,6 +437,17 @@ async function buy(item: Item) {
         :pending="my.pending"
         @buy="buy"
         @close="shopOpen = false"
+      />
+    </div>
+
+    <!-- A minigame being picked: a slot machine over the map, which can't be skipped. -->
+    <div v-if="spin" class="tt-overlay">
+      <MinigameSpin
+        :key="spin.id"
+        :spin="spin"
+        :team-name="spinTeam?.name ?? null"
+        :team-color="spinTeam ? teamColor(spinTeam) : 'var(--osrs-white)'"
+        @done="game.finishSpin(spin.id)"
       />
     </div>
   </div>
