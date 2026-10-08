@@ -17,6 +17,7 @@ import {
   polyline,
   tooltip,
   type LatLng,
+  type LatLngBounds,
   type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
@@ -82,6 +83,8 @@ const emit = defineEmits<{
 
 const container = useTemplateRef<HTMLDivElement>('container')
 let leaflet: LeafletMap | null = null
+/** The world map's edges, which the view never leaves. */
+let mapBounds: LatLngBounds | null = null
 let frame = 0
 
 const pieces = layerGroup()
@@ -659,21 +662,44 @@ function renderFrame() {
   }
 
   // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
-  // moving the view would cut the flight short.
-  if (props.follow && props.selected !== null && !flying) {
+  // moving the view would cut the flight short, and a zoom, which it would make jerk.
+  if (props.follow && props.selected !== null && !flying && !zooming) {
     const target = placed.get(props.selected)
-    if (target) {
-      const centre = map.getCenter()
-      const dLat = target.lat - centre.lat
-      const dLng = target.lng - centre.lng
-      if (Math.abs(dLat) + Math.abs(dLng) > 0.05) {
-        map.setView(latLng(centre.lat + dLat * 0.12, centre.lng + dLng * 0.12), map.getZoom(), {
-          animate: false,
-        })
-      }
-    }
+    if (target) followStep(map, target)
   }
 }
+
+/** Share of the way to the followed team the camera moves each frame. */
+const FOLLOW_EASE = 0.12
+
+/**
+ * Moves the view a step towards `target`, in whole pixels, as Leaflet pans. It aims for the
+ * nearest centre the map's edges allow and stops within a pixel of it: every move redraws the
+ * roads and reports the view, so a camera that keeps nudging at an edge or at a pixel's fraction
+ * would do that every frame.
+ */
+function followStep(map: LeafletMap, target: LatLng) {
+  const zoom = map.getZoom()
+  const half = map.getSize().divideBy(2)
+  const want = map.project(target, zoom)
+  if (mapBounds) {
+    const a = map.project(mapBounds.getNorthWest(), zoom)
+    const b = map.project(mapBounds.getSouthEast(), zoom)
+    want.x = clampCentre(want.x, Math.min(a.x, b.x) + half.x, Math.max(a.x, b.x) - half.x)
+    want.y = clampCentre(want.y, Math.min(a.y, b.y) + half.y, Math.max(a.y, b.y) - half.y)
+  }
+  const gap = want.subtract(map.project(map.getCenter(), zoom))
+  const step = point(stepToward(gap.x), stepToward(gap.y))
+  if (step.x !== 0 || step.y !== 0) map.panBy(step, { animate: false })
+}
+
+/** Within `[lo, hi]`, or between them when the view is wider than the map. */
+const clampCentre = (v: number, lo: number, hi: number) =>
+  lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v))
+
+/** An eased step in whole pixels: at least one while a pixel or more is left, then none. */
+const stepToward = (gap: number) =>
+  Math.abs(gap) < 1 ? 0 : Math.sign(gap) * Math.max(1, Math.round(Math.abs(gap) * FOLLOW_EASE))
 
 /** A small card that flips over above the piece: what spectators see of a draw. */
 function cardCue(card: Card): HTMLElement {
@@ -699,6 +725,7 @@ onMounted(() => {
     transformation: new Transformation(1, -CRS_ORIGIN.x, -1, CRS_ORIGIN.y),
   })
   const bounds = latLngBounds(imageBounds(worldMap))
+  mapBounds = bounds
   const map = createMap(container.value, {
     crs,
     minZoom: -3,
@@ -742,8 +769,12 @@ onMounted(() => {
   map.on('zoomanim', (e: ZoomAnimEvent) => scalePieces(e.zoom))
   map.on('zoom', () => scalePieces(map.getZoom()))
   scalePieces(map.getZoom())
-  map.on('zoomstart', () => (zoomedFrom = map.getZoom()))
+  map.on('zoomstart', () => {
+    zoomedFrom = map.getZoom()
+    zooming = true
+  })
   map.on('zoomend', () => {
+    zooming = false
     if (!flying && atMin() && zoomedFrom > map.getZoom()) overviewSoon()
   })
   container.value.addEventListener(
@@ -788,6 +819,7 @@ onMounted(() => {
   map.on('click', onClick)
   DomEvent.disableScrollPropagation(container.value)
   leaflet = map
+  zoomAroundCentre(props.follow)
   emitView()
   frame = requestAnimationFrame(renderFrame)
 })
@@ -810,6 +842,21 @@ watch(
     for (const entry of teamMarkers.values()) entry.pose = ''
   },
 )
+watch(() => props.follow, zoomAroundCentre)
+
+/**
+ * While following, the wheel, a double click and a pinch zoom on the centre, where the team is,
+ * instead of on the pointer. Zooming on the pointer carried the team off centre and the camera
+ * then dragged it back, swinging the view.
+ */
+function zoomAroundCentre(following: boolean) {
+  const options = leaflet?.options
+  if (!options) return
+  const on = following ? 'center' : true
+  options.scrollWheelZoom = on
+  options.doubleClickZoom = on
+  options.touchZoom = on
+}
 
 onBeforeUnmount(() => {
   stopFlight()
@@ -841,6 +888,8 @@ function locate(tile: TileId, zoom = 1) {
  * A flight is on: the follow camera holds off, and its zoom changes are not the viewer zooming out.
  */
 let flying = false
+/** A zoom animation is running; the follow camera waits for it. */
+let zooming = false
 let flight = 0
 
 const FLIGHT_MS = 800
