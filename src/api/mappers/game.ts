@@ -144,6 +144,7 @@ export function toTeam(wire: WireTeam): Team {
     },
     tilesCompleted: wire.tiles_completed,
     version: wire.version,
+    appearance: wire.appearance,
   }
 }
 

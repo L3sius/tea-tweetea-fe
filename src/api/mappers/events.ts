@@ -20,6 +20,8 @@ export function toGameEvent(wire: WireEvent): GameEvent {
       return { kind: wire.type, teamId: teamId(wire.team), member: wire.member }
     case 'account_added':
       return { kind: wire.type, teamId: teamId(wire.team), member: wire.member, rsn: wire.rsn }
+    case 'appearance_set':
+      return { kind: wire.type, teamId: teamId(wire.team), appearance: wire.appearance }
     case 'game_started':
       return {
         kind: wire.type,

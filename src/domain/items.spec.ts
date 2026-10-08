@@ -25,6 +25,7 @@ function team(status: TeamStatus, overrides: Partial<Team> = {}): Team {
     },
     tilesCompleted: 0,
     version: 1,
+    appearance: null,
     ...overrides,
   }
 }

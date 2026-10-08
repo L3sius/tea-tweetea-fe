@@ -19,6 +19,7 @@ import {
   type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
+  type ZoomAnimEvent,
 } from 'leaflet'
 import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
 import type { Board, Tile } from '@/domain/board'
@@ -28,7 +29,12 @@ import type { Blocker, Card, GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import type { Choreography, Placement } from '@/domain/motion'
 import { nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
-import { spriteElement } from '@/map/sprite'
+import { perform, ticksToMs } from '@/characters/acting'
+import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
+import { HEADING, headingOf } from '@/characters/heading'
+import type { Appearance } from '@/characters/roster'
+import type * as Stage from '@/characters/stage'
+import { characterElement, spriteElement } from '@/map/sprite'
 import { itemEntry } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { tileTheme } from '@/map/tileTheme'
@@ -60,6 +66,8 @@ const props = defineProps<{
   targetTiles: ReadonlySet<TileId> | null
   /** Skip callouts for this team, whose captain is watching their draw in the panel. */
   hideCuesFor: TeamId | null
+  /** How a team's piece looks as an OSRS character, or null to draw it as a bird. */
+  appearanceOf: (team: TeamId) => Appearance | null
 }>()
 
 const emit = defineEmits<{
@@ -79,7 +87,16 @@ const pieces = layerGroup()
 const reachLayer = layerGroup()
 const routeLayer = layerGroup()
 const cueLayer = layerGroup()
-const teamMarkers = new Map<TeamId, { marker: Marker; el: HTMLElement; pose: string }>()
+type TeamMarker = {
+  marker: Marker
+  el: HTMLElement
+  pose: string
+  /** The NPC the team plays as, or null for a bird. */
+  npc: number | null
+  /** Draws the character, once three.js has loaded. */
+  piece: Stage.CharacterPiece | null
+}
+const teamMarkers = new Map<TeamId, TeamMarker>()
 const cueMarkers = new Map<string, Marker>()
 
 /**
@@ -193,7 +210,7 @@ function drawBoard(map: LeafletMap) {
         icon: divIcon({
           className: 'shop-marker',
           html: '<span class="tt-sprite tt-icon-coins"></span>',
-          iconSize: [36, 36],
+          iconSize: [34, 34],
         }),
         interactive: false,
       }).addTo(map)
@@ -220,7 +237,7 @@ function drawPieces() {
       icon: divIcon({
         className: '',
         html: `<div class="gem-marker tt-sprite tt-gem-${gem}" style="--gem:var(--gem-${gem}-glow)"></div>`,
-        iconSize: [32, 35],
+        iconSize: [30, 33],
       }),
       zIndexOffset: 500,
       interactive: false,
@@ -233,7 +250,7 @@ function drawPieces() {
       icon: divIcon({
         className: 'blocker-marker',
         html: blockerHtml(blocker.kind),
-        iconSize: [30, 30],
+        iconSize: [28, 28],
       }),
       zIndexOffset: 400,
       interactive: false,
@@ -426,36 +443,77 @@ const TIP_TOP_CLEARANCE = 76
 
 // --- Team pieces, animated every frame from the choreography. ---
 
+/** Canvas size of a character piece; the bird is 32 × 38. */
+const CHARACTER_SIZE = { width: 60, height: 80 }
+/**
+ * The zoom a followed team is shown at. Characters keep their size up to here and grow with the map
+ * past it, so zooming in never leaves them small next to the board (about 2.8× at full zoom).
+ */
+const PIECE_FULL_ZOOM = 0.5
+const pieceScale = (zoom: number) => Math.max(1, 2 ** (zoom - PIECE_FULL_ZOOM))
+
+// three.js is big, so it only loads once some team plays as a character.
+let stage: Promise<typeof Stage> | null = null
+const loadStage = () => (stage ??= import('@/characters/stage'))
+
 function ensureTeamMarker(map: LeafletMap, team: Team) {
+  const npc = props.appearanceOf(team.id)?.npc ?? null
   let entry = teamMarkers.get(team.id)
-  if (entry) return entry
-  const el = spriteElement(teamColor(team), team.name)
+  if (entry && entry.npc === npc) return entry
+  // New, or the team changed character: rebuild the piece.
+  if (entry) {
+    entry.marker.remove()
+    entry.piece?.dispose()
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = CHARACTER_SIZE.width
+  // The body box leaves 4px at the bottom for the shadow.
+  canvas.height = CHARACTER_SIZE.height - 4
+  const el =
+    npc !== null
+      ? characterElement(canvas, teamColor(team), team.name)
+      : spriteElement(teamColor(team), team.name)
+  const [width, height] = npc !== null ? [CHARACTER_SIZE.width, CHARACTER_SIZE.height] : [32, 38]
   const m = marker(latLng(0, 0), {
-    icon: divIcon({ className: 'sprite-icon', html: el, iconSize: [32, 38], iconAnchor: [16, 34] }),
+    icon: divIcon({
+      className: 'sprite-icon',
+      html: el,
+      iconSize: [width, height],
+      iconAnchor: [width / 2, height - 4],
+    }),
     zIndexOffset: 1000,
     // Clicks go through to the node underneath, so a piece never hides its tile. Teams are
     // followed from the standings and the inset map instead.
     interactive: false,
   })
   m.addTo(map)
-  entry = { marker: m, el, pose: '' }
+  const created: TeamMarker = { marker: m, el, pose: '', npc, piece: null }
+  if (npc !== null) {
+    void loadAnimationInfo()
+    void loadStage().then(({ CharacterPiece }) => {
+      if (teamMarkers.get(team.id) === created) created.piece = new CharacterPiece(npc, canvas)
+    })
+  }
+  entry = created
   teamMarkers.set(team.id, entry)
   return entry
 }
 
-function placementLatLng(p: Placement): { at: LatLng; dx: number } | null {
+/** Where to draw a placement, and how far its move goes east (`dx`) and north (`dy`). */
+function placementLatLng(p: Placement): { at: LatLng; dx: number; dy: number } | null {
   if (p.kind === 'still') {
     const at = tileLatLng(p.tile)
-    return at ? { at, dx: 0 } : null
+    return at ? { at, dx: 0, dy: 0 } : null
   }
   const from = tileLatLng(p.from)
   const to = tileLatLng(p.to)
   if (!from || !to) return null
-  if (p.kind === 'teleport') return { at: p.progress < 0.5 ? from : to, dx: 0 }
+  if (p.kind === 'teleport') return { at: p.progress < 0.5 ? from : to, dx: 0, dy: 0 }
   const k = p.kind === 'slide' ? easeOut(p.progress) : p.progress
   return {
     at: latLng(from.lat + (to.lat - from.lat) * k, from.lng + (to.lng - from.lng) * k),
     dx: to.lng - from.lng,
+    dy: to.lat - from.lat,
   }
 }
 
@@ -463,8 +521,44 @@ const easeOut = (k: number) => 1 - (1 - k) ** 3
 
 /** Last horizontal direction each team walked, so idle pieces keep facing the same way. */
 const facing = new Map<TeamId, number>()
+/** Which way each team last walked, for characters (see characters/heading.ts). */
+const walkHeading = new Map<TeamId, number>()
 const placed = new Map<TeamId, LatLng>()
 let lastPrune = 0
+
+/** Draws a team's character doing whatever it is doing at `time` (see characters/acting.ts). */
+function drawCharacter(
+  piece: Stage.CharacterPiece,
+  team: Team,
+  p: Placement,
+  time: number,
+  still: ReadonlyMap<TileId, readonly TeamId[]>,
+) {
+  const appearance = props.appearanceOf(team.id)
+  if (!appearance) return
+  const frozenUntil = team.frozenUntil?.getTime() ?? null
+  const performance = perform({
+    team: team.id,
+    time,
+    placement: p,
+    appearance,
+    frozenUntil: frozenUntil !== null && frozenUntil > time ? frozenUntil : null,
+    reactions: props.choreography.reactionsOf(team.id, time),
+    isSea: (tile) => props.board.tiles.get(tile)?.sea ?? false,
+    isOccupied: (tile) => (still.get(tile) ?? []).some((other) => other !== team.id),
+    lengthOf: (anim) => {
+      const info = animationInfoOf(anim)
+      return info ? ticksToMs(info.ticks) : null
+    },
+  })
+  // Characters face the way they walk (a trap knocks them back facing the same way), and turn
+  // to the viewer once they stop.
+  const heading =
+    p.kind === 'walk' || p.kind === 'slide'
+      ? (walkHeading.get(team.id) ?? HEADING.south)
+      : HEADING.south
+  piece.draw(performance, heading, time)
+}
 
 function renderFrame() {
   frame = requestAnimationFrame(renderFrame)
@@ -495,6 +589,8 @@ function renderFrame() {
     entry.marker.setLatLng(where.at)
     placed.set(team.id, where.at)
     if (where.dx !== 0) facing.set(team.id, Math.sign(where.dx))
+    if (p.kind === 'walk' && (where.dx !== 0 || where.dy !== 0))
+      walkHeading.set(team.id, headingOf(where.dx, where.dy))
 
     const frozen = team.frozenUntil !== null && team.frozenUntil > now
     const pose =
@@ -513,10 +609,12 @@ function renderFrame() {
                 : 'idle'
     const group = p.kind === 'still' ? still.get(p.tile) : undefined
     const slot = group ? group.indexOf(team.id) - (group.length - 1) / 2 : 0
+    if (entry.piece) drawCharacter(entry.piece, team, p, time, still)
     const key = `${pose}|${facing.get(team.id) ?? 1}|${slot}|${props.selected === team.id}`
     if (key !== entry.pose) {
       entry.pose = key
-      entry.el.className = `sprite sprite-${pose}${props.selected === team.id ? ' sprite-selected' : ''}`
+      const kind = entry.npc !== null ? ' sprite-character' : ''
+      entry.el.className = `sprite${kind} sprite-${pose}${props.selected === team.id ? ' sprite-selected' : ''}`
       entry.el.style.setProperty('--facing', String(facing.get(team.id) ?? 1))
       entry.el.style.setProperty('--slot', String(slot))
     }
@@ -543,8 +641,15 @@ function renderFrame() {
         el.className = `cue cue-${cue.tone}`
         el.textContent = cue.text
       }
+      const character = teamMarkers.get(cue.teamId)?.npc != null
+      const lift = character ? CHARACTER_SIZE.height + 4 : 46
       m = marker(at, {
-        icon: divIcon({ className: 'cue-icon', html: el, iconSize: [0, 0], iconAnchor: [0, 46] }),
+        icon: divIcon({
+          className: character ? 'cue-icon cue-over-character' : 'cue-icon',
+          html: el,
+          iconSize: [0, 0],
+          iconAnchor: [0, lift],
+        }),
         interactive: false,
         zIndexOffset: 2000,
       }).addTo(cueLayer)
@@ -626,6 +731,13 @@ onMounted(() => {
     overviewTimer = setTimeout(() => atMin() && showAll(), OVERVIEW_QUIET_MS)
   }
   let zoomedFrom = map.getZoom()
+  // Characters grow with the map when zoomed in close (see PIECE_FULL_ZOOM): at the start of an
+  // animated zoom, so they grow along with it, and on every other zoom change.
+  const scalePieces = (zoom: number) =>
+    map.getContainer().style.setProperty('--piece-scale', String(pieceScale(zoom)))
+  map.on('zoomanim', (e: ZoomAnimEvent) => scalePieces(e.zoom))
+  map.on('zoom', () => scalePieces(map.getZoom()))
+  scalePieces(map.getZoom())
   map.on('zoomstart', () => (zoomedFrom = map.getZoom()))
   map.on('zoomend', () => {
     if (!flying && atMin() && zoomedFrom > map.getZoom()) overviewSoon()
@@ -699,6 +811,7 @@ onBeforeUnmount(() => {
   stopFlight()
   render(null, sceneRoot)
   cancelAnimationFrame(frame)
+  for (const entry of teamMarkers.values()) entry.piece?.dispose()
   teamMarkers.clear()
   cueMarkers.clear()
   leaflet?.remove()
@@ -830,8 +943,8 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 /* Gems, shops and blockers are landmarks: half again the size of their sprites, over the nodes. */
 .board-map .gem-marker {
-  width: 32px;
-  height: 35px;
+  width: 30px;
+  height: 33px;
   filter: drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px var(--gem));
   animation: gem-glint 2.4s steps(2, end) infinite;
 }
@@ -843,19 +956,19 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 }
 .board-map .shop-marker span {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker {
-  font-size: 26px;
-  line-height: 30px;
+  font-size: 24px;
+  line-height: 28px;
   text-align: center;
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker .tt-sprite {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 }
 /* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
@@ -1032,6 +1145,39 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   75% {
     transform: translateX(1.5px) rotate(6deg);
   }
+}
+.board-map .sprite-character {
+  width: 60px;
+  height: 80px;
+  transform: translateX(calc(var(--slot, 0) * 30px * var(--piece-scale, 1)));
+}
+/* Zoomed in close, the character and its shadow grow from the feet up, as the map does. */
+.board-map .sprite-character .sprite-body,
+.board-map .sprite-character .sprite-shadow {
+  scale: var(--piece-scale, 1);
+  transform-origin: 50% 100%;
+  transition: scale 0.25s;
+}
+/* Callouts over a grown character rise with its head. */
+.board-map .cue-over-character > * {
+  translate: 0 calc((1 - var(--piece-scale, 1)) * 76px);
+}
+/* A character turns in 3D instead of mirroring, and animates itself instead of hopping. */
+.board-map .sprite-character .sprite-body {
+  transform: none;
+}
+.board-map .sprite-character .sprite-body canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  /* A 1px black outline, so the character stands out from busy map ground. */
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000)
+    drop-shadow(0 -1px 0 #000);
+}
+.board-map .sprite-character .sprite-shadow {
+  left: 15px;
+  width: 30px;
 }
 .board-map .sprite-selected .sprite-shadow {
   background: rgb(255 255 0 / 0.55);

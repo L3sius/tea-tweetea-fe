@@ -1,0 +1,16 @@
+{
+  "name": "tea-tweetea-characters",
+  "private": true,
+  "type": "module",
+  "description": "Exports OSRS NPC models and animations from a local cache for the board's characters.",
+  "scripts": {
+    "export": "node export.mjs",
+    "catalog": "node catalog.mjs",
+    "describe": "node describe.mjs",
+    "upload": "./upload.sh"
+  },
+  "dependencies": {
+    "lodash": "4.17.21",
+    "osrscachereader": "1.1.3"
+  }
+}

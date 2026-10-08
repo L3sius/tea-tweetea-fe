@@ -74,6 +74,15 @@ const Status = z.discriminatedUnion('status', [
 ])
 export type WireStatus = z.infer<typeof Status>
 
+export const WireAppearance = z.object({
+  npc: z.int(),
+  idle: z.int(),
+  walk: z.int(),
+  run: z.int(),
+  swim: z.int(),
+})
+export type WireAppearance = z.infer<typeof WireAppearance>
+
 export const WireTeam = z.object({
   id: Id,
   name: z.string(),
@@ -93,6 +102,7 @@ export const WireTeam = z.object({
   }),
   tiles_completed: z.int(),
   version: z.int(),
+  appearance: WireAppearance.nullable(),
 })
 export type WireTeam = z.infer<typeof WireTeam>
 

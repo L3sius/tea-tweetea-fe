@@ -16,12 +16,17 @@
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write src/ e2e/ scripts/ *.ts",
     "fixtures:refresh": "node scripts/refresh-fixtures.mjs",
+    "characters:export": "npm --prefix tools/characters run export --",
+    "characters:upload": "npm --prefix tools/characters run upload --",
+    "characters:catalog": "npm --prefix tools/characters run catalog --",
+    "characters:describe": "npm --prefix tools/characters run describe --",
     "test": "vitest run"
   },
   "dependencies": {
     "@vueuse/core": "^15.0.0",
     "leaflet": "^1.9.4",
     "pinia": "^4.0.3",
+    "three": "^0.186.1",
     "vue": "^3.5.42",
     "vue-router": "^5.3.1",
     "zod": "^4.6.5"
@@ -33,6 +38,7 @@
     "@types/jsdom": "^30.0.0",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.4",
+    "@types/three": "^0.186.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/eslint-plugin": "^1.6.27",
     "@vue/eslint-config-typescript": "^14.9.0",

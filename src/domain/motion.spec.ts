@@ -24,14 +24,61 @@ describe('Choreography', () => {
   it('walks one step per STEP_MS from the entry time', () => {
     const c = new Choreography()
     c.apply(walk(1, T0, [10, 11, 12]))
-    expect(c.placement(red, T0)).toEqual({ kind: 'walk', from: 10, to: 11, progress: 0 })
+    expect(c.placement(red, T0)).toEqual({
+      kind: 'walk',
+      from: 10,
+      to: 11,
+      progress: 0,
+      steps: 2,
+      seq: 1,
+    })
     expect(c.placement(red, T0 + STEP_MS * 1.5)).toEqual({
       kind: 'walk',
       from: 11,
       to: 12,
       progress: 0.5,
+      steps: 2,
+      seq: 1,
     })
     expect(c.placement(red, T0 + STEP_MS * 2)).toBeNull()
+  })
+
+  it('tells every step how long its whole walk is', () => {
+    const c = new Choreography()
+    c.apply(walk(1, T0, [10, 11, 12, 13, 14, 15, 16, 17, 18]))
+    expect(c.placement(red, T0 + STEP_MS * 5.5)).toMatchObject({ kind: 'walk', steps: 8 })
+  })
+
+  it('starts reactions after the movement that comes first', () => {
+    const c = new Choreography()
+    const blue = teamId(1)
+    c.apply(walk(1, T0, [10, 11, 12]))
+    c.apply(
+      entry(2, T0, [
+        { kind: 'tile_completed', teamId: red, tileId: tileId(12) },
+        { kind: 'card_drawn', teamId: blue, card: { kind: 'joker' }, steps: 1 },
+        {
+          kind: 'card_drawn',
+          teamId: blue,
+          card: { kind: 'suited', rank: 5, suit: 'clubs' },
+          steps: 5,
+        },
+      ]),
+    )
+    const walkEnds = T0 + STEP_MS * 2
+    expect(c.reactionsOf(red, walkEnds - 1)).toEqual([])
+    expect(c.reactionsOf(red, walkEnds)).toMatchObject([{ kind: 'celebrate', at: walkEnds }])
+    // Only a Joker is worth sulking about.
+    expect(c.reactionsOf(blue, T0).map((r) => r.kind)).toEqual(['despair'])
+  })
+
+  it('lands a teleport when the piece arrives', () => {
+    const c = new Choreography()
+    c.know(red, tileId(10))
+    c.apply(entry(1, T0, [{ kind: 'teleported', teamId: red, from: tileId(10), to: tileId(40) }]))
+    expect(c.reactionsOf(red, T0 + TELEPORT_MS)).toMatchObject([
+      { kind: 'arrive', at: T0 + TELEPORT_MS },
+    ])
   })
 
   it('resumes mid-walk when the page loads late', () => {

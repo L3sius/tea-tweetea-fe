@@ -199,6 +199,8 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${event.member} joined ${team(event.teamId)}`
     case 'account_added':
       return null
+    case 'appearance_set':
+      return `${team(event.teamId)} has a new look`
     case 'game_started':
       return 'The game has started!'
     case 'game_ended':

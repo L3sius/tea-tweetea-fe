@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { cardLabel, itemName, teamStatusText } from '@/domain/describe'
 import type { Card } from '@/domain/game'
 import {
@@ -170,6 +171,14 @@ async function playAs(name: string) {
               Thaw
             </button>
           </div>
+        </div>
+
+        <!-- Character -->
+        <div>
+          <p class="dev-label">Character</p>
+          <RouterLink class="tt-link" :to="{ path: '/characters', query: { team: team.id } }">
+            Dress {{ team.name }} as an OSRS character
+          </RouterLink>
         </div>
 
         <!-- Gold -->

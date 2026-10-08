@@ -1,5 +1,5 @@
 import type { Observation } from './activity'
-import type { Card } from './game'
+import type { Appearance, Card } from './game'
 import type { InstanceId, TeamId, TileId } from './ids'
 import type { Gem, Item } from './vocabulary'
 
@@ -16,11 +16,15 @@ export type TeamCommand =
   | { kind: 'choose_opponent'; opponent: TeamId }
   | { kind: 'steal_gem'; gem: Gem }
   | { kind: 'discard'; item: Item }
+  /** Dress the team's own piece as an OSRS character, or back to the default piece with null. */
+  | { kind: 'set_appearance'; appearance: Appearance | null }
 
 export type AdminCommand =
   | { kind: 'create_team'; name: string; code: string }
   | { kind: 'add_member'; teamId: TeamId; name: string }
   | { kind: 'add_account'; teamId: TeamId; member: string; rsn: string }
+  /** Dress the team's piece as an OSRS character, or back to the default piece with null. */
+  | { kind: 'set_appearance'; teamId: TeamId; appearance: Appearance | null }
   | { kind: 'start_game' }
   | { kind: 'complete_tile'; teamId: TeamId }
   | { kind: 'contribute'; teamId: TeamId; instanceId: InstanceId; key: string; amount: number }

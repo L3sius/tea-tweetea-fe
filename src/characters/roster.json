@@ -1,0 +1,45 @@
+{
+  "styles": {
+    "idle": [{ "id": 808, "label": "Standing" }],
+    "walk": [
+      { "id": 819, "label": "Walk" },
+      { "id": 762, "label": "Log balance" },
+      { "id": 844, "label": "Crawl" },
+      { "id": 1306, "label": "Zombie" },
+      { "id": 1440, "label": "Long crawl" },
+      { "id": 1702, "label": "Spear spin" },
+      { "id": 2752, "label": "Under the net" },
+      { "id": 12083, "label": "Party strut" }
+    ],
+    "run": [
+      { "id": 824, "label": "Run" },
+      { "id": 868, "label": "Run on the spot" },
+      { "id": 2250, "label": "Rogue's dash" },
+      { "id": 2251, "label": "Fox run" },
+      { "id": 2433, "label": "Conveyor belt" },
+      { "id": 2750, "label": "Over the log" },
+      { "id": 3854, "label": "Rune runner" },
+      { "id": 4031, "label": "Slip and slide" }
+    ],
+    "swim": [
+      { "id": 772, "label": "Swim" },
+      { "id": 3415, "label": "Front crawl" },
+      { "id": 3418, "label": "Tread water" }
+    ]
+  },
+  "reactions": {
+    "celebrate": [862, 818],
+    "despair": [194],
+    "arrive": [1265],
+    "frozen": [2338, 2339, 4094, 10084, 4196, 4758],
+    "use_item": [8524],
+    "pass": [840],
+    "slip": [4031]
+  },
+  "easterEggs": {
+    "idle": [848, 870, 855, 857, 858, 859, 861, 863, 864, 865, 872, 874, 908, 918, 4751],
+    "idleChancePerMinute": 0.125,
+    "gaitChancePerWalk": 0.05
+  },
+  "featured": [3106, 3111, 732, 397]
+}
