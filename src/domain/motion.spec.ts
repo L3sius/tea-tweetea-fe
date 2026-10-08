@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { GameEvent, JournalEntry } from './events'
 import { teamId, tileId } from './ids'
-import { Choreography, STEP_MS, TELEPORT_MS } from './motion'
+import { Choreography, JOKER_HOLD_MS, STEP_MS, TELEPORT_MS } from './motion'
 
 const red = teamId(0)
 const T0 = Date.parse('2026-10-06T12:00:00Z')
@@ -70,6 +70,27 @@ describe('Choreography', () => {
     expect(c.reactionsOf(red, walkEnds)).toMatchObject([{ kind: 'celebrate', at: walkEnds }])
     // Only a Joker is worth sulking about.
     expect(c.reactionsOf(blue, T0).map((r) => r.kind)).toEqual(['despair'])
+  })
+
+  it('lets the piece sulk at a Joker before the Joker teleports it', () => {
+    const c = new Choreography()
+    c.know(red, tileId(10))
+    c.apply(
+      entry(1, T0, [
+        { kind: 'card_drawn', teamId: red, card: { kind: 'joker' }, steps: 1 },
+        {
+          kind: 'joker_effect',
+          teamId: red,
+          effect: { kind: 'teleport' },
+        },
+        { kind: 'teleported', teamId: red, from: tileId(10), to: tileId(40) },
+      ]),
+    )
+    expect(c.reactionsOf(red, T0)).toMatchObject([{ kind: 'despair', at: T0 }])
+    expect(c.activeCues(T0).map((cue) => cue.tone)).toEqual(['card'])
+    // The teleport waits for the sulk.
+    expect(c.placement(red, T0 + JOKER_HOLD_MS - 1)).toMatchObject({ kind: 'still', tile: 10 })
+    expect(c.placement(red, T0 + JOKER_HOLD_MS + 1)).toMatchObject({ kind: 'teleport', to: 40 })
   })
 
   it('lands a teleport when the piece arrives', () => {

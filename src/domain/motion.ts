@@ -13,6 +13,8 @@ import type { TeamId, TileId } from './ids'
 export const STEP_MS = 840
 export const TELEPORT_MS = 1100
 export const SLIDE_MS = 650
+/** After a Joker the team's piece sulks this long before the Joker's effect (a teleport, say) plays. */
+export const JOKER_HOLD_MS = 2000
 /** How long an effect callout stays up. */
 export const CUE_MS = 2600
 /** Gap between callouts raised at the same moment, so they don't stack on top of each other. */
@@ -125,6 +127,12 @@ export class Choreography {
 
     const react = (team: TeamId, kind: ReactionKind, index: number) =>
       this.reactions.push({ id: `${entry.seq}.${index}`, teamId: team, kind, at: now(team) })
+    /** Makes the rest of the entry wait `ms` for this team, so a reaction can be seen. */
+    const hold = (team: TeamId, ms: number) => {
+      const end = now(team) + ms
+      cursor.set(team, end)
+      this.busyUntil.set(team, Math.max(this.busyUntil.get(team) ?? 0, end))
+    }
 
     entry.events.forEach((event, index) => {
       switch (event.kind) {
@@ -145,8 +153,10 @@ export class Choreography {
           move(event.teamId, event.to, 'teleport')
           return react(event.teamId, 'arrive', index)
         case 'card_drawn':
-          if (event.card.kind === 'joker') react(event.teamId, 'despair', index)
-          return cue(event.teamId, cardLabel(event.card), 'card', index, event.card)
+          cue(event.teamId, cardLabel(event.card), 'card', index, event.card)
+          if (event.card.kind !== 'joker') return
+          react(event.teamId, 'despair', index)
+          return hold(event.teamId, JOKER_HOLD_MS)
         case 'trap_triggered':
           cue(event.teamId, `${blockerName(event.trap)}!`, 'bad', index)
           react(event.teamId, 'slip', index)
