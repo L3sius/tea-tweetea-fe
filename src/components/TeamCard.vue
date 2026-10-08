@@ -10,9 +10,11 @@ import {
 } from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId } from '@/domain/ids'
+import { itemEntry } from '@/domain/items'
 import { GEMS, type Item } from '@/domain/vocabulary'
 import { teamColor } from '@/ui/colors'
 import { TtButton, TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
+import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 
 const props = defineProps<{
@@ -45,10 +47,16 @@ const task = computed(() => {
   return { challenge, effort, ...challengeProgress(challenge, instance, id) }
 })
 
+/** The team's items, each with what it does, for the hover box. */
 const items = computed(() =>
   [...(props.items ?? [])]
     .filter(([, count]) => count > 0)
-    .map(([item, count]) => (count > 1 ? `${itemName(item)} x${count}` : itemName(item))),
+    .map(([item, count]) => ({
+      item,
+      count,
+      name: itemName(item),
+      text: itemEntry(item).description,
+    })),
 )
 </script>
 
@@ -89,19 +97,60 @@ const items = computed(() =>
       <TtText v-if="task.effort" :size="1" color="muted">{{ task.effort }}</TtText>
     </template>
 
-    <TtText v-if="items.length" :size="1" color="cyan" aria-label="Items">
-      {{ items.join(', ') }}
-    </TtText>
-
-    <TtText :size="1" color="muted">
-      <span
-        v-for="(member, i) in team.members"
-        :key="member.name"
-        :title="member.accounts.join(', ')"
+    <!-- Pictures, not names: hover (or tap) one for what it does. -->
+    <ul v-if="items.length" class="flex flex-wrap justify-center gap-1" aria-label="Items">
+      <li
+        v-for="i in items"
+        :key="i.item"
+        class="item"
+        tabindex="0"
+        :aria-label="`${i.name}: ${i.text}`"
       >
-        {{ member.name }}<template v-if="i < team.members.length - 1">, </template>
-      </span>
-    </TtText>
+        <ItemSlot :item="i.item" :count="i.count" :size="74" hint="" />
+        <span class="item-tip" role="tooltip">
+          <span class="item-tip-name">{{ i.name }}</span>
+          {{ i.text }}
+        </span>
+      </li>
+    </ul>
     <TtButton size="sm" @click="emit('locate', team)">Follow</TtButton>
   </article>
 </template>
+
+<style scoped>
+/* What an item does, in the game's examine-box style, over the item while hovered or focused. */
+.item {
+  position: relative;
+  outline: none;
+}
+.item-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 20;
+  display: none;
+  width: max-content;
+  max-width: 220px;
+  padding: 4px 8px;
+  border: 3px solid #000;
+  background: var(--tooltip-bg);
+  box-shadow: 4px 4px 0 #000;
+  color: var(--osrs-white);
+  font-family: var(--font-small);
+  font-size: var(--fs-1);
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.item-tip-name {
+  display: block;
+  color: var(--osrs-orange);
+}
+.item:hover .item-tip,
+.item:focus-visible .item-tip,
+.item:focus .item-tip {
+  display: block;
+}
+</style>
