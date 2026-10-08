@@ -172,8 +172,8 @@ const heading = ref<number>(HEADING.south)
 
       <TtPanel title="On its own" :padding="12" :gap="9">
         <TtText :size="1" color="white">
-          These play by themselves: one of each pool when the moment comes, and now and then an
-          emote while standing around.
+          These play by themselves: one from the pool when the moment comes, and now and then an
+          emote while standing around. Hover one for its name.
         </TtText>
         <AnimationShelf :npc="draft.npc" :heading="heading" />
       </TtPanel>
