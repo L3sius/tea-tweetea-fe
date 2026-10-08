@@ -1,4 +1,5 @@
 import type { StatsGroup } from '@/domain/activity'
+import { teamId } from '@/domain/ids'
 import type { ApiClient } from '../client'
 import { decode, parseJson } from '../decode'
 import { endpoints } from '../endpoints'
@@ -20,6 +21,8 @@ type FixtureName =
   | `me-${string}`
 
 export const FIXTURE_ADMIN_CODE = 'admin'
+/** The sample game's team codes, by team id (`TEAMS` in the backend's `src/bin/simulate.rs`). */
+export const SAMPLE_TEAM_CODES = ['red', 'blue', 'green', 'gold'] as const
 const JOURNAL_PAGE_LIMIT = 500
 const DEFAULT_FEED_LIMIT = 50
 
@@ -30,8 +33,8 @@ export type FixtureClientOptions = {
 
 /**
  * A read-only API backed by recorded responses, for offline work and tests.
- * Team codes are the team names in lower case, as in the sample game. Commands are checked for a
- * valid code and team version, then accepted without changing anything.
+ * Team codes are the sample game's (`SAMPLE_TEAM_CODES`). Commands are checked for a valid code
+ * and team version, then accepted without changing anything.
  */
 export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}): ApiClient {
   async function load(name: FixtureName): Promise<unknown> {
@@ -47,7 +50,8 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
 
   async function teamForCode(teamCode: string) {
     const state = await getState()
-    const team = [...state.teams.values()].find((t) => t.name.toLowerCase() === teamCode)
+    const index = SAMPLE_TEAM_CODES.findIndex((code) => code === teamCode)
+    const team = index < 0 ? undefined : state.teams.get(teamId(index))
     if (!team) throw new ApiError({ kind: 'unauthorized' })
     return { team, seq: state.seq }
   }

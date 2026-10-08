@@ -1,29 +1,29 @@
 {
   "seq": 1155,
-  "server_time": "2026-10-08T10:52:46.998709759Z",
+  "server_time": "2026-10-08T12:13:58.311120500Z",
   "phase": "running",
   "teams": [
     {
       "id": 0,
-      "name": "Red",
+      "name": "Varrock Sewer Rats",
       "members": [
         {
-          "name": "Red Archer",
+          "name": "Sewer Sam",
           "accounts": [
-            "Red Archer",
-            "Red Alt"
+            "Sewer Sam",
+            "Sewer Sam II"
           ]
         },
         {
-          "name": "Red Mage",
+          "name": "Rat Catcher",
           "accounts": [
-            "Red Mage"
+            "Rat Catcher"
           ]
         },
         {
-          "name": "Red Tank",
+          "name": "Bucket Bob",
           "accounts": [
-            "Red Tank"
+            "Bucket Bob"
           ]
         }
       ],
@@ -59,25 +59,25 @@
     },
     {
       "id": 1,
-      "name": "Blue",
+      "name": "Gnome Child Gang",
       "members": [
         {
-          "name": "Blue Archer",
+          "name": "Gnome Kid",
           "accounts": [
-            "Blue Archer",
-            "Blue Alt"
+            "Gnome Kid",
+            "Gnome Kid 2"
           ]
         },
         {
-          "name": "Blue Mage",
+          "name": "Tree Gnome",
           "accounts": [
-            "Blue Mage"
+            "Tree Gnome"
           ]
         },
         {
-          "name": "Blue Tank",
+          "name": "Glough Fan",
           "accounts": [
-            "Blue Tank"
+            "Glough Fan"
           ]
         }
       ],
@@ -123,25 +123,25 @@
     },
     {
       "id": 2,
-      "name": "Green",
+      "name": "Zulrah Scale Farmers",
       "members": [
         {
-          "name": "Green Archer",
+          "name": "Scale Daddy",
           "accounts": [
-            "Green Archer",
-            "Green Alt"
+            "Scale Daddy",
+            "Scale Mommy"
           ]
         },
         {
-          "name": "Green Mage",
+          "name": "Venom Vic",
           "accounts": [
-            "Green Mage"
+            "Venom Vic"
           ]
         },
         {
-          "name": "Green Tank",
+          "name": "Snakeling",
           "accounts": [
-            "Green Tank"
+            "Snakeling"
           ]
         }
       ],
@@ -175,25 +175,25 @@
     },
     {
       "id": 3,
-      "name": "Gold",
+      "name": "Draynor Bank Mob",
       "members": [
         {
-          "name": "Gold Archer",
+          "name": "Bank Stander",
           "accounts": [
-            "Gold Archer",
-            "Gold Alt"
+            "Bank Stander",
+            "Bank Sitter"
           ]
         },
         {
-          "name": "Gold Mage",
+          "name": "Wizard Ned",
           "accounts": [
-            "Gold Mage"
+            "Wizard Ned"
           ]
         },
         {
-          "name": "Gold Tank",
+          "name": "Morgan Fan",
           "accounts": [
-            "Gold Tank"
+            "Morgan Fan"
           ]
         }
       ],
@@ -203,7 +203,7 @@
         "instance": 121
       },
       "frozen_until": null,
-      "shield_until": "2026-10-08T18:50:07.685293667Z",
+      "shield_until": "2026-10-08T19:27:44.568069100Z",
       "match_id": null,
       "gems": [
         "blue"
@@ -745,7 +745,7 @@
   "instances": {
     "8": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-05T12:30:07.685293667Z",
+      "started": "2026-10-05T13:07:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 7
@@ -793,7 +793,7 @@
     },
     "17": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-05T18:10:07.685293667Z",
+      "started": "2026-10-05T18:47:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 16
@@ -841,7 +841,7 @@
     },
     "24": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-05T22:30:07.685293667Z",
+      "started": "2026-10-05T23:07:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 23
@@ -889,7 +889,7 @@
     },
     "27": {
       "challenge": "sire-50",
-      "started": "2026-10-05T22:30:07.685293667Z",
+      "started": "2026-10-05T23:07:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 26
@@ -932,7 +932,7 @@
     },
     "35": {
       "challenge": "sire-50",
-      "started": "2026-10-06T03:30:07.685293667Z",
+      "started": "2026-10-06T04:07:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 34
@@ -977,7 +977,7 @@
     },
     "48": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-06T13:10:07.685293667Z",
+      "started": "2026-10-06T13:47:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 47
@@ -1025,7 +1025,7 @@
     },
     "58": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-06T15:50:07.685293667Z",
+      "started": "2026-10-06T16:27:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 57
@@ -1073,7 +1073,7 @@
     },
     "73": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-07T00:10:07.685293667Z",
+      "started": "2026-10-07T00:47:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 72
@@ -1121,7 +1121,7 @@
     },
     "90": {
       "challenge": "dagannoth-task",
-      "started": "2026-10-07T12:50:07.685293667Z",
+      "started": "2026-10-07T13:27:44.568069100Z",
       "scope": {
         "scope": "match",
         "id": 89
@@ -1148,7 +1148,7 @@
     },
     "103": {
       "challenge": "sire-50",
-      "started": "2026-10-07T19:50:07.685293667Z",
+      "started": "2026-10-07T20:27:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 102
@@ -1191,7 +1191,7 @@
     },
     "107": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-07T20:50:07.685293667Z",
+      "started": "2026-10-07T21:27:44.568069100Z",
       "scope": {
         "scope": "minigame",
         "id": 106
@@ -1239,7 +1239,7 @@
     },
     "113": {
       "challenge": "dagannoth-task",
-      "started": "2026-10-07T23:10:07.685293667Z",
+      "started": "2026-10-07T23:47:44.568069100Z",
       "scope": {
         "scope": "match",
         "id": 112
@@ -1266,7 +1266,7 @@
     },
     "121": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-08T02:30:07.685293667Z",
+      "started": "2026-10-08T03:07:44.568069100Z",
       "scope": {
         "scope": "tile",
         "team": 3,
@@ -1284,7 +1284,7 @@
     },
     "123": {
       "challenge": "dagannoth-task",
-      "started": "2026-10-08T03:50:07.685293667Z",
+      "started": "2026-10-08T04:27:44.568069100Z",
       "scope": {
         "scope": "match",
         "id": 122
@@ -1311,7 +1311,7 @@
     },
     "126": {
       "challenge": "malediction-ward",
-      "started": "2026-10-08T05:50:07.685293667Z",
+      "started": "2026-10-08T06:27:44.568069100Z",
       "scope": {
         "scope": "tile",
         "team": 0,
@@ -1333,7 +1333,7 @@
     },
     "130": {
       "challenge": "dagannoth-task",
-      "started": "2026-10-08T10:30:07.685293667Z",
+      "started": "2026-10-08T11:07:44.568069100Z",
       "scope": {
         "scope": "tile",
         "team": 2,
@@ -1364,7 +1364,7 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-05T18:30:07.685293667Z",
+      "deadline": "2026-10-05T19:07:44.568069100Z",
       "finished": [
         0,
         1,
@@ -1403,7 +1403,7 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-06T00:10:07.685293667Z",
+      "deadline": "2026-10-06T00:47:44.568069100Z",
       "finished": [
         0,
         1,
@@ -1442,7 +1442,7 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-06T04:30:07.685293667Z",
+      "deadline": "2026-10-06T05:07:44.568069100Z",
       "finished": [
         0,
         3,
@@ -1477,7 +1477,7 @@
         "gold_per_unit": 1
       },
       "initiator": 1,
-      "deadline": "2026-10-06T02:30:07.685293667Z",
+      "deadline": "2026-10-06T03:07:44.568069100Z",
       "finished": [],
       "gold": [
         {
@@ -1503,7 +1503,7 @@
         "gold_per_unit": 1
       },
       "initiator": 3,
-      "deadline": "2026-10-06T07:30:07.685293667Z",
+      "deadline": "2026-10-06T08:07:44.568069100Z",
       "finished": [],
       "gold": [
         {
@@ -1537,7 +1537,7 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-06T19:10:07.685293667Z",
+      "deadline": "2026-10-06T19:47:44.568069100Z",
       "finished": [
         1,
         2,
@@ -1576,7 +1576,7 @@
         ]
       },
       "initiator": 3,
-      "deadline": "2026-10-06T21:50:07.685293667Z",
+      "deadline": "2026-10-06T22:27:44.568069100Z",
       "finished": [
         3,
         1,
@@ -1615,7 +1615,7 @@
         ]
       },
       "initiator": 3,
-      "deadline": "2026-10-07T06:10:07.685293667Z",
+      "deadline": "2026-10-07T06:47:44.568069100Z",
       "finished": [
         2,
         0,
@@ -1650,7 +1650,7 @@
         "gold_per_unit": 1
       },
       "initiator": 2,
-      "deadline": "2026-10-07T23:50:07.685293667Z",
+      "deadline": "2026-10-08T00:27:44.568069100Z",
       "finished": [],
       "gold": [
         {
@@ -1684,7 +1684,7 @@
         ]
       },
       "initiator": 1,
-      "deadline": "2026-10-08T02:50:07.685293667Z",
+      "deadline": "2026-10-08T03:27:44.568069100Z",
       "finished": [
         1,
         3,
@@ -1717,7 +1717,7 @@
       "instance": 90,
       "mover": 1,
       "defender": 0,
-      "deadline": "2026-10-07T16:50:07.685293667Z",
+      "deadline": "2026-10-07T17:27:44.568069100Z",
       "outcome": {
         "outcome": "won",
         "winner": 1,
@@ -1729,7 +1729,7 @@
       "instance": 113,
       "mover": 0,
       "defender": 1,
-      "deadline": "2026-10-08T03:10:07.685293667Z",
+      "deadline": "2026-10-08T03:47:44.568069100Z",
       "outcome": {
         "outcome": "won",
         "winner": 0,
@@ -1741,7 +1741,7 @@
       "instance": 123,
       "mover": 0,
       "defender": 1,
-      "deadline": "2026-10-08T07:50:07.685293667Z",
+      "deadline": "2026-10-08T08:27:44.568069100Z",
       "outcome": {
         "outcome": "won",
         "winner": 0,

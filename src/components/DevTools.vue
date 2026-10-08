@@ -11,6 +11,8 @@ import {
   type ItemGroup,
 } from '@/domain/items'
 import { ITEMS, SUITS, type Item, type Suit } from '@/domain/vocabulary'
+import { SAMPLE_TEAM_CODES } from '@/api/fixtures/fixtureClient'
+import type { TeamId } from '@/domain/ids'
 import { useDevStore } from '@/stores/dev'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
@@ -70,8 +72,9 @@ const last = computed(() => {
   return dev.lastEntry()
 })
 
-async function playAs(name: string) {
-  await my.login(name.toLowerCase())
+async function playAs(id: TeamId) {
+  const code = SAMPLE_TEAM_CODES[id]
+  if (code) await my.login(code)
 }
 </script>
 
@@ -121,11 +124,11 @@ async function playAs(name: string) {
         <template v-if="team">
           <p class="mt-1.5" style="color: var(--text-muted)">{{ statusLine }}</p>
           <button
-            v-if="my.teamId !== team.id"
+            v-if="my.teamId !== team.id && SAMPLE_TEAM_CODES[team.id]"
             type="button"
             class="tt-link mt-1"
-            title="Logs in with the team name as the code, as in the sample game"
-            @click="playAs(team.name)"
+            title="Logs in with the sample game's code for this team"
+            @click="playAs(team.id)"
           >
             Play as {{ team.name }}
           </button>

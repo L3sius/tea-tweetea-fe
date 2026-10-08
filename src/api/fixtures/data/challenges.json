@@ -1,4 +1,104 @@
 {
+  "kq-dragon-pickaxe": {
+    "id": "kq-dragon-pickaxe",
+    "name": "Dragon Pickaxe",
+    "description": "Obtain a Dragon pickaxe from the Kalphite Queen",
+    "est_hours": 6.4,
+    "tags": [
+      "desert",
+      "boss"
+    ],
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "items",
+        "items": [
+          {
+            "name": "Dragon pickaxe",
+            "sources": [
+              "Kalphite Queen"
+            ]
+          }
+        ]
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Kalphite Queen"
+      ]
+    }
+  },
+  "malediction-ward": {
+    "id": "malediction-ward",
+    "name": "Malediction Ward",
+    "description": "Obtain all three Malediction shards in the Wilderness",
+    "est_hours": 9,
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "items",
+        "items": [
+          {
+            "name": "Malediction shard 1",
+            "sources": [
+              "Chaos Fanatic"
+            ]
+          },
+          {
+            "name": "Malediction shard 2",
+            "sources": [
+              "Crazy archaeologist"
+            ]
+          },
+          {
+            "name": "Malediction shard 3",
+            "sources": [
+              "Scorpia"
+            ]
+          }
+        ]
+      }
+    },
+    "goal": {
+      "kind": "each",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Chaos Fanatic",
+        "Crazy archaeologist",
+        "Scorpia"
+      ]
+    }
+  },
+  "sire-50": {
+    "id": "sire-50",
+    "name": "Abyssal Sire",
+    "description": "Kill the Abyssal Sire 50 times",
+    "est_hours": 2,
+    "criterion": {
+      "kind": "kill_count",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 50
+    },
+    "effort": {
+      "kind": "kills",
+      "bosses": [
+        "Abyssal Sire"
+      ]
+    }
+  },
   "any-raid-pet": {
     "id": "any-raid-pet",
     "name": "Raid Pet",
@@ -52,40 +152,6 @@
       ]
     }
   },
-  "kq-dragon-pickaxe": {
-    "id": "kq-dragon-pickaxe",
-    "name": "Dragon Pickaxe",
-    "description": "Obtain a Dragon pickaxe from the Kalphite Queen",
-    "est_hours": 6.4,
-    "tags": [
-      "desert",
-      "boss"
-    ],
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "items",
-        "items": [
-          {
-            "name": "Dragon pickaxe",
-            "sources": [
-              "Kalphite Queen"
-            ]
-          }
-        ]
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": [
-        "Kalphite Queen"
-      ]
-    }
-  },
   "any-drop-1m": {
     "id": "any-drop-1m",
     "name": "Big Drop",
@@ -107,66 +173,6 @@
     "effort": {
       "kind": "loots",
       "sources": "any"
-    }
-  },
-  "sire-50": {
-    "id": "sire-50",
-    "name": "Abyssal Sire",
-    "description": "Kill the Abyssal Sire 50 times",
-    "est_hours": 2,
-    "criterion": {
-      "kind": "kill_count",
-      "bosses": [
-        "Abyssal Sire"
-      ]
-    },
-    "goal": {
-      "kind": "total",
-      "n": 50
-    },
-    "effort": {
-      "kind": "kills",
-      "bosses": [
-        "Abyssal Sire"
-      ]
-    }
-  },
-  "dagannoth-task": {
-    "id": "dagannoth-task",
-    "name": "Slayer Task",
-    "description": "Complete a dagannoth slayer task",
-    "est_hours": 1,
-    "criterion": {
-      "kind": "slayer",
-      "tasks": [
-        "Dagannoth"
-      ]
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "elapsed"
-    }
-  },
-  "fight-caves-26m": {
-    "id": "fight-caves-26m",
-    "name": "Fight Caves",
-    "description": "Complete the Fight Caves in under 26 minutes",
-    "est_hours": 1.5,
-    "criterion": {
-      "kind": "timed_kill",
-      "boss": "TzTok-Jad",
-      "max_seconds": 1560
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "best_time",
-      "boss": "TzTok-Jad"
     }
   },
   "beginner-clue-9-cabbage": {
@@ -192,50 +198,6 @@
       "tier": "beginner"
     }
   },
-  "malediction-ward": {
-    "id": "malediction-ward",
-    "name": "Malediction Ward",
-    "description": "Obtain all three Malediction shards in the Wilderness",
-    "est_hours": 9,
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "items",
-        "items": [
-          {
-            "name": "Malediction shard 1",
-            "sources": [
-              "Chaos Fanatic"
-            ]
-          },
-          {
-            "name": "Malediction shard 2",
-            "sources": [
-              "Crazy archaeologist"
-            ]
-          },
-          {
-            "name": "Malediction shard 3",
-            "sources": [
-              "Scorpia"
-            ]
-          }
-        ]
-      }
-    },
-    "goal": {
-      "kind": "each",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": [
-        "Chaos Fanatic",
-        "Crazy archaeologist",
-        "Scorpia"
-      ]
-    }
-  },
   "elite-clue-150k-200k": {
     "id": "elite-clue-150k-200k",
     "name": "Clue Value Reward",
@@ -257,6 +219,44 @@
     "effort": {
       "kind": "caskets",
       "tier": "elite"
+    }
+  },
+  "fight-caves-26m": {
+    "id": "fight-caves-26m",
+    "name": "Fight Caves",
+    "description": "Complete the Fight Caves in under 26 minutes",
+    "est_hours": 1.5,
+    "criterion": {
+      "kind": "timed_kill",
+      "boss": "TzTok-Jad",
+      "max_seconds": 1560
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "best_time",
+      "boss": "TzTok-Jad"
+    }
+  },
+  "dagannoth-task": {
+    "id": "dagannoth-task",
+    "name": "Slayer Task",
+    "description": "Complete a dagannoth slayer task",
+    "est_hours": 1,
+    "criterion": {
+      "kind": "slayer",
+      "tasks": [
+        "Dagannoth"
+      ]
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "elapsed"
     }
   }
 }

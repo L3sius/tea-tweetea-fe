@@ -6,8 +6,11 @@ import { createFixtureClient } from './fixtureClient'
 const client = createFixtureClient()
 
 describe('fixture client', () => {
-  it('identifies a team by its lower-case name', async () => {
-    await expect(client.getMe('blue')).resolves.toMatchObject({ teamId: 1, name: 'Blue' })
+  it('identifies a team by its sample code', async () => {
+    await expect(client.getMe('blue')).resolves.toMatchObject({
+      teamId: 1,
+      name: 'Gnome Child Gang',
+    })
   })
 
   it('serves the recorded inventory of red, and an empty one for teams without a recording', async () => {
