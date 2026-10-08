@@ -1,10 +1,17 @@
 // How a tile's tooltip scene looks, worked out from the tile's own data: land or sea picks the
 // environment, frame and header style; the region picks the colour and crests; the kind picks its
 // colour and a note. The scene component only draws what this returns.
+import frameBloody from '@/assets/tt/img/scene/frame-bloody.png'
+import frameCrystal from '@/assets/tt/img/scene/frame-crystal.png'
+import frameJungle from '@/assets/tt/img/scene/frame-jungle.png'
 import frameLand from '@/assets/tt/img/scene/frame-land.png'
+import frameMarble from '@/assets/tt/img/scene/frame-marble.png'
+import frameSandy from '@/assets/tt/img/scene/frame-sandy.png'
 import frameSea from '@/assets/tt/img/scene/frame-sea.png'
+import frameTerracotta from '@/assets/tt/img/scene/frame-terracotta.png'
+import frameVolcanic from '@/assets/tt/img/scene/frame-volcanic.png'
 import type { TileKind } from '@/domain/vocabulary'
-import { regionLook } from './regions'
+import { regionLook, type FrameStyle } from './regions'
 
 export type Environment = 'land' | 'sea'
 
@@ -30,6 +37,17 @@ const ENVIRONMENTS: Record<Environment, Pick<TileTheme, 'header' | 'frame'>> = {
   sea: { header: 'open', frame: { url: frameSea, slice: 16 } },
 }
 
+/** Each region's own land frame: the Wilderness volcanic, Morytania bloody, the Desert sandy … */
+const LAND_FRAMES: Record<FrameStyle, string> = {
+  volcanic: frameVolcanic,
+  bloody: frameBloody,
+  sandy: frameSandy,
+  terracotta: frameTerracotta,
+  jungle: frameJungle,
+  marble: frameMarble,
+  crystal: frameCrystal,
+}
+
 /** Coloured like the tile's marker on the map. */
 const KINDS: Record<TileKind, TileTheme['kind']> = {
   normal: { colour: '#e8dcb8', note: null },
@@ -43,9 +61,12 @@ const KINDS: Record<TileKind, TileTheme['kind']> = {
 export function tileTheme(tile: { sea: boolean; kind: TileKind }, regionName: string): TileTheme {
   const environment: Environment = tile.sea ? 'sea' : 'land'
   const region = regionLook(regionName)
+  const base = ENVIRONMENTS[environment]
+  const landFrame = environment === 'land' && region.frame ? LAND_FRAMES[region.frame] : null
   return {
     environment,
-    ...ENVIRONMENTS[environment],
+    header: base.header,
+    frame: landFrame ? { url: landFrame, slice: 16 } : base.frame,
     colour: region.colour,
     crests: region.badges,
     kind: KINDS[tile.kind],

@@ -284,6 +284,181 @@ def cloth_edge(rng):
     write('cloth-edge.png', im)
 
 
+# --- Regional land frames ---------------------------------------------------------------------
+#
+# Same build as the plain land frame (an 8px band of blocks on a 64px 9-slice, slice 16, ragged
+# outer edge), in each region's materials, with its own decoration on top and down the sides.
+
+def block_band(px, n, blocks, mortar, inner):
+    """Blocks in a coarse running bond with mortar lines, a darker inner edge, an outline rim."""
+    for y in range(n):
+        for x in range(n):
+            d = min(x, y, n - 1 - x, n - 1 - y)
+            if d >= 8:
+                continue
+            if d < 2:
+                px[x, y] = OUTLINE if d == 0 else inner
+                continue
+            bx, by = (x + (y // 4) * 2) // 4, y // 4
+            block = blocks[(bx * 7 + by * 3) % len(blocks)]
+            px[x, y] = block if (x % 4 and y % 4) else mortar
+            if d == 7:
+                px[x, y] = inner
+
+
+def band_pixels(n, depth=(2, 7)):
+    """Every pixel of the band between the given depths, as (x, y, side, along)."""
+    out = []
+    for y in range(n):
+        for x in range(n):
+            d = min(x, y, n - 1 - x, n - 1 - y)
+            if depth[0] <= d <= depth[1]:
+                side = 't' if d == y else 'b' if d == n - 1 - y else 'l' if d == x else 'r'
+                out.append((x, y, side, x if side in 'tb' else y))
+    return out
+
+
+def ragged(px, n, rng, chance=0.3):
+    for i in range(n):
+        for side in range(4):
+            if rng.random() < chance:
+                x, y = ((i, 0), (i, n - 1), (0, i), (n - 1, i))[side]
+                px[x, y] = CLEAR
+
+
+def volcanic(px, n, rng):
+    """Wilderness: black basalt, lava glowing through the cracks, embers along the top."""
+    block_band(px, n, [rgb('#2b2524'), rgb('#3a312e'), rgb('#231d1c')], rgb('#140f0e'), rgb('#0e0a09'))
+    lava, hot = rgb('#e2531b'), rgb('#ffb347')
+    for x, y, side, along in band_pixels(n):
+        if px[x, y] == rgb('#140f0e') and rng.random() < 0.45:
+            px[x, y] = hot if rng.random() < 0.3 else lava
+    for x in range(n):  # a crust of ash on top, glowing here and there
+        for y in (2, 3):
+            px[x, y] = rgb('#1b1514')
+        if rng.random() < 0.18:
+            px[x, 2] = hot
+            px[x, 1] = rgb('#ff8a2a')
+
+
+def bloody(px, n, rng):
+    """Morytania: dark mossy stone, blood running down from the top, swamp moss."""
+    block_band(px, n, [rgb('#3e4a3f'), rgb('#2f3a31'), rgb('#46503f')], rgb('#1d241e'), rgb('#141a15'))
+    for x in range(n):  # swamp moss on top
+        for y in (2, 3):
+            px[x, y] = rgb('#3d4f2a') if (x // 2) % 3 else rgb('#55693a')
+    blood, dark = rgb('#8a0f12'), rgb('#5c0a0c')
+    for x in range(1, n - 1):  # drips from the top edge, down the band and the sides
+        if rng.random() < 0.38:
+            for y in range(1, 2 + rng.randrange(4, 8)):
+                px[x, y] = blood if y < 4 else dark
+    for _ in range(44):
+        x, y, side, along = rng.choice(band_pixels(n, (2, 6)))
+        if side != 't':
+            px[x, y] = blood
+            ny = y + 1
+            if ny < n and px[x, ny][3]:
+                px[x, ny] = dark
+
+
+def sandy(px, n, rng):
+    """Desert: sandstone blocks, a drift of sand over the top, sand blown into the joints."""
+    block_band(px, n, [rgb('#c9a35a'), rgb('#b88f45'), rgb('#d4b06a')], rgb('#7d5d2a'), rgb('#5e441c'))
+    sand, light = rgb('#e3c57a'), rgb('#f1dc9c')
+    for x in range(n):
+        top = 1 + (1 if (x // 5) % 2 else 0) + (1 if (x // 11) % 2 else 0)
+        for y in range(top, 6):
+            px[x, y] = light if y == top else sand
+    for x, y, side, along in band_pixels(n, (2, 6)):
+        if px[x, y] == rgb('#7d5d2a') and rng.random() < 0.3:
+            px[x, y] = sand
+
+
+def terracotta(px, n, rng):
+    """Varlamore: sun-baked clay tiles with a gold trim along the top."""
+    block_band(px, n, [rgb('#b5532c'), rgb('#c76a3b'), rgb('#9c4424')], rgb('#5e2a16'), rgb('#41190b'))
+    for x in range(n):
+        px[x, 2] = rgb('#f2d36b') if x % 4 == 0 else rgb('#d9a441')
+        px[x, 3] = rgb('#a37422')
+
+
+def jungle(px, n, rng):
+    """Karamja: mossy stone under thick leaves, vines hanging off the top and wound down the sides."""
+    block_band(px, n, [rgb('#5d6a4a'), rgb('#4b583b'), rgb('#68765a')], rgb('#2e3a22'), rgb('#20291a'))
+    leaf, light, vine, dark = rgb('#2e6b1f'), rgb('#4e9a2a'), rgb('#3f7a24'), rgb('#1f4a14')
+    for x in range(n):
+        top = 1 + rng.randrange(0, 2)
+        for y in range(top, 6):
+            px[x, y] = light if (x + y) % 3 == 0 else leaf
+    # Vines hanging off the top band, two pixels thick, with a leaf every few pixels.
+    for x in range(3, n - 4, 5):
+        if rng.random() < 0.7:
+            for y in range(5, 5 + rng.randrange(2, 4)):
+                px[x, y] = vine
+                px[x + 1, y] = dark
+    # Vines wound all the way down both sides, swaying a pixel across the band.
+    for side in (2, 4, n - 3, n - 5):
+        for y in range(6, n - 3):
+            x = side + (1 if (y // 4) % 2 else 0) * (1 if side < n // 2 else -1)
+            px[x, y] = vine if y % 4 else dark
+            if y % 6 == 0:  # a leaf
+                lx = x + (1 if side < n // 2 else -1)
+                px[lx, y] = light
+                px[lx, y + 1] = leaf
+
+
+def crystal(px, n, rng):
+    """Kandarin & Elven Lands: pale crystal shards, as in Prifddinas, catching the light."""
+    block_band(px, n, [rgb('#8fd3e8'), rgb('#b7e6f2'), rgb('#6fb6cf')], rgb('#3e7f9a'), rgb('#2b5f75'))
+    glint, deep = rgb('#f2fbff'), rgb('#4a9cbc')
+    # Facets: a light top-left edge on each block, a deeper bottom-right, and the odd glint.
+    for x, y, side, along in band_pixels(n, (2, 6)):
+        if px[x, y] in (rgb('#3e7f9a'),):
+            continue
+        if x % 4 == 1 or y % 4 == 1:
+            px[x, y] = glint if rng.random() < 0.18 else px[x, y]
+        elif x % 4 == 3 and y % 4 == 3:
+            px[x, y] = deep
+    # Shards standing up along the top edge.
+    for x in range(1, n - 2, 4):
+        h = rng.randrange(2, 4)
+        for y in range(2, 2 + h):
+            px[x, y] = glint
+            px[x + 1, y] = rgb('#b7e6f2')
+
+
+def marble(px, n, rng):
+    """Kourend: pale marble blocks with a dark green trim."""
+    block_band(px, n, [rgb('#a9b3bb'), rgb('#8f9aa3'), rgb('#b8c1c7')], rgb('#5d666d'), rgb('#3e454a'))
+    for x in range(n):
+        px[x, 2] = rgb('#1f4d3a')
+        px[x, 3] = rgb('#2f6b52') if x % 6 else rgb('#c99a2e')
+
+
+REGION_FRAMES = {
+    'volcanic': volcanic,
+    'bloody': bloody,
+    'sandy': sandy,
+    'terracotta': terracotta,
+    'jungle': jungle,
+    'marble': marble,
+    'crystal': crystal,
+}
+
+
+def region_frames():
+    """One land frame per regional style, each from its own seed so the others never shift."""
+    for i, (name, draw) in enumerate(REGION_FRAMES.items()):
+        rng = random.Random(1000 + i)
+        n = 64
+        im = Image.new('RGBA', (n, n), CLEAR)
+        px = im.load()
+        draw(px, n, rng)
+        ragged(px, n, rng)
+        outline(im)
+        write(f'frame-{name}.png', im)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     rng = random.Random(398)
@@ -293,6 +468,7 @@ def main():
     earth_frame(rng)
     plate(rng)
     cloth_edge(rng)
+    region_frames()
 
 
 if __name__ == '__main__':

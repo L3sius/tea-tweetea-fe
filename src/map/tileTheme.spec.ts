@@ -25,6 +25,15 @@ describe('tileTheme', () => {
     )
   })
 
+  it('frames land in the region’s own material, and the sea always in waves', () => {
+    const wild = tileTheme({ sea: false, kind: 'normal' }, 'Wilderness & Fremenik')
+    const misthalin = tileTheme({ sea: false, kind: 'normal' }, 'Misthalin')
+    const wildSea = tileTheme({ sea: true, kind: 'normal' }, 'Wilderness & Fremenik')
+    expect(wild.frame.url).toMatch(/volcanic/)
+    expect(misthalin.frame.url).toMatch(/frame-land/)
+    expect(wildSea.frame.url).toMatch(/frame-sea/)
+  })
+
   it('still draws an unknown continent, without crests', () => {
     const theme = tileTheme({ sea: false, kind: 'shop' }, 'Zanaris')
     expect(theme.crests).toEqual([])
