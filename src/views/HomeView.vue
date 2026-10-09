@@ -254,6 +254,7 @@ async function buyMysteryBox() {
         :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
         :replay="game.replay"
+        :dev-quote="dev.quote"
         :appearance-of="characters.appearanceOf"
         @hover="onHover"
         @pick="onPick"

@@ -41,6 +41,7 @@ import type { Choreography, Cue, Placement } from '@/domain/motion'
 import type { Replay } from '@/domain/replay'
 import { nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
 import { perform, ticksToMs } from '@/characters/acting'
+import { PASS_QUOTE, chatStyle, idleQuote, quoteMs, type Quote } from '@/characters/quotes'
 import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
 import { HEADING, headingOf } from '@/characters/heading'
 import type { Appearance } from '@/characters/roster'
@@ -79,6 +80,8 @@ const props = defineProps<{
   hideCuesFor: TeamId | null
   /** A replay of past moves: the teams it moves are drawn from it instead of the live game. */
   replay?: Replay | null
+  /** A quote the dev tools asked a character to say, on top of the ones the clock picks. */
+  devQuote?: Quote | null
   /** How a team's piece looks as an OSRS character, or null to draw it as a bird. */
   appearanceOf: (team: TeamId) => Appearance | null
 }>()
@@ -113,6 +116,8 @@ type TeamMarker = {
 }
 const teamMarkers = new Map<TeamId, TeamMarker>()
 const cueMarkers = new Map<string, Marker>()
+/** Each walking team's "pass" line: the walk it was said on, so a walk says it only once. */
+const passQuotes = new Map<TeamId, Quote & { seq: number }>()
 
 /**
  * How close, in screen pixels, the pointer must be to a node to hover or pick it. Nodes keep the
@@ -661,27 +666,44 @@ function renderFrame() {
       .filter((c) => !replay?.teams.has(c.teamId) && c.teamId !== props.hideCuesFor),
     ...(replay?.choreography.activeCues(time) ?? []).map((c) => ({ ...c, id: `replay-${c.id}` })),
   ]
-  const live = new Set(active.map((c) => c.id))
+  const talking = new Set(active.map((c) => c.teamId))
+  const overheads: Overhead[] = [
+    ...active.map((cue) => ({
+      id: cue.id,
+      teamId: cue.teamId,
+      card: cue.card !== undefined,
+      make: () => {
+        if (cue.card) return cardCue(cue.card)
+        const el = document.createElement('div')
+        el.className = `cue cue-${cue.tone}`
+        el.textContent = cue.text
+        return el
+      },
+    })),
+    ...quotesAt(time, placements, still, talking).map((q) => ({
+      id: `quote-${q.team}-${q.since}`,
+      teamId: q.team,
+      card: false,
+      make: () => quoteElement(q),
+    })),
+  ]
+  const live = new Set(overheads.map((o) => o.id))
   for (const [id, m] of cueMarkers) {
     if (!live.has(id)) {
       cueLayer.removeLayer(m)
       cueMarkers.delete(id)
     }
   }
-  for (const cue of active) {
+  for (const cue of overheads) {
     const at = placed.get(cue.teamId)
     if (!at) continue
     let m = cueMarkers.get(cue.id)
     if (!m) {
-      const el = cue.card ? cardCue(cue.card) : document.createElement('div')
-      if (!cue.card) {
-        el.className = `cue cue-${cue.tone}`
-        el.textContent = cue.text
-      }
+      const el = cue.make()
       const character = teamMarkers.get(cue.teamId)?.npc != null
       // A character's drawn card goes beside it, level with its body, so it never hides the
       // character's reaction to it (a Joker makes it cry). Other callouts go over its head.
-      const beside = character && cue.card !== undefined
+      const beside = character && cue.card
       const lift = beside ? CARD_BESIDE_LIFT : character ? CHARACTER_SIZE.height + 4 : 46
       const placement = beside ? ' cue-beside-character' : character ? ' cue-over-character' : ''
       m = marker(at, {
@@ -704,6 +726,84 @@ function renderFrame() {
     const want = followCentre(map, props.selected, map.getZoom())
     if (want) followStep(map, want)
   }
+}
+
+/** Something drawn over a piece: a callout, a drawn card or a quote. */
+type Overhead = { id: string; teamId: TeamId; card: boolean; make: () => HTMLElement }
+
+/**
+ * The quotes over the pieces at `time`: the board's idle quote, if its character stands idle and
+ * has no callout up; each walking team's line as it passes a team standing on its path; and a
+ * quote from the dev tools.
+ */
+function quotesAt(
+  time: number,
+  placements: ReadonlyMap<TeamId, Placement | null>,
+  still: ReadonlyMap<TileId, TeamId[]>,
+  talking: ReadonlySet<TeamId>,
+): Quote[] {
+  const out: Quote[] = []
+  const teams = [...props.state.teams.values()]
+  const players = teams.flatMap((t) => t.members.map((m) => m.name)).sort()
+  const idle = idleQuote(
+    time,
+    teams.map((t) => t.id).sort((a, b) => a - b),
+    players,
+  )
+  const speaker = idle ? props.state.teams.get(idle.team) : undefined
+  if (idle && speaker) {
+    const p = placements.get(idle.team)
+    const frozen = speaker.frozenUntil !== null && speaker.frozenUntil.getTime() > time
+    if ((p === null || p?.kind === 'still') && !frozen && !talking.has(idle.team)) out.push(idle)
+  }
+  for (const [team, p] of placements) {
+    if (p?.kind !== 'walk') continue
+    const passing = still.has(p.to) || still.has(p.from)
+    if (passing && passQuotes.get(team)?.seq !== p.seq) {
+      const { text, ...style } = chatStyle(PASS_QUOTE, 'pass', team, p.seq)
+      passQuotes.set(team, {
+        team,
+        text,
+        style,
+        since: time,
+        until: time + quoteMs(text),
+        seq: p.seq,
+      })
+    }
+  }
+  for (const q of passQuotes.values()) if (time < q.until) out.push(q)
+  const dev = props.devQuote
+  if (dev && time >= dev.since && time < dev.until) out.push(dev)
+  return out
+}
+
+/** Motions that move each letter on its own, so the text is split into one span per letter. */
+const LETTER_MOTIONS = new Set(['wave', 'wave2', 'shake'])
+
+/**
+ * A quote as OSRS overhead chat. The line moves (scroll, slide), the span inside it carries the
+ * colour, and the letters inside that move on their own (wave, shake): three elements, so a
+ * colour animation and a motion never cancel each other out.
+ */
+function quoteElement(q: Quote): HTMLElement {
+  const el = document.createElement('div')
+  el.className = `quote chat-${q.style.motion}`
+  el.style.setProperty('--quote-ms', `${q.until - q.since}ms`)
+  const coloured = document.createElement('span')
+  coloured.className = `chat-${q.style.colour}`
+  el.append(coloured)
+  if (!LETTER_MOTIONS.has(q.style.motion)) {
+    coloured.textContent = q.text
+    return el
+  }
+  ;[...q.text].forEach((char, i) => {
+    const letter = document.createElement('span')
+    letter.className = 'chat-letter'
+    letter.textContent = char === ' ' ? ' ' : char
+    letter.style.setProperty('--i', String(i))
+    coloured.append(letter)
+  })
+  return el
 }
 
 /** Screen pixels from a team's tile up to the middle of its piece, at `zoom`. */
@@ -1403,6 +1503,189 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
   animation: cue-rise 2.6s steps(12, end) forwards;
+}
+/* A quote is OSRS overhead chat: yellow, still, over the head while it lasts. */
+.board-map .quote {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-bold);
+  font-size: var(--fs-1);
+  line-height: 1;
+  color: var(--osrs-yellow);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+}
+/* OSRS chat colours. Flash blinks between two colours; glow fades through a cycle. */
+.board-map .chat-red {
+  color: #ff0000;
+}
+.board-map .chat-green {
+  color: #00ff00;
+}
+.board-map .chat-cyan {
+  color: #00ffff;
+}
+.board-map .chat-purple {
+  color: #ff00ff;
+}
+.board-map .chat-white {
+  color: #ffffff;
+}
+.board-map .chat-flash1 {
+  animation: chat-flash1 0.4s steps(1) infinite;
+}
+.board-map .chat-flash2 {
+  animation: chat-flash2 0.4s steps(1) infinite;
+}
+.board-map .chat-flash3 {
+  animation: chat-flash3 0.4s steps(1) infinite;
+}
+.board-map .chat-glow1 {
+  animation: chat-glow1 2.4s linear infinite;
+}
+.board-map .chat-glow2 {
+  animation: chat-glow2 2.4s linear infinite;
+}
+.board-map .chat-glow3 {
+  animation: chat-glow3 2.4s linear infinite;
+}
+@keyframes chat-flash1 {
+  0% {
+    color: #ff0000;
+  }
+  50% {
+    color: #ffff00;
+  }
+}
+@keyframes chat-flash2 {
+  0% {
+    color: #00ffff;
+  }
+  50% {
+    color: #0000ff;
+  }
+}
+@keyframes chat-flash3 {
+  0% {
+    color: #00b000;
+  }
+  50% {
+    color: #80ff80;
+  }
+}
+@keyframes chat-glow1 {
+  0%,
+  100% {
+    color: #ff0000;
+  }
+  33% {
+    color: #ffff00;
+  }
+  66% {
+    color: #00ffff;
+  }
+}
+@keyframes chat-glow2 {
+  0%,
+  100% {
+    color: #ff0000;
+  }
+  33% {
+    color: #ff00ff;
+  }
+  66% {
+    color: #0000ff;
+  }
+}
+@keyframes chat-glow3 {
+  0%,
+  100% {
+    color: #ffffff;
+  }
+  33% {
+    color: #00ff00;
+  }
+  66% {
+    color: #00ffff;
+  }
+}
+/* OSRS chat motions. Letters keep their own place in the wave by their index. */
+.board-map .chat-letter {
+  display: inline-block;
+}
+.board-map .chat-wave .chat-letter {
+  animation: chat-wave 0.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.1s);
+}
+.board-map .chat-wave2 .chat-letter {
+  animation: chat-wave2 0.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.1s);
+}
+/* Shake jitters at first, then settles, as it does in game. */
+.board-map .chat-shake .chat-letter {
+  animation: chat-shake 0.12s steps(2) 8;
+  animation-delay: calc(var(--i) * -0.03s);
+}
+.board-map .chat-scroll {
+  animation: chat-scroll var(--quote-ms) linear forwards;
+}
+.board-map .chat-slide {
+  animation: chat-slide var(--quote-ms) ease-in-out forwards;
+}
+@keyframes chat-wave {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -4px;
+  }
+}
+@keyframes chat-wave2 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: 2px -3px;
+  }
+  50% {
+    translate: 0 -4px;
+  }
+  75% {
+    translate: -2px -3px;
+  }
+}
+@keyframes chat-shake {
+  0% {
+    translate: 1px -2px;
+  }
+  50% {
+    translate: -1px 2px;
+  }
+}
+@keyframes chat-scroll {
+  from {
+    translate: 60px 0;
+  }
+  to {
+    translate: -60px 0;
+  }
+}
+@keyframes chat-slide {
+  0% {
+    translate: 0 -18px;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    translate: 0 0;
+    opacity: 1;
+  }
+  100% {
+    translate: 0 -18px;
+    opacity: 0;
+  }
 }
 .board-map .cue-good {
   color: var(--osrs-green);

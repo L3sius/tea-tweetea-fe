@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 import { describeProblem, isApiError } from '@/api'
+import { fillQuote, parseChat, quoteMs, type ChatStyle, type Quote } from '@/characters/quotes'
 import type { AdminCommand } from '@/domain/commands'
 import { describeEvent } from '@/domain/describe'
 import type { Card } from '@/domain/game'
@@ -34,6 +35,31 @@ export const useDevStore = defineStore('dev', () => {
    * dev draw instead of a real one, so the reveal can be tested with any card.
    */
   const riggedCard = shallowRef<Card | null>(null)
+  /** A quote a character says now, for testing; only this page sees it. */
+  const quote = shallowRef<Quote | null>(null)
+
+  /**
+   * Makes the chosen team's character say `text` at once, whatever it is doing, with `style`
+   * unless the line has OSRS effect prefixes of its own.
+   */
+  function say(text: string, style: ChatStyle) {
+    const team = teamId.value ?? [...(game.state?.teams.keys() ?? [])][0]
+    if (team === undefined) return
+    const players = [...(game.state?.teams.values() ?? [])].flatMap((t) =>
+      t.members.map((m) => m.name),
+    )
+    const filled = fillQuote(text, players, Math.random())
+    if (filled === null) return
+    const parsed = parseChat(filled)
+    const since = game.serverNow()
+    quote.value = {
+      team,
+      text: parsed.text,
+      style: parsed.style ?? style,
+      since,
+      until: since + quoteMs(parsed.text),
+    }
+  }
 
   function readCode(): string | null {
     try {
@@ -183,6 +209,8 @@ export const useDevStore = defineStore('dev', () => {
     message,
     pickingTile,
     riggedCard,
+    quote,
+    say,
     run,
     completeTile,
     adjustGold,

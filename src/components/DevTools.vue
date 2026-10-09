@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import {
+  CHAT_COLOURS,
+  CHAT_MOTIONS,
+  IDLE_QUOTES,
+  PASS_QUOTE,
+  type ChatColour,
+  type ChatMotion,
+} from '@/characters/quotes'
 import { cardLabel, itemName, teamStatusText } from '@/domain/describe'
 import type { Card } from '@/domain/game'
 import { ITEM_GROUP, ITEM_GROUPS, inventorySize, type ItemGroup } from '@/domain/items'
@@ -18,6 +26,11 @@ const game = useGameStore()
 const my = useTeamStore()
 
 const open = ref(false)
+/** Every line a character can say, for trying one out. */
+const QUOTES = [...IDLE_QUOTES, PASS_QUOTE]
+const quoteText = ref(QUOTES[0] ?? '')
+const quoteColour = ref<ChatColour>('yellow')
+const quoteMotion = ref<ChatMotion>('none')
 const item = ref<Item>('bronze_feather')
 const rank = ref(7)
 const suit = ref<Suit | 'joker'>('diamonds')
@@ -270,6 +283,31 @@ async function playAs(id: TeamId) {
           </div>
         </div>
       </template>
+
+      <!-- A quote over a character, without waiting for the clock to pick one. -->
+      <div>
+        <p class="dev-label">Quote ({{ dev.teamId === null ? 'first team' : 'chosen team' }})</p>
+        <div class="flex gap-1.5">
+          <select v-model="quoteText" class="tt-input min-w-0 flex-1" aria-label="Quote">
+            <option v-for="q in QUOTES" :key="q" :value="q">{{ q }}</option>
+          </select>
+          <button
+            type="button"
+            class="dev-btn"
+            @click="dev.say(quoteText, { colour: quoteColour, motion: quoteMotion })"
+          >
+            💬 Say
+          </button>
+        </div>
+        <div class="mt-1.5 flex gap-1.5">
+          <select v-model="quoteColour" class="tt-input min-w-0 flex-1" aria-label="Chat colour">
+            <option v-for="c in CHAT_COLOURS" :key="c" :value="c">{{ c }}</option>
+          </select>
+          <select v-model="quoteMotion" class="tt-input min-w-0 flex-1" aria-label="Chat effect">
+            <option v-for="m in CHAT_MOTIONS" :key="m" :value="m">{{ m }}</option>
+          </select>
+        </div>
+      </div>
 
       <!-- The minigame slot machine, without waiting for a team to land on a red tile. -->
       <button type="button" class="dev-btn w-full text-left" @click="spinMinigame">
