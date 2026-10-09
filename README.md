@@ -3,6 +3,9 @@
 Website for **Tweetea and the Magic Gems**, an Old School RuneScape clan board game: teams complete
 OSRS tasks, draw cards, walk the map and race to collect all eight gems.
 
+**Starting the event?** Follow [docs/launch.md](docs/launch.md): the backend, the assets, this
+site and the players' Dink, in order.
+
 ## Getting started
 
 ```sh
