@@ -23,8 +23,8 @@ const emit = defineEmits<{ watch: [seq: number] }>()
 
 const MAX_ENTRIES = 40
 
-/** Events that start a move worth watching again: a walk, a teleport, a trap. */
-const MOVE_STARTS = new Set(['move_confirmed', 'teleported', 'trap_triggered'])
+/** Events that start a move worth watching again: a walk or a teleport. */
+const MOVE_STARTS = new Set(['move_confirmed', 'teleported'])
 
 type Block = { seq: number; at: Date; lines: TextPart[][]; watch: boolean }
 

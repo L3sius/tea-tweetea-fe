@@ -58,7 +58,7 @@ describe('tileBefore', () => {
     expect(tileBefore(log, 4, blue)).toBe(6)
   })
 
-  it('follows teleports and traps', () => {
+  it('follows teleports', () => {
     const log = [
       start,
       entry(2, [{ kind: 'teleported', teamId: red, from: tileId(5), to: tileId(40) }]),

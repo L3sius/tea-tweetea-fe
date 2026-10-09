@@ -18,7 +18,6 @@ function movedTeam(event: GameEvent): TeamId | null {
     case 'move_confirmed':
     case 'stepped':
     case 'teleported':
-    case 'trap_triggered':
       return event.teamId
     default:
       return null
@@ -42,7 +41,7 @@ export function tileBefore(log: readonly JournalEntry[], seq: number, team: Team
       if (e.kind === 'game_started') return e.positions[team] ?? null
       if ('teamId' in e && e.teamId !== team) continue
       if (e.kind === 'stepped' || e.kind === 'landed') return e.tileId
-      if (e.kind === 'teleported' || e.kind === 'trap_triggered') return e.to
+      if (e.kind === 'teleported') return e.to
     }
   }
   return null

@@ -24,6 +24,8 @@ const props = defineProps<{
   /** The tile the team stands on, for items that only work on land or at sea. */
   here?: Tile
   now: Date
+  /** How many blockers the team has on the board, against the per-team limit. */
+  blockersPlaced: number
   pending: boolean
   /** Locked items are listed but the menu says why they can't be used yet. */
   locked?: boolean
@@ -54,7 +56,7 @@ const items = computed(() =>
         text: itemEntry(item).description,
         group: ITEM_GROUPS[group],
         held: group === 'held',
-        why: whyNotUsable(props.team, item, props.now, props.here),
+        why: whyNotUsable(props.team, item, props.now, props.here, props.blockersPlaced),
       }
     }),
 )

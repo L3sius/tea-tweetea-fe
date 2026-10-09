@@ -1,127 +1,204 @@
 {
-  "bronze_feather": {
-    "name": "Bronze feather",
-    "description": "Your next move is 1.5 times as long (rounded).",
-    "icon": "https://oldschool.runescape.wiki/images/Bronze_feather.png"
-  },
-  "silver_feather": {
-    "name": "Silver feather",
-    "description": "Your next move is twice as long.",
-    "icon": "https://oldschool.runescape.wiki/images/Silver_feather.png"
-  },
-  "gold_feather": {
-    "name": "Gold feather",
-    "description": "Your next move is 2.5 times as long (rounded).",
-    "icon": null
-  },
-  "morrigans_throwing_axe": {
-    "name": "Morrigan's throwing axe",
-    "description": "Halves a rival team's next move. Hostile: the target is then shielded for 12 hours.",
-    "icon": "https://oldschool.runescape.wiki/images/Morrigan%27s_throwing_axe.png"
-  },
-  "quetzal_whistle": {
-    "name": "Quetzal whistle",
-    "description": "On land only: fly to a random land tile away from the gems.",
-    "icon": "https://oldschool.runescape.wiki/images/Perfected_quetzal_whistle.png"
-  },
-  "ogre_boat": {
-    "name": "Ogre boat",
-    "description": "At sea only: sail to a random sea tile away from the gems.",
-    "icon": "https://oldschool.runescape.wiki/images/thumb/Ogre_boat.png/300px-Ogre_boat.png"
-  },
-  "group_teleport": {
-    "name": "Group teleport",
-    "description": "Sends every team that is not moving or in a match to a random shop.",
-    "icon": "https://oldschool.runescape.wiki/images/Ice_plateau_teleport_%28tablet%29.png"
-  },
-  "banana": {
-    "name": "Banana",
-    "description": "Trap for a nearby tile: a team walking over it slips back a tile and is frozen for 6 hours.",
-    "icon": "https://oldschool.runescape.wiki/images/Banana.png"
-  },
-  "harpie_bug_swarm": {
-    "name": "Harpie bug swarm",
-    "description": "Trap for a nearby tile: a team walking over it stops there.",
-    "icon": "https://oldschool.runescape.wiki/images/Harpie_Bug_Swarm.png"
-  },
-  "snake_charmer": {
-    "name": "Snake charmer",
-    "description": "Trap for a nearby tile: a team landing on it is sent back 5 tiles.",
-    "icon": "https://oldschool.runescape.wiki/images/thumb/Ali_the_Snake_Charmer.png/180px-Ali_the_Snake_Charmer.png"
-  },
-  "wilderness_web": {
-    "name": "Wilderness web",
-    "description": "Blocks a nearby tile for 12 hours: nobody can walk through it.",
-    "icon": "https://oldschool.runescape.wiki/images/Web.png"
-  },
-  "ice_barrage": {
-    "name": "Ice Barrage",
-    "description": "Freezes a rival team for 6 hours. Hostile: the target is then shielded for 12 hours.",
-    "icon": "https://oldschool.runescape.wiki/images/Ice_Barrage.png"
-  },
-  "entangle": {
-    "name": "Entangle",
-    "description": "Freezes a rival team for 3 hours. Hostile: the target is then shielded for 12 hours.",
-    "icon": "https://oldschool.runescape.wiki/images/Entangle.png"
-  },
-  "protect_from_magic": {
-    "name": "Protect from Magic",
-    "description": "Passive: blocks the next freeze on your team, then is used up.",
-    "icon": "https://oldschool.runescape.wiki/images/Protect_from_Magic.png"
-  },
-  "leprechaun_hat": {
-    "name": "Leprechaun hat",
-    "description": "For your next 5 draws, a club pays gold.",
-    "icon": "https://oldschool.runescape.wiki/images/Leprechaun_hat.png"
-  },
-  "saturated_heart": {
-    "name": "Saturated heart",
-    "description": "For your next 5 draws, a heart pays gold.",
-    "icon": "https://oldschool.runescape.wiki/images/Saturated_heart.png"
-  },
-  "sapphire_necklace": {
-    "name": "Sapphire necklace",
-    "description": "Passive: protects your blue gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Sapphire_necklace.png"
-  },
-  "emerald_necklace": {
-    "name": "Emerald necklace",
-    "description": "Passive: protects your green gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Emerald_necklace.png"
-  },
-  "dragon_necklace": {
-    "name": "Dragon necklace",
-    "description": "Passive: protects your purple gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Dragon_necklace.png"
-  },
-  "ruby_necklace": {
-    "name": "Ruby necklace",
-    "description": "Passive: protects your red gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Ruby_necklace.png"
-  },
-  "onyx_necklace": {
-    "name": "Onyx necklace",
-    "description": "Passive: protects your yellow gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Onyx_necklace.png"
-  },
-  "zenyte_necklace": {
-    "name": "Zenyte necklace",
-    "description": "Passive: protects your orange gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Zenyte_necklace.png"
-  },
-  "topaz_necklace": {
-    "name": "Topaz necklace",
-    "description": "Passive: protects your pink gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Topaz_necklace.png"
-  },
-  "diamond_necklace": {
-    "name": "Diamond necklace",
-    "description": "Passive: protects your white gem when you lose a match.",
-    "icon": "https://oldschool.runescape.wiki/images/Diamond_necklace.png"
-  },
   "mystery_box": {
     "name": "Mystery box",
-    "description": "Opens into a random item.",
-    "icon": null
+    "description": "Sold in every shop. A random item goes straight into your inventory.",
+    "icon": null,
+    "price": 40,
+    "freeze_hours": null,
+    "multiplier": null
+  },
+  "items": {
+    "bronze_feather": {
+      "name": "Bronze feather",
+      "description": "Your next move is 1.5 times as long (rounded).",
+      "icon": "https://oldschool.runescape.wiki/images/Bronze_feather.png",
+      "price": 40,
+      "freeze_hours": null,
+      "multiplier": 1.5
+    },
+    "silver_feather": {
+      "name": "Silver feather",
+      "description": "Your next move is 2 times as long.",
+      "icon": "https://oldschool.runescape.wiki/images/Silver_feather.png",
+      "price": 80,
+      "freeze_hours": null,
+      "multiplier": 2
+    },
+    "gold_feather": {
+      "name": "Gold feather",
+      "description": "Your next move is 2.5 times as long (rounded).",
+      "icon": null,
+      "price": 100,
+      "freeze_hours": null,
+      "multiplier": 2.5
+    },
+    "morrigans_throwing_axe": {
+      "name": "Morrigan's throwing axe",
+      "description": "Halves a rival team's next move. Hostile: the target is then shielded for 12 hours.",
+      "icon": "https://oldschool.runescape.wiki/images/Morrigan%27s_throwing_axe.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "quetzal_whistle": {
+      "name": "Quetzal whistle",
+      "description": "On land only: fly to a random land tile away from the gems.",
+      "icon": "https://oldschool.runescape.wiki/images/Perfected_quetzal_whistle.png",
+      "price": 20,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "ogre_boat": {
+      "name": "Ogre boat",
+      "description": "At sea only: sail to a random sea tile away from the gems.",
+      "icon": "https://oldschool.runescape.wiki/images/thumb/Ogre_boat.png/300px-Ogre_boat.png",
+      "price": 20,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "group_teleport": {
+      "name": "Group teleport",
+      "description": "Sends every team that is not moving or in a match to a random shop.",
+      "icon": "https://oldschool.runescape.wiki/images/Ice_plateau_teleport_%28tablet%29.png",
+      "price": 50,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "banana": {
+      "name": "Banana",
+      "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 30 minutes.",
+      "icon": "https://oldschool.runescape.wiki/images/Banana.png",
+      "price": 10,
+      "freeze_hours": 0.5,
+      "multiplier": null
+    },
+    "harpie_bug_swarm": {
+      "name": "Harpie bug swarm",
+      "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 1 hour.",
+      "icon": "https://oldschool.runescape.wiki/images/Harpie_Bug_Swarm.png",
+      "price": 15,
+      "freeze_hours": 1,
+      "multiplier": null
+    },
+    "snake_charmer": {
+      "name": "Snake charmer",
+      "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 2 hours.",
+      "icon": "https://oldschool.runescape.wiki/images/thumb/Ali_the_Snake_Charmer.png/180px-Ali_the_Snake_Charmer.png",
+      "price": 25,
+      "freeze_hours": 2,
+      "multiplier": null
+    },
+    "wilderness_web": {
+      "name": "Wilderness web",
+      "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 4 hours.",
+      "icon": "https://oldschool.runescape.wiki/images/Web.png",
+      "price": 40,
+      "freeze_hours": 4,
+      "multiplier": null
+    },
+    "ice_barrage": {
+      "name": "Ice Barrage",
+      "description": "Freezes a rival team for 6 hours. Hostile: the target is then shielded for 12 hours.",
+      "icon": "https://oldschool.runescape.wiki/images/Ice_Barrage.png",
+      "price": 30,
+      "freeze_hours": 6,
+      "multiplier": null
+    },
+    "entangle": {
+      "name": "Entangle",
+      "description": "Freezes a rival team for 3 hours. Hostile: the target is then shielded for 12 hours.",
+      "icon": "https://oldschool.runescape.wiki/images/Entangle.png",
+      "price": 20,
+      "freeze_hours": 3,
+      "multiplier": null
+    },
+    "protect_from_magic": {
+      "name": "Protect from Magic",
+      "description": "Passive: blocks the next freeze on your team, then is used up.",
+      "icon": "https://oldschool.runescape.wiki/images/Protect_from_Magic.png",
+      "price": 20,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "leprechaun_hat": {
+      "name": "Leprechaun hat",
+      "description": "For your next 5 draws, a club pays gold.",
+      "icon": "https://oldschool.runescape.wiki/images/Leprechaun_hat.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "saturated_heart": {
+      "name": "Saturated heart",
+      "description": "For your next 5 draws, a heart pays gold.",
+      "icon": "https://oldschool.runescape.wiki/images/Saturated_heart.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "sapphire_necklace": {
+      "name": "Sapphire necklace",
+      "description": "Passive: protects your blue gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Sapphire_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "emerald_necklace": {
+      "name": "Emerald necklace",
+      "description": "Passive: protects your green gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Emerald_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "dragon_necklace": {
+      "name": "Dragon necklace",
+      "description": "Passive: protects your purple gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Dragon_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "ruby_necklace": {
+      "name": "Ruby necklace",
+      "description": "Passive: protects your red gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Ruby_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "onyx_necklace": {
+      "name": "Onyx necklace",
+      "description": "Passive: protects your yellow gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Onyx_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "zenyte_necklace": {
+      "name": "Zenyte necklace",
+      "description": "Passive: protects your orange gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Zenyte_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "topaz_necklace": {
+      "name": "Topaz necklace",
+      "description": "Passive: protects your pink gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Topaz_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    },
+    "diamond_necklace": {
+      "name": "Diamond necklace",
+      "description": "Passive: protects your white gem when you lose a match.",
+      "icon": "https://oldschool.runescape.wiki/images/Diamond_necklace.png",
+      "price": 30,
+      "freeze_hours": null,
+      "multiplier": null
+    }
   }
 }

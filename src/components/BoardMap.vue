@@ -27,7 +27,14 @@ import {
 import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
 import type { Board, Tile } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
-import { blockerName, cardLabel, challengeProgress, clock, type Names } from '@/domain/describe'
+import {
+  blockerFreezeText,
+  blockerName,
+  cardLabel,
+  challengeProgress,
+  clock,
+  type Names,
+} from '@/domain/describe'
 import type { Blocker, Card, GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import type { Choreography, Cue, Placement } from '@/domain/motion'
@@ -114,11 +121,18 @@ const cueMarkers = new Map<string, Marker>()
  */
 const PICK_RADIUS = 20
 
-const BLOCKER_ICONS = { banana: '🍌', swarm: '🐝', snake: '🐍', web: '🕸️' } as const
+const BLOCKER_ICONS: Partial<Record<Item, string>> = {
+  banana: '🍌',
+  harpie_bug_swarm: '🐝',
+  snake_charmer: '🐍',
+  wilderness_web: '🕸️',
+}
 
 /** Blockers with a kit sprite draw it; the rest fall back to their emoji. */
-const blockerHtml = (kind: keyof typeof BLOCKER_ICONS) =>
-  kind === 'banana' ? '<span class="tt-sprite tt-icon-banana"></span>' : BLOCKER_ICONS[kind]
+const blockerHtml = (item: Item) =>
+  item === 'banana'
+    ? '<span class="tt-sprite tt-icon-banana"></span>'
+    : (BLOCKER_ICONS[item] ?? '⛔')
 
 /** The last click while picking: a yellow cross on a tile, red when it missed. */
 const click = ref<{ x: number; y: number; key: number; color: 'yellow' | 'red' } | null>(null)
@@ -132,15 +146,13 @@ function tileLatLng(tile: TileId): LatLng | null {
 
 const tileGems = () => new Map([...props.state.gemTiles].map(([gem, tile]) => [tile, gem]))
 
-/** Each blocker's item, for its picture, and what it does to whoever meets it. */
-const BLOCKERS: Record<Blocker['kind'], { item: Item; text: (b: Blocker) => string }> = {
-  banana: { item: 'banana', text: () => 'slips the next team over it back a tile, frozen.' },
-  swarm: { item: 'harpie_bug_swarm', text: () => 'stops the next team that walks over it.' },
-  snake: { item: 'snake_charmer', text: () => 'sends the next team to land here back 5 tiles.' },
-  web: {
-    item: 'wilderness_web',
-    text: (b) => (b.kind === 'web' ? `blocks the way until ${clock(b.until)}.` : ''),
-  },
+/** What a blocker does to whoever walks onto it, who placed it and when it goes. */
+function blockerText(blocker: Blocker): string {
+  const freeze = blockerFreezeText(blocker)
+  const stops = freeze
+    ? `stops every team that walks onto it and freezes it for ${freeze}.`
+    : 'stops every team that walks onto it.'
+  return `${stops} Placed by ${props.names.team(blocker.owner)}, gone at ${clock(blocker.until)}.`
 }
 
 /**
@@ -181,9 +193,9 @@ function tileView(tile: Tile): TileView {
     blocker: blocker
       ? {
           name: blockerName(blocker),
-          icon: itemEntry(BLOCKERS[blocker.kind].item).icon,
-          text: BLOCKERS[blocker.kind].text(blocker),
-          web: blocker.kind === 'web',
+          icon: itemEntry(blocker.item).icon,
+          text: blockerText(blocker),
+          web: blocker.item === 'wilderness_web',
         }
       : null,
     teams,
@@ -257,7 +269,7 @@ function drawPieces() {
     marker(at, {
       icon: divIcon({
         className: 'blocker-marker',
-        html: blockerHtml(blocker.kind),
+        html: blockerHtml(blocker.item),
         iconSize: [28, 28],
       }),
       zIndexOffset: 400,
@@ -519,15 +531,13 @@ function placementLatLng(p: Placement): { at: LatLng; dx: number; dy: number } |
   const to = tileLatLng(p.to)
   if (!from || !to) return null
   if (p.kind === 'teleport') return { at: p.progress < 0.5 ? from : to, dx: 0, dy: 0 }
-  const k = p.kind === 'slide' ? easeOut(p.progress) : p.progress
+  const k = p.progress
   return {
     at: latLng(from.lat + (to.lat - from.lat) * k, from.lng + (to.lng - from.lng) * k),
     dx: to.lng - from.lng,
     dy: to.lat - from.lat,
   }
 }
-
-const easeOut = (k: number) => 1 - (1 - k) ** 3
 
 /** Last horizontal direction each team walked, so idle pieces keep facing the same way. */
 const facing = new Map<TeamId, number>()
@@ -579,12 +589,8 @@ function drawCharacter(
       return info ? ticksToMs(info.ticks) : null
     },
   })
-  // Characters face the way they walk (a trap knocks them back facing the same way), and turn
-  // to the viewer once they stop.
-  const heading =
-    p.kind === 'walk' || p.kind === 'slide'
-      ? (walkHeading.get(team.id) ?? HEADING.south)
-      : HEADING.south
+  // Characters face the way they walk, and turn to the viewer once they stop.
+  const heading = p.kind === 'walk' ? (walkHeading.get(team.id) ?? HEADING.south) : HEADING.south
   piece.draw(performance, heading, time)
 }
 
@@ -624,17 +630,15 @@ function renderFrame() {
     const pose =
       p.kind === 'walk'
         ? 'walking'
-        : p.kind === 'slide'
-          ? 'sliding'
-          : p.kind === 'teleport'
-            ? p.progress < 0.5
-              ? 'teleport-out'
-              : 'teleport-in'
-            : frozen
-              ? 'frozen'
-              : team.matchId !== null
-                ? 'fighting'
-                : 'idle'
+        : p.kind === 'teleport'
+          ? p.progress < 0.5
+            ? 'teleport-out'
+            : 'teleport-in'
+          : frozen
+            ? 'frozen'
+            : team.matchId !== null
+              ? 'fighting'
+              : 'idle'
     const group = p.kind === 'still' ? still.get(p.tile) : undefined
     const slot = group ? group.indexOf(team.id) - (group.length - 1) / 2 : 0
     if (entry.piece) drawCharacter(entry.piece, team, p, time, still)
@@ -1293,14 +1297,6 @@ defineExpose({ locate, panTo, zoomBy, showAll })
 @keyframes feet-swap {
   50% {
     opacity: 0;
-  }
-}
-.board-map .sprite-sliding .sprite-body {
-  animation: sprite-spin 0.65s ease-out;
-}
-@keyframes sprite-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 .board-map .sprite-teleport-out .sprite-body {

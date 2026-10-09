@@ -18,7 +18,7 @@ const SHELVES = [
   { label: 'Frozen', ids: ROSTER.reactions.frozen },
   { label: 'Item used', ids: ROSTER.reactions.use_item },
   { label: 'Passing a team', ids: ROSTER.reactions.pass },
-  { label: 'Caught by a trap', ids: ROSTER.reactions.slip },
+  { label: 'Caught by a blocker', ids: ROSTER.reactions.slip },
   { label: 'Idle emotes', ids: ROSTER.easterEggs.idle },
 ]
 

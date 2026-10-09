@@ -60,8 +60,11 @@ export function toEffect(wire: WireEffect): Effect {
   }
 }
 
-export const toBlocker = (wire: WireBlocker): Blocker =>
-  wire.blocker === 'web' ? { kind: 'web', until: toDate(wire.until) } : { kind: wire.blocker }
+export const toBlocker = (wire: WireBlocker): Blocker => ({
+  item: wire.item,
+  owner: teamId(wire.owner),
+  until: toDate(wire.until),
+})
 
 export const toScoring = (wire: WireScoring): Scoring =>
   wire.type === 'race'

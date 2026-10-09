@@ -97,7 +97,7 @@ describe('game state', () => {
     teams: [wireTeam()],
     tiles: ['a', 'b', 'c'],
     gems: [0, 1, 2, 0, 1, 2, 0, 1],
-    blockers: { '1': { blocker: 'web', until: '2026-10-05T14:00:00Z' } },
+    blockers: { '1': { item: 'wilderness_web', owner: 2, until: '2026-10-05T14:00:00Z' } },
     instances: {
       '17': {
         challenge: 'a',
@@ -114,7 +114,8 @@ describe('game state', () => {
   it('keys maps by numeric id', () => {
     const state = toGameState(WireState.parse(wireState))
     expect(state.blockers.get(tileId(1))).toEqual({
-      kind: 'web',
+      item: 'wilderness_web',
+      owner: 2,
       until: new Date('2026-10-05T14:00:00Z'),
     })
     const instance = state.instances.get(instanceId(17))
@@ -139,7 +140,7 @@ describe('game state', () => {
   })
 
   it('rejects non-numeric map keys', () => {
-    const blockers = { first: { blocker: 'swarm' } }
+    const blockers = { first: { item: 'banana', owner: 0, until: '2026-10-05T14:00:00Z' } }
     expect(WireState.safeParse({ ...wireState, blockers }).success).toBe(false)
   })
 })

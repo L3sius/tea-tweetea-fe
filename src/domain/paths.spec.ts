@@ -21,13 +21,12 @@ const adj = adjacency([
 const none = new Set<TileId>()
 
 /** Checks a path follows the server's rule. */
-function isValid(path: TileId[], length: number, webs = none) {
+function isValid(path: TileId[], length: number) {
   if (path.length !== length + 1) return false
   for (const [i, tile] of path.entries()) {
     if (i === 0) continue
     if (!adj.get(path[i - 1] ?? tile)?.includes(tile)) return false
     if (i >= 2 && tile === path[i - 2]) return false
-    if (webs.has(tile)) return false
   }
   return true
 }
@@ -58,13 +57,49 @@ describe('Walks', () => {
     expect(path).toContain(tileId(5))
     expect(isValid(path ?? [], 5)).toBe(true)
   })
+})
 
-  it('routes around webs', () => {
-    const webs = new Set(t(4))
-    const walks = new Walks(adj, webs, tileId(0), 4)
-    const path = walks.through(tileId(6))
-    expect(path).toEqual(t(0, 1, 2, 3, 6))
-    expect(walks.through(tileId(4))).toBeNull()
+describe('Walks with blockers', () => {
+  it('ends the route on the first blocker it enters', () => {
+    const walks = new Walks(adj, new Set(t(2)), tileId(0), 4)
+    const route = t(0, 1, 2)
+    expect(walks.stopped(route)).toBe(true)
+    expect(walks.stepsLeft(route)).toBe(0)
+    const { near, far } = walks.options(route)
+    expect(near.size + far.size).toBe(0)
+  })
+
+  it('fills in the steps a blocker cuts off so the server gets a full walk', () => {
+    const walks = new Walks(adj, new Set(t(2)), tileId(0), 4)
+    const full = walks.complete(t(0, 1, 2))
+    expect(full?.slice(0, 3)).toEqual(t(0, 1, 2))
+    expect(isValid(full ?? [], 4)).toBe(true)
+    expect(walks.complete(t(0, 1))).toBeNull()
+  })
+
+  it('offers a blocker as a place to end, but nothing past it', () => {
+    const { near, far, ends } = new Walks(adj, new Set(t(1)), tileId(0), 3).options(t(0))
+    expect([...near]).toEqual(t(1))
+    expect(far.size).toBe(0)
+    expect([...ends]).toEqual(t(1))
+  })
+
+  it('lets a team standing on a blocker walk off it', () => {
+    const walks = new Walks(adj, new Set(t(0)), tileId(0), 3)
+    expect(walks.stopped(t(0))).toBe(false)
+    expect([...walks.options(t(0)).near]).toEqual(t(1))
+  })
+
+  it('goes round a blocker to reach a tile behind it', () => {
+    const walks = new Walks(adj, new Set(t(4)), tileId(0), 5)
+    expect(walks.walkTo(t(0, 1, 2), tileId(5))).toEqual(t(0, 1, 2, 3, 6, 5))
+  })
+
+  it('walks onto a blocker and back off it to undo', () => {
+    const walks = new Walks(adj, new Set(t(4)), tileId(0), 5)
+    const route = walks.walkTo(t(0, 1), tileId(4))
+    expect(route).toEqual(t(0, 1, 4))
+    expect(walks.walkTo(route ?? [], tileId(1))).toEqual(t(0, 1))
   })
 })
 
@@ -134,11 +169,6 @@ describe('Walks.walkTo', () => {
     const walks = new Walks(adj, none, tileId(0), 5)
     expect(walks.walkTo(t(0, 1, 2, 3), tileId(7))).toBeNull()
     expect(walks.options(t(0, 1, 2, 3)).reroute.has(tileId(7))).toBe(false)
-  })
-
-  it('does not reroute through webs', () => {
-    const walks = new Walks(adj, new Set(t(4)), tileId(0), 5)
-    expect(walks.walkTo(t(0, 1, 2), tileId(5))).toEqual(t(0, 1, 2, 3, 6, 5))
   })
 
   it('goes round a loop onto a route tile when that is shorter than walking back', () => {

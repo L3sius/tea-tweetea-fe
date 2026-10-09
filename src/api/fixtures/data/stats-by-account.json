@@ -1,82 +1,82 @@
 [
   {
-    "key": "Morgan Fan",
-    "count": 69,
-    "value": 290159760
-  },
-  {
-    "key": "Sewer Sam",
-    "count": 104,
-    "value": 228511640
-  },
-  {
-    "key": "Gnome Kid",
-    "count": 80,
-    "value": 194006360
-  },
-  {
-    "key": "Glough Fan",
-    "count": 70,
-    "value": 193559920
-  },
-  {
     "key": "Scale Daddy",
-    "count": 67,
-    "value": 190363080
-  },
-  {
-    "key": "Sewer Sam II",
-    "count": 81,
-    "value": 182607000
-  },
-  {
-    "key": "Bucket Bob",
-    "count": 100,
-    "value": 180812560
-  },
-  {
-    "key": "Snakeling",
-    "count": 70,
-    "value": 161611600
-  },
-  {
-    "key": "Venom Vic",
-    "count": 85,
-    "value": 131364480
-  },
-  {
-    "key": "Scale Mommy",
-    "count": 59,
-    "value": 126955920
-  },
-  {
-    "key": "Gnome Kid 2",
-    "count": 74,
-    "value": 123012120
-  },
-  {
-    "key": "Bank Sitter",
-    "count": 59,
-    "value": 98162560
-  },
-  {
-    "key": "Bank Stander",
-    "count": 62,
-    "value": 91312440
-  },
-  {
-    "key": "Tree Gnome",
-    "count": 55,
-    "value": 76006840
-  },
-  {
-    "key": "Wizard Ned",
-    "count": 50,
-    "value": 70154360
+    "count": 97,
+    "value": 256617440
   },
   {
     "key": "Rat Catcher",
-    "count": 82,
-    "value": 64161400
+    "count": 66,
+    "value": 201568240
+  },
+  {
+    "key": "Morgan Fan",
+    "count": 85,
+    "value": 180811760
+  },
+  {
+    "key": "Sewer Sam II",
+    "count": 65,
+    "value": 172763880
+  },
+  {
+    "key": "Snakeling",
+    "count": 96,
+    "value": 166164440
+  },
+  {
+    "key": "Scale Mommy",
+    "count": 91,
+    "value": 153609560
+  },
+  {
+    "key": "Bank Sitter",
+    "count": 86,
+    "value": 144157760
+  },
+  {
+    "key": "Bank Stander",
+    "count": 81,
+    "value": 141760680
+  },
+  {
+    "key": "Sewer Sam",
+    "count": 61,
+    "value": 134569440
+  },
+  {
+    "key": "Glough Fan",
+    "count": 102,
+    "value": 113358400
+  },
+  {
+    "key": "Gnome Kid 2",
+    "count": 115,
+    "value": 109809000
+  },
+  {
+    "key": "Venom Vic",
+    "count": 91,
+    "value": 97809040
+  },
+  {
+    "key": "Bucket Bob",
+    "count": 62,
+    "value": 95015960
+  },
+  {
+    "key": "Wizard Ned",
+    "count": 61,
+    "value": 78161320
+  },
+  {
+    "key": "Tree Gnome",
+    "count": 121,
+    "value": 73354720
+  },
+  {
+    "key": "Gnome Kid",
+    "count": 112,
+    "value": 42809120
   }
 ]

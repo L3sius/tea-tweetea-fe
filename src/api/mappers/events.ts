@@ -67,13 +67,12 @@ export function toGameEvent(wire: WireEvent): GameEvent {
         from: tileId(wire.from),
         to: tileId(wire.to),
       }
-    case 'trap_triggered':
+    case 'blocker_triggered':
       return {
         kind: wire.type,
         teamId: teamId(wire.team),
         tileId: tileId(wire.tile),
-        trap: toBlocker(wire.trap),
-        to: tileId(wire.to),
+        blocker: toBlocker(wire.blocker),
       }
     case 'progress':
       return {

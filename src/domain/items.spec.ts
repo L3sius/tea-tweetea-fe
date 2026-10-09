@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Team, TeamStatus } from './game'
 import { instanceId, matchId, teamId, tileId } from './ids'
-import { gainedItem, whyNotUsable } from './items'
+import { blockersOut, gainedItem, whyNotUsable } from './items'
 
 const NOW = new Date('2026-10-06T12:00:00Z')
 
@@ -85,6 +85,25 @@ describe('whyNotUsable', () => {
     expect(whyNotUsable(ready, 'quetzal_whistle', NOW, sea)).toBe('Only works on land')
     expect(whyNotUsable(ready, 'ogre_boat', NOW, sea)).toBeNull()
     expect(whyNotUsable(ready, 'ogre_boat', NOW, land)).toBe('Only works at sea')
+  })
+
+  it('allows only two blockers out at a time', () => {
+    expect(whyNotUsable(ready, 'banana', NOW, undefined, 1)).toBeNull()
+    expect(whyNotUsable(ready, 'wilderness_web', NOW, undefined, 2)).toMatch(/2 blockers out/)
+    expect(whyNotUsable(ready, 'ice_barrage', NOW, undefined, 2)).toBeNull()
+  })
+})
+
+describe('blockersOut', () => {
+  it('counts the team’s own blockers that are still on the board', () => {
+    const later = new Date(NOW.getTime() + 60_000)
+    const earlier = new Date(NOW.getTime() - 60_000)
+    const blockers = new Map([
+      [tileId(1), { item: 'banana', owner: teamId(0), until: later }],
+      [tileId(2), { item: 'banana', owner: teamId(0), until: earlier }],
+      [tileId(3), { item: 'banana', owner: teamId(1), until: later }],
+    ] as const)
+    expect(blockersOut(blockers, teamId(0), NOW)).toBe(1)
   })
 })
 

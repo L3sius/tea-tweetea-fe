@@ -12,7 +12,6 @@ import type { TeamId, TileId } from './ids'
 /** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
 export const STEP_MS = 840
 export const TELEPORT_MS = 1100
-export const SLIDE_MS = 650
 /** After a Joker the team's piece sulks this long before the Joker's effect (a teleport, say) plays. */
 export const JOKER_HOLD_MS = 2000
 /** How long an effect callout stays up. */
@@ -22,7 +21,7 @@ const CUE_GAP_MS = 500
 /** A drawn card holds the floor a little longer before the next callout. */
 const CARD_CUE_GAP_MS = 1400
 
-export type SegmentKind = 'walk' | 'teleport' | 'slide'
+export type SegmentKind = 'walk' | 'teleport'
 
 /** One move of a piece between two tiles, in server time (ms since the epoch). */
 export type Segment = {
@@ -31,7 +30,7 @@ export type Segment = {
   kind: SegmentKind
   start: number
   end: number
-  /** Steps in the whole walk this segment belongs to (1 for teleports and slides). */
+  /** Steps in the whole walk this segment belongs to (1 for teleports). */
   steps: number
   /** The journal entry it plays, so everyone watching can pick the same variations. */
   seq: number
@@ -108,7 +107,7 @@ export class Choreography {
     const move = (team: TeamId, to: TileId, kind: SegmentKind) => {
       const from = this.lastTile.get(team) ?? to
       const start = now(team)
-      const length = kind === 'walk' ? STEP_MS : kind === 'teleport' ? TELEPORT_MS : SLIDE_MS
+      const length = kind === 'walk' ? STEP_MS : TELEPORT_MS
       const end = start + length
       const walked = kind === 'walk' ? (this.walkSteps.get(team) ?? steps.get(team) ?? 1) : 1
       if (from !== to)
@@ -157,10 +156,10 @@ export class Choreography {
           if (event.card.kind !== 'joker') return
           react(event.teamId, 'despair', index)
           return hold(event.teamId, JOKER_HOLD_MS)
-        case 'trap_triggered':
-          cue(event.teamId, `${blockerName(event.trap)}!`, 'bad', index)
-          react(event.teamId, 'slip', index)
-          return move(event.teamId, event.to, 'slide')
+        // The team has already stepped onto the blocker's tile; it stops there.
+        case 'blocker_triggered':
+          cue(event.teamId, `${blockerName(event.blocker)}!`, 'bad', index)
+          return react(event.teamId, 'slip', index)
         case 'tile_completed':
           react(event.teamId, 'celebrate', index)
           break

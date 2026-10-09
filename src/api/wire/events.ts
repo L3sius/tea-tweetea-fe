@@ -27,7 +27,8 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('stepped', { team: Id, tile: Id }),
   event('landed', { team: Id, tile: Id, instance: Id }),
   event('teleported', { team: Id, from: Id, to: Id }),
-  event('trap_triggered', { team: Id, tile: Id, trap: WireBlocker, to: Id }),
+  // The team stops on `tile`; `landed` and `frozen` follow.
+  event('blocker_triggered', { team: Id, tile: Id, blocker: WireBlocker }),
   // `key` is empty (null or "") and `amount` 0 when only the effort changed.
   event('progress', {
     instance: Id,

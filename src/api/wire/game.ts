@@ -23,12 +23,8 @@ export const WireEffect = z.discriminatedUnion('effect', [
 ])
 export type WireEffect = z.infer<typeof WireEffect>
 
-export const WireBlocker = z.discriminatedUnion('blocker', [
-  z.object({ blocker: z.literal('banana') }),
-  z.object({ blocker: z.literal('swarm') }),
-  z.object({ blocker: z.literal('snake') }),
-  z.object({ blocker: z.literal('web'), until: Timestamp }),
-])
+/** A blocker item on a tile: who placed it and when it leaves the board. */
+export const WireBlocker = z.object({ item: Item, owner: Id, until: Timestamp })
 export type WireBlocker = z.infer<typeof WireBlocker>
 
 export const WireScoring = z.discriminatedUnion('type', [

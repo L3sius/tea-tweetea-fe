@@ -95,11 +95,10 @@ export type Team = {
 export type Appearance = { npc: number; idle: number; walk: number; run: number; swim: number }
 
 /**
- * Traps trigger once: a banana or a harpie bug swarm when walked over, a snake charmer when landed
- * on. A Wilderness web blocks its tile until it expires.
+ * A blocker item on a tile until `until`. Paths may cross it, but every team that walks onto it,
+ * its owner included, stops there and is frozen for the item's time.
  */
-export type Blocker =
-  { kind: 'banana' } | { kind: 'swarm' } | { kind: 'snake' } | { kind: 'web'; until: Date }
+export type Blocker = { item: Item; owner: TeamId; until: Date }
 
 export type InstanceScope =
   | { kind: 'tile'; teamId: TeamId; tileId: TileId }

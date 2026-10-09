@@ -5,12 +5,13 @@ import {
   challengeProgress,
   describeEvent,
   effortText,
+  hoursText,
   itemName,
   observationText,
   teamParts,
 } from './describe'
 import type { Instance } from './game'
-import { challengeId, instanceId, teamId, type ChallengeId, type TeamId } from './ids'
+import { challengeId, instanceId, teamId, tileId, type ChallengeId, type TeamId } from './ids'
 
 const names = {
   team: (id: TeamId) => ['Red', 'Blue'][id] ?? '?',
@@ -163,6 +164,25 @@ describe('private items', () => {
   it('still names an item a team uses, since its effect is public', () => {
     const used = { kind: 'item_used', teamId: teamId(1), item: 'banana', target: null } as const
     expect(describeEvent(used, names)).toBe('Blue used a Banana')
+  })
+})
+
+describe('blockers', () => {
+  it('says which blocker stopped a team', () => {
+    const blocker = { item: 'harpie_bug_swarm', owner: red, until: new Date() } as const
+    const event = {
+      kind: 'blocker_triggered',
+      teamId: teamId(1),
+      tileId: tileId(4),
+      blocker,
+    } as const
+    expect(describeEvent(event, names)).toBe('Blue was stopped by a harpie bug swarm')
+  })
+
+  it('writes freeze times in minutes or hours', () => {
+    expect(hoursText(0.5)).toBe('30 minutes')
+    expect(hoursText(1)).toBe('1 hour')
+    expect(hoursText(4)).toBe('4 hours')
   })
 })
 

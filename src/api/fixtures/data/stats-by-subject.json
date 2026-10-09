@@ -1,33 +1,38 @@
 [
   {
-    "key": "Chambers of Xeric",
-    "count": 32,
-    "value": 960000000
-  },
-  {
     "key": "Cerberus",
     "count": 31,
     "value": 868000000
   },
   {
+    "key": "Chambers of Xeric",
+    "count": 26,
+    "value": 780000000
+  },
+  {
     "key": "General Graardor",
-    "count": 28,
-    "value": 392000000
+    "count": 24,
+    "value": 336000000
   },
   {
     "key": "Vorkath",
-    "count": 106,
-    "value": 121670400
+    "count": 101,
+    "value": 111279200
   },
   {
     "key": "Zulrah",
-    "count": 71,
-    "value": 59205440
+    "count": 63,
+    "value": 65603520
   },
   {
     "key": "elite",
-    "count": 12,
-    "value": 1800000
+    "count": 9,
+    "value": 1350000
+  },
+  {
+    "key": "Scorpia",
+    "count": 38,
+    "value": 38000
   },
   {
     "key": "Chaos Fanatic",
@@ -35,43 +40,38 @@
     "value": 26000
   },
   {
-    "key": "Scorpia",
+    "key": "Crazy archaeologist",
     "count": 23,
     "value": 23000
   },
   {
-    "key": "Crazy archaeologist",
-    "count": 18,
-    "value": 18000
-  },
-  {
     "key": "Hill Giant",
-    "count": 40,
-    "value": 11200
+    "count": 43,
+    "value": 12040
   },
   {
     "key": "Kalphite Queen",
-    "count": 8,
-    "value": 8000
+    "count": 9,
+    "value": 9000
   },
   {
     "key": "Abyssal Sire",
-    "count": 720,
-    "value": 0
-  },
-  {
-    "key": "Dagannoth",
-    "count": 24,
+    "count": 968,
     "value": 0
   },
   {
     "key": "TzTok-Jad",
-    "count": 17,
+    "count": 14,
+    "value": 0
+  },
+  {
+    "key": "Dagannoth",
+    "count": 13,
     "value": 0
   },
   {
     "key": "Noxious Foe",
-    "count": 11,
+    "count": 4,
     "value": 0
   }
 ]

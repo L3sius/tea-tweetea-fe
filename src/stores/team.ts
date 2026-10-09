@@ -5,10 +5,10 @@ import { describeProblem, isApiError } from '@/api'
 import type { ItemTarget, TeamCommand } from '@/domain/commands'
 import { drawOutcome, type DrawOutcome } from '@/domain/draw'
 import type { GameEvent, JournalEntry } from '@/domain/events'
-import type { Team } from '@/domain/game'
+import type { Blocker, Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
-import { BLOCKER_RANGE, ITEM_TARGET, gainedItem } from '@/domain/items'
-import { adjacency, webTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
+import { BLOCKER_RANGE, ITEM_TARGET, blockersOut, gainedItem } from '@/domain/items'
+import { adjacency, blockerTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 import { useDevStore } from './dev'
@@ -65,22 +65,24 @@ export const useTeamStore = defineStore('team', () => {
 
   const adj = computed(() => (game.board ? adjacency(game.board.roads) : new Map()))
 
-  /** The walks open to the team after a draw. */
   /**
-   * Webs still standing, as a string so it only changes when a web appears or expires. The clock
+   * Blockers still standing, as a string so it only changes when one appears or expires. The clock
    * ticks every few seconds; without this the search and the map's rings would redo themselves
    * on every tick.
    */
-  const webKey = computed(() =>
-    game.state ? [...webTiles(game.state, now.value)].sort((a, b) => a - b).join(',') : '',
+  const blockerKey = computed(() =>
+    game.state ? [...blockerTiles(game.state, now.value)].sort((a, b) => a - b).join(',') : '',
   )
 
+  /** The walks open to the team after a draw. */
   const walks = computed(() => {
     const t = team.value
     if (!t || t.status.kind !== 'drawn' || !game.state || t.frozenUntil || t.matchId !== null)
       return null
-    const webs = new Set(webKey.value ? webKey.value.split(',').map((r) => tileId(Number(r))) : [])
-    return new Walks(adj.value, webs, t.position, t.status.length)
+    const stops = new Set(
+      blockerKey.value ? blockerKey.value.split(',').map((r) => tileId(Number(r))) : [],
+    )
+    return new Walks(adj.value, stops, t.position, t.status.length)
   })
   /** The route so far, or just the start tile before the first checkpoint. */
   const path = computed<TileId[] | null>(() => {
@@ -93,6 +95,18 @@ export const useTeamStore = defineStore('team', () => {
   /** Where the next checkpoint can go. */
   const options = computed(() =>
     walks.value && path.value ? walks.value.options(path.value) : null,
+  )
+  /** The blocker the route ends on, if it walks onto one: the move stops there. */
+  const stoppedBy = computed<{ tileId: TileId; blocker: Blocker } | null>(() => {
+    const w = walks.value
+    const p = path.value
+    const end = p?.at(-1)
+    const blocker = end === undefined ? undefined : game.state?.blockers.get(end)
+    return w && p && end !== undefined && blocker && w.stopped(p) ? { tileId: end, blocker } : null
+  })
+  /** How many blockers the team has on the board, against the per-team limit. */
+  const blockersPlaced = computed(() =>
+    team.value && game.state ? blockersOut(game.state.blockers, team.value.id, now.value) : 0,
   )
 
   /** Tiles a tile-targeted item may go on: in range, not a shop, free of teams, gems and blockers. */
@@ -376,8 +390,10 @@ export const useTeamStore = defineStore('team', () => {
   }
 
   async function confirmRoute() {
-    if (!route.value || stepsLeft.value !== 0) return
-    if ((await act({ kind: 'confirm_path', path: route.value })) !== null) clearRoute()
+    // A route that ends on a blocker still needs its full length; the tail is never walked.
+    const full = route.value && walks.value?.complete(route.value)
+    if (!full) return
+    if ((await act({ kind: 'confirm_path', path: full })) !== null) clearRoute()
   }
 
   /** Uses an item at once, or waits for a target if it needs one. */
@@ -406,6 +422,8 @@ export const useTeamStore = defineStore('team', () => {
     preview,
     stepsLeft,
     options,
+    stoppedBy,
+    blockersPlaced,
     targeting,
     walks,
     targetableTiles,

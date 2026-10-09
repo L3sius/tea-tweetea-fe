@@ -19,7 +19,8 @@ export type GameEvent =
   | { kind: 'stepped'; teamId: TeamId; tileId: TileId }
   | { kind: 'landed'; teamId: TeamId; tileId: TileId; instanceId: InstanceId }
   | { kind: 'teleported'; teamId: TeamId; from: TileId; to: TileId }
-  | { kind: 'trap_triggered'; teamId: TeamId; tileId: TileId; trap: Blocker; to: TileId }
+  /** The team walked onto a blocker and stopped there; `landed` and `frozen` follow. */
+  | { kind: 'blocker_triggered'; teamId: TeamId; tileId: TileId; blocker: Blocker }
   // Tasks
   | {
       kind: 'progress'

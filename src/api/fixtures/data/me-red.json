@@ -2,11 +2,7 @@
   "team": 0,
   "name": "Varrock Sewer Rats",
   "items": {
-    "bronze_feather": 3,
-    "silver_feather": 1,
-    "banana": 3,
-    "protect_from_magic": 1,
-    "dragon_necklace": 1
+    "bronze_feather": 2
   },
-  "seq": 1155
+  "seq": 1346
 }

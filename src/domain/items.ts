@@ -1,6 +1,7 @@
 // What each item does and what it is used on, from the server's rules (`src/engine/items.rs`).
 import type { Tile } from './board'
-import type { Team } from './game'
+import type { Blocker, Team } from './game'
+import type { TeamId, TileId } from './ids'
 import { ITEMS, NECKLACES, type Item } from './vocabulary'
 
 const TARGETS: Partial<Record<Item, ItemTargetKind>> = {
@@ -18,6 +19,28 @@ export type ItemTargetKind = 'none' | 'team' | 'tile'
 
 /** How far from the team a blocker may be placed (`blocker_range` in the game config). */
 export const BLOCKER_RANGE = 10
+
+/** How many blockers a team may have on the board at once (`blockers_per_team`). */
+export const BLOCKERS_PER_TEAM = 2
+
+/** Hours a blocker freezes the team it catches (`blocker_hours` in the game config). */
+export const BLOCKER_FREEZE_HOURS: Partial<Record<Item, number>> = {
+  banana: 0.5,
+  harpie_bug_swarm: 1,
+  snake_charmer: 2,
+  wilderness_web: 4,
+}
+
+/** The blockers a team has on the board that have not worn off by `now`. */
+export function blockersOut(
+  blockers: ReadonlyMap<TileId, Blocker>,
+  team: TeamId,
+  now: Date,
+): number {
+  let n = 0
+  for (const b of blockers.values()) if (b.owner === team && b.until > now) n++
+  return n
+}
 
 /** What each item is used on, from the server's `apply_item`. */
 export const ITEM_TARGET: Record<Item, ItemTargetKind> = Object.fromEntries(
@@ -83,22 +106,25 @@ const FALLBACK_CATALOGUE: Record<Item, ItemEntry> = {
   banana: {
     name: 'Banana',
     description:
-      'Trap for a nearby tile: a team walking over it slips back a tile and is frozen for 6 hours.',
+      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 30 minutes.',
     icon: 'https://oldschool.runescape.wiki/images/Banana.png',
   },
   harpie_bug_swarm: {
     name: 'Harpie bug swarm',
-    description: 'Trap for a nearby tile: a team walking over it stops there.',
+    description:
+      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 1 hour.',
     icon: 'https://oldschool.runescape.wiki/images/Harpie_Bug_Swarm.png',
   },
   snake_charmer: {
     name: 'Snake charmer',
-    description: 'Trap for a nearby tile: a team landing on it is sent back 5 tiles.',
+    description:
+      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 2 hours.',
     icon: 'https://oldschool.runescape.wiki/images/thumb/Ali_the_Snake_Charmer.png/180px-Ali_the_Snake_Charmer.png',
   },
   wilderness_web: {
     name: 'Wilderness web',
-    description: 'Blocks a nearby tile for 12 hours: nobody can walk through it.',
+    description:
+      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 4 hours.',
     icon: 'https://oldschool.runescape.wiki/images/Web.png',
   },
   ice_barrage: {
@@ -243,7 +269,7 @@ export const ITEM_GROUPS: Record<ItemGroup, { label: string; hint: string }> = {
   draw: { label: 'Your draw', hint: 'Changes the card you are about to draw' },
   you: { label: 'Your token', hint: 'Moves your own piece' },
   rival: { label: 'A rival', hint: 'Slows or freezes another team' },
-  board: { label: 'The board', hint: 'Leaves a trap or a web on a tile near you' },
+  board: { label: 'The board', hint: 'Leaves a blocker on a tile near you' },
   everyone: { label: 'Everyone', hint: 'Affects every team at once' },
   held: { label: 'Kept', hint: 'Works by being held; nothing to use' },
 }
@@ -280,10 +306,18 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
  * Why the team cannot use an item right now, or null if it can. Mirrors the server's rule
  * (`use_item` in docs/api.md): power-ups are a decision taken between finishing a tile and drawing,
  * one per tile, never while frozen or in a match. `here` is the team's tile, for the items that
- * only work on land or at sea.
+ * only work on land or at sea; `placed` is how many blockers the team has out.
  */
-export function whyNotUsable(team: Team, item: Item, now: Date, here?: Tile): string | null {
+export function whyNotUsable(
+  team: Team,
+  item: Item,
+  now: Date,
+  here?: Tile,
+  placed = 0,
+): string | null {
   if (PASSIVE_ITEMS.has(item)) return 'Works while held'
+  if (BLOCKER_FREEZE_HOURS[item] !== undefined && placed >= BLOCKERS_PER_TEAM)
+    return `You already have ${BLOCKERS_PER_TEAM} blockers out`
   if (here && item === 'quetzal_whistle' && here.sea) return 'Only works on land'
   if (here && item === 'ogre_boat' && !here.sea) return 'Only works at sea'
   if (team.frozenUntil !== null && team.frozenUntil > now) return 'Not while frozen'

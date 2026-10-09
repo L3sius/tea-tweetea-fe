@@ -4,7 +4,7 @@ import type { Challenge, Criterion } from './challenge'
 import type { GameEvent } from './events'
 import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
-import { itemEntry } from './items'
+import { BLOCKER_FREEZE_HOURS, itemEntry } from './items'
 import { NECKLACES, type Item, type Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
@@ -26,17 +26,18 @@ export function cardLabel(card: Card): string {
 /** The item's name from the server's catalogue. */
 export const itemName = (item: Item): string => itemEntry(item).name
 
-export function blockerName(blocker: Blocker): string {
-  switch (blocker.kind) {
-    case 'banana':
-      return 'Banana'
-    case 'swarm':
-      return 'Harpie bug swarm'
-    case 'snake':
-      return 'Snake charmer'
-    case 'web':
-      return 'Wilderness web'
-  }
+export const blockerName = (blocker: Blocker): string => itemName(blocker.item)
+
+/** "30 minutes", "1 hour", "2 hours". */
+export function hoursText(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)} minutes`
+  return hours === 1 ? '1 hour' : `${hours} hours`
+}
+
+/** How long a blocker freezes the team it catches, as text; null if the item is not a blocker. */
+export function blockerFreezeText(blocker: Blocker): string | null {
+  const hours = BLOCKER_FREEZE_HOURS[blocker.item]
+  return hours === undefined ? null : hoursText(hours)
 }
 
 /** `seesItems`: whether the viewer may know which item a gift was (its own team's only). */
@@ -221,8 +222,8 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.teamId)} landed on a new tile`
     case 'teleported':
       return `${team(event.teamId)} was teleported`
-    case 'trap_triggered':
-      return `${team(event.teamId)} hit ${a(blockerName(event.trap).toLowerCase())}`
+    case 'blocker_triggered':
+      return `${team(event.teamId)} was stopped by ${a(blockerName(event.blocker).toLowerCase())}`
     case 'tile_completed':
       return `${team(event.teamId)} completed a tile`
     case 'gem_collected':
@@ -260,6 +261,7 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
         : `${team(event.teamId)} spent ${-event.delta} gold`
     case 'blocker_placed':
       return `${team(event.by)} placed ${a(blockerName(event.blocker).toLowerCase())}`
+    // A blocker only leaves the board when it expires.
     case 'blocker_removed':
       return null
     case 'frozen':

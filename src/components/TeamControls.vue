@@ -2,6 +2,8 @@
 import { useIntervalFn, useNow } from '@vueuse/core'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import {
+  blockerFreezeText,
+  blockerName,
   cardLabel,
   challengeProgress,
   clock,
@@ -88,6 +90,17 @@ const task = computed(() => {
   return { challenge, effort, ...challengeProgress(challenge, instance, t.id) }
 })
 
+/** Why the route ends early: it walks onto a blocker, which stops and freezes the team. */
+const stopText = computed(() => {
+  const stop = my.stoppedBy
+  if (!stop) return null
+  const freeze = blockerFreezeText(stop.blocker)
+  const name = blockerName(stop.blocker)
+  return freeze
+    ? `Your walk stops at the ${name}, and you will be frozen for ${freeze}.`
+    : `Your walk stops at the ${name}.`
+})
+
 /** The tile the team stands on. */
 const here = computed(() => (team.value ? game.board?.tiles.get(team.value.position) : undefined))
 
@@ -95,7 +108,8 @@ const usableCount = computed(() => {
   const t = team.value
   if (!t) return 0
   return [...my.items].filter(
-    ([item, n]) => n > 0 && whyNotUsable(t, item, now.value, here.value) === null,
+    ([item, n]) =>
+      n > 0 && whyNotUsable(t, item, now.value, here.value, my.blockersPlaced) === null,
   ).length
 })
 
@@ -425,6 +439,7 @@ async function login() {
         :items="my.items"
         :here="here"
         :now="now"
+        :blockers-placed="my.blockersPlaced"
         :pending="my.pending"
         @use="my.useItem"
         @discard="discard"
@@ -520,7 +535,10 @@ async function login() {
           :value-color="my.stepsLeft === 0 ? 'var(--osrs-green)' : 'var(--osrs-yellow)'"
           :width="150"
         />
-        <TtText v-if="my.stepsLeft > 0" :size="1" color="white" class="max-w-[340px]">
+        <TtText v-if="stopText" :size="1" color="red" class="max-w-[340px]">
+          {{ stopText }} Press Go! to walk it.
+        </TtText>
+        <TtText v-else-if="my.stepsLeft > 0" :size="1" color="white" class="max-w-[340px]">
           Click nodes on the map to walk there, one checkpoint at a time. Yellow squares are one
           step away.
         </TtText>
@@ -584,6 +602,7 @@ async function login() {
         :items="my.items"
         :here="here"
         :now="now"
+        :blockers-placed="my.blockersPlaced"
         :pending="my.pending"
         :locked="step === 'tile'"
         @use="use"
