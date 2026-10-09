@@ -717,6 +717,10 @@ type GuideMarker = {
   saying: string | null
 }
 let guideMarker: GuideMarker | null = null
+/** Where the guide was last drawn, for the camera to follow. */
+let guideAt: LatLng | null = null
+/** Screen pixels from his tile up to the middle of his (larger) body. */
+const GUIDE_LIFT = 48
 
 function ensureGuide(map: LeafletMap, guide: Guide): GuideMarker {
   if (guideMarker) return guideMarker
@@ -755,6 +759,7 @@ function removeGuide() {
   guideMarker?.say?.remove()
   guideMarker?.piece?.dispose()
   guideMarker = null
+  guideAt = null
 }
 
 /** Draws the guide where his script has him, with his overhead line, if any. */
@@ -766,6 +771,7 @@ function drawGuide(map: LeafletMap, time: number) {
   const where = p && placementLatLng(p)
   if (!p || !where) return
   entry.marker.setLatLng(where.at)
+  guideAt = where.at
   if (p.kind === 'walk' && (where.dx !== 0 || where.dy !== 0))
     entry.heading = headingOf(where.dx, where.dy)
   // He faces the way he walks, and turns to the viewer to talk.
@@ -921,8 +927,15 @@ function renderFrame() {
 
   // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
   // moving the view would cut the flight short, and a zoom, which it would make jerk.
-  if (props.follow && props.selected !== null && !flying && !zooming && !glideFrame) {
-    const want = followCentre(map, props.selected, map.getZoom())
+  // The tutorial's guide is followed the same way while he's on the board.
+  if (!flying && !zooming && !glideFrame) {
+    const zoom = map.getZoom()
+    const want =
+      props.guide && guideAt
+        ? centreOn(map, guideAt, GUIDE_LIFT * pieceScale(zoom), zoom)
+        : props.follow && props.selected !== null
+          ? followCentre(map, props.selected, zoom)
+          : null
     if (want) followStep(map, want)
   }
 }
@@ -1016,8 +1029,12 @@ function bodyLift(team: TeamId, zoom: number): number {
  */
 function followCentre(map: LeafletMap, team: TeamId, zoom: number): Point | null {
   const at = placed.get(team)
-  if (!at) return null
-  const want = map.project(at, zoom).subtract(point(0, bodyLift(team, zoom)))
+  return at ? centreOn(map, at, bodyLift(team, zoom), zoom) : null
+}
+
+/** The view centre (pixels at `zoom`) that puts `at`, raised by `lift` pixels, in the middle. */
+function centreOn(map: LeafletMap, at: LatLng, lift: number, zoom: number): Point {
+  const want = map.project(at, zoom).subtract(point(0, lift))
   if (mapBounds) {
     const half = map.getSize().divideBy(2)
     const a = map.project(mapBounds.getNorthWest(), zoom)

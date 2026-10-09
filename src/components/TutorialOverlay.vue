@@ -3,7 +3,7 @@ import { useEventListener, useRafFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import CharacterPreview from '@/components/CharacterPreview.vue'
 import { HEADING } from '@/characters/heading'
-import { useTutorialStore } from '@/stores/tutorial'
+import { TO_BLACK_MS, useTutorialStore } from '@/stores/tutorial'
 import { GUIDE } from '@/tutorial/guide'
 import { GESTURE } from '@/tutorial/script'
 import { TtButton, TtText } from '@/ui/tt'
@@ -54,25 +54,33 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 <template>
   <div class="tutorial fixed inset-0 z-[3000] select-none">
     <!-- Title card -->
+    <!-- The page fades to black, then the title card fades in from it. -->
     <div
       v-if="tutorial.phase === 'title'"
-      class="flex size-full flex-col items-center justify-center gap-4 bg-black px-4 text-center"
+      class="title-cover size-full bg-black"
+      :style="{ '--to-black': `${TO_BLACK_MS}ms` }"
     >
-      <CharacterPreview
-        :npc="GUIDE.npc"
-        :anim="GESTURE.wave"
-        :heading="HEADING.south"
-        :width="60"
-        :height="80"
-        :scale="2"
-      />
-      <TtText as="h2" :size="4" font="quill" color="orange" glow>How to play</TtText>
-      <TtText :size="1" color="white">
-        A short tour of the board with {{ GUIDE.name }}. About two minutes, with sound.
-      </TtText>
-      <div class="flex items-center gap-4">
-        <TtButton @click="tutorial.begin()">Begin</TtButton>
-        <button type="button" class="tt-link tt-1" @click="tutorial.finish()">Skip the tour</button>
+      <div
+        class="title-card flex size-full flex-col items-center justify-center gap-4 px-4 text-center"
+      >
+        <CharacterPreview
+          :npc="GUIDE.npc"
+          :anim="GESTURE.wave"
+          :heading="HEADING.south"
+          :width="60"
+          :height="80"
+          :scale="2"
+        />
+        <TtText as="h2" :size="4" font="quill" color="orange" glow>How to play</TtText>
+        <TtText :size="1" color="white">
+          A short tour of the board with {{ GUIDE.name }}. About two minutes, with sound.
+        </TtText>
+        <div class="flex items-center gap-4">
+          <TtButton @click="tutorial.begin()">Begin</TtButton>
+          <button type="button" class="tt-link tt-1" @click="tutorial.finish()">
+            Skip the tour
+          </button>
+        </div>
       </div>
     </div>
 
@@ -111,22 +119,21 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
             :heading="HEADING.south"
             :width="44"
             :height="56"
-            :scale="2"
+            :scale="3"
           />
         </div>
-        <div class="flex min-w-0 flex-1 flex-col gap-1">
+        <div class="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
           <TtText :size="1" font="bold" color="orange">{{ GUIDE.name }}</TtText>
           <p class="tt-1 min-h-[3lh] text-white" aria-live="polite">{{ shownText }}</p>
-          <div class="mt-auto flex items-center justify-between gap-2">
+          <div class="relative mt-auto flex w-full items-center justify-center">
             <button
               v-if="!tutorial.isFirst"
               type="button"
-              class="tt-link tt-1"
+              class="tt-link tt-1 absolute left-0"
               @click.stop="tutorial.back()"
             >
               ← Back
             </button>
-            <span v-else />
             <TtText :size="1" color="cyan" :class="{ invisible: typing }">
               {{ tutorial.isLast ? 'Click to finish' : 'Click to continue' }}
             </TtText>
@@ -141,11 +148,25 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 .chatbox {
   cursor: pointer;
 }
-/* Head and shoulders, like an OSRS chathead. */
+/* Head and shoulders, like an OSRS chathead: the top of a 3× preview, nudged down in its box. */
 .chathead {
-  width: 88px;
-  height: 64px;
+  width: 112px;
+  height: 104px;
   overflow: hidden;
+}
+.chathead > :deep(canvas) {
+  margin: 12px 0 0 -10px;
+}
+.title-cover {
+  animation: fade-in var(--to-black) ease both;
+}
+.title-card {
+  animation: fade-in 0.9s ease var(--to-black) both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
 }
 .letterbox-top-enter-active,
 .letterbox-bottom-enter-active {

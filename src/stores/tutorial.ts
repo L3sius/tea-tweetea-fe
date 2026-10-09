@@ -20,6 +20,8 @@ const VERSION = '1'
 const SAY_MS = 2600
 /** Assumed for a gesture whose length hasn't loaded. */
 const GESTURE_MS = 2000
+/** How long the page takes to fade to black before the title card (see TutorialOverlay). */
+export const TO_BLACK_MS = 700
 
 /** A camera move for the map to make; a new id each time, so the same move can repeat. */
 export type CameraMove = { id: number; to: 'all' | TileId; zoom?: number; ms: number }
@@ -202,7 +204,13 @@ export const useTutorialStore = defineStore('tutorial', () => {
     else if (beat.value > 0) enterBeat(beat.value - 1)
   }
 
-  /** Opens the title card; the tour itself waits for a click, which also lets the music start. */
+  let musicTimer: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * Fades the page to black and opens the title card, with the music starting as it appears.
+   * Browsers only play sound after a click: from "How to play" it starts here, while a first visit
+   * opens by itself and has to wait for "Begin".
+   */
   function start() {
     flush('line')
     flush('beat')
@@ -211,16 +219,20 @@ export const useTutorialStore = defineStore('tutorial', () => {
     place(game.board ? startTile(game.board) : null)
     void loadAnimationInfo()
     phase.value = 'title'
+    clearTimeout(musicTimer)
+    musicTimer = setTimeout(() => music.play(music.NEWBIE_MELODY), TO_BLACK_MS)
   }
 
   function begin() {
-    music.play(music.NEWBIE_MELODY)
+    clearTimeout(musicTimer)
+    if (!music.isPlaying()) music.play(music.NEWBIE_MELODY)
     phase.value = 'playing'
     enterBeat(0)
   }
 
   /** Ends the tour, at the end or by skipping; either way it won't open by itself again. */
   function finish() {
+    clearTimeout(musicTimer)
     flush('line')
     flush('beat')
     music.stop()

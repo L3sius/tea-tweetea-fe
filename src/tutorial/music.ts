@@ -44,6 +44,11 @@ function fade(to: number, done?: () => void) {
   fading = requestAnimationFrame(step)
 }
 
+/** Whether a track is playing (a start the browser refused isn't). */
+export function isPlaying(): boolean {
+  return audio !== null && !audio.paused
+}
+
 /** Starts a track, looping, faded in. */
 export function play(track: string) {
   stop(true)

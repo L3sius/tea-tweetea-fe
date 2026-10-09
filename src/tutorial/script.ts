@@ -67,8 +67,9 @@ export const TUTORIAL: Beat[] = [
   {
     id: 'welcome',
     cues: [
-      // Close on him in the dark, before anything else is there.
+      // Close on him, with the map fading in behind him.
       at(0, { kind: 'camera', to: 'guide', zoom: 1.5, ms: 0 }),
+      at(0, { kind: 'reveal', what: ['terrain'] }),
       at(2500, { kind: 'say', text: '*sips tea*' }),
     ],
     lines: [
@@ -86,7 +87,6 @@ export const TUTORIAL: Beat[] = [
   {
     id: 'map',
     cues: [
-      at(0, { kind: 'reveal', what: ['terrain'] }),
       at(1800, { kind: 'camera', to: 'all', ms: 3500 }),
       at(3200, { kind: 'say', text: 'Ooh, look at that.' }),
       at(7000, { kind: 'camera', to: 'guide', zoom: 0.5, ms: 3000 }),
