@@ -77,4 +77,18 @@ A team's piece can be any OSRS NPC built like a player instead of a bird.
 - `/characters` tries looks on any NPC. A team logged in with its code saves its own look there (the
   `set_appearance` team action); the server keeps it on the team and every board picks it up.
 
+### Tutorial
+
+A first visit opens a guided tour of the board (and "How to play" replays it): Earl Grey talks the
+player through it while the page builds itself up part by part.
+
+- `src/tutorial/script.ts` holds the lines, gestures, camera moves and what each beat reveals.
+- The tour plays on its own frozen world (`src/tutorial/world/`: a copy of the board and of the
+  sample game), so it looks the same whatever the live map and game become. Earl Grey's routes are
+  tiles of that board, checked by `script.spec.ts`.
+- `stores/tutorial.ts` plays it; parts of the page are named with `v-tutorial="'panel'"`, and the
+  map's layers with BoardMap's `layers` prop, so the script never depends on particular markup.
+- Whether a browser has seen it is kept in `localStorage` (`tweetea.tutorial`); bump `VERSION` in
+  the store to show a reworked tour to everyone once.
+
 The game rules are in the rulebook; the API reference is `docs/api.md` in the backend repository.

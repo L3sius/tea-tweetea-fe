@@ -1,0 +1,1801 @@
+{
+  "seq": 1346,
+  "server_time": "2026-10-09T13:17:54.260618300Z",
+  "phase": "running",
+  "teams": [
+    {
+      "id": 0,
+      "name": "Varrock Sewer Rats",
+      "members": [
+        {
+          "name": "Sewer Sam",
+          "accounts": ["Sewer Sam", "Sewer Sam II"]
+        },
+        {
+          "name": "Rat Catcher",
+          "accounts": ["Rat Catcher"]
+        },
+        {
+          "name": "Bucket Bob",
+          "accounts": ["Bucket Bob"]
+        }
+      ],
+      "position": 378,
+      "status": {
+        "status": "working",
+        "instance": 114
+      },
+      "frozen_until": null,
+      "shield_until": "2026-10-08T17:15:08.644126500Z",
+      "match_id": null,
+      "gems": [],
+      "gold": 144,
+      "effects": {
+        "multiplier": 1,
+        "halved": false,
+        "suit_gold": null,
+        "item_used_here": false
+      },
+      "tiles_completed": 18,
+      "version": 80,
+      "appearance": {
+        "npc": 3106,
+        "idle": 808,
+        "walk": 819,
+        "run": 824,
+        "swim": 772
+      }
+    },
+    {
+      "id": 1,
+      "name": "Gnome Child Gang",
+      "members": [
+        {
+          "name": "Gnome Kid",
+          "accounts": ["Gnome Kid", "Gnome Kid 2"]
+        },
+        {
+          "name": "Tree Gnome",
+          "accounts": ["Tree Gnome"]
+        },
+        {
+          "name": "Glough Fan",
+          "accounts": ["Glough Fan"]
+        }
+      ],
+      "position": 378,
+      "status": {
+        "status": "working",
+        "instance": 108
+      },
+      "frozen_until": null,
+      "shield_until": "2026-10-08T16:55:08.644126500Z",
+      "match_id": null,
+      "gems": ["blue", "green", "orange", "white"],
+      "gold": 413,
+      "effects": {
+        "multiplier": 1,
+        "halved": false,
+        "suit_gold": null,
+        "item_used_here": false
+      },
+      "tiles_completed": 21,
+      "version": 90,
+      "appearance": {
+        "npc": 3111,
+        "idle": 808,
+        "walk": 1306,
+        "run": 2251,
+        "swim": 3415
+      }
+    },
+    {
+      "id": 2,
+      "name": "Zulrah Scale Farmers",
+      "members": [
+        {
+          "name": "Scale Daddy",
+          "accounts": ["Scale Daddy", "Scale Mommy"]
+        },
+        {
+          "name": "Venom Vic",
+          "accounts": ["Venom Vic"]
+        },
+        {
+          "name": "Snakeling",
+          "accounts": ["Snakeling"]
+        }
+      ],
+      "position": 250,
+      "status": {
+        "status": "working",
+        "instance": 119
+      },
+      "frozen_until": "2026-10-09T13:25:08.644126500Z",
+      "shield_until": null,
+      "match_id": null,
+      "gems": ["yellow", "orange"],
+      "gold": 213,
+      "effects": {
+        "multiplier": 1,
+        "halved": false,
+        "suit_gold": null,
+        "item_used_here": false
+      },
+      "tiles_completed": 24,
+      "version": 94,
+      "appearance": {
+        "npc": 732,
+        "idle": 808,
+        "walk": 844,
+        "run": 868,
+        "swim": 772
+      }
+    },
+    {
+      "id": 3,
+      "name": "Draynor Bank Mob",
+      "members": [
+        {
+          "name": "Bank Stander",
+          "accounts": ["Bank Stander", "Bank Sitter"]
+        },
+        {
+          "name": "Wizard Ned",
+          "accounts": ["Wizard Ned"]
+        },
+        {
+          "name": "Morgan Fan",
+          "accounts": ["Morgan Fan"]
+        }
+      ],
+      "position": 166,
+      "status": {
+        "status": "working",
+        "instance": 118
+      },
+      "frozen_until": null,
+      "shield_until": null,
+      "match_id": null,
+      "gems": [],
+      "gold": 12,
+      "effects": {
+        "multiplier": 1,
+        "halved": false,
+        "suit_gold": null,
+        "item_used_here": false
+      },
+      "tiles_completed": 24,
+      "version": 104,
+      "appearance": {
+        "npc": 397,
+        "idle": 808,
+        "walk": 819,
+        "run": 3854,
+        "swim": 3418
+      }
+    }
+  ],
+  "tiles": [
+    "any-drop-1m",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "sire-50",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "malediction-ward",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "sire-50",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "sire-50",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "fight-caves-26m",
+    "malediction-ward",
+    "sire-50",
+    "malediction-ward",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "fight-caves-26m",
+    "sire-50",
+    "malediction-ward",
+    "malediction-ward",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "sire-50",
+    "dagannoth-task",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "sire-50",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "sire-50",
+    "any-drop-1m",
+    "malediction-ward",
+    "sire-50",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "malediction-ward",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "dagannoth-task",
+    "malediction-ward",
+    "sire-50",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "sire-50",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "malediction-ward",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "malediction-ward",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "malediction-ward",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "sire-50",
+    "dagannoth-task",
+    "sire-50",
+    "malediction-ward",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "sire-50",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "malediction-ward",
+    "any-drop-1m",
+    "malediction-ward",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "sire-50",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "any-drop-1m",
+    "sire-50",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "sire-50",
+    "dagannoth-task",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "malediction-ward",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "sire-50",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "sire-50",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "any-drop-1m",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "malediction-ward",
+    "any-drop-1m",
+    "sire-50",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "sire-50",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "malediction-ward",
+    "malediction-ward",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "any-drop-1m",
+    "sire-50",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "malediction-ward",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "malediction-ward",
+    "fight-caves-26m",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "malediction-ward",
+    "sire-50",
+    "fight-caves-26m",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "fight-caves-26m",
+    "malediction-ward",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "kq-dragon-pickaxe",
+    "malediction-ward",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "sire-50",
+    "any-drop-1m",
+    "sire-50",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "malediction-ward",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "sire-50",
+    "malediction-ward",
+    "fight-caves-26m",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "malediction-ward",
+    "dagannoth-task",
+    "sire-50",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "ca-noxious-foe",
+    "sire-50",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "malediction-ward",
+    "dagannoth-task",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "sire-50",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "kq-dragon-pickaxe",
+    "dagannoth-task",
+    "any-drop-1m",
+    "sire-50",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "sire-50",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "sire-50",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "malediction-ward",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "sire-50",
+    "dagannoth-task",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "dagannoth-task",
+    "malediction-ward",
+    "sire-50",
+    "elite-clue-150k-200k",
+    "fight-caves-26m",
+    "sire-50",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "sire-50",
+    "dagannoth-task",
+    "ca-noxious-foe",
+    "fight-caves-26m",
+    "kq-dragon-pickaxe",
+    "any-drop-1m",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "any-drop-1m",
+    "kq-dragon-pickaxe",
+    "dagannoth-task",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "sire-50",
+    "ca-noxious-foe",
+    "fight-caves-26m",
+    "sire-50",
+    "fight-caves-26m",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "dagannoth-task",
+    "any-drop-1m",
+    "elite-clue-150k-200k",
+    "kq-dragon-pickaxe",
+    "kq-dragon-pickaxe",
+    "fight-caves-26m",
+    "malediction-ward",
+    "elite-clue-150k-200k",
+    "dagannoth-task",
+    "sire-50",
+    "ca-noxious-foe",
+    "any-drop-1m",
+    "dagannoth-task",
+    "fight-caves-26m",
+    "any-drop-1m",
+    "sire-50",
+    "malediction-ward",
+    "kq-dragon-pickaxe",
+    "ca-noxious-foe",
+    "elite-clue-150k-200k",
+    "malediction-ward",
+    "ca-noxious-foe",
+    "dagannoth-task"
+  ],
+  "gems": [2, 35, 92, 63, 195, 144, 70, 79],
+  "blockers": {
+    "199": {
+      "item": "banana",
+      "owner": 0,
+      "until": "2026-10-09T16:15:08.644126500Z"
+    },
+    "250": {
+      "item": "banana",
+      "owner": 0,
+      "until": "2026-10-10T07:55:08.644126500Z"
+    },
+    "382": {
+      "item": "banana",
+      "owner": 1,
+      "until": "2026-10-10T06:35:08.644126500Z"
+    },
+    "433": {
+      "item": "banana",
+      "owner": 3,
+      "until": "2026-10-09T22:15:08.644126500Z"
+    }
+  },
+  "shops": {
+    "56": [
+      "silver_feather",
+      "harpie_bug_swarm",
+      "wilderness_web",
+      "ice_barrage",
+      "saturated_heart",
+      "diamond_necklace"
+    ],
+    "80": [
+      "snake_charmer",
+      "entangle",
+      "sapphire_necklace",
+      "dragon_necklace",
+      "zenyte_necklace",
+      "diamond_necklace"
+    ],
+    "98": [
+      "morrigans_throwing_axe",
+      "banana",
+      "harpie_bug_swarm",
+      "ice_barrage",
+      "entangle",
+      "onyx_necklace"
+    ],
+    "126": [
+      "quetzal_whistle",
+      "entangle",
+      "protect_from_magic",
+      "saturated_heart",
+      "onyx_necklace",
+      "topaz_necklace"
+    ],
+    "168": [
+      "bronze_feather",
+      "gold_feather",
+      "group_teleport",
+      "ice_barrage",
+      "protect_from_magic",
+      "ruby_necklace"
+    ],
+    "237": [
+      "morrigans_throwing_axe",
+      "ogre_boat",
+      "group_teleport",
+      "emerald_necklace",
+      "topaz_necklace",
+      "diamond_necklace"
+    ],
+    "307": [
+      "gold_feather",
+      "quetzal_whistle",
+      "snake_charmer",
+      "entangle",
+      "leprechaun_hat",
+      "dragon_necklace"
+    ]
+  },
+  "instances": {
+    "8": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-06T14:55:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 7
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 3
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        },
+        "1": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 3
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 6
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "18": {
+      "challenge": "sire-50",
+      "started": "2026-10-06T21:15:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 17
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 24
+          },
+          "done": 24,
+          "target": 50,
+          "effort": 24
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 56
+          },
+          "done": 50,
+          "target": 50,
+          "effort": 56
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 40
+          },
+          "done": 40,
+          "target": 50,
+          "effort": 40
+        }
+      },
+      "done": [2]
+    },
+    "22": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-06T22:15:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 21
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        },
+        "1": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 4
+        },
+        "2": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        },
+        "3": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "26": {
+      "challenge": "sire-50",
+      "started": "2026-10-06T23:35:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 25
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 24
+          },
+          "done": 24,
+          "target": 50,
+          "effort": 24
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 40
+          },
+          "done": 40,
+          "target": 50,
+          "effort": 40
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "32": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-07T02:35:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 31
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "3": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 4
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "41": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-07T10:35:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 40
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 5
+        },
+        "1": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 5
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 7
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "46": {
+      "challenge": "sire-50",
+      "started": "2026-10-07T13:15:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 45
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "53": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-07T18:55:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 52
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 4
+        },
+        "1": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 6
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 6
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 4
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "63": {
+      "challenge": "sire-50",
+      "started": "2026-10-08T01:55:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 62
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 24
+          },
+          "done": 24,
+          "target": 50,
+          "effort": 24
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "66": {
+      "challenge": "sire-50",
+      "started": "2026-10-08T02:55:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 65
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 24
+          },
+          "done": 24,
+          "target": 50,
+          "effort": 24
+        },
+        "1": {
+          "counts": {
+            "Abyssal Sire": 32
+          },
+          "done": 32,
+          "target": 50,
+          "effort": 32
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 48
+          },
+          "done": 48,
+          "target": 50,
+          "effort": 48
+        },
+        "3": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "79": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-08T12:35:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 78
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        },
+        "1": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "3": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 1
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "93": {
+      "challenge": "any-drop-1m",
+      "started": "2026-10-08T23:35:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 92
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "value": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "1": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 2
+        },
+        "2": {
+          "counts": {
+            "value": 2
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        },
+        "3": {
+          "counts": {
+            "value": 3
+          },
+          "done": 1,
+          "target": 1,
+          "effort": 3
+        }
+      },
+      "done": [0, 1, 2, 3]
+    },
+    "108": {
+      "challenge": "sire-50",
+      "started": "2026-10-09T06:55:08.644126500Z",
+      "scope": {
+        "scope": "tile",
+        "team": 1,
+        "tile": 378
+      },
+      "progress": {
+        "1": {
+          "counts": {
+            "Abyssal Sire": 32
+          },
+          "done": 32,
+          "target": 50,
+          "effort": 32
+        }
+      },
+      "done": []
+    },
+    "112": {
+      "challenge": "dagannoth-task",
+      "started": "2026-10-09T10:55:08.644126500Z",
+      "scope": {
+        "scope": "match",
+        "id": 111
+      },
+      "progress": {
+        "0": {
+          "counts": {},
+          "done": 0,
+          "target": 1,
+          "effort": null
+        },
+        "1": {
+          "counts": {
+            "Dagannoth": 1
+          },
+          "done": 1,
+          "target": 1,
+          "effort": null
+        }
+      },
+      "done": [1]
+    },
+    "114": {
+      "challenge": "sire-50",
+      "started": "2026-10-09T11:15:08.644126500Z",
+      "scope": {
+        "scope": "tile",
+        "team": 0,
+        "tile": 378
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        }
+      },
+      "done": []
+    },
+    "116": {
+      "challenge": "sire-50",
+      "started": "2026-10-09T11:55:08.644126500Z",
+      "scope": {
+        "scope": "minigame",
+        "id": 115
+      },
+      "progress": {
+        "0": {
+          "counts": {
+            "Abyssal Sire": 16
+          },
+          "done": 16,
+          "target": 50,
+          "effort": 16
+        },
+        "1": {
+          "counts": {},
+          "done": 0,
+          "target": 50,
+          "effort": null
+        },
+        "2": {
+          "counts": {
+            "Abyssal Sire": 8
+          },
+          "done": 8,
+          "target": 50,
+          "effort": 8
+        },
+        "3": {
+          "counts": {},
+          "done": 0,
+          "target": 50,
+          "effort": null
+        }
+      },
+      "done": []
+    },
+    "118": {
+      "challenge": "sire-50",
+      "started": "2026-10-09T11:55:08.644126500Z",
+      "scope": {
+        "scope": "tile",
+        "team": 3,
+        "tile": 166
+      },
+      "progress": {
+        "3": {
+          "counts": {},
+          "done": 0,
+          "target": 50,
+          "effort": null
+        }
+      },
+      "done": []
+    },
+    "119": {
+      "challenge": "kq-dragon-pickaxe",
+      "started": "2026-10-09T12:55:08.644126500Z",
+      "scope": {
+        "scope": "tile",
+        "team": 2,
+        "tile": 250
+      },
+      "progress": {
+        "2": {
+          "counts": {},
+          "done": 0,
+          "target": 1,
+          "effort": null
+        }
+      },
+      "done": []
+    }
+  },
+  "minigames": {
+    "7": {
+      "id": 7,
+      "instance": 8,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 1,
+      "deadline": "2026-10-06T20:55:08.644126500Z",
+      "finished": [1, 0, 2, 3],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 5
+        },
+        {
+          "team": 3,
+          "gold": 3
+        }
+      ]
+    },
+    "17": {
+      "id": 17,
+      "instance": 18,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 0,
+      "deadline": "2026-10-07T01:15:08.644126500Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 32
+        },
+        {
+          "team": 1,
+          "gold": 24
+        },
+        {
+          "team": 2,
+          "gold": 50
+        },
+        {
+          "team": 3,
+          "gold": 40
+        }
+      ]
+    },
+    "21": {
+      "id": 21,
+      "instance": 22,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 3,
+      "deadline": "2026-10-07T04:15:08.644126500Z",
+      "finished": [2, 1, 3, 0],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 3
+        },
+        {
+          "team": 1,
+          "gold": 10
+        },
+        {
+          "team": 2,
+          "gold": 20
+        },
+        {
+          "team": 3,
+          "gold": 10
+        }
+      ]
+    },
+    "25": {
+      "id": 25,
+      "instance": 26,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 3,
+      "deadline": "2026-10-07T03:35:08.644126500Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 24
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 48
+        },
+        {
+          "team": 3,
+          "gold": 32
+        }
+      ]
+    },
+    "31": {
+      "id": 31,
+      "instance": 32,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 3,
+      "deadline": "2026-10-07T08:35:08.644126500Z",
+      "finished": [3, 0, 1, 2],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 5
+        },
+        {
+          "team": 2,
+          "gold": 3
+        },
+        {
+          "team": 3,
+          "gold": 40
+        }
+      ]
+    },
+    "40": {
+      "id": 40,
+      "instance": 41,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 1,
+      "deadline": "2026-10-07T16:35:08.644126500Z",
+      "finished": [1, 0, 2, 3],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 5
+        },
+        {
+          "team": 3,
+          "gold": 3
+        }
+      ]
+    },
+    "45": {
+      "id": 45,
+      "instance": 46,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 1,
+      "deadline": "2026-10-07T17:15:08.644126500Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 16
+        },
+        {
+          "team": 1,
+          "gold": 96
+        },
+        {
+          "team": 2,
+          "gold": 16
+        },
+        {
+          "team": 3,
+          "gold": 16
+        }
+      ]
+    },
+    "52": {
+      "id": 52,
+      "instance": 53,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 1,
+      "deadline": "2026-10-08T00:55:08.644126500Z",
+      "finished": [2, 0, 1, 3],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 10
+        },
+        {
+          "team": 2,
+          "gold": 20
+        },
+        {
+          "team": 3,
+          "gold": 3
+        }
+      ]
+    },
+    "62": {
+      "id": 62,
+      "instance": 63,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 0,
+      "deadline": "2026-10-08T05:55:08.644126500Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 32
+        },
+        {
+          "team": 1,
+          "gold": 24
+        },
+        {
+          "team": 2,
+          "gold": 48
+        },
+        {
+          "team": 3,
+          "gold": 16
+        }
+      ]
+    },
+    "65": {
+      "id": 65,
+      "instance": 66,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 1,
+      "deadline": "2026-10-08T06:55:08.644126500Z",
+      "finished": [],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 24
+        },
+        {
+          "team": 1,
+          "gold": 64
+        },
+        {
+          "team": 2,
+          "gold": 48
+        },
+        {
+          "team": 3,
+          "gold": 16
+        }
+      ]
+    },
+    "78": {
+      "id": 78,
+      "instance": 79,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 1,
+      "deadline": "2026-10-08T18:35:08.644126500Z",
+      "finished": [1, 0, 2, 3],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 10
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 5
+        },
+        {
+          "team": 3,
+          "gold": 3
+        }
+      ]
+    },
+    "92": {
+      "id": 92,
+      "instance": 93,
+      "scoring": {
+        "type": "race",
+        "payouts": [20, 10, 5, 3]
+      },
+      "initiator": 1,
+      "deadline": "2026-10-09T05:35:08.644126500Z",
+      "finished": [1, 3, 2, 0],
+      "gold": [
+        {
+          "team": 0,
+          "gold": 3
+        },
+        {
+          "team": 1,
+          "gold": 40
+        },
+        {
+          "team": 2,
+          "gold": 5
+        },
+        {
+          "team": 3,
+          "gold": 10
+        }
+      ]
+    },
+    "115": {
+      "id": 115,
+      "instance": 116,
+      "scoring": {
+        "type": "contribution",
+        "cap": 50,
+        "gold_per_unit": 1
+      },
+      "initiator": 2,
+      "deadline": "2026-10-09T15:55:08.644126500Z",
+      "finished": [],
+      "gold": null
+    }
+  },
+  "matches": {
+    "111": {
+      "id": 111,
+      "instance": 112,
+      "mover": 0,
+      "defender": 1,
+      "deadline": "2026-10-09T14:55:08.644126500Z",
+      "outcome": {
+        "outcome": "won",
+        "winner": 1,
+        "stolen": "orange"
+      }
+    }
+  }
+}

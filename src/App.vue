@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import { RouterView } from 'vue-router'
+import { useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
+import TutorialOverlay from '@/components/TutorialOverlay.vue'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
+import { useTutorialStore } from '@/stores/tutorial'
+import { vTutorial } from '@/tutorial/directive'
 import { useFrontendUpdates } from '@/ui/frontendUpdates'
 import { TtButton, TtText } from '@/ui/tt'
 
@@ -12,6 +16,19 @@ const game = useGameStore()
 const team = useTeamStore()
 const { error, newBuildAvailable } = storeToRefs(game)
 const frontendUpdated = useFrontendUpdates()
+const tutorial = useTutorialStore()
+const router = useRouter()
+
+// A first visit opens the tutorial on the board, once the board has loaded.
+watch(
+  () => game.board,
+  async (board) => {
+    if (!board || tutorial.seen || tutorial.active) return
+    await router.push('/')
+    tutorial.start()
+  },
+  { immediate: true },
+)
 
 // The game streams for as long as the app is open, whichever page is showing.
 onMounted(() => {
@@ -25,7 +42,7 @@ const reload = () => window.location.reload()
 
 <template>
   <div class="flex h-dvh flex-col gap-1.5 overflow-hidden p-1.5">
-    <AppHeader />
+    <AppHeader v-tutorial="'header'" />
     <div
       v-if="newBuildAvailable || frontendUpdated"
       class="tt-sprite-display z-[1100] flex flex-wrap items-center justify-center gap-3 px-3"
@@ -47,5 +64,6 @@ const reload = () => window.location.reload()
     <main class="relative min-h-0 flex-1">
       <RouterView />
     </main>
+    <TutorialOverlay v-if="tutorial.cover !== 'off'" />
   </div>
 </template>

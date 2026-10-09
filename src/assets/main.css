@@ -205,3 +205,16 @@ select {
   transform: translate(var(--shadow-right, 3px), var(--shadow-bottom, 4px));
   clip-path: inset(0 var(--shadow-right, 3px) var(--shadow-bottom, 4px) 0);
 }
+
+/* Parts of the page the tutorial hasn't revealed yet (see src/tutorial/directive.ts). */
+.tutorial-hidden {
+  display: none !important;
+}
+.tutorial-reveal {
+  animation: tutorial-reveal 0.9s ease both;
+}
+@keyframes tutorial-reveal {
+  from {
+    opacity: 0;
+  }
+}

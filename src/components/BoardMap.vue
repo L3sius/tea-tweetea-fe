@@ -15,6 +15,7 @@ import {
   point,
   polyline,
   tooltip,
+  type ImageOverlay,
   type LatLng,
   type LatLngBounds,
   type LeafletMouseEvent,
@@ -38,13 +39,15 @@ import type { Blocker, Card, GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import type { Choreography, Cue, Placement } from '@/domain/motion'
 import type { Replay } from '@/domain/replay'
-import { nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
+import { adjacency, nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
 import { perform, ticksToMs } from '@/characters/acting'
 import { PASS_QUOTE, chatStyle, idleQuote, quoteMs, type Quote } from '@/characters/quotes'
 import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
 import { HEADING, headingOf } from '@/characters/heading'
 import type { Appearance } from '@/characters/roster'
 import type * as Stage from '@/characters/stage'
+import type { Guide } from '@/stores/tutorial'
+import type { BoardLayer, RevealName } from '@/tutorial/script'
 import { characterElement, spriteElement } from '@/map/sprite'
 import { itemEntry } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
@@ -84,6 +87,12 @@ const props = defineProps<{
   devQuote?: Quote | null
   /** How a team's piece looks as an OSRS character, or null to draw it as a bird. */
   appearanceOf: (team: TeamId) => Appearance | null
+  /** The parts of the board to draw (the tutorial builds it up); every part when not given. */
+  layers?: ReadonlySet<RevealName> | null
+  /** The tutorial's guide, walking the board. */
+  guide?: Guide | null
+  /** A tile whose task card shows as if hovered (the tutorial points at one). */
+  inspect?: TileId | null
 }>()
 
 const emit = defineEmits<{
@@ -102,6 +111,12 @@ let mapBounds: LatLngBounds | null = null
 let frame = 0
 
 const pieces = layerGroup()
+const gemLayer = layerGroup()
+const roadLayer = layerGroup()
+const nodeLayer = layerGroup()
+const shopLayer = layerGroup()
+let terrain: ImageOverlay | null = null
+let resizing: ResizeObserver | null = null
 const reachLayer = layerGroup()
 const routeLayer = layerGroup()
 const cueLayer = layerGroup()
@@ -111,6 +126,8 @@ type TeamMarker = {
   pose: string
   /** The NPC the team plays as, or null for a bird. */
   npc: number | null
+  /** What the piece was drawn as (character, name, colour); a change redraws it. */
+  look: string
   /** Draws the character, once three.js has loaded. */
   piece: Stage.CharacterPiece | null
 }
@@ -218,15 +235,14 @@ function drawScene(tile: Tile) {
   )
 }
 
-function drawBoard(map: LeafletMap) {
+function drawBoard() {
   // Roads: a black outline under a parchment line, as on the event site's board.
   const roads = props.board.roads.flatMap(([a, b]) => {
     const from = tileLatLng(a)
     const to = tileLatLng(b)
     return from && to ? [[from, to]] : []
   })
-  polyline(roads, { color: '#000', weight: 5.5, opacity: 0.85, interactive: false }).addTo(map)
-  polyline(roads, { color: '#c8b98a', weight: 2.5, opacity: 0.95, interactive: false }).addTo(map)
+  roadLines(roads).forEach((line) => line.addTo(roadLayer))
   for (const tile of props.board.tiles.values()) {
     const at = tileLatLng(tile.id)
     if (!at) continue
@@ -238,23 +254,138 @@ function drawBoard(map: LeafletMap) {
           iconSize: [34, 34],
         }),
         interactive: false,
-      }).addTo(map)
+      }).addTo(shopLayer)
       continue
     }
-    circleMarker(at, {
-      radius: tile.kind === 'red' ? 8 : 6,
-      color: '#000',
-      weight: 1.5,
-      fillColor: TILE_COLORS[tile.kind],
-      fillOpacity: 1,
-      interactive: false,
-    }).addTo(map)
+    nodeDot(tile, at).addTo(nodeLayer)
   }
+  applyLayers()
+}
+
+/** Roads: a black outline under a parchment line, as on the event site's board. */
+const roadLines = (roads: LatLng[][]) => [
+  polyline(roads, { color: '#000', weight: 5.5, opacity: 0.85, interactive: false }),
+  polyline(roads, { color: '#c8b98a', weight: 2.5, opacity: 0.95, interactive: false }),
+]
+
+const nodeDot = (tile: Tile, at: LatLng) =>
+  circleMarker(at, {
+    radius: tile.kind === 'red' ? 8 : 6,
+    color: '#000',
+    weight: 1.5,
+    fillColor: TILE_COLORS[tile.kind],
+    fillOpacity: 1,
+    interactive: false,
+  })
+
+// --- Building the board up, for the tutorial ---
+
+const shown = (layer: BoardLayer) => !props.layers || props.layers.has(layer)
+
+/** Roads and nodes spreading out from the guide; replaced by the whole board once it's done. */
+const spreadRoads = layerGroup()
+const spreadNodes = layerGroup()
+let spreadFrame = 0
+const SPREAD_MS = 2600
+
+/**
+ * Shows the parts of the board in `layers`. Canvas layers draw in the order they join the map, so
+ * the roads, nodes and walk highlights go back on in that order whenever one comes or goes.
+ */
+function applyLayers() {
+  const map = leaflet
+  if (!map) return
+  // The map fades in, and goes at once: the tutorial hides it under black.
+  const image = terrain?.getElement()
+  if (image) image.style.transition = shown('terrain') ? '' : 'none'
+  terrain?.setOpacity(shown('terrain') ? 1 : 0)
+  for (const layer of [roadLayer, nodeLayer, reachLayer, routeLayer]) layer.remove()
+  if (shown('roads') && !spreadFrame) roadLayer.addTo(map)
+  if (shown('nodes') && !spreadFrame) nodeLayer.addTo(map)
+  reachLayer.addTo(map)
+  routeLayer.addTo(map)
+  // Pieces the tutorial brings in fade in, rather than appearing at once.
+  if (props.layers && shown('gems') && !map.hasLayer(gemLayer)) fadeIn('fade-gems')
+  if (props.layers && shown('landmarks') && !map.hasLayer(shopLayer)) fadeIn('fade-landmarks')
+  for (const [layer, on] of [
+    [gemLayer, shown('gems')],
+    [shopLayer, shown('landmarks')],
+    [pieces, shown('landmarks')],
+  ] as const) {
+    if (on) layer.addTo(map)
+    else layer.remove()
+  }
+  map.getContainer().classList.toggle('hide-teams', !shown('teams'))
+  // During the tutorial only the card it points at shows (see .board-map.in-tour below).
+  map.getContainer().classList.toggle('in-tour', !!props.layers)
+}
+
+/** Marks the map with `name` for a moment, so pieces added now play their entrance (see CSS). */
+function fadeIn(name: string) {
+  const el = leaflet?.getContainer()
+  if (!el) return
+  el.classList.add(name)
+  setTimeout(() => el.classList.remove(name), GEM_FADE_MS)
+}
+const GEM_FADE_MS = 1600
+
+/** Draws the roads and nodes ring by ring outwards from `origin`, then the whole board. */
+function spreadFrom(origin: TileId) {
+  const map = leaflet
+  if (!map) return
+  cancelAnimationFrame(spreadFrame)
+  const roads = adjacency(props.board.roads)
+  const depth = new Map<TileId, number>([[origin, 0]])
+  const queue = [origin]
+  for (let at = queue.shift(); at !== undefined; at = queue.shift()) {
+    for (const next of roads.get(at) ?? []) {
+      if (depth.has(next)) continue
+      depth.set(next, (depth.get(at) ?? 0) + 1)
+      queue.push(next)
+    }
+  }
+  const deepest = Math.max(1, ...depth.values())
+  spreadRoads.clearLayers().addTo(map)
+  spreadNodes.clearLayers().addTo(map)
+  let drawn = -1
+  const start = performance.now()
+  const step = (now: number) => {
+    const t = Math.min(1, (now - start) / SPREAD_MS)
+    const ring = Math.floor(t * (deepest + 1))
+    for (let d = drawn + 1; d <= ring; d++) {
+      const lines = props.board.roads.flatMap(([a, b]) => {
+        const from = tileLatLng(a)
+        const to = tileLatLng(b)
+        const first = Math.min(depth.get(a) ?? Infinity, depth.get(b) ?? Infinity)
+        return from && to && first === d - 1 ? [[from, to]] : []
+      })
+      if (lines.length) roadLines(lines).forEach((line) => line.addTo(spreadRoads))
+      for (const [id, tileDepth] of depth) {
+        const tile = props.board.tiles.get(id)
+        const at = tileLatLng(id)
+        if (tileDepth === d && tile && at && tile.kind !== 'shop')
+          nodeDot(tile, at).addTo(spreadNodes)
+      }
+      // Nodes stay on top of roads drawn after them.
+      spreadNodes.remove().addTo(map)
+    }
+    drawn = ring
+    if (t < 1) {
+      spreadFrame = requestAnimationFrame(step)
+      return
+    }
+    spreadFrame = 0
+    spreadRoads.remove()
+    spreadNodes.remove()
+    applyLayers()
+  }
+  spreadFrame = requestAnimationFrame(step)
 }
 
 /** Gems and blockers: board pieces that change as the game goes on. */
 function drawPieces() {
   pieces.clearLayers()
+  gemLayer.clearLayers()
   for (const [gem, tile] of props.state.gemTiles) {
     const at = tileLatLng(tile)
     if (!at) continue
@@ -266,7 +397,7 @@ function drawPieces() {
       }),
       zIndexOffset: 500,
       interactive: false,
-    }).addTo(pieces)
+    }).addTo(gemLayer)
   }
   for (const [tile, blocker] of props.state.blockers) {
     const at = tileLatLng(tile)
@@ -485,13 +616,12 @@ const loadStage = () => (stage ??= import('@/characters/stage'))
 
 function ensureTeamMarker(map: LeafletMap, team: Team) {
   const npc = props.appearanceOf(team.id)?.npc ?? null
+  const look = `${npc}|${team.name}|${teamColor(team)}`
   let entry = teamMarkers.get(team.id)
-  if (entry && entry.npc === npc) return entry
-  // New, or the team changed character: rebuild the piece.
-  if (entry) {
-    entry.marker.remove()
-    entry.piece?.dispose()
-  }
+  if (entry && entry.look === look) return entry
+  // New, or the team looks different (another character, or another game's team, as when the
+  // tutorial swaps in its own): rebuild the piece.
+  if (entry) removeTeamMarker(team.id)
   const canvas = document.createElement('canvas')
   canvas.width = CHARACTER_SIZE.width
   // The body box leaves 4px at the bottom for the shadow.
@@ -514,7 +644,7 @@ function ensureTeamMarker(map: LeafletMap, team: Team) {
     interactive: false,
   })
   m.addTo(map)
-  const created: TeamMarker = { marker: m, el, pose: '', npc, piece: null }
+  const created: TeamMarker = { marker: m, el, pose: '', npc, look, piece: null }
   if (npc !== null) {
     void loadAnimationInfo()
     void loadStage().then(({ CharacterPiece }) => {
@@ -524,6 +654,13 @@ function ensureTeamMarker(map: LeafletMap, team: Team) {
   entry = created
   teamMarkers.set(team.id, entry)
   return entry
+}
+
+function removeTeamMarker(team: TeamId) {
+  const entry = teamMarkers.get(team)
+  entry?.marker.remove()
+  entry?.piece?.dispose()
+  teamMarkers.delete(team)
 }
 
 /** Where to draw a placement, and how far its move goes east (`dx`) and north (`dy`). */
@@ -599,6 +736,104 @@ function drawCharacter(
   piece.draw(performance, heading, time)
 }
 
+// --- The tutorial's guide ---
+
+type GuideMarker = {
+  marker: Marker
+  piece: Stage.CharacterPiece | null
+  /** The last way he walked, kept while he stands. */
+  heading: number
+  say: Marker | null
+  saying: string | null
+}
+let guideMarker: GuideMarker | null = null
+/** Where the guide was last drawn, for the camera to follow while he walks. */
+let guideAt: LatLng | null = null
+let guideWalking = false
+/** Screen pixels from his tile up to the middle of his (larger) body. */
+const GUIDE_LIFT = 48
+
+function ensureGuide(map: LeafletMap, guide: Guide): GuideMarker {
+  if (guideMarker) return guideMarker
+  const canvas = document.createElement('canvas')
+  canvas.width = CHARACTER_SIZE.width
+  canvas.height = CHARACTER_SIZE.height - 4
+  const el = characterElement(canvas, 'var(--osrs-orange)', guide.name)
+  el.className = 'sprite sprite-character sprite-guide'
+  const m = marker(latLng(0, 0), {
+    icon: divIcon({
+      className: 'sprite-icon guide-icon',
+      html: el,
+      iconSize: [CHARACTER_SIZE.width, CHARACTER_SIZE.height],
+      iconAnchor: [CHARACTER_SIZE.width / 2, CHARACTER_SIZE.height - 4],
+    }),
+    zIndexOffset: 1500,
+    interactive: false,
+  }).addTo(map)
+  const created: GuideMarker = {
+    marker: m,
+    piece: null,
+    heading: HEADING.south,
+    say: null,
+    saying: null,
+  }
+  guideMarker = created
+  void loadAnimationInfo()
+  void loadStage().then(({ CharacterPiece }) => {
+    if (guideMarker === created) created.piece = new CharacterPiece(guide.npc, canvas)
+  })
+  return created
+}
+
+function removeGuide() {
+  guideMarker?.marker.remove()
+  guideMarker?.say?.remove()
+  guideMarker?.piece?.dispose()
+  guideMarker = null
+  guideAt = null
+}
+
+/** Draws the guide where his script has him, with his overhead line, if any. */
+function drawGuide(map: LeafletMap, time: number) {
+  const guide = props.guide
+  if (!guide) return removeGuide()
+  const entry = ensureGuide(map, guide)
+  const p = guide.placement(time)
+  const where = p && placementLatLng(p)
+  if (!p || !where) return
+  entry.marker.setLatLng(where.at)
+  guideAt = where.at
+  guideWalking = p.kind === 'walk'
+  if (p.kind === 'walk' && (where.dx !== 0 || where.dy !== 0))
+    entry.heading = headingOf(where.dx, where.dy)
+  // He faces the way he walks, and turns to the viewer to talk.
+  const heading = p.kind === 'walk' ? entry.heading : HEADING.south
+  entry.piece?.draw(guide.performance(time, p), heading, time)
+
+  const text = guide.say(time)
+  if (text !== entry.saying) {
+    entry.say?.remove()
+    entry.say = null
+    entry.saying = text
+    if (text !== null) {
+      const el = document.createElement('div')
+      el.className = 'cue cue-info'
+      el.textContent = text
+      entry.say = marker(where.at, {
+        icon: divIcon({
+          className: 'cue-icon cue-over-character guide-say',
+          html: el,
+          iconSize: [0, 0],
+          iconAnchor: [0, CHARACTER_SIZE.height + 4],
+        }),
+        interactive: false,
+        zIndexOffset: 2000,
+      }).addTo(map)
+    }
+  }
+  entry.say?.setLatLng(where.at)
+}
+
 function renderFrame() {
   frame = requestAnimationFrame(renderFrame)
   const map = leaflet
@@ -619,6 +854,9 @@ function renderFrame() {
     const tile = p === null ? team.position : p.kind === 'still' ? p.tile : null
     if (tile !== null) still.set(tile, [...(still.get(tile) ?? []), team.id])
   }
+
+  // Pieces of teams the game no longer has (another game's, as the tutorial swaps games) go.
+  for (const id of teamMarkers.keys()) if (!props.state.teams.has(id)) removeTeamMarker(id)
 
   for (const team of props.state.teams.values()) {
     const entry = ensureTeamMarker(map, team)
@@ -720,10 +958,20 @@ function renderFrame() {
     } else m.setLatLng(at)
   }
 
+  drawGuide(map, time)
+
   // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
   // moving the view would cut the flight short, and a zoom, which it would make jerk.
-  if (props.follow && props.selected !== null && !flying && !zooming && !glideFrame) {
-    const want = followCentre(map, props.selected, map.getZoom())
+  // The tutorial's guide is followed the same way, only while he walks: standing, he leaves the
+  // camera to the tutorial's own moves.
+  if (!flying && !zooming && !glideFrame) {
+    const zoom = map.getZoom()
+    const want =
+      props.guide && guideAt && guideWalking
+        ? centreOn(map, guideAt, GUIDE_LIFT * pieceScale(zoom), zoom)
+        : props.follow && props.selected !== null
+          ? followCentre(map, props.selected, zoom)
+          : null
     if (want) followStep(map, want)
   }
 }
@@ -751,7 +999,8 @@ function quotesAt(
     players,
   )
   const speaker = idle ? props.state.teams.get(idle.team) : undefined
-  if (idle && speaker) {
+  // During the tutorial its guide does the talking.
+  if (idle && speaker && !props.guide) {
     const p = placements.get(idle.team)
     const frozen = speaker.frozenUntil !== null && speaker.frozenUntil.getTime() > time
     if ((p === null || p?.kind === 'still') && !frozen && !talking.has(idle.team)) out.push(idle)
@@ -817,8 +1066,12 @@ function bodyLift(team: TeamId, zoom: number): number {
  */
 function followCentre(map: LeafletMap, team: TeamId, zoom: number): Point | null {
   const at = placed.get(team)
-  if (!at) return null
-  const want = map.project(at, zoom).subtract(point(0, bodyLift(team, zoom)))
+  return at ? centreOn(map, at, bodyLift(team, zoom), zoom) : null
+}
+
+/** The view centre (pixels at `zoom`) that puts `at`, raised by `lift` pixels, in the middle. */
+function centreOn(map: LeafletMap, at: LatLng, lift: number, zoom: number): Point {
+  const want = map.project(at, zoom).subtract(point(0, lift))
   if (mapBounds) {
     const half = map.getSize().divideBy(2)
     const a = map.project(mapBounds.getNorthWest(), zoom)
@@ -893,7 +1146,10 @@ onMounted(() => {
     renderer: liveCanvas({ padding: 0.4 }),
   })
   // Always the pixel-art map; the board is drawn over it at fixed pixel sizes.
-  imageOverlay(worldMap.imageUrl, bounds, { className: 'pixel-map', pane: 'tilePane' }).addTo(map)
+  terrain = imageOverlay(worldMap.imageUrl, bounds, {
+    className: 'pixel-map',
+    pane: 'tilePane',
+  }).addTo(map)
 
   // The map always fills the view: zooming out stops where it just covers it, and panning stops at
   // its edges, so no background ever shows. Fully zoomed out it centres itself, as "All" does.
@@ -937,11 +1193,11 @@ onMounted(() => {
     },
     { passive: true },
   )
-  drawBoard(map)
-  reachLayer.addTo(map)
-  routeLayer.addTo(map)
-  pieces.addTo(map)
+  drawBoard()
   cueLayer.addTo(map)
+  // The map fills whatever room it has, as panels come and go.
+  resizing = new ResizeObserver(() => map.invalidateSize({ animate: false }))
+  resizing.observe(container.value)
   drawPieces()
   drawReach()
   drawRoute()
@@ -983,6 +1239,10 @@ onMounted(() => {
   map.on('click', onClick)
   DomEvent.disableScrollPropagation(container.value)
   leaflet = map
+  // The board's layers go on the map only now: `drawBoard` above ran before `leaflet` was set, so
+  // its call to `applyLayers` did nothing. Without this, a map opened with no tour running (a
+  // reload, or coming back from another page) would have no roads, nodes, gems or shops.
+  applyLayers()
   zoomAroundCentre(props.follow)
   emitView()
   frame = requestAnimationFrame(renderFrame)
@@ -1007,6 +1267,31 @@ watch(
   },
 )
 watch(() => props.follow, zoomAroundCentre)
+watch(
+  () => props.inspect,
+  (tile) => {
+    showInfo(tile ?? null, true)
+    // A task card the tutorial points at is its own, and fades in; hovering one stays instant.
+    const card = infoTip.getElement()
+    card?.classList.toggle('tour-card', tile != null)
+    card?.classList.remove('tip-reveal')
+    void card?.offsetWidth
+    if (tile != null) card?.classList.add('tip-reveal')
+  },
+)
+watch(
+  () => props.layers,
+  (now, before) => {
+    // A click marker still playing as the tutorial opens goes with the page it was on.
+    if (now && !before) click.value = null
+    // Roads appearing with the guide on the board spread out from him.
+    const tile = props.guide?.placement(props.serverNow())
+    const origin = tile?.kind === 'still' ? tile.tile : null
+    const appearing = shown('roads') && before && !before.has('roads')
+    if (appearing && origin !== null) spreadFrom(origin)
+    applyLayers()
+  },
+)
 
 /**
  * While following, the wheel, a double click and a pinch zoom on the centre, where the team is,
@@ -1031,6 +1316,9 @@ function zoomAroundCentre(following: boolean) {
 onBeforeUnmount(() => {
   stopFlight()
   stopGlide()
+  cancelAnimationFrame(spreadFrame)
+  resizing?.disconnect()
+  removeGuide()
   render(null, sceneRoot)
   cancelAnimationFrame(frame)
   for (const entry of teamMarkers.values()) entry.piece?.dispose()
@@ -1047,12 +1335,12 @@ const OVERVIEW_QUIET_MS = 200
 const LOCATE_ZOOM_IN = 1.5
 
 /** Pans and zooms to a tile, never zooming out. */
-function locate(tile: TileId, zoom = 1) {
+function locate(tile: TileId, zoom = 1, ms = FLIGHT_MS) {
   const map = leaflet
   const at = tileLatLng(tile)
   if (!map || !at) return
   const target = Math.max(zoom, map.getMinZoom() + LOCATE_ZOOM_IN, map.getZoom())
-  fly(map, at, Math.min(target, map.getMaxZoom()))
+  fly(map, at, Math.min(target, map.getMaxZoom()), ms)
 }
 
 /**
@@ -1072,7 +1360,7 @@ const FLIGHT_MS = 800
  * background around the map (worst when flying to a team at the edge right after loading). A drag,
  * a wheel tick or a zoom button stops it where it is.
  */
-function fly(map: LeafletMap, at: LatLng, zoom: number) {
+function fly(map: LeafletMap, at: LatLng, zoom: number, ms = FLIGHT_MS) {
   stopFlight()
   const from = map.getCenter()
   const z0 = map.getZoom()
@@ -1083,7 +1371,7 @@ function fly(map: LeafletMap, at: LatLng, zoom: number) {
   const start = performance.now()
   flying = true
   const frame = (now: number) => {
-    const t = Math.min(1, (now - start) / FLIGHT_MS)
+    const t = ms > 0 ? Math.min(1, (now - start) / ms) : 1
     const e = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2
     const centre = latLng(from.lat + (at.lat - from.lat) * e, from.lng + (at.lng - from.lng) * e)
     map.setView(centre, z0 + (z1 - z0) * e, { animate: false })
@@ -1195,14 +1483,14 @@ function zoomBy(delta: number) {
  * The overview: fully zoomed out and centred, from "All" or from zooming out as far as it goes. It
  * ends following, which would otherwise pull the view off centre again.
  */
-function showAll() {
+function showAll(ms = FLIGHT_MS) {
   const map = leaflet
   if (!map) return
   const centre = latLngBounds(imageBounds(worldMap)).getCenter()
   const off = map.latLngToContainerPoint(centre).distanceTo(map.getSize().divideBy(2))
   if (off < 2 && map.getZoom() <= map.getMinZoom() + 0.001) return
   emit('freeRoam')
-  fly(map, centre, map.getMinZoom())
+  fly(map, centre, map.getMinZoom(), ms)
 }
 
 defineExpose({ locate, panTo, zoomBy, showAll })
@@ -1229,7 +1517,54 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   font: inherit;
 }
 .board-map .pixel-map {
+  /* The tutorial fades the map in. */
+  transition: opacity 1.8s ease;
   image-rendering: pixelated;
+}
+/*
+ * During the tutorial only the task card it points at shows. A card hovered on the page as the tour
+ * opened would otherwise linger over it: the tour covers the map, so that hover never ends.
+ */
+.board-map.in-tour .leaflet-tooltip.tile-tip:not(.tour-card) {
+  display: none;
+}
+/* A task card the tutorial points at. */
+.board-map .leaflet-tooltip.tip-reveal {
+  animation: gem-fade-in 0.8s ease both;
+}
+/* Shops and traps the tutorial brings in. */
+.board-map.fade-landmarks :is(.shop-marker, .blocker-marker) {
+  animation: gem-fade-in 1.5s ease both;
+}
+/* Gems the tutorial brings in fade in, glinting as ever. */
+.board-map.fade-gems .gem-marker {
+  animation:
+    gem-fade-in 1.5s ease both,
+    gem-glint 2.4s steps(2, end) infinite;
+}
+@keyframes gem-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+/*
+ * Teams the tutorial hasn't introduced yet; its guide and his lines still show. They fade in when
+ * revealed, and go at once when hidden, so nothing of the page before lingers into the tour.
+ */
+.board-map:not(.hide-teams) .sprite-icon:not(.guide-icon) {
+  transition:
+    opacity 1.2s ease,
+    visibility 1.2s;
+}
+.board-map.hide-teams .sprite-icon:not(.guide-icon),
+.board-map.hide-teams .cue-icon:not(.guide-say) {
+  opacity: 0;
+  visibility: hidden;
+}
+/* The guide stands a head taller than the teams' pieces. */
+.board-map .sprite-guide .sprite-body {
+  transform: scale(1.25);
+  transform-origin: 50% 100%;
 }
 /* The tile tooltip is all scene (TileScene draws its own frame): no box, no pointer. */
 .board-map .leaflet-tooltip.tile-tip {

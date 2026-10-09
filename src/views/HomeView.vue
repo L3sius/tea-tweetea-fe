@@ -12,6 +12,7 @@ import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
 import TeamControls from '@/components/TeamControls.vue'
+import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
@@ -19,9 +20,12 @@ import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { useCharacterStore } from '@/stores/characters'
-import { useGameStore } from '@/stores/game'
+import { byStanding, useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
+import { useTutorialStore } from '@/stores/tutorial'
+import { vTutorial } from '@/tutorial/directive'
+import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { TtButton, TtPanel, TtText } from '@/ui/tt'
 
@@ -29,10 +33,47 @@ const game = useGameStore()
 const my = useTeamStore()
 const dev = useDevStore()
 const characters = useCharacterStore()
-const { board, challenges, state, feed, log, loading, standings, alerts, choreography } =
-  storeToRefs(game)
+const tutorial = useTutorialStore()
+const {
+  board: liveBoard,
+  challenges: liveChallenges,
+  state: liveState,
+  feed,
+  log,
+  loading,
+  standings: liveStandings,
+  alerts,
+  choreography: liveChoreography,
+} = storeToRefs(game)
+
+// The tutorial plays on its own frozen world (tutorial/world) with Earl Grey as a team in it
+// (tutorial/pretend), so the tour looks the same whatever the live game does; the live game comes
+// back when it ends.
+const world = computed(() => (tutorial.staged ? tutorial.world : null))
+const board = computed(() => world.value?.board ?? liveBoard.value)
+const state = computed(() => (world.value ? tutorial.tourState : null) ?? liveState.value)
+const challenges = computed(() => world.value?.challenges ?? liveChallenges.value)
+const choreography = computed(() => world.value?.choreography ?? liveChoreography.value)
+const names = computed(() => (world.value ? tutorial.tourNames : null) ?? game.names)
+const standings = computed(() =>
+  world.value ? [...world.value.state.teams.values()].sort(byStanding) : liveStandings.value,
+)
+const appearanceOf = (team: TeamId) =>
+  world.value
+    ? (world.value.state.teams.get(team)?.appearance ?? null)
+    : characters.appearanceOf(team)
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
 const boardMap = useTemplateRef('boardMap')
+
+// The tutorial flies the camera as its script says.
+watch(
+  () => tutorial.camera,
+  (move) => {
+    if (!move) return
+    if (move.to === 'all') boardMap.value?.showAll(move.ms)
+    else boardMap.value?.locate(move.to, move.zoom, move.ms)
+  },
+)
 
 /**
  * The overview is all most players need: the followed team's tile and the minigames on now. The
@@ -86,6 +127,18 @@ function openTab(id: Tab) {
   sheetOpen.value = true
 }
 
+// The tutorial shows the side panel on its overview, where the current tile and minigames are, and
+// goes back to it whenever it points at either, in case the player has opened another tab.
+const SPOT_TABS: Record<SpotName, Tab> = { 'current-tile': 'overview', minigames: 'overview' }
+watch(
+  () => tutorial.staged && tutorial.revealed.has('panel'),
+  (shown) => shown && openTab('overview'),
+)
+watch(
+  () => (tutorial.staged ? tutorial.spotlight : null),
+  (spot) => spot && openTab(SPOT_TABS[spot]),
+)
+
 /** The team this viewer last chose to follow, so the overview opens on it next time. */
 const WATCH_KEY = 'tweetea.watchTeam'
 
@@ -131,7 +184,9 @@ function watchedTeam(): TeamId | null {
 }
 
 /** The team the overview shows: the one followed, else the captain's own, else the leader. */
-const focus = computed(() => followed.value ?? my.team ?? standings.value[0] ?? null)
+const focus = computed(() =>
+  world.value ? tutorial.guideTeam : (followed.value ?? my.team ?? standings.value[0] ?? null),
+)
 
 /** A team picked on the map: follow it and show it in the overview. */
 function showTeam(id: TeamId) {
@@ -240,30 +295,37 @@ async function buyMysteryBox() {
         :board="board"
         :state="state"
         :challenges="challenges"
-        :names="game.names"
+        :names="names"
         :choreography="choreography"
         :server-now="game.serverNow"
-        :selected="selected"
-        :follow="follow"
-        :my-team="my.team"
-        :route="picking ? my.path : null"
-        :checkpoints="my.checkpoints"
-        :preview="picking ? my.preview : null"
+        :selected="world ? null : selected"
+        :follow="follow && !tutorial.staged"
+        :my-team="world ? null : my.team"
+        :route="!world && picking ? my.path : null"
+        :checkpoints="world ? [] : my.checkpoints"
+        :preview="!world && picking ? my.preview : null"
         :steps-left="my.stepsLeft"
-        :options="picking ? my.options : null"
-        :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
+        :options="!world && picking ? my.options : null"
+        :target-tiles="world ? null : dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
-        :replay="game.replay"
-        :dev-quote="dev.quote"
-        :appearance-of="characters.appearanceOf"
+        :replay="world ? null : game.replay"
+        :dev-quote="world ? null : dev.quote"
+        :appearance-of="appearanceOf"
+        :layers="tutorial.staged ? tutorial.revealed : null"
+        :guide="tutorial.staged ? tutorial.guide : null"
+        :inspect="tutorial.staged ? tutorial.inspecting : null"
         @hover="onHover"
         @pick="onPick"
         @free-roam="freeRoam"
         @view="view = $event"
       />
 
+      <!-- The tutorial's tour plays inside the map's frame. -->
+      <TutorialStage v-if="tutorial.staged" />
+
       <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
+        v-tutorial="'teams'"
         class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1 max-sm:hidden"
         aria-label="Teams"
       >
@@ -290,14 +352,17 @@ async function buyMysteryBox() {
 
       <!-- Play-testing tools -->
       <div
-        v-if="dev.enabled"
+        v-if="dev.enabled && !tutorial.staged"
         class="pointer-events-none absolute top-1.5 right-1.5 z-[1060] flex justify-end"
       >
         <DevTools />
       </div>
 
       <!-- Alerts -->
-      <div class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3">
+      <div
+        v-if="!tutorial.staged"
+        class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3"
+      >
         <AlertToasts
           :alerts="alerts"
           @dismiss="game.dismiss"
@@ -309,6 +374,7 @@ async function buyMysteryBox() {
            on), then who the camera follows. -->
       <div
         v-if="game.replay || game.missedMoves > 0 || followed"
+        v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-1"
       >
         <div
@@ -368,7 +434,10 @@ async function buyMysteryBox() {
       </div>
 
       <!-- Map controls, folded under a menu button -->
-      <div class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1">
+      <div
+        v-tutorial="'controls'"
+        class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1"
+      >
         <template v-if="controlsOpen">
           <div class="tt-sprite-display flex flex-col gap-0.5 px-1 py-0" aria-label="Map legend">
             <span v-for="l in LEGEND" :key="l.label" class="flex items-center gap-1.5">
@@ -432,6 +501,7 @@ async function buyMysteryBox() {
       <!-- Overview -->
       <div
         v-if="insetOpen"
+        v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1.5 z-[1000] w-36 sm:w-52 lg:w-64"
         :class="
           game.replay || game.missedMoves > 0
@@ -455,6 +525,7 @@ async function buyMysteryBox() {
 
     <!-- Side panel (desktop) / bottom sheet (phone) -->
     <aside
+      v-tutorial="'panel'"
       class="z-[1000] flex min-h-0 flex-col gap-1.5 lg:w-[456px]"
       :class="sheetOpen ? 'max-lg:h-[46dvh]' : ''"
     >
@@ -492,7 +563,13 @@ async function buyMysteryBox() {
         class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
       >
         <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
-          <TtPanel title="Current tile" width="100%" :padding="12" :gap="10">
+          <TtPanel
+            title="Current tile"
+            width="100%"
+            :padding="12"
+            :gap="10"
+            data-tutorial-spot="current-tile"
+          >
             <!-- Which team to watch, on phones only: wider screens pick it on the map's team strip,
                  which phones hide to keep the small map clear. -->
             <div
@@ -516,22 +593,28 @@ async function buyMysteryBox() {
             <TeamCard
               v-if="focus"
               :team="focus"
-              :items="my.team?.id === focus.id ? my.items : null"
+              :items="!world && my.team?.id === focus.id ? my.items : null"
               :state="state"
               :challenges="challenges"
-              :names="game.names"
+              :names="names"
               :now="now"
               :moving="isAnimating(focus.id)"
             />
           </TtPanel>
-          <EventsPanel :state="state" :challenges="challenges" :names="game.names" :now="now" />
+          <EventsPanel
+            :state="state"
+            :challenges="challenges"
+            :names="names"
+            :now="now"
+            data-tutorial-spot="minigames"
+          />
         </div>
         <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" />
         <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />
         <GameLog
           v-else
           :log="log"
-          :names="game.names"
+          :names="names"
           :teams="state.teams"
           :now="now"
           :revealed="revealed"
@@ -541,15 +624,16 @@ async function buyMysteryBox() {
     </aside>
 
     <!-- Using an item asks first; a target picked on the map is part of the question. -->
+    <!-- During the tutorial, the player's own dialogs and the live game's slot machine wait. -->
     <UseItemDialog
-      v-if="my.confirming"
+      v-if="my.confirming && !world"
       :use="my.confirming"
       @confirm="my.confirmUse()"
       @cancel="my.cancelUse()"
     />
 
     <!-- The shop opens over everything, like the event site's shop modal -->
-    <div v-if="shopOpen" class="tt-overlay" @click.self="closeShop">
+    <div v-if="shopOpen && !world" class="tt-overlay" @click.self="closeShop">
       <ShopPanel
         :buyer="buyer"
         :stock="shopStock"
@@ -565,7 +649,7 @@ async function buyMysteryBox() {
     </div>
 
     <!-- A minigame being picked: a slot machine over the map, which can't be skipped. -->
-    <div v-if="spin" class="tt-overlay">
+    <div v-if="spin && !world" class="tt-overlay">
       <MinigameSpin
         :key="spin.id"
         :spin="spin"
