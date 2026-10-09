@@ -4,7 +4,6 @@ import {
   DomEvent,
   Transformation,
   Util,
-  canvas,
   circleMarker,
   divIcon,
   imageOverlay,
@@ -49,6 +48,7 @@ import type * as Stage from '@/characters/stage'
 import { characterElement, spriteElement } from '@/map/sprite'
 import { itemEntry } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
+import { liveCanvas } from '@/map/liveCanvas'
 import { tileTheme } from '@/map/tileTheme'
 import { CRS_ORIGIN, imageBounds, terrainScene, tileCentre, worldMap } from '@/map/world'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
@@ -888,10 +888,9 @@ onMounted(() => {
     maxBoundsViscosity: 1,
     attributionControl: false,
     zoomControl: false,
-    // Roads and nodes go on one canvas, redrawn only when a drag ends. Leaflet's default margin
-    // around the view (10%) ran out within a short drag and showed bare map until the redraw;
-    // half a view each way covers a normal drag.
-    renderer: canvas({ padding: 0.5 }),
+    // Roads and nodes go on one canvas, drawn with a margin of 40% of the view around it and
+    // drawn again whenever a move is about to run past that margin (see liveCanvas).
+    renderer: liveCanvas({ padding: 0.4 }),
   })
   // Always the pixel-art map; the board is drawn over it at fixed pixel sizes.
   imageOverlay(worldMap.imageUrl, bounds, { className: 'pixel-map', pane: 'tilePane' }).addTo(map)
