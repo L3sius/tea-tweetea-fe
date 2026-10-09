@@ -1264,6 +1264,9 @@ watch(
 watch(
   () => props.layers,
   (now, before) => {
+    // A tile hovered just before the tutorial opened would keep its card up over the tour's scene,
+    // since the tour covers the map and no hover ever ends; only its own card shows.
+    if (now && !before) showInfo(props.inspect ?? null, true)
     // Roads appearing with the guide on the board spread out from him.
     const tile = props.guide?.placement(props.serverNow())
     const origin = tile?.kind === 'still' ? tile.tile : null

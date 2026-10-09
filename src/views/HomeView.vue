@@ -25,6 +25,7 @@ import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
 import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
+import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { TtButton, TtPanel, TtText } from '@/ui/tt'
 
@@ -126,10 +127,16 @@ function openTab(id: Tab) {
   sheetOpen.value = true
 }
 
-// The tutorial shows the side panel on its overview, where the current tile is.
+// The tutorial shows the side panel on its overview, where the current tile and minigames are, and
+// goes back to it whenever it points at either, in case the player has opened another tab.
+const SPOT_TABS: Record<SpotName, Tab> = { 'current-tile': 'overview', minigames: 'overview' }
 watch(
   () => tutorial.staged && tutorial.revealed.has('panel'),
   (shown) => shown && openTab('overview'),
+)
+watch(
+  () => (tutorial.staged ? tutorial.spotlight : null),
+  (spot) => spot && openTab(SPOT_TABS[spot]),
 )
 
 /** The team this viewer last chose to follow, so the overview opens on it next time. */
