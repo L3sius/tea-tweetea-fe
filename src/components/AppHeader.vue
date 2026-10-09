@@ -15,7 +15,8 @@ const { connection } = storeToRefs(game)
 const my = useTeamStore()
 const tutorial = useTutorialStore()
 const router = useRouter()
-const wide = useMediaQuery('(min-width: 1024px)')
+// The big title only where the header still fits on one row beside it.
+const wide = useMediaQuery('(min-width: 1600px)')
 
 /** The tutorial plays on the board. */
 async function howToPlay() {
@@ -42,7 +43,7 @@ const LINKS = [
 
 <template>
   <header
-    class="tt-frame-iron relative z-[1100] flex shrink-0 flex-wrap items-center justify-center gap-x-6 gap-y-1.5 px-3 py-0.5"
+    class="tt-frame-iron relative z-[1100] flex shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-1.5 px-3 py-0.5"
   >
     <RouterLink to="/" class="whitespace-nowrap">
       <TtText as="h1" :size="wide ? 3 : 2" font="quill" color="orange" glow>
@@ -66,32 +67,36 @@ const LINKS = [
           {{ link.label }}
         </TtButton>
       </RouterLink>
+      <TtButton size="sm" @click="howToPlay">How to play</TtButton>
     </nav>
     <div class="flex flex-wrap items-center justify-center gap-3 lg:ml-auto">
-      <TtButton size="sm" @click="howToPlay">How to play</TtButton>
-      <!-- The team this browser plays for, and the way out. -->
-      <span v-if="my.team" class="flex items-center gap-2">
+      <!-- The team this browser plays for, with the way out beside it. -->
+      <span v-if="my.team" class="flex min-w-0 items-center gap-1.5">
+        <TtText :size="1" color="muted" class="hidden whitespace-nowrap 2xl:inline">
+          Playing as
+        </TtText>
         <TtText
           :size="1"
           font="bold"
           :color="teamColor(my.team)"
           class="max-w-48 truncate"
-          :title="my.team.name"
+          :title="`Playing as ${my.team.name}`"
         >
           {{ my.team.name }}
         </TtText>
-        <TtButton size="sm" @click="my.logout()">Log out</TtButton>
+        <TtText :size="1" color="muted" aria-hidden="true">·</TtText>
+        <button type="button" class="tt-link tt-1 whitespace-nowrap" @click="my.logout()">
+          Log out
+        </button>
       </span>
-      <span class="flex items-center gap-3" role="status">
-        <span class="flex items-center gap-1.5">
-          <span
-            class="tt-swatch"
-            :class="{ 'animate-pulse': connection === 'live' || connection === 'reconnecting' }"
-            :style="{ background: badge.color }"
-            aria-hidden="true"
-          />
-          <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
-        </span>
+      <span class="flex items-center gap-1.5" role="status">
+        <span
+          class="tt-swatch"
+          :class="{ 'animate-pulse': connection === 'live' || connection === 'reconnecting' }"
+          :style="{ background: badge.color }"
+          aria-hidden="true"
+        />
+        <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
       </span>
       <SoundControl />
     </div>
