@@ -7,7 +7,7 @@ import { drawOutcome, type DrawOutcome } from '@/domain/draw'
 import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { Blocker, Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
-import { ITEM_TARGET, blockersOut, gainedItem } from '@/domain/items'
+import { ITEM_TARGET, blockersOut, gainedItem, whyNotUsable } from '@/domain/items'
 import { adjacency, blockerTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
@@ -129,6 +129,23 @@ export const useTeamStore = defineStore('team', () => {
       else if (occupied.has(tile) || gems.has(tile) || state.blockers.has(tile)) tiles.delete(tile)
     }
     return tiles
+  })
+
+  /**
+   * Why the item waiting for a target can no longer be used, if it can't: the card was drawn,
+   * the team moved or froze, or the item is gone. A pick left open would keep the map waiting for
+   * a target and swallow the clicks of the walk.
+   */
+  const targetingBlocked = computed(() => {
+    const pending = targeting.value
+    const t = team.value
+    if (!pending) return null
+    if (!t || (items.value.get(pending.item) ?? 0) === 0) return 'gone'
+    const here = game.board?.tiles.get(t.position)
+    return whyNotUsable(t, pending.item, now.value, here, blockers.value)
+  })
+  watch(targetingBlocked, (why) => {
+    if (why !== null) targeting.value = null
   })
 
   // A new draw, an item that changes the length, or a move all make the shown route stale.
