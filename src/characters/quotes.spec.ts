@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import type { FeedItem } from '@/domain/activity'
 import { teamId } from '@/domain/ids'
 import {
   EFFECT_CHANCE,
+  DEATH_EXCUSES,
   IDLE_QUOTES,
   chatStyle,
+  deathQuotes,
   fillQuote,
   idleQuote,
   parseChat,
@@ -88,5 +91,54 @@ describe('OSRS chat effects', () => {
     }
     expect(styled / 1000).toBeCloseTo(EFFECT_CHANCE, 1)
     expect(chatStyle('gz', 42)).toEqual(chatStyle('gz', 42))
+  })
+})
+
+describe('deathQuotes', () => {
+  const T = Date.parse('2026-10-10T12:00:00Z')
+  const death = (id: number, team: number, rsn: string, at: number): FeedItem => ({
+    id,
+    at: new Date(at),
+    rsn,
+    teamId: teamId(team),
+    kind: 'death',
+    subject: 'Zulrah',
+    value: 0,
+    count: 1,
+    observation: { kind: 'death', killer: 'Zulrah', pvp: false },
+  })
+
+  it('has every other team say "Sit <name>", and the dead player’s team make an excuse', () => {
+    const feed = [death(7, 1, 'Gnome Kid', T)]
+    expect(deathQuotes(feed, teams, T)).toEqual([])
+    // Each line starts within a moment of the others, so a second later all of them are up.
+    const quotes = deathQuotes(feed, teams, T + 3_000)
+    expect(quotes.map((q) => q.team).sort()).toEqual(teams)
+    for (const q of quotes.filter((q) => q.team !== teamId(1))) expect(q.text).toBe('Sit Gnome Kid')
+    const excuse = quotes.find((q) => q.team === teamId(1))?.text
+    expect(DEATH_EXCUSES.map((e) => e.replace('{killer}', 'Zulrah'))).toContain(excuse)
+    expect(deathQuotes(feed, teams, T + 3_000)).toEqual(quotes)
+  })
+
+  it('leaves out excuses that name a killer when Dink names none', () => {
+    const unknown: FeedItem = {
+      ...death(9, 1, 'Gnome Kid', T),
+      observation: { kind: 'death', killer: null, pvp: false },
+    }
+    for (let id = 0; id < 50; id++) {
+      const [excuse] = deathQuotes([{ ...unknown, id }], [teamId(1)], T + 3_000)
+      expect(excuse?.text).not.toMatch(/\{killer\}|nerf $| is overtuned/)
+    }
+  })
+
+  it('lets a taunt end, and says nothing for other activity', () => {
+    const feed = [death(7, 1, 'Gnome Kid', T)]
+    expect(deathQuotes(feed, teams, T + 60_000)).toEqual([])
+    const loot: FeedItem = {
+      ...death(8, 1, 'Gnome Kid', T),
+      kind: 'loot',
+      observation: { kind: 'loot', source: 'Zulrah', items: [] },
+    }
+    expect(deathQuotes([loot], teams, T + 2_500)).toEqual([])
   })
 })

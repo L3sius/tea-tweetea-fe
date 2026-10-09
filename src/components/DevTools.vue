@@ -5,6 +5,7 @@ import {
   CHAT_COLOURS,
   CHAT_MOTIONS,
   IDLE_QUOTES,
+  DEATH_QUOTE,
   PASS_QUOTE,
   type ChatColour,
   type ChatMotion,
@@ -27,7 +28,7 @@ const my = useTeamStore()
 
 const open = ref(false)
 /** Every line a character can say, for trying one out. */
-const QUOTES = [...IDLE_QUOTES, PASS_QUOTE]
+const QUOTES = [...IDLE_QUOTES, PASS_QUOTE, DEATH_QUOTE]
 const quoteText = ref(QUOTES[0] ?? '')
 const quoteColour = ref<ChatColour>('yellow')
 const quoteMotion = ref<ChatMotion>('none')

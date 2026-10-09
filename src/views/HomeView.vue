@@ -317,6 +317,7 @@ async function buyMysteryBox() {
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
         :replay="world ? null : game.replay"
         :dev-quote="world ? null : dev.quote"
+        :feed="world ? [] : feed"
         :appearance-of="appearanceOf"
         :layers="tutorial.staged ? tutorial.revealed : null"
         :guide="tutorial.staged ? tutorial.guide : null"

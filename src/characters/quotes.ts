@@ -1,6 +1,7 @@
 // What the characters say over their heads, as OSRS overhead chat. Like the idle emotes, every
 // choice is a hash of the server clock (see `chance` in acting.ts), so everyone watching sees the
 // same quote at the same moment and nothing comes from the backend.
+import type { FeedItem } from '@/domain/activity'
 import type { TeamId } from '@/domain/ids'
 import { chance, pick } from './acting'
 
@@ -48,11 +49,33 @@ export const IDLE_QUOTES: readonly string[] = [
   'Zingerrrr!',
   'Oh boy, time to go to Mcdonaldzzz',
 ]
-// "Sit {player}", said about a player who just died, waits for the backend to report deaths: the
-// activity feed has no death events yet.
-
 /** Said by a walking team as it passes a team standing on its path, once per walk. */
 export const PASS_QUOTE = 'get good, noob'
+
+/** Said by every other team's character when a player dies (Dink reports it in the feed). */
+export const DEATH_QUOTE = 'Sit {player}'
+
+/**
+ * Said by the character of the team the player died for, while the others say "Sit". `{killer}`
+ * becomes what killed them; those lines are left out when Dink doesn't say.
+ */
+export const DEATH_EXCUSES: readonly string[] = [
+  'lag',
+  'I was AFK, I swear',
+  'my prayer was on, I promise',
+  'nerf {killer}',
+  '{killer} is overtuned',
+  'there goes my gear',
+  "grave timer's ticking, brb",
+  'that was a misclick',
+  'uninstalling',
+  'rng hates me',
+]
+
+/** How long after a death the taunts come: long enough for the feed to have reached every page. */
+const DEATH_QUOTE_DELAY_MS = 2_000
+/** The taunts start up to this far apart, so they don't all appear on one frame. */
+const DEATH_QUOTE_SPREAD_MS = 600
 
 /** Chance that a minute of server time has a quote somewhere on the board. */
 export const QUOTE_CHANCE_PER_MINUTE = 1
@@ -132,8 +155,12 @@ export function chatStyle(
 
 const MINUTE_MS = 60_000
 
+/** The longest a quote stays up. */
+const QUOTE_MAX_MS = 6_000
+
 /** How long a quote stays up: long enough to read, longer for longer lines. */
-export const quoteMs = (text: string) => Math.min(6_000, Math.max(3_000, 2_000 + text.length * 70))
+export const quoteMs = (text: string) =>
+  Math.min(QUOTE_MAX_MS, Math.max(3_000, 2_000 + text.length * 70))
 
 /** A line over a character's head, from `since` until `until` (server ms). */
 export type Quote = { team: TeamId; text: string; style: ChatStyle; since: number; until: number }
@@ -168,4 +195,40 @@ export function idleQuote(
   const since = minute * MINUTE_MS + chance('quote-at', minute) * (MINUTE_MS - length)
   const until = since + length
   return time >= since && time < until ? { team, text, style, since, until } : null
+}
+
+/**
+ * What the characters say about recent deaths at `time`: every other team says "Sit <name>", and
+ * the team the player died for makes an excuse. The death's id picks the excuse and when each line
+ * starts, so every page shows the same. `feed` is the activity feed as every page loads it; `teams`
+ * must be in the same order for everyone.
+ */
+export function deathQuotes(
+  feed: readonly FeedItem[],
+  teams: readonly TeamId[],
+  time: number,
+): Quote[] {
+  const out: Quote[] = []
+  for (const item of feed) {
+    const death = item.observation
+    if (death.kind !== 'death') continue
+    const at = item.at.getTime() + DEATH_QUOTE_DELAY_MS
+    // The feed is newest first: once one is too old to still show, the rest are older.
+    if (at + DEATH_QUOTE_SPREAD_MS + QUOTE_MAX_MS < time) break
+    const excuses = DEATH_EXCUSES.filter(
+      (line) => death.killer !== null || !line.includes('{killer}'),
+    )
+    for (const team of teams) {
+      const line =
+        team === item.teamId
+          ? (pick(excuses, 'death-excuse', item.id) ?? '').replace('{killer}', death.killer ?? '')
+          : DEATH_QUOTE.replace('{player}', item.rsn)
+      if (!line) continue
+      const { text, ...style } = chatStyle(line, 'death', item.id, team)
+      const since = at + chance('death-at', item.id, team) * DEATH_QUOTE_SPREAD_MS
+      const until = since + quoteMs(text)
+      if (time >= since && time < until) out.push({ team, text, style, since, until })
+    }
+  }
+  return out
 }

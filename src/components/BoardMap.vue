@@ -25,6 +25,7 @@ import {
   type ZoomAnimEvent,
 } from 'leaflet'
 import { h, onBeforeUnmount, onMounted, ref, render, useTemplateRef, watch } from 'vue'
+import type { FeedItem } from '@/domain/activity'
 import type { Board, Tile } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
 import {
@@ -41,7 +42,14 @@ import type { Choreography, Cue, Placement } from '@/domain/motion'
 import type { Replay } from '@/domain/replay'
 import { adjacency, nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
 import { perform, ticksToMs } from '@/characters/acting'
-import { PASS_QUOTE, chatStyle, idleQuote, quoteMs, type Quote } from '@/characters/quotes'
+import {
+  PASS_QUOTE,
+  chatStyle,
+  deathQuotes,
+  idleQuote,
+  quoteMs,
+  type Quote,
+} from '@/characters/quotes'
 import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
 import { HEADING, headingOf } from '@/characters/heading'
 import type { Appearance } from '@/characters/roster'
@@ -86,6 +94,8 @@ const props = defineProps<{
   replay?: Replay | null
   /** A quote the dev tools asked a character to say, on top of the ones the clock picks. */
   devQuote?: Quote | null
+  /** The activity feed: a death in it makes another team's character taunt "Sit <name>". */
+  feed?: readonly FeedItem[]
   /** How a team's piece looks as an OSRS character, or null to draw it as a bird. */
   appearanceOf: (team: TeamId) => Appearance | null
   /** The parts of the board to draw (the tutorial builds it up); every part when not given. */
@@ -1017,6 +1027,7 @@ function quotesAt(
     }
   }
   for (const q of passQuotes.values()) if (time < q.until) out.push(q)
+  out.push(...deathQuotes(props.feed ?? [], ids, time))
   const dev = props.devQuote
   if (dev && time >= dev.since && time < dev.until) out.push(dev)
   return out
