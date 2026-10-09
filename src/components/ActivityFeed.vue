@@ -18,6 +18,15 @@ const props = defineProps<{
 
 const filter = reactive<FeedFilter>({ ...NO_FILTER })
 const expanded = ref(new Set<string>())
+/**
+ * Rows are one line, cut short with the whole text on hover. Touch screens can't hover, so there
+ * a tap opens the row in full instead, and another tap closes it.
+ */
+const canHover = window.matchMedia?.('(hover: hover)').matches ?? true
+const openRow = ref<string | null>(null)
+const toggleRow = (key: string) => {
+  if (!canHover) openRow.value = openRow.value === key ? null : key
+}
 const showFilters = ref(false)
 
 const rows = computed(() => feedRows(props.feed, filter, expanded.value))
@@ -94,7 +103,11 @@ function reset() {
             {{ timeFrom(row.item.at, now) }}
           </time>
           <!-- One line: who, what, how many and what it was worth. Hover shows it whole. -->
-          <p class="truncate" :title="rowText(row.item, row.count, row.value)">
+          <p
+            :class="openRow === row.key ? 'break-words' : 'truncate'"
+            :title="rowText(row.item, row.count, row.value)"
+            @click="toggleRow(row.key)"
+          >
             <TtText :size="1" font="bold" :color="colorOf(row.item.teamId)">{{
               row.item.rsn
             }}</TtText>

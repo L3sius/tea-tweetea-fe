@@ -29,7 +29,9 @@ const style = computed(() => {
     display: props.block ? 'block' : undefined,
     margin: 0,
     fontWeight: 'normal',
-    textWrap: 'pretty' as const,
+    // Only the style, not the `text-wrap` shorthand: that also sets wrapping on, which would undo
+    // `white-space: nowrap` (and `truncate`) on the text or around it.
+    textWrapStyle: 'pretty' as const,
   }
 })
 </script>
