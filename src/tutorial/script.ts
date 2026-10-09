@@ -130,7 +130,7 @@ export const TUTORIAL: Beat[] = [
       // The gems fade in as the camera pulls out, before he mentions them.
       at(0, { kind: 'camera', to: 'all', ms: 3500 }),
       at(200, { kind: 'reveal', what: ['gems'] }),
-      at(3200, { kind: 'say', text: 'Ooh, look at that.' }),
+      at(3200, { kind: 'say', text: 'Ooh, pretty...' }),
     ],
     lines: [
       { text: 'This is the map of Gielinor. Can you see the gems?', gesture: 'beckon' },
