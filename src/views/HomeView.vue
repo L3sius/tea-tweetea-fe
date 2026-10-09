@@ -213,12 +213,17 @@ function openShop() {
   shopOpen.value = true
 }
 
+/** The shop stays open while a mystery box's reel spins, so the reel is never cut short. */
+function closeShop() {
+  if (!my.opening) shopOpen.value = false
+}
+
 async function buy(item: Item) {
   await my.act({ kind: 'buy', item })
 }
 
 async function buyMysteryBox() {
-  await my.act({ kind: 'buy_mystery_box' })
+  await my.buyMysteryBox()
 }
 </script>
 
@@ -543,16 +548,18 @@ async function buyMysteryBox() {
     />
 
     <!-- The shop opens over everything, like the event site's shop modal -->
-    <div v-if="shopOpen" class="tt-overlay" @click.self="shopOpen = false">
+    <div v-if="shopOpen" class="tt-overlay" @click.self="closeShop">
       <ShopPanel
         :buyer="buyer"
         :stock="shopStock"
         :held="inventorySize(my.items)"
         :inventory-limit="game.rules?.inventoryLimit ?? 0"
         :pending="my.pending"
+        :opening="my.opening"
         @buy="buy"
         @buy-mystery-box="buyMysteryBox"
-        @close="shopOpen = false"
+        @opened="my.boxOpened()"
+        @close="closeShop"
       />
     </div>
 

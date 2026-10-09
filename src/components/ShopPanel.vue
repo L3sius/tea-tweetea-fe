@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
 import { itemEntry, mysteryBoxEntry } from '@/domain/items'
-import type { Item } from '@/domain/vocabulary'
+import { ITEMS, type Item } from '@/domain/vocabulary'
 import { TtButton, TtDisplayBox, TtPanel, TtSlot, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
+import SlotReel from './SlotReel.vue'
 
 const props = defineProps<{
   /** The shopping team, when this browser manages one that can buy here now. */
@@ -16,8 +17,30 @@ const props = defineProps<{
   held: number
   inventoryLimit: number
   pending: boolean
+  /** The item a mystery box just gave, while the reel spins to it. */
+  opening: Item | null
 }>()
-const emit = defineEmits<{ buy: [item: Item]; buyMysteryBox: []; close: [] }>()
+const emit = defineEmits<{ buy: [item: Item]; buyMysteryBox: []; opened: []; close: [] }>()
+
+/** How long the box's reel spins before it lands on the item. */
+const BOX_SPIN_MS = 4000
+
+/** The reel scrolls past every item by name, so each name leads back to its item for its picture. */
+const REEL_ITEMS = new Map(ITEMS.map((item) => [itemName(item), item]))
+const reelNames = [...REEL_ITEMS.keys()]
+
+/** What the last box gave, shown once the reel has landed on it. */
+const gotFromBox = ref<Item | null>(null)
+
+function onLanded() {
+  gotFromBox.value = props.opening
+  emit('opened')
+}
+
+// Closing the shop mid-spin still puts the item in the inventory.
+onBeforeUnmount(() => {
+  if (props.opening) emit('opened')
+})
 
 /** What stops the buyer paying `price`, or null if nothing does. */
 function whyNot(price: number): string | null {
@@ -41,6 +64,7 @@ const box = computed(() => {
 
 /** The picked row: an item from the stock, or the mystery box. */
 const picked = ref<Item | 'mystery_box' | null>(null)
+watch(picked, () => (gotFromBox.value = null))
 const current = computed(() => {
   if (picked.value === 'mystery_box') return { ...box.value, buy: () => emit('buyMysteryBox') }
   const row = rows.value.find((r) => r.item === picked.value)
@@ -102,7 +126,39 @@ const current = computed(() => {
       </li>
     </ul>
 
-    <div v-if="current" class="flex min-h-[96px] flex-col items-center gap-1.5">
+    <!-- A mystery box opens on a reel, which lands on the item the server already drew. -->
+    <div v-if="opening" class="flex min-h-[96px] w-full flex-col items-center gap-1.5">
+      <TtText :size="2">Opening the mystery box…</TtText>
+      <SlotReel
+        :winner="itemName(opening)"
+        :fakes="reelNames"
+        :duration-ms="BOX_SPIN_MS"
+        @landed="onLanded"
+      >
+        <template #pick="{ label }">
+          <span class="reel-item">
+            <ItemSlot v-if="REEL_ITEMS.get(label)" :item="REEL_ITEMS.get(label)!" :size="48" />
+            <span>{{ label }}</span>
+          </span>
+        </template>
+      </SlotReel>
+    </div>
+    <div v-else-if="gotFromBox" class="flex min-h-[96px] flex-col items-center gap-1.5">
+      <TtText :size="2">You got the {{ itemName(gotFromBox) }}!</TtText>
+      <TtText :size="1" color="white" class="max-w-[480px]">{{
+        itemEntry(gotFromBox).description
+      }}</TtText>
+      <TtButton
+        v-if="buyer"
+        size="sm"
+        :disabled="pending || box.why !== null"
+        :title="box.why ?? undefined"
+        @click="emit('buyMysteryBox')"
+      >
+        {{ box.why ?? `Buy another for ${box.price} gold` }}
+      </TtButton>
+    </div>
+    <div v-else-if="current" class="flex min-h-[96px] flex-col items-center gap-1.5">
       <TtText :size="2">{{ current.name }}</TtText>
       <TtText :size="1" color="white" class="max-w-[480px]">{{ current.description }}</TtText>
       <TtButton
@@ -119,11 +175,17 @@ const current = computed(() => {
       Click an item to see what it does.
     </TtText>
 
-    <TtButton @click="emit('close')">Close shop</TtButton>
+    <TtButton v-if="!opening" @click="emit('close')">Close shop</TtButton>
   </TtPanel>
 </template>
 
 <style scoped>
+.reel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
 .box-picture {
   width: 54px;
   height: 54px;

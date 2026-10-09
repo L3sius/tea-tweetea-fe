@@ -34,7 +34,16 @@ export const useTeamStore = defineStore('team', () => {
   const code = ref<string | null>(null)
   const teamId = ref<TeamId | null>(null)
   /** The team's inventory. It is private, so it comes from `/team/me` rather than the state. */
-  const items = shallowRef<ReadonlyMap<Item, number>>(new Map())
+  const serverItems = shallowRef<ReadonlyMap<Item, number>>(new Map())
+  /**
+   * The inventory from before a mystery box was bought, shown until the reel lands on what came
+   * out of it. The server has put the item in already; the page only waits to show it.
+   */
+  const beforeBox = shallowRef<ReadonlyMap<Item, number> | null>(null)
+  /** The item a mystery box gave, while the reel spins to it. */
+  const opening = shallowRef<Item | null>(null)
+  /** The inventory as the page shows it. */
+  const items = computed(() => beforeBox.value ?? serverItems.value)
   /** The journal entry `items` is current to. */
   let itemsSeq = 0
   const pending = ref(false)
@@ -144,7 +153,7 @@ export const useTeamStore = defineStore('team', () => {
     const item = confirming.value?.item ?? targeting.value?.item
     const t = team.value
     if (!item) return null
-    if (!t || (items.value.get(item) ?? 0) === 0) return 'gone'
+    if (!t || (serverItems.value.get(item) ?? 0) === 0) return 'gone'
     const here = game.board?.tiles.get(t.position)
     return whyNotUsable(t, item, now.value, here, blockers.value)
   })
@@ -178,7 +187,7 @@ export const useTeamStore = defineStore('team', () => {
     try {
       const me = await api.getMe(entered)
       if (code.value !== entered) return
-      items.value = me.items
+      serverItems.value = me.items
       itemsSeq = me.seq
     } catch {
       // The next change that names the team tries again.
@@ -218,7 +227,7 @@ export const useTeamStore = defineStore('team', () => {
       const me = await api.getMe(trimmed)
       code.value = trimmed
       teamId.value = me.teamId
-      items.value = me.items
+      serverItems.value = me.items
       itemsSeq = me.seq
       try {
         localStorage.setItem(CODE_KEY, trimmed)
@@ -249,7 +258,9 @@ export const useTeamStore = defineStore('team', () => {
   function logout() {
     code.value = null
     teamId.value = null
-    items.value = new Map()
+    serverItems.value = new Map()
+    beforeBox.value = null
+    opening.value = null
     itemsSeq = 0
     error.value = null
     clearRoute()
@@ -297,7 +308,7 @@ export const useTeamStore = defineStore('team', () => {
   async function draw(): Promise<DrawOutcome | null> {
     const id = team.value?.id
     if (id === undefined) return null
-    const before = items.value
+    const before = serverItems.value
     const seq = await sendDraw(id)
     if (seq === null) return null
     const entry = await waitForEntry(seq)
@@ -305,7 +316,7 @@ export const useTeamStore = defineStore('team', () => {
     // The journal keeps the free item private, even from its team: the inventory says which it was.
     if (outcome?.freeItem && outcome.freeItem.item === null) {
       await refreshItems()
-      outcome.freeItem.item = gainedItem(before, items.value)
+      outcome.freeItem.item = gainedItem(before, serverItems.value)
     }
     if (outcome) return outcome
     // No entry (offline fixtures or a slow stream): fall back to what the state says.
@@ -424,6 +435,26 @@ export const useTeamStore = defineStore('team', () => {
     if ((await act({ kind: 'confirm_path', path: full })) !== null) clearRoute()
   }
 
+  /**
+   * Buys a mystery box. The server picks the item at once; it stays out of the shown inventory
+   * until `boxOpened`, so the reel can land on it first.
+   */
+  async function buyMysteryBox() {
+    if (opening.value) return
+    beforeBox.value = serverItems.value
+    const seq = await act({ kind: 'buy_mystery_box' })
+    const item = seq === null ? null : gainedItem(beforeBox.value ?? new Map(), serverItems.value)
+    // Refused, or the inventory could not be read: there is nothing to reveal.
+    if (item === null) beforeBox.value = null
+    opening.value = item
+  }
+
+  /** The reel has landed on the box's item: it goes into the shown inventory. */
+  function boxOpened() {
+    opening.value = null
+    beforeBox.value = null
+  }
+
   /** Asks to use an item at once, or waits for a target first if it needs one. */
   function useItem(item: Item) {
     const kind = ITEM_TARGET[item]
@@ -486,6 +517,9 @@ export const useTeamStore = defineStore('team', () => {
     undoCheckpoint,
     clearRoute,
     confirmRoute,
+    opening,
+    buyMysteryBox,
+    boxOpened,
     useItem,
     useOn,
     confirmUse,

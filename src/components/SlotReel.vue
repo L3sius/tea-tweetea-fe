@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
-import { reelProgress, reelStrip } from '@/ui/reel'
+import { FAKE_PICKS, reelProgress, reelStrip } from '@/ui/reel'
 
 // A slot-machine reel: picks scroll from left to right past the marker and stop on `winner`. The
-// winner is decided before it starts (by the server); the spin is only for show.
+// winner is decided before it starts (by the server); the spin is only for show. Picks show as
+// text, or through the `pick` slot (an item's picture, say).
 
-const props = withDefaults(defineProps<{ winner: string; durationMs?: number }>(), {
-  durationMs: 6000,
-})
+const props = withDefaults(
+  defineProps<{
+    winner: string
+    durationMs?: number
+    /** What the reel scrolls past on its way to the winner. */
+    fakes?: readonly string[]
+  }>(),
+  { durationMs: 6000, fakes: () => FAKE_PICKS },
+)
 const emit = defineEmits<{ landed: [] }>()
-
+defineSlots<{ pick?: (props: { label: string }) => unknown }>()
 /** Width of one pick on the strip, gap included. */
 const PICK = 232
 
-const strip = reelStrip(props.winner)
+const strip = reelStrip(props.winner, undefined, props.fakes)
 const view = useTemplateRef('view')
 const offset = ref(0)
 const landed = ref(false)
@@ -51,7 +58,7 @@ onBeforeUnmount(() => cancelAnimationFrame(frame))
         class="reel-pick"
         :class="{ win: landed && i === strip.winner }"
       >
-        {{ label }}
+        <slot name="pick" :label="label">{{ label }}</slot>
       </li>
     </ol>
     <!-- The marker the reel stops on: a line behind the picks, and notches over them. -->
