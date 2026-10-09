@@ -90,8 +90,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const tourState = computed<GameState | null>(() => (void changes.value, pretend?.state() ?? null))
   const tourNames = computed(() => (void changes.value, pretend?.names() ?? null))
   const guideTeam = computed(() => (void changes.value, pretend ? { ...pretend.team } : null))
-  const muted = ref(music.isMuted())
-  const volume = ref(music.getVolume())
 
   const active = computed(() => phase.value !== 'off')
   /** The page is the tour's scene: parts of it hidden, Earl Grey on the map. */
@@ -412,18 +410,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
     changes.value++
   }
 
-  function toggleMute() {
-    muted.value = !muted.value
-    music.setMuted(muted.value)
-  }
-
-  /** Sets the music's volume (0–1); moving it up unmutes. */
-  function setVolume(to: number) {
-    music.setVolume(to)
-    volume.value = music.getVolume()
-    if (muted.value && to > 0) toggleMute()
-  }
-
   return {
     seen,
     phase,
@@ -446,9 +432,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
     spin,
     shopTile,
     world,
-    muted,
-    volume,
-    setVolume,
     guide,
     shows,
     start,
@@ -456,7 +439,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
     next,
     back,
     finish,
-    toggleMute,
     endSpin,
     jumpTo,
     closeShop: () => (shopTile.value = null),

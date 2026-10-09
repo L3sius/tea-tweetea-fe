@@ -8,6 +8,7 @@ import { useTeamStore } from '@/stores/team'
 import { useTutorialStore } from '@/stores/tutorial'
 import { teamColor } from '@/ui/colors'
 import { TtButton, TtText } from '@/ui/tt'
+import SoundControl from './SoundControl.vue'
 
 const game = useGameStore()
 const { connection } = storeToRefs(game)
@@ -92,6 +93,7 @@ const LINKS = [
           <TtText :size="1" :color="badge.color">{{ badge.label }}</TtText>
         </span>
       </span>
+      <SoundControl />
     </div>
   </header>
 </template>

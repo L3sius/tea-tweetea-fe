@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 import CharacterPreview from '@/components/CharacterPreview.vue'
 import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
+import SoundControl from '@/components/SoundControl.vue'
 import { HEADING } from '@/characters/heading'
 import { useGameStore } from '@/stores/game'
 import { useTutorialStore } from '@/stores/tutorial'
@@ -106,7 +107,7 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
       </div>
     </Transition>
 
-    <!-- Contents, skip and the music -->
+    <!-- Contents and skip, and the sound while the header is hidden -->
     <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
       <div class="flex items-center gap-1.5">
         <TtButton
@@ -120,28 +121,8 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
         </TtButton>
         <TtButton size="sm" @click="tutorial.finish()">Skip</TtButton>
       </div>
-      <div class="tt-sprite-display flex items-center gap-2 py-0 pr-2 pl-0">
-        <TtButton
-          size="sm"
-          class="!min-h-9"
-          :aria-pressed="tutorial.muted"
-          :title="tutorial.muted ? 'Unmute the music' : 'Mute the music'"
-          @click="tutorial.toggleMute()"
-        >
-          {{ tutorial.muted ? '♪ Off' : '♪ On' }}
-        </TtButton>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          class="volume"
-          :class="{ 'opacity-50': tutorial.muted }"
-          :value="Math.round(tutorial.volume * 100)"
-          aria-label="Music volume"
-          @input="tutorial.setVolume(Number(($event.target as HTMLInputElement).value) / 100)"
-        />
-      </div>
+      <!-- The site's sound control lives in the header; while the tour hides it, it shows here. -->
+      <SoundControl v-if="!tutorial.shows('header')" />
       <Transition name="fade-quick">
         <nav
           v-if="contentsOpen"
@@ -268,10 +249,6 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 <style scoped>
 .chatbox {
   cursor: pointer;
-}
-.volume {
-  width: 96px;
-  accent-color: var(--osrs-orange);
 }
 .chapter {
   padding: 2px 8px;
