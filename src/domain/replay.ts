@@ -78,9 +78,20 @@ export function watchEntries(log: readonly JournalEntry[], seq: number): Journal
   return out
 }
 
-/** The latest moves after `seq` (a last visit), each with the card drawn for it. */
-export function catchUpEntries(log: readonly JournalEntry[], seq: number): JournalEntry[] {
-  const moves = log.filter((e) => e.seq > seq && movesIn(e).length > 0).slice(-CATCH_UP_MOVES)
+/** Moves after `after` (a last visit) up to `upTo` (when this page loaded): what was missed. */
+export const missedMoveEntries = (log: readonly JournalEntry[], after: number, upTo: number) =>
+  log.filter((e) => e.seq > after && e.seq <= upTo && movesIn(e).length > 0)
+
+/**
+ * The latest moves missed between a last visit (`after`) and loading the page (`upTo`), each with
+ * the card drawn for it. Moves after `upTo` were watched live, so they are not offered again.
+ */
+export function catchUpEntries(
+  log: readonly JournalEntry[],
+  after: number,
+  upTo = Infinity,
+): JournalEntry[] {
+  const moves = missedMoveEntries(log, after, upTo).slice(-CATCH_UP_MOVES)
   const picked = new Map<number, JournalEntry>()
   for (const move of moves) for (const e of watchEntries(log, move.seq)) picked.set(e.seq, e)
   return [...picked.values()].sort((a, b) => a.seq - b.seq)

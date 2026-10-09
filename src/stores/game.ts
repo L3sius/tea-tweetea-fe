@@ -15,6 +15,7 @@ import {
   RETURN_COUNTDOWN_S,
   buildReplay,
   catchUpEntries,
+  missedMoveEntries,
   movesIn,
   watchEntries,
   type Replay,
@@ -136,6 +137,7 @@ export const useGameStore = defineStore('game', () => {
         ])
       useItemCatalogue(loadedItems)
       rules.value = loadedRules
+      loadedSeq.value = loadedState.seq
       board.value = loadedBoard
       challenges.value = loadedChallenges
       feed.value = loadedFeed
@@ -216,11 +218,16 @@ export const useGameStore = defineStore('game', () => {
 
   /** The newest entry seen on an earlier visit; null on a first visit or once caught up. */
   const lastSeen = ref<number | null>(readLastSeen())
-  /** Moves made since the last visit. */
+  /**
+   * The newest entry when this page loaded. Moves after it arrive live and are watched as they
+   * happen, so only moves between the last visit and this one count as missed.
+   */
+  const loadedSeq = ref<number | null>(null)
+  /** Moves made between the last visit and loading this page. */
   const missedMoves = computed(() =>
-    lastSeen.value === null
+    lastSeen.value === null || loadedSeq.value === null
       ? 0
-      : log.value.filter((e) => e.seq > (lastSeen.value ?? 0) && movesIn(e).length > 0).length,
+      : missedMoveEntries(log.value, lastSeen.value, loadedSeq.value).length,
   )
 
   function startReplay(entries: JournalEntry[], label: string) {
@@ -255,8 +262,8 @@ export const useGameStore = defineStore('game', () => {
 
   /** Replays the moves made since the last visit, then counts them as seen. */
   function catchUp() {
-    if (lastSeen.value === null) return
-    startReplay(catchUpEntries(log.value, lastSeen.value), 'While you were away')
+    if (lastSeen.value === null || loadedSeq.value === null) return
+    startReplay(catchUpEntries(log.value, lastSeen.value, loadedSeq.value), 'While you were away')
     lastSeen.value = null
   }
 

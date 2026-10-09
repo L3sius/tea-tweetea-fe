@@ -91,6 +91,12 @@ describe('catchUpEntries', () => {
     expect(catchUpEntries(log, 0).map((e) => e.seq)).toEqual([2, 3, 4, 5])
   })
 
+  it('leaves out moves made after the page loaded, which were watched live', () => {
+    const log = [start, card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10, 11], blue)]
+    expect(catchUpEntries(log, 1, 3).map((e) => e.seq)).toEqual([2, 3])
+    expect(catchUpEntries(log, 3, 3)).toEqual([])
+  })
+
   it(`keeps only the last ${CATCH_UP_MOVES} moves`, () => {
     const log = [start]
     for (let i = 0; i < 30; i++) log.push(walk(2 + i, [5, 7]))
