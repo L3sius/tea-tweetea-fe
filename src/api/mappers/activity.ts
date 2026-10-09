@@ -21,6 +21,7 @@ export function toObservation(wire: WireObservation): Observation {
     case 'slayer':
     case 'pet':
     case 'combat_achievement':
+    case 'death':
       return wire
   }
 }

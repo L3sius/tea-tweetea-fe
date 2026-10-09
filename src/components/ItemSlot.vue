@@ -35,7 +35,6 @@ const picture = computed(() => Math.round(props.size * 0.6))
   <TtSlot
     :size="size"
     :icon="sprite.icon"
-    :gem="sprite.gem"
     :quantity="count"
     :selected="selected"
     :empty="dim"
@@ -53,9 +52,8 @@ const picture = computed(() => Math.round(props.size * 0.6))
     <span
       v-else-if="!sprite.icon"
       class="tt-1 pointer-events-none px-1 text-center break-words"
-      :class="sprite.gem ? 'absolute right-0 bottom-0.5 left-0' : ''"
       :style="{ color: 'var(--osrs-white)' }"
-      >{{ sprite.gem ? 'Necklace' : name }}</span
+      >{{ name }}</span
     >
   </TtSlot>
 </template>

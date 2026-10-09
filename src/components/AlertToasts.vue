@@ -7,7 +7,6 @@ const emit = defineEmits<{ dismiss: [id: string]; openEvents: [id: string] }>()
 
 const TITLE_COLOR = {
   minigame: 'var(--osrs-orange)',
-  match: 'var(--osrs-red)',
   gem: 'var(--gem-purple-glow)',
   end: 'var(--osrs-green)',
   item: 'var(--osrs-yellow)',

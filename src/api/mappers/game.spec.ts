@@ -11,7 +11,6 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   status: { status: 'ready' },
   frozen_until: null,
   shield_until: null,
-  match_id: null,
   gems: ['blue', 'white'],
   gold: 55,
   effects: {
@@ -57,7 +56,7 @@ describe('teams', () => {
           status: 'moving',
           path: [40, 41, 42],
           at: 1,
-          pauses: [{ pause: 'match', id: null, opponent: 3 }],
+          pauses: [{ pause: 'shop' }],
           checked: false,
         },
       }),
@@ -67,7 +66,7 @@ describe('teams', () => {
       move: {
         path: [40, 41, 42],
         atIndex: 1,
-        pauses: [{ kind: 'match', matchId: null, opponent: 3 }],
+        pauses: [{ kind: 'shop' }],
         currentTileResolved: false,
       },
     })
@@ -109,7 +108,6 @@ describe('game state', () => {
       },
     },
     minigames: {},
-    matches: {},
   }
 
   it('keys maps by numeric id', () => {

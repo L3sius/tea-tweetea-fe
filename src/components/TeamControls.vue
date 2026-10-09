@@ -19,14 +19,12 @@ import { useTeamStore } from '@/stores/team'
 import { teamColor } from '@/ui/colors'
 import { count } from '@/ui/format'
 import {
-  GEM_NAMES,
   TtButton,
   TtDisplayBox,
   TtDivider,
   TtGemTracker,
   TtPanel,
   TtProgressBar,
-  TtSlot,
   TtText,
 } from '@/ui/tt'
 import CardDraw from './CardDraw.vue'
@@ -69,16 +67,6 @@ const atShop = computed(() => {
   if (pause.value?.kind === 'shop') return true
   const standing = ['working', 'ready', 'drawn'].includes(t.status.kind)
   return standing && game.board.tiles.get(t.position)?.kind === 'shop'
-})
-
-/** A match this team won and must now pick a gem from. */
-const stealing = computed(() => {
-  const t = team.value
-  if (!t) return null
-  for (const m of state.value.matches.values()) {
-    if (m.outcome.kind === 'stealing' && m.outcome.winner === t.id) return m.outcome
-  }
-  return null
 })
 
 const task = computed(() => {
@@ -173,12 +161,10 @@ const step = computed<Step | null>(() => {
 })
 const stepIndex = computed(() => STEPS.findIndex((s) => s.id === step.value))
 
-/** Something outside the turn's steps holds the team: game state, a gem to steal, ice, a match. */
+/** Something outside the turn's steps holds the team: the game's state, or ice. */
 const blocker = computed(() => {
   if (state.value.phase !== 'running') return 'phase'
-  if (stealing.value) return 'stealing'
   if (frozen.value && my.drawPhase === 'idle') return 'frozen'
-  if (team.value?.matchId !== null && my.drawPhase === 'idle') return 'match'
   if (animating.value && my.drawPhase === 'idle') return 'animating'
   return null
 })
@@ -340,35 +326,11 @@ async function login() {
       <TtText v-if="blocker === 'phase'" :size="2" color="white">
         {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
       </TtText>
-      <template v-else-if="blocker === 'stealing' && stealing">
-        <TtText :size="2" color="green" glow>You won the match!</TtText>
-        <TtText :size="1" color="white">
-          Pick a gem to steal. Choose before {{ clock(stealing.deadline) }}.
-        </TtText>
-        <div class="mt-1 flex flex-wrap justify-center gap-1">
-          <TtSlot
-            v-for="gem in stealing.options"
-            :key="gem"
-            :gem="gem"
-            :size="90"
-            :label="GEM_NAMES[gem]"
-            :title="`Steal the ${GEM_NAMES[gem]}`"
-            :empty="my.pending"
-            @click="!my.pending && my.act({ kind: 'steal_gem', gem })"
-          />
-        </div>
-      </template>
       <template v-else-if="blocker === 'frozen' && frozen">
         <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
         <TtText :size="1" color="white" class="max-w-[340px]">
           You can't draw or use power-ups while frozen. Hold Protect from Magic to block the next
           freeze.
-        </TtText>
-      </template>
-      <template v-else-if="blocker === 'match'">
-        <TtText :size="2" color="red" glow>In a match</TtText>
-        <TtText :size="1" color="white" class="max-w-[340px]">
-          The first team to finish the match challenge wins. See the Events tab.
         </TtText>
       </template>
       <TtText v-else :size="2" color="white">Walking...</TtText>
@@ -570,20 +532,6 @@ async function login() {
           <TtButton @click="emit('openShop')">Browse</TtButton>
           <TtButton :disabled="my.pending" @click="my.act({ kind: 'close_shop' })">
             Walk on
-          </TtButton>
-        </div>
-      </template>
-      <template v-else-if="pause?.kind === 'choose_opponent'">
-        <TtText :size="2" color="red">Several teams are here. Who do you challenge?</TtText>
-        <div class="flex flex-wrap justify-center gap-1.5">
-          <TtButton
-            v-for="id in pause.candidates"
-            :key="id"
-            size="sm"
-            :disabled="my.pending"
-            @click="my.act({ kind: 'choose_opponent', opponent: id })"
-          >
-            {{ game.names.team(id) }}
           </TtButton>
         </div>
       </template>

@@ -69,7 +69,7 @@ const statusLine = computed(() => {
   const t = team.value
   if (!t) return ''
   const now = new Date(game.serverNow())
-  const line = `${teamStatusText(t, now, game.names)} · tile #${t.position} · ${t.gold}g`
+  const line = `${teamStatusText(t, now)} · tile #${t.position} · ${t.gold}g`
   // Items are private: only the team this browser plays as shows its count.
   return t.id === my.teamId
     ? `${line} · ${inventorySize(my.items)}/${game.rules?.inventoryLimit ?? '?'} items`

@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const color = computed(() => teamColor(props.team))
 const statusText = computed(() =>
-  props.moving ? 'Walking...' : teamStatusText(props.team, props.now, props.names),
+  props.moving ? 'Walking...' : teamStatusText(props.team, props.now),
 )
 
 /** The tile task the team is working on, with how far along it is. */

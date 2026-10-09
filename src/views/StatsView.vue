@@ -28,6 +28,7 @@ const KINDS: { value: ObservationKind | null; label: string; subject: string }[]
   { value: 'pet', label: 'Pets', subject: 'Pets' },
   { value: 'slayer', label: 'Slayer', subject: 'Slayer tasks' },
   { value: 'combat_achievement', label: 'Combat achievements', subject: 'Tasks' },
+  { value: 'death', label: 'Deaths', subject: 'Killers' },
 ]
 const kindInfo = computed(
   () => KINDS.find((k) => k.value === filter.value.kind) ?? { subject: 'Top sources' },

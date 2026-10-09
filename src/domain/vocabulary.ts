@@ -37,25 +37,5 @@ export const ITEMS = [
   'protect_from_magic',
   'leprechaun_hat',
   'saturated_heart',
-  'sapphire_necklace',
-  'emerald_necklace',
-  'dragon_necklace',
-  'ruby_necklace',
-  'onyx_necklace',
-  'zenyte_necklace',
-  'topaz_necklace',
-  'diamond_necklace',
 ] as const
 export type Item = (typeof ITEMS)[number]
-
-/** The necklace that protects each gem in a lost match, in gem order. */
-export const NECKLACES = {
-  blue: 'sapphire_necklace',
-  green: 'emerald_necklace',
-  purple: 'dragon_necklace',
-  red: 'ruby_necklace',
-  yellow: 'onyx_necklace',
-  orange: 'zenyte_necklace',
-  pink: 'topaz_necklace',
-  white: 'diamond_necklace',
-} as const satisfies Record<Gem, Item>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Team, TeamStatus } from './game'
-import { instanceId, matchId, teamId, tileId } from './ids'
+import { instanceId, teamId, tileId } from './ids'
 import { blockersOut, gainedItem, whyNotUsable } from './items'
 
 const NOW = new Date('2026-10-06T12:00:00Z')
@@ -14,7 +14,6 @@ function team(status: TeamStatus, overrides: Partial<Team> = {}): Team {
     status,
     frozenUntil: null,
     shieldUntil: null,
-    matchId: null,
     gems: new Set(),
     gold: 100,
     effects: {
@@ -59,15 +58,12 @@ describe('whyNotUsable', () => {
     expect(whyNotUsable(used, 'bronze_feather', NOW)).toMatch(/Already used/)
   })
 
-  it('locks everything while frozen or in a match, even when ready', () => {
+  it('locks everything while frozen, even when ready', () => {
     const frozen = team({ kind: 'ready' }, { frozenUntil: new Date(NOW.getTime() + 60_000) })
     expect(whyNotUsable(frozen, 'bronze_feather', NOW)).toBe('Not while frozen')
-    const fighting = team({ kind: 'ready' }, { matchId: matchId(1) })
-    expect(whyNotUsable(fighting, 'bronze_feather', NOW)).toBe('Not during a match')
   })
 
-  it('treats necklaces and Protect from Magic as kept, not used', () => {
-    expect(whyNotUsable(ready, 'sapphire_necklace', NOW)).toBe('Works while held')
+  it('treats Protect from Magic as kept, not used', () => {
     expect(whyNotUsable(ready, 'protect_from_magic', NOW)).toBe('Works while held')
   })
 

@@ -11,6 +11,8 @@ export type Observation =
   | { kind: 'slayer'; task: string }
   | { kind: 'pet'; name: string }
   | { kind: 'combat_achievement'; task: string }
+  /** `killer`: the NPC or player that killed the account, or null. `pvp`: killed by a player. */
+  | { kind: 'death'; killer: string | null; pvp: boolean }
 
 export type ObservationKind = Observation['kind']
 

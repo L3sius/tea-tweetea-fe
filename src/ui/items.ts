@@ -1,11 +1,8 @@
 import { itemEntry } from '@/domain/items'
-import { GEMS, NECKLACES, type Gem, type Item } from '@/domain/vocabulary'
+import type { Item } from '@/domain/vocabulary'
 
-/**
- * What an item slot shows: the catalogue's picture (OSRS Wiki), else a kit sprite, a gem for a
- * necklace, or just the item's name.
- */
-export type ItemSprite = { url?: string; icon?: string; gem?: Gem }
+/** What an item slot shows: the catalogue's picture (OSRS Wiki), else a kit sprite, or its name. */
+export type ItemSprite = { url?: string; icon?: string }
 
 // Kit sprites for when the catalogue has no picture or it fails to load.
 const ICONS: Partial<Record<Item, string>> = {
@@ -15,14 +12,10 @@ const ICONS: Partial<Record<Item, string>> = {
   banana: 'banana',
 }
 
-const NECKLACE_GEMS = new Map<Item, Gem>(GEMS.map((gem) => [NECKLACES[gem], gem]))
-
 /** The fallback without the catalogue picture. */
 export function itemKitSprite(item: Item): ItemSprite {
   const icon = ICONS[item]
-  if (icon) return { icon }
-  const gem = NECKLACE_GEMS.get(item)
-  return gem ? { gem } : {}
+  return icon ? { icon } : {}
 }
 
 export function itemSprite(item: Item): ItemSprite {

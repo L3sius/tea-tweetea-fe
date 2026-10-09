@@ -9,7 +9,6 @@ const standing = (over: Partial<Standing> = {}): Standing => ({
   finished: false,
   place: null,
   gold: null,
-  won: false,
   ...over,
 })
 const race: Stake = { kind: 'places', payouts: [20, 10, 5, 3] }
@@ -18,7 +17,7 @@ const perUnit: Stake = { kind: 'per_unit', goldPerUnit: 1, cap: 50 }
 describe('standingText', () => {
   it(`says "Not yet" for a one-off task nobody has done, and "Didn't finish" once it is over`, () => {
     expect(standingText(standing(), race)).toBe('Not yet')
-    expect(standingText(standing(), { kind: 'gem' }, false)).toBe("Didn't finish")
+    expect(standingText(standing(), race, false)).toBe("Didn't finish")
   })
 
   it('counts a longer task, and ticks it once it is complete', () => {
@@ -33,12 +32,6 @@ describe('standingText', () => {
     )
     expect(standingText(standing({ done: 30, needed: 50, gold: 30 }), perUnit)).toBe(
       '30/50 +30 gold',
-    )
-  })
-
-  it('names the winner of a match', () => {
-    expect(standingText(standing({ done: 1, finished: true, won: true }), { kind: 'gem' })).toBe(
-      'Won ✓',
     )
   })
 })

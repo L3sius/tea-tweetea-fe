@@ -1,82 +1,82 @@
 [
   {
-    "key": "Scale Daddy",
-    "count": 97,
-    "value": 256617440
-  },
-  {
-    "key": "Rat Catcher",
-    "count": 66,
-    "value": 201568240
-  },
-  {
-    "key": "Morgan Fan",
-    "count": 85,
-    "value": 180811760
-  },
-  {
-    "key": "Sewer Sam II",
-    "count": 65,
-    "value": 172763880
-  },
-  {
-    "key": "Snakeling",
-    "count": 96,
-    "value": 166164440
-  },
-  {
-    "key": "Scale Mommy",
-    "count": 91,
-    "value": 153609560
-  },
-  {
-    "key": "Bank Sitter",
-    "count": 86,
-    "value": 144157760
+    "key": "Gnome Kid",
+    "count": 127,
+    "value": 273555720
   },
   {
     "key": "Bank Stander",
-    "count": 81,
-    "value": 141760680
-  },
-  {
-    "key": "Sewer Sam",
-    "count": 61,
-    "value": 134569440
-  },
-  {
-    "key": "Glough Fan",
-    "count": 102,
-    "value": 113358400
+    "count": 90,
+    "value": 270609440
   },
   {
     "key": "Gnome Kid 2",
-    "count": 115,
-    "value": 109809000
-  },
-  {
-    "key": "Venom Vic",
-    "count": 91,
-    "value": 97809040
-  },
-  {
-    "key": "Bucket Bob",
-    "count": 62,
-    "value": 95015960
+    "count": 106,
+    "value": 249956920
   },
   {
     "key": "Wizard Ned",
-    "count": 61,
-    "value": 78161320
+    "count": 87,
+    "value": 247011320
+  },
+  {
+    "key": "Snakeling",
+    "count": 106,
+    "value": 199564680
+  },
+  {
+    "key": "Rat Catcher",
+    "count": 82,
+    "value": 194710600
+  },
+  {
+    "key": "Scale Mommy",
+    "count": 94,
+    "value": 187013560
+  },
+  {
+    "key": "Morgan Fan",
+    "count": 75,
+    "value": 175015880
+  },
+  {
+    "key": "Sewer Sam",
+    "count": 78,
+    "value": 172209280
   },
   {
     "key": "Tree Gnome",
-    "count": 121,
-    "value": 73354720
+    "count": 88,
+    "value": 146157480
   },
   {
-    "key": "Gnome Kid",
+    "key": "Glough Fan",
     "count": 112,
-    "value": 42809120
+    "value": 137959200
+  },
+  {
+    "key": "Bank Sitter",
+    "count": 85,
+    "value": 105011640
+  },
+  {
+    "key": "Scale Daddy",
+    "count": 77,
+    "value": 104610000
+  },
+  {
+    "key": "Sewer Sam II",
+    "count": 82,
+    "value": 101354280
+  },
+  {
+    "key": "Venom Vic",
+    "count": 84,
+    "value": 96406360
+  },
+  {
+    "key": "Bucket Bob",
+    "count": 76,
+    "value": 69662600
   }
 ]

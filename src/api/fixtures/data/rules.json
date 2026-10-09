@@ -10,6 +10,5 @@
   "suit_gold_per_rank": 2,
   "initiator_multiplier": 2,
   "random_event_chance": 0.2,
-  "steal_minutes": 30,
   "min_gem_distance": 3
 }

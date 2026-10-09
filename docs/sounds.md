@@ -1,14 +1,14 @@
 # Sounds
 
 The board plays OSRS sounds as moments show on the map: a card turning, a spell landing, a gem
-collected. They ship with the site in `public/sounds/` (36 files, about 0.6 MB), so a deploy always
+collected. They ship with the site in `public/sounds/` (34 files, about 0.6 MB), so a deploy always
 carries the sounds its code plays. The tour's music is bigger and lives on the asset server instead
 (`tools/characters/audio/`, see `tools/characters/README.md`).
 
 ## How it works
 
 - `src/domain/sounds.ts` says which sound each game event makes, and who hears it:
-  - **everyone**: big moments (gems, Jokers, spells, blockers, teleports, minigames, matches).
+  - **everyone**: big moments (gems, Jokers, spells, blockers, teleports, minigames).
   - **team**: small ones (cards, feathers, shops, tiles completed, items dropped), heard only by
     the team they happen to and by whoever follows that team on the map.
 - `Choreography` (`src/domain/motion.ts`) schedules each sound at the moment its event shows on the
@@ -47,7 +47,6 @@ OSRS Wiki's [jingles](https://oldschool.runescape.wiki/w/Jingles), by name.
 | `stunned`            | a team walks onto a Snake charmer, or is frozen otherwise | sound 3005 `stun_impact`               |
 | `web-stuck`          | a team walks onto a web                                   | sound 1280 `TBCU_spider_stick`         |
 | `protect-from-magic` | Protect from Magic blocks a freeze                        | sound 2675 `protect_from_magic`        |
-| `necklace-save`      | a necklace saves a gem                                    | sound 136 `enchant_sapphire_amulet`    |
 | `item-drop`          | a team drops an item                                      | sound 2739 `put_down`                  |
 | `teleport`           | a team teleports (Joker, dev tools)                       | sound 200 `teleport_all`               |
 | `thaw`               | a team thaws                                              | sound 2541 `shatter`                   |
@@ -55,16 +54,15 @@ OSRS Wiki's [jingles](https://oldschool.runescape.wiki/w/Jingles), by name.
 | `coins-recorded`     | a team buys                                               | a recording of the in-game coins sound |
 | `casket-open`        | the mystery box reel lands                                | sound 50 `casket_open`                 |
 | `level-up`           | a gem is collected                                        | jingle "Attack Level Up!"              |
-| `thieving`           | a gem is stolen                                           | sound 4709 `lore_thieving_fingers`     |
 | `oh-dear`            | a gem is lost                                             | jingle "Oh Dear!"                      |
 | `fanfare`            | a tile is completed                                       | sound 2930 `fanfare`                   |
 | `horn`               | a minigame opens                                          | sound 3302 `barbassault_horn`          |
-| `victory`            | a match is won                                            | jingle "Victory! (Castle Wars)"        |
+| `victory`            | a minigame ends                                           | jingle "Victory! (Castle Wars)"        |
 | `genie`              | a random event happens                                    | sound 2301 `genie_appear`              |
 | `quest-complete`     | a team wins the game                                      | jingle "Quest Complete 1"              |
 
-The quetzal's wing flaps, the Venenatis web, Lunar Tele Group and the phoenix necklace are newer
-sounds than the cache dump we had, so the closest older sound stands in for them.
+The quetzal's wing flaps, the Venenatis web and Lunar Tele Group are newer sounds than the cache
+dump we had, so the closest older sound stands in for them.
 
 ## Adding or swapping a sound
 

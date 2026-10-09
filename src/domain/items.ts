@@ -2,7 +2,7 @@
 import type { Tile } from './board'
 import type { Blocker, Team } from './game'
 import type { TeamId, TileId } from './ids'
-import { ITEMS, NECKLACES, type Item } from './vocabulary'
+import { ITEMS, type Item } from './vocabulary'
 
 const TARGETS: Partial<Record<Item, ItemTargetKind>> = {
   morrigans_throwing_axe: 'team',
@@ -86,10 +86,7 @@ export const itemEntry = (item: Item): ItemEntry =>
 export const mysteryBoxEntry = (): ItemEntry => catalogue.mysteryBox
 
 /** Items that do nothing when used; they work by being held. */
-export const PASSIVE_ITEMS: ReadonlySet<Item> = new Set<Item>([
-  'protect_from_magic',
-  ...Object.values(NECKLACES),
-])
+export const PASSIVE_ITEMS: ReadonlySet<Item> = new Set<Item>(['protect_from_magic'])
 
 export const inventorySize = (items: ReadonlyMap<Item, number>) =>
   [...items.values()].reduce((a, b) => a + b, 0)
@@ -132,20 +129,12 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
   protect_from_magic: 'held',
   leprechaun_hat: 'draw',
   saturated_heart: 'draw',
-  sapphire_necklace: 'held',
-  emerald_necklace: 'held',
-  dragon_necklace: 'held',
-  ruby_necklace: 'held',
-  onyx_necklace: 'held',
-  zenyte_necklace: 'held',
-  topaz_necklace: 'held',
-  diamond_necklace: 'held',
 }
 
 /**
  * Why the team cannot use an item right now, or null if it can. Mirrors the server's rule
  * (`use_item` in docs/api.md): power-ups are a decision taken between finishing a tile and drawing,
- * one per tile, never while frozen or in a match. `here` is the team's tile, for the items that
+ * one per tile, never while frozen. `here` is the team's tile, for the items that
  * only work on land or at sea; `blockers` is how many the team has out against its limit.
  */
 export function whyNotUsable(
@@ -161,7 +150,6 @@ export function whyNotUsable(
   if (here && item === 'quetzal_whistle' && here.sea) return 'Only works on land'
   if (here && item === 'ogre_boat' && !here.sea) return 'Only works at sea'
   if (team.frozenUntil !== null && team.frozenUntil > now) return 'Not while frozen'
-  if (team.matchId !== null) return 'Not during a match'
   if (team.effects.itemUsedHere) return 'Already used an item on this tile'
   switch (team.status.kind) {
     case 'ready':

@@ -1,4 +1,4 @@
-import type { Gem, Item } from '@/domain/vocabulary'
+import type { Item } from '@/domain/vocabulary'
 import type { WireObservation } from './activity'
 import type { WireAppearance, WireCard, WireTarget } from './game'
 
@@ -11,8 +11,6 @@ type TeamAction =
   | { action: 'buy'; item: Item }
   | { action: 'buy_mystery_box' }
   | { action: 'close_shop' }
-  | { action: 'choose_opponent'; opponent: number }
-  | { action: 'steal_gem'; gem: Gem }
   | { action: 'discard'; item: Item }
   | { action: 'set_appearance'; appearance: WireAppearance | null }
 

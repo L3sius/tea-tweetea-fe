@@ -100,11 +100,7 @@ const view = ref<{ south: number; west: number; north: number; east: number } | 
 const liveCount = computed(() => {
   const s = state.value
   if (!s) return 0
-  const minigames = [...s.minigames.values()].filter((m) => m.payouts === null).length
-  const matches = [...s.matches.values()].filter(
-    (m) => m.outcome.kind === 'open' || m.outcome.kind === 'stealing',
-  ).length
-  return minigames + matches
+  return [...s.minigames.values()].filter((m) => m.payouts === null).length
 })
 
 const TABS = computed(() => [

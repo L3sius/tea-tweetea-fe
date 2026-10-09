@@ -880,9 +880,7 @@ function renderFrame() {
             : 'teleport-in'
           : frozen
             ? 'frozen'
-            : team.matchId !== null
-              ? 'fighting'
-              : 'idle'
+            : 'idle'
     const group = p.kind === 'still' ? still.get(p.tile) : undefined
     const slot = group ? group.indexOf(team.id) - (group.length - 1) / 2 : 0
     if (entry.piece) drawCharacter(entry.piece, team, p, time, still)
@@ -994,11 +992,8 @@ function quotesAt(
   const out: Quote[] = []
   const teams = [...props.state.teams.values()]
   const players = teams.flatMap((t) => t.members.map((m) => m.name)).sort()
-  const idle = idleQuote(
-    time,
-    teams.map((t) => t.id).sort((a, b) => a - b),
-    players,
-  )
+  const ids = teams.map((t) => t.id).sort((a, b) => a - b)
+  const idle = idleQuote(time, ids, players)
   const speaker = idle ? props.state.teams.get(idle.team) : undefined
   // During the tutorial its guide does the talking.
   if (idle && speaker && !props.guide) {
@@ -1776,17 +1771,6 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   top: -8px;
   right: -6px;
   font-size: 14px;
-}
-.board-map .sprite-fighting .sprite-body svg {
-  animation: sprite-shake 0.5s ease-in-out infinite;
-}
-@keyframes sprite-shake {
-  25% {
-    transform: translateX(-1.5px) rotate(-6deg);
-  }
-  75% {
-    transform: translateX(1.5px) rotate(6deg);
-  }
 }
 .board-map .sprite-character {
   width: 60px;

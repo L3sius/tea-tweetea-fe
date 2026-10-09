@@ -14,7 +14,6 @@ export const WireRules = z.object({
   suit_gold_per_rank: z.number(),
   initiator_multiplier: z.number(),
   random_event_chance: z.number(),
-  steal_minutes: z.number(),
   min_gem_distance: z.int(),
 })
 export type WireRules = z.infer<typeof WireRules>

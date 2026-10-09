@@ -90,8 +90,7 @@ export const useTeamStore = defineStore('team', () => {
   /** The walks open to the team after a draw. */
   const walks = computed(() => {
     const t = team.value
-    if (!t || t.status.kind !== 'drawn' || !game.state || t.frozenUntil || t.matchId !== null)
-      return null
+    if (!t || t.status.kind !== 'drawn' || !game.state || t.frozenUntil) return null
     const stops = new Set(
       blockerKey.value ? blockerKey.value.split(',').map((r) => tileId(Number(r))) : [],
     )

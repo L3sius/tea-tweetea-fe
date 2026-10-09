@@ -33,10 +33,6 @@ export function toWireTeamRequest(
     case 'buy':
     case 'discard':
       return { ...base, action: command.kind, item: command.item }
-    case 'choose_opponent':
-      return { ...base, action: command.kind, opponent: command.opponent }
-    case 'steal_gem':
-      return { ...base, action: command.kind, gem: command.gem }
     case 'set_appearance':
       return { ...base, action: command.kind, appearance: command.appearance }
   }
@@ -63,6 +59,7 @@ function toWireObservation(observation: Observation): WireObservation {
     case 'slayer':
     case 'pet':
     case 'combat_achievement':
+    case 'death':
       return observation
   }
 }

@@ -49,7 +49,7 @@ export function tileBefore(log: readonly JournalEntry[], seq: number, team: Team
 
 /**
  * The entries that make up the move in entry `seq`: the card the team drew for it, the move
- * itself, and later entries that carry on the same walk (after a shop or a match paused it).
+ * itself, and later entries that carry on the same walk (after a shop paused it).
  */
 export function watchEntries(log: readonly JournalEntry[], seq: number): JournalEntry[] {
   const at = log.findIndex((e) => e.seq === seq)

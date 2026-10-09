@@ -27,7 +27,6 @@ export const SOUNDS = [
   'stunned',
   'web-stuck',
   'protect-from-magic',
-  'necklace-save',
   'item-drop',
   'teleport',
   'thaw',
@@ -35,7 +34,6 @@ export const SOUNDS = [
   'coins-recorded',
   'casket-open',
   'level-up',
-  'thieving',
   'oh-dear',
   'fanfare',
   'horn',
@@ -125,8 +123,6 @@ export function soundFor(event: GameEvent, context: Context): SoundFor | null {
       if (event.reason === 'blocked a freeze') return everyone('protect-from-magic', event.teamId)
       if (event.reason === 'discarded') return forTeam('item-drop', event.teamId)
       return null
-    case 'necklace_used':
-      return everyone('necklace-save', event.teamId)
     case 'teleported':
       if (context.itemUsed && TELEPORT_ITEMS.has(context.itemUsed)) return null
       return everyone('teleport', event.teamId)
@@ -138,16 +134,16 @@ export function soundFor(event: GameEvent, context: Context): SoundFor | null {
       return forTeam('coins-recorded', event.teamId)
     case 'gem_collected':
       return everyone('level-up', event.teamId)
-    case 'gem_stolen':
-      return everyone('thieving', event.to)
     case 'gem_lost':
       return everyone('oh-dear', event.teamId)
     case 'tile_completed':
       return forTeam('fanfare', event.teamId)
     case 'minigame_opened':
       return everyone('horn', event.initiator)
-    case 'match_won':
-      return everyone('victory', event.winner)
+    case 'minigame_closed': {
+      const best = event.payouts[0]
+      return best ? everyone('victory', best.teamId) : null
+    }
     case 'random_event':
       return everyone('genie', event.teamId)
     case 'game_ended':

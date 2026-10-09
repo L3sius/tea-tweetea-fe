@@ -42,11 +42,7 @@ export const WireTarget = z.discriminatedUnion('target', [
 ])
 export type WireTarget = z.infer<typeof WireTarget>
 
-const Pause = z.discriminatedUnion('pause', [
-  z.object({ pause: z.literal('shop') }),
-  z.object({ pause: z.literal('choose_opponent'), candidates: z.array(Id) }),
-  z.object({ pause: z.literal('match'), id: Id.nullable(), opponent: Id }),
-])
+const Pause = z.discriminatedUnion('pause', [z.object({ pause: z.literal('shop') })])
 
 // The server flattens the move into the `moving` status.
 const Status = z.discriminatedUnion('status', [
@@ -87,7 +83,6 @@ export const WireTeam = z.object({
   status: Status,
   frozen_until: Timestamp.nullable(),
   shield_until: Timestamp.nullable(),
-  match_id: Id.nullable(),
   gems: z.array(Gem),
   gold: z.number(),
   effects: z.object({
@@ -105,7 +100,6 @@ export type WireTeam = z.infer<typeof WireTeam>
 const Scope = z.discriminatedUnion('scope', [
   z.object({ scope: z.literal('tile'), team: Id, tile: Id }),
   z.object({ scope: z.literal('minigame'), id: Id }),
-  z.object({ scope: z.literal('match'), id: Id }),
 ])
 
 /** One team's standing on an instance, sent whole in every `progress` event. */
@@ -137,29 +131,6 @@ export const WireMinigame = z.object({
 })
 export type WireMinigame = z.infer<typeof WireMinigame>
 
-const MatchOutcome = z.discriminatedUnion('outcome', [
-  z.object({ outcome: z.literal('open') }),
-  z.object({
-    outcome: z.literal('stealing'),
-    winner: Id,
-    loser: Id,
-    options: z.array(Gem),
-    deadline: Timestamp,
-  }),
-  z.object({ outcome: z.literal('won'), winner: Id, stolen: Gem.nullable() }),
-  z.object({ outcome: z.literal('abandoned') }),
-])
-
-export const WireMatch = z.object({
-  id: Id,
-  instance: Id,
-  mover: Id,
-  defender: Id,
-  deadline: Timestamp,
-  outcome: MatchOutcome,
-})
-export type WireMatch = z.infer<typeof WireMatch>
-
 /** `GET /state`. */
 export const WireState = z.object({
   seq: z.int().nonnegative(),
@@ -175,6 +146,5 @@ export const WireState = z.object({
   shops: idKeyed(z.array(Item)),
   instances: idKeyed(WireInstance),
   minigames: idKeyed(WireMinigame),
-  matches: idKeyed(WireMatch),
 })
 export type WireState = z.infer<typeof WireState>

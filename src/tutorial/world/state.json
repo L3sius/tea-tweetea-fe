@@ -27,7 +27,6 @@
       },
       "frozen_until": null,
       "shield_until": "2026-10-08T17:15:08.644126500Z",
-      "match_id": null,
       "gems": [],
       "gold": 144,
       "effects": {
@@ -70,7 +69,6 @@
       },
       "frozen_until": null,
       "shield_until": "2026-10-08T16:55:08.644126500Z",
-      "match_id": null,
       "gems": ["blue", "green", "orange", "white"],
       "gold": 413,
       "effects": {
@@ -113,7 +111,6 @@
       },
       "frozen_until": "2026-10-09T13:25:08.644126500Z",
       "shield_until": null,
-      "match_id": null,
       "gems": ["yellow", "orange"],
       "gold": 213,
       "effects": {
@@ -156,7 +153,6 @@
       },
       "frozen_until": null,
       "shield_until": null,
-      "match_id": null,
       "gems": [],
       "gold": 12,
       "effects": {
@@ -706,57 +702,20 @@
       "harpie_bug_swarm",
       "wilderness_web",
       "ice_barrage",
-      "saturated_heart",
-      "diamond_necklace"
+      "saturated_heart"
     ],
-    "80": [
-      "snake_charmer",
-      "entangle",
-      "sapphire_necklace",
-      "dragon_necklace",
-      "zenyte_necklace",
-      "diamond_necklace"
-    ],
-    "98": [
-      "morrigans_throwing_axe",
-      "banana",
-      "harpie_bug_swarm",
-      "ice_barrage",
-      "entangle",
-      "onyx_necklace"
-    ],
-    "126": [
-      "quetzal_whistle",
-      "entangle",
-      "protect_from_magic",
-      "saturated_heart",
-      "onyx_necklace",
-      "topaz_necklace"
-    ],
+    "80": ["snake_charmer", "entangle"],
+    "98": ["morrigans_throwing_axe", "banana", "harpie_bug_swarm", "ice_barrage", "entangle"],
+    "126": ["quetzal_whistle", "entangle", "protect_from_magic", "saturated_heart"],
     "168": [
       "bronze_feather",
       "gold_feather",
       "group_teleport",
       "ice_barrage",
-      "protect_from_magic",
-      "ruby_necklace"
+      "protect_from_magic"
     ],
-    "237": [
-      "morrigans_throwing_axe",
-      "ogre_boat",
-      "group_teleport",
-      "emerald_necklace",
-      "topaz_necklace",
-      "diamond_necklace"
-    ],
-    "307": [
-      "gold_feather",
-      "quetzal_whistle",
-      "snake_charmer",
-      "entangle",
-      "leprechaun_hat",
-      "dragon_necklace"
-    ]
+    "237": ["morrigans_throwing_axe", "ogre_boat", "group_teleport"],
+    "307": ["gold_feather", "quetzal_whistle", "snake_charmer", "entangle", "leprechaun_hat"]
   },
   "instances": {
     "8": {
@@ -1295,31 +1254,6 @@
       },
       "done": []
     },
-    "112": {
-      "challenge": "dagannoth-task",
-      "started": "2026-10-09T10:55:08.644126500Z",
-      "scope": {
-        "scope": "match",
-        "id": 111
-      },
-      "progress": {
-        "0": {
-          "counts": {},
-          "done": 0,
-          "target": 1,
-          "effort": null
-        },
-        "1": {
-          "counts": {
-            "Dagannoth": 1
-          },
-          "done": 1,
-          "target": 1,
-          "effort": null
-        }
-      },
-      "done": [1]
-    },
     "114": {
       "challenge": "sire-50",
       "started": "2026-10-09T11:15:08.644126500Z",
@@ -1782,20 +1716,6 @@
       "deadline": "2026-10-09T15:55:08.644126500Z",
       "finished": [],
       "gold": null
-    }
-  },
-  "matches": {
-    "111": {
-      "id": 111,
-      "instance": 112,
-      "mover": 0,
-      "defender": 1,
-      "deadline": "2026-10-09T14:55:08.644126500Z",
-      "outcome": {
-        "outcome": "won",
-        "winner": 1,
-        "stolen": "orange"
-      }
     }
   }
 }

@@ -38,7 +38,6 @@ export class PretendGame {
       status: { kind: 'idle' },
       frozenUntil: null,
       shieldUntil: null,
-      matchId: null,
       gems: new Set(),
       gold: 0,
       effects: { moveMultiplier: 1, nextMoveHalved: false, suitGold: null, itemUsedHere: false },
@@ -126,7 +125,7 @@ export class PretendGame {
       instances.set(this.minigame.task.id, this.minigame.task)
       minigames.set(this.minigame.minigame.id, this.minigame.minigame)
     }
-    return { ...base, instances, minigames, matches: new Map() }
+    return { ...base, instances, minigames }
   }
 
   names(): Names {

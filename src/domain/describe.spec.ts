@@ -132,10 +132,10 @@ describe('effortText', () => {
 })
 
 describe('describeEvent', () => {
-  it('names the teams involved', () => {
-    expect(
-      describeEvent({ kind: 'gem_stolen', from: teamId(1), to: red, gem: 'blue' }, names),
-    ).toBe('Red stole the blue gem from Blue')
+  it('names the team involved', () => {
+    expect(describeEvent({ kind: 'gem_lost', teamId: red, gem: 'blue' }, names)).toBe(
+      'Red lost the blue gem',
+    )
   })
 
   it('leaves out bookkeeping events', () => {
@@ -155,6 +155,14 @@ describe('observationText', () => {
         ],
       }),
     ).toBe('got Dragonbone necklace and 1 more from Vorkath')
+  })
+
+  it('tells how an account died, and to whom', () => {
+    const death = (killer: string | null, pvp: boolean) =>
+      observationText({ kind: 'death', killer, pvp })
+    expect(death(null, false)).toBe('died')
+    expect(death('Zulrah', false)).toBe('was killed by Zulrah')
+    expect(death('Zezima', true)).toBe('was killed by Zezima (PvP)')
   })
 
   it('formats kill times', () => {

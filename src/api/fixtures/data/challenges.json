@@ -1,4 +1,69 @@
 {
+  "elite-clue-150k-200k": {
+    "id": "elite-clue-150k-200k",
+    "name": "Clue Value Reward",
+    "description": "Complete an elite clue worth between 150k and 200k",
+    "est_hours": 2.5,
+    "criterion": {
+      "kind": "clue",
+      "tier": "elite",
+      "filter": {
+        "by": "value",
+        "min_gp": 150000,
+        "max_gp": 200000
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "caskets",
+      "tier": "elite"
+    }
+  },
+  "fight-caves-26m": {
+    "id": "fight-caves-26m",
+    "name": "Fight Caves",
+    "description": "Complete the Fight Caves in under 26 minutes",
+    "est_hours": 1.5,
+    "criterion": {
+      "kind": "timed_kill",
+      "boss": "TzTok-Jad",
+      "max_seconds": 1560
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "best_time",
+      "boss": "TzTok-Jad"
+    }
+  },
+  "beginner-clue-9-cabbage": {
+    "id": "beginner-clue-9-cabbage",
+    "name": "Cabbages",
+    "description": "Get exactly 9 cabbage from a beginner casket",
+    "est_hours": 4,
+    "criterion": {
+      "kind": "clue",
+      "tier": "beginner",
+      "filter": {
+        "by": "exact_stack",
+        "item": "Cabbage",
+        "quantity": 9
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "caskets",
+      "tier": "beginner"
+    }
+  },
   "kq-dragon-pickaxe": {
     "id": "kq-dragon-pickaxe",
     "name": "Dragon Pickaxe",
@@ -33,82 +98,20 @@
       ]
     }
   },
-  "elite-clue-150k-200k": {
-    "id": "elite-clue-150k-200k",
-    "name": "Clue Value Reward",
-    "description": "Complete an elite clue worth between 150k and 200k",
-    "est_hours": 2.5,
+  "ca-noxious-foe": {
+    "id": "ca-noxious-foe",
+    "name": "Noxious Foe",
+    "description": "Complete the Noxious Foe combat achievement",
+    "est_hours": 0.5,
     "criterion": {
-      "kind": "clue",
-      "tier": "elite",
-      "filter": {
-        "by": "value",
-        "min_gp": 150000,
-        "max_gp": 200000
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "caskets",
-      "tier": "elite"
-    }
-  },
-  "any-drop-1m": {
-    "id": "any-drop-1m",
-    "name": "Big Drop",
-    "description": "Receive any single item worth at least 1,000,000 gp",
-    "est_hours": 3,
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "value",
-        "min_gp": 1000000,
-        "per": "stack",
-        "sources": "any"
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": "any"
-    }
-  },
-  "fight-caves-26m": {
-    "id": "fight-caves-26m",
-    "name": "Fight Caves",
-    "description": "Complete the Fight Caves in under 26 minutes",
-    "est_hours": 1.5,
-    "criterion": {
-      "kind": "timed_kill",
-      "boss": "TzTok-Jad",
-      "max_seconds": 1560
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "best_time",
-      "boss": "TzTok-Jad"
-    }
-  },
-  "any-raid-pet": {
-    "id": "any-raid-pet",
-    "name": "Raid Pet",
-    "description": "Obtain any raid pet",
-    "est_hours": 400,
-    "criterion": {
-      "kind": "pet",
-      "pets": [
-        "Olmlet",
-        "Lil' zik",
-        "Tumeken's guardian"
+      "kind": "combat_achievement",
+      "tasks": [
+        {
+          "name": "Noxious Foe",
+          "description": "Kill an Aberrant Spectre.",
+          "tier": "easy",
+          "monster": "Aberrant Spectre"
+        }
       ]
     },
     "goal": {
@@ -118,77 +121,8 @@
     "effort": {
       "kind": "loots",
       "sources": [
-        "Chambers of Xeric",
-        "Theatre of Blood",
-        "Tombs of Amascut"
+        "Aberrant spectre"
       ]
-    }
-  },
-  "malediction-ward": {
-    "id": "malediction-ward",
-    "name": "Malediction Ward",
-    "description": "Obtain all three Malediction shards in the Wilderness",
-    "est_hours": 9,
-    "criterion": {
-      "kind": "loot",
-      "filter": {
-        "by": "items",
-        "items": [
-          {
-            "name": "Malediction shard 1",
-            "sources": [
-              "Chaos Fanatic"
-            ]
-          },
-          {
-            "name": "Malediction shard 2",
-            "sources": [
-              "Crazy archaeologist"
-            ]
-          },
-          {
-            "name": "Malediction shard 3",
-            "sources": [
-              "Scorpia"
-            ]
-          }
-        ]
-      }
-    },
-    "goal": {
-      "kind": "each",
-      "n": 1
-    },
-    "effort": {
-      "kind": "loots",
-      "sources": [
-        "Chaos Fanatic",
-        "Crazy archaeologist",
-        "Scorpia"
-      ]
-    }
-  },
-  "beginner-clue-9-cabbage": {
-    "id": "beginner-clue-9-cabbage",
-    "name": "Cabbages",
-    "description": "Get exactly 9 cabbage from a beginner casket",
-    "est_hours": 4,
-    "criterion": {
-      "kind": "clue",
-      "tier": "beginner",
-      "filter": {
-        "by": "exact_stack",
-        "item": "Cabbage",
-        "quantity": 9
-      }
-    },
-    "goal": {
-      "kind": "total",
-      "n": 1
-    },
-    "effort": {
-      "kind": "caskets",
-      "tier": "beginner"
     }
   },
   "sire-50": {
@@ -232,20 +166,17 @@
       "kind": "elapsed"
     }
   },
-  "ca-noxious-foe": {
-    "id": "ca-noxious-foe",
-    "name": "Noxious Foe",
-    "description": "Complete the Noxious Foe combat achievement",
-    "est_hours": 0.5,
+  "any-raid-pet": {
+    "id": "any-raid-pet",
+    "name": "Raid Pet",
+    "description": "Obtain any raid pet",
+    "est_hours": 400,
     "criterion": {
-      "kind": "combat_achievement",
-      "tasks": [
-        {
-          "name": "Noxious Foe",
-          "description": "Kill an Aberrant Spectre.",
-          "tier": "easy",
-          "monster": "Aberrant Spectre"
-        }
+      "kind": "pet",
+      "pets": [
+        "Olmlet",
+        "Lil' zik",
+        "Tumeken's guardian"
       ]
     },
     "goal": {
@@ -255,7 +186,76 @@
     "effort": {
       "kind": "loots",
       "sources": [
-        "Aberrant spectre"
+        "Chambers of Xeric",
+        "Theatre of Blood",
+        "Tombs of Amascut"
+      ]
+    }
+  },
+  "any-drop-1m": {
+    "id": "any-drop-1m",
+    "name": "Big Drop",
+    "description": "Receive any single item worth at least 1,000,000 gp",
+    "est_hours": 3,
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "value",
+        "min_gp": 1000000,
+        "per": "stack",
+        "sources": "any"
+      }
+    },
+    "goal": {
+      "kind": "total",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": "any"
+    }
+  },
+  "malediction-ward": {
+    "id": "malediction-ward",
+    "name": "Malediction Ward",
+    "description": "Obtain all three Malediction shards in the Wilderness",
+    "est_hours": 9,
+    "criterion": {
+      "kind": "loot",
+      "filter": {
+        "by": "items",
+        "items": [
+          {
+            "name": "Malediction shard 1",
+            "sources": [
+              "Chaos Fanatic"
+            ]
+          },
+          {
+            "name": "Malediction shard 2",
+            "sources": [
+              "Crazy archaeologist"
+            ]
+          },
+          {
+            "name": "Malediction shard 3",
+            "sources": [
+              "Scorpia"
+            ]
+          }
+        ]
+      }
+    },
+    "goal": {
+      "kind": "each",
+      "n": 1
+    },
+    "effort": {
+      "kind": "loots",
+      "sources": [
+        "Chaos Fanatic",
+        "Crazy archaeologist",
+        "Scorpia"
       ]
     }
   }

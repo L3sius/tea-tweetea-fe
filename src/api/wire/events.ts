@@ -40,8 +40,6 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('tile_completed', { team: Id, tile: Id }),
   event('gem_collected', { team: Id, gem: Gem, tile: Id }),
   event('gem_lost', { team: Id, gem: Gem }),
-  event('gem_stolen', { from: Id, to: Id, gem: Gem }),
-  event('necklace_used', { team: Id, gem: Gem }),
   event('shop_opened', { team: Id, tile: Id }),
   event('shop_closed', { team: Id }),
   // Inventories are private: the public journal blanks the item here, except for items lost in
@@ -79,16 +77,6 @@ export const WireEvent = z.discriminatedUnion('type', [
   }),
   event('minigame_finished', { id: Id, team: Id, place: z.int().positive() }),
   event('minigame_closed', { id: Id, gold: z.array(WirePayout) }),
-  event('opponent_choice', { team: Id, candidates: z.array(Id) }),
-  event('match_started', {
-    id: Id,
-    mover: Id,
-    defender: Id,
-    challenge: z.string(),
-    deadline: Timestamp,
-  }),
-  event('match_won', { id: Id, winner: Id, loser: Id, options: z.array(Gem) }),
-  event('match_abandoned', { id: Id, mover: Id, defender: Id }),
 ])
 export type WireEvent = z.infer<typeof WireEvent>
 

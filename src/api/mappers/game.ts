@@ -6,8 +6,6 @@ import type {
   GameState,
   Instance,
   InstanceScope,
-  Match,
-  MatchOutcome,
   Minigame,
   Payout,
   Pause,
@@ -16,21 +14,12 @@ import type {
   TeamProgress,
   TeamStatus,
 } from '@/domain/game'
-import {
-  challengeId,
-  instanceId,
-  matchId,
-  minigameId,
-  teamId,
-  tileId,
-  type InstanceId,
-} from '@/domain/ids'
+import { challengeId, instanceId, minigameId, teamId, tileId, type InstanceId } from '@/domain/ids'
 import type {
   WireBlocker,
   WireCard,
   WireEffect,
   WireInstance,
-  WireMatch,
   WireMinigame,
   WirePayout,
   WireScoring,
@@ -87,14 +76,6 @@ function toPause(wire: WirePause): Pause {
   switch (wire.pause) {
     case 'shop':
       return { kind: 'shop' }
-    case 'choose_opponent':
-      return { kind: 'choose_opponent', candidates: wire.candidates.map(teamId) }
-    case 'match':
-      return {
-        kind: 'match',
-        matchId: wire.id === null ? null : matchId(wire.id),
-        opponent: teamId(wire.opponent),
-      }
   }
 }
 
@@ -136,7 +117,6 @@ export function toTeam(wire: WireTeam): Team {
     status: toStatus(wire.status),
     frozenUntil: toDateOrNull(wire.frozen_until),
     shieldUntil: toDateOrNull(wire.shield_until),
-    matchId: wire.match_id === null ? null : matchId(wire.match_id),
     gems: new Set(wire.gems),
     gold: wire.gold,
     effects: {
@@ -157,8 +137,6 @@ function toScope(wire: WireInstance['scope']): InstanceScope {
       return { kind: 'tile', teamId: teamId(wire.team), tileId: tileId(wire.tile) }
     case 'minigame':
       return { kind: 'minigame', minigameId: minigameId(wire.id) }
-    case 'match':
-      return { kind: 'match', matchId: matchId(wire.id) }
   }
 }
 
@@ -192,35 +170,6 @@ export function toMinigame(wire: WireMinigame): Minigame {
   }
 }
 
-function toMatchOutcome(wire: WireMatch['outcome']): MatchOutcome {
-  switch (wire.outcome) {
-    case 'open':
-    case 'abandoned':
-      return { kind: wire.outcome }
-    case 'stealing':
-      return {
-        kind: 'stealing',
-        winner: teamId(wire.winner),
-        loser: teamId(wire.loser),
-        options: wire.options,
-        deadline: toDate(wire.deadline),
-      }
-    case 'won':
-      return { kind: 'won', winner: teamId(wire.winner), stolen: wire.stolen }
-  }
-}
-
-export function toMatch(wire: WireMatch): Match {
-  return {
-    id: matchId(wire.id),
-    instanceId: instanceId(wire.instance),
-    mover: teamId(wire.mover),
-    defender: teamId(wire.defender),
-    deadline: toDate(wire.deadline),
-    outcome: toMatchOutcome(wire.outcome),
-  }
-}
-
 export function toGameState(wire: WireState): GameState {
   return {
     seq: wire.seq,
@@ -235,6 +184,5 @@ export function toGameState(wire: WireState): GameState {
       toInstance(value, instanceId(id)),
     ),
     minigames: mapIdKeyed(wire.minigames, minigameId, toMinigame),
-    matches: mapIdKeyed(wire.matches, matchId, toMatch),
   }
 }

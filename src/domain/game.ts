@@ -1,4 +1,4 @@
-import type { ChallengeId, InstanceId, MatchId, MinigameId, TeamId, TileId } from './ids'
+import type { ChallengeId, InstanceId, MinigameId, TeamId, TileId } from './ids'
 import type { Gem, Item, Phase, Suit } from './vocabulary'
 
 /** Ranks run 2–10, then J=11, Q=12, K=13, A=14. A Joker moves one tile. */
@@ -30,10 +30,7 @@ export type Effects = {
 }
 
 /** Decisions a moving team must take before walking on. */
-export type Pause =
-  | { kind: 'shop' }
-  | { kind: 'choose_opponent'; candidates: TeamId[] }
-  | { kind: 'match'; matchId: MatchId | null; opponent: TeamId }
+export type Pause = { kind: 'shop' }
 
 export type Move = {
   /** The whole walk, start tile included. */
@@ -73,11 +70,10 @@ export type Team = {
   members: Member[]
   position: TileId
   status: TeamStatus
-  /** Frozen and in-match sit on top of the status; the status resumes when they end. */
+  /** Frozen sits on top of the status; the status resumes when it ends. */
   frozenUntil: Date | null
   /** Hostile items can't target the team before then; every hit starts a new shield. */
   shieldUntil: Date | null
-  matchId: MatchId | null
   gems: Set<Gem>
   gold: number
   effects: Effects
@@ -101,17 +97,15 @@ export type Appearance = { npc: number; idle: number; walk: number; run: number;
 export type Blocker = { item: Item; owner: TeamId; until: Date }
 
 export type InstanceScope =
-  | { kind: 'tile'; teamId: TeamId; tileId: TileId }
-  | { kind: 'minigame'; minigameId: MinigameId }
-  | { kind: 'match'; matchId: MatchId }
+  { kind: 'tile'; teamId: TeamId; tileId: TileId } | { kind: 'minigame'; minigameId: MinigameId }
 
-/** One running copy of a challenge, for a tile, a minigame or a match. */
+/** One running copy of a challenge, for a tile or a minigame. */
 export type Instance = {
   id: InstanceId
   challengeId: ChallengeId
   startedAt: Date
   scope: InstanceScope
-  /** Every team that can contribute: the tile's team, both match teams, or all teams. */
+  /** Every team that can contribute: the tile's team, or all teams. */
   progress: Map<TeamId, TeamProgress>
   /** Teams that have completed the challenge. */
   done: Set<TeamId>
@@ -146,21 +140,6 @@ export type Minigame = {
   payouts: Payout[] | null
 }
 
-export type MatchOutcome =
-  | { kind: 'open' }
-  | { kind: 'stealing'; winner: TeamId; loser: TeamId; options: Gem[]; deadline: Date }
-  | { kind: 'won'; winner: TeamId; stolen: Gem | null }
-  | { kind: 'abandoned' }
-
-export type Match = {
-  id: MatchId
-  instanceId: InstanceId
-  mover: TeamId
-  defender: TeamId
-  deadline: Date
-  outcome: MatchOutcome
-}
-
 /** Everything public about a game at one point in its journal. */
 export type GameState = {
   seq: number
@@ -174,8 +153,7 @@ export type GameState = {
   blockers: Map<TileId, Blocker>
   /** What each shop tile stocks; every shop also sells the mystery box. */
   shops: Map<TileId, Item[]>
-  /** Active tile instances plus every minigame and match instance. */
+  /** Active tile instances plus every minigame instance. */
   instances: Map<InstanceId, Instance>
   minigames: Map<MinigameId, Minigame>
-  matches: Map<MatchId, Match>
 }

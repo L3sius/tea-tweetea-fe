@@ -8,7 +8,7 @@ import type { TeamId } from '@/domain/ids'
 import { teamColor } from '@/ui/colors'
 import { TtProgressBar, TtText } from '@/ui/tt'
 
-// One minigame or match: what it asks, how long is left, what it pays, and each team's standing,
+// One minigame: what it asks, how long is left, what it pays, and each team's standing,
 // leader first. Each team gets a full line for its name, so long names are never cut short.
 
 const props = defineProps<{
@@ -25,17 +25,13 @@ const colorOf = (id: TeamId) => {
 
 const stakeTitle = computed(() => {
   const stake = props.contest.stake
-  if (stake.kind === 'places') return 'Race: first to finish wins'
-  if (stake.kind === 'per_unit') return 'Every one counts'
-  return 'First to finish wins'
+  return stake.kind === 'places' ? 'Race: first to finish wins' : 'Every one counts'
 })
 </script>
 
 <template>
   <article class="contest tt-sprite-display flex w-full flex-col items-center gap-1.5 px-2 py-1.5">
-    <TtText :size="1" font="bold" :color="contest.kind === 'match' ? 'red' : 'orange'">
-      {{ contest.kind === 'match' ? 'Match' : 'Minigame' }}
-    </TtText>
+    <TtText :size="1" font="bold" color="orange">Minigame</TtText>
     <TtText as="h3" :size="2" color="yellow" class="[overflow-wrap:anywhere]">
       {{ contest.title }}
     </TtText>
@@ -63,11 +59,10 @@ const stakeTitle = computed(() => {
           </span>
         </li>
       </ul>
-      <p v-else-if="contest.stake.kind === 'per_unit'" class="stakes-line">
+      <p v-else class="stakes-line">
         <span class="tt-sprite tt-icon-coins size-6" aria-hidden="true" />
         {{ contest.stake.goldPerUnit }} gold each, up to {{ contest.stake.cap }} per team
       </p>
-      <p v-else class="stakes-line">The winner may steal a gem from the other team</p>
     </section>
 
     <TtText v-if="contest.initiator !== null" :size="1" color="muted">
@@ -93,7 +88,7 @@ const stakeTitle = computed(() => {
           </TtText>
           <TtText
             :size="1"
-            :color="s.place !== null || s.won || s.finished ? 'green' : 'white'"
+            :color="s.place !== null || s.finished ? 'green' : 'white'"
             class="shrink-0"
           >
             {{ standingText(s, contest.stake, contest.live) }}

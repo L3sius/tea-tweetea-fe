@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const open = ref<string | null>(null)
 const toggle = (key: string) => (open.value = open.value === key ? null : key)
-/** Finished minigames and matches stay out of the way until asked for. */
+/** Finished minigames stay out of the way until asked for. */
 const showResults = ref(false)
 
 const all = computed(() =>
@@ -29,7 +29,7 @@ const all = computed(() =>
 <template>
   <TtPanel title="Minigames" width="100%" :padding="12" :gap="12">
     <TtText v-if="all.live.length === 0" :size="1" color="muted">
-      No minigames or matches right now. Landing on a red tile opens one.
+      No minigames right now. Landing on a red tile opens one.
     </TtText>
     <ContestCard
       v-for="c in all.live"
@@ -57,7 +57,7 @@ const all = computed(() =>
           :aria-expanded="open === c.key"
           @click="toggle(c.key)"
         >
-          <TtText :size="1" color="muted">{{ c.kind === 'match' ? 'Match' : 'Minigame' }}</TtText>
+          <TtText :size="1" color="muted">Minigame</TtText>
           <TtText :size="1" :color="open === c.key ? 'white' : 'yellow'">{{ c.title }}</TtText>
           <TtText :size="1" color="muted">{{ timeFrom(c.deadline, now) }}</TtText>
         </button>

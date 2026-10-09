@@ -284,8 +284,6 @@ function cueFor(
   switch (event.kind) {
     case 'gem_collected':
       return { team: event.teamId, text: `${capital(event.gem)} gem!`, tone: 'gem' }
-    case 'gem_stolen':
-      return { team: event.to, text: `Stole the ${event.gem} gem!`, tone: 'gem' }
     case 'gem_lost':
       return { team: event.teamId, text: `Lost the ${event.gem} gem`, tone: 'bad' }
     case 'gold_changed':
@@ -317,8 +315,6 @@ function cueFor(
           tone: 'bad',
         }
       return null
-    case 'necklace_used':
-      return { team: event.teamId, text: 'A necklace saved the gem!', tone: 'good' }
     case 'shielded':
       return { team: event.teamId, text: 'Shielded', tone: 'info' }
     case 'item_used':
@@ -337,10 +333,6 @@ function cueFor(
         text: `Joker: ${effectText(event.effect, seesItems(event.teamId))}`,
         tone: 'info',
       }
-    case 'match_started':
-      return { team: event.mover, text: 'Match!', tone: 'bad' }
-    case 'match_won':
-      return { team: event.winner, text: 'Won the match!', tone: 'good' }
     case 'minigame_opened':
       return { team: event.initiator, text: 'Minigame!', tone: 'info' }
     case 'shop_opened':

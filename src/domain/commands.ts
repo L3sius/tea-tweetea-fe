@@ -1,7 +1,7 @@
 import type { Observation } from './activity'
 import type { Appearance, Card } from './game'
 import type { InstanceId, TeamId, TileId } from './ids'
-import type { Gem, Item } from './vocabulary'
+import type { Item } from './vocabulary'
 
 /** What an item is used on, for items that affect a rival team or a tile. */
 export type ItemTarget = { kind: 'team'; teamId: TeamId } | { kind: 'tile'; tileId: TileId }
@@ -15,8 +15,6 @@ export type TeamCommand =
   /** A random item, straight into the inventory; every shop sells it. */
   | { kind: 'buy_mystery_box' }
   | { kind: 'close_shop' }
-  | { kind: 'choose_opponent'; opponent: TeamId }
-  | { kind: 'steal_gem'; gem: Gem }
   | { kind: 'discard'; item: Item }
   /** Dress the team's own piece as an OSRS character, or back to the default piece with null. */
   | { kind: 'set_appearance'; appearance: Appearance | null }

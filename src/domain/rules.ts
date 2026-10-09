@@ -18,8 +18,6 @@ export type Rules = {
   initiatorMultiplier: number
   /** Chance of a random event when landing on a normal tile. */
   randomEventChance: number
-  /** Minutes a match winner has to pick a gem before one is taken at random. */
-  stealMinutes: number
   /** Spawns and random teleports keep at least this many tiles from gems. */
   minGemDistance: number
 }

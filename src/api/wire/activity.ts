@@ -15,6 +15,8 @@ export const WireObservation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('slayer'), task: z.string() }),
   z.object({ kind: z.literal('pet'), name: z.string() }),
   z.object({ kind: z.literal('combat_achievement'), task: z.string() }),
+  // `killer` is the NPC or player that killed the account, or null; `pvp` a death to a player.
+  z.object({ kind: z.literal('death'), killer: z.string().nullable(), pvp: z.boolean() }),
 ])
 export type WireObservation = z.infer<typeof WireObservation>
 
@@ -23,7 +25,7 @@ export const WireFeedItem = z.object({
   at: Timestamp,
   rsn: z.string(),
   team: Id.nullable(),
-  kind: z.enum(['loot', 'clue', 'kill_count', 'slayer', 'pet', 'combat_achievement']),
+  kind: z.enum(['loot', 'clue', 'kill_count', 'slayer', 'pet', 'combat_achievement', 'death']),
   subject: z.string(),
   value: z.number(),
   count: z.int().positive(),

@@ -20,7 +20,6 @@ import {
   watchEntries,
   type Replay,
 } from '@/domain/replay'
-import { NECKLACES } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 
 /** Journal entries kept for the game log; also how far back a reload looks for walks to resume. */
@@ -43,7 +42,7 @@ export type Alert = {
   id: string
   title: string
   text: string
-  tone: 'minigame' | 'match' | 'gem' | 'end' | 'item'
+  tone: 'minigame' | 'gem' | 'end' | 'item'
   /** Stays until dismissed, or until the next sticky alert replaces it (a minigame opening). */
   sticky?: boolean
 }
@@ -417,35 +416,6 @@ function alertFor(
           tone: 'minigame',
         },
       }
-    case 'match_started':
-      return {
-        team: event.mover,
-        alert: {
-          title: `${names.team(event.mover)} vs ${names.team(event.defender)}`,
-          text: `A match has started: ${names.challenge(event.challengeId)}.`,
-          tone: 'match',
-        },
-      }
-    case 'match_won':
-      return {
-        team: null,
-        alert: {
-          title: `${names.team(event.winner)} won the match`,
-          text: event.options.length
-            ? `${names.team(event.loser)} lost. ${names.team(event.winner)} gets to steal a gem.`
-            : `${names.team(event.loser)} had no gem to lose.`,
-          tone: 'match',
-        },
-      }
-    case 'gem_stolen':
-      return {
-        team: null,
-        alert: {
-          title: 'Gem stolen!',
-          text: `${names.team(event.to)} took the ${event.gem} gem from ${names.team(event.from)}.`,
-          tone: 'gem',
-        },
-      }
     case 'gem_collected':
       return {
         team: event.teamId,
@@ -463,15 +433,6 @@ function alertFor(
           title: 'Inventory full',
           text: `${names.team(event.teamId)} had no room, so ${event.item && names.seesItems(event.teamId) ? itemName(event.item) : 'an item'} was lost.`,
           tone: 'item',
-        },
-      }
-    case 'necklace_used':
-      return {
-        team: null,
-        alert: {
-          title: 'Saved by a necklace',
-          text: `${names.team(event.teamId)}'s ${itemName(NECKLACES[event.gem])} kept the ${event.gem} gem safe.`,
-          tone: 'gem',
         },
       }
     case 'game_ended':

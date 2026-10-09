@@ -1,8 +1,331 @@
 [
   {
-    "id": 1384,
-    "at": "2026-10-09T12:55:08.644126500Z",
+    "id": 1449,
+    "at": "2026-10-09T21:01:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1448,
+    "at": "2026-10-09T21:01:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1447,
+    "at": "2026-10-09T21:01:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 1446,
+    "at": "2026-10-09T20:41:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1435,
+    "at": "2026-10-09T20:21:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1433,
+    "at": "2026-10-09T20:01:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1432,
+    "at": "2026-10-09T20:01:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1413,
+    "at": "2026-10-09T19:01:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1411,
+    "at": "2026-10-09T18:41:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1410,
+    "at": "2026-10-09T18:41:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1409,
+    "at": "2026-10-09T18:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1406,
+    "at": "2026-10-09T18:01:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1397,
+    "at": "2026-10-09T18:01:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1394,
+    "at": "2026-10-09T17:21:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1392,
+    "at": "2026-10-09T17:21:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1390,
+    "at": "2026-10-09T17:21:57.623925100Z",
     "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1388,
+    "at": "2026-10-09T17:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1384,
+    "at": "2026-10-09T16:41:57.623925100Z",
+    "rsn": "Wizard Ned",
     "team": 3,
     "kind": "loot",
     "subject": "Chambers of Xeric",
@@ -22,52 +345,10 @@
   },
   {
     "id": 1383,
-    "at": "2026-10-09T12:35:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1374,
-    "at": "2026-10-09T12:35:08.644126500Z",
+    "at": "2026-10-09T16:21:57.623925100Z",
     "rsn": "Scale Daddy",
     "team": 2,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1373,
-    "at": "2026-10-09T12:15:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
     "subject": "General Graardor",
     "value": 14000000,
     "count": 1,
@@ -84,227 +365,10 @@
     }
   },
   {
-    "id": 1372,
-    "at": "2026-10-09T12:15:08.644126500Z",
-    "rsn": "Scale Mommy",
-    "team": 2,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1371,
-    "at": "2026-10-09T11:55:08.644126500Z",
-    "rsn": "Scale Mommy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1354,
-    "at": "2026-10-09T11:15:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1352,
-    "at": "2026-10-09T11:15:08.644126500Z",
-    "rsn": "Glough Fan",
+    "id": 1365,
+    "at": "2026-10-09T16:01:57.623925100Z",
+    "rsn": "Gnome Kid",
     "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1351,
-    "at": "2026-10-09T10:55:08.644126500Z",
-    "rsn": "Bucket Bob",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1350,
-    "at": "2026-10-09T10:55:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1341,
-    "at": "2026-10-09T10:35:08.644126500Z",
-    "rsn": "Bucket Bob",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1340,
-    "at": "2026-10-09T10:15:08.644126500Z",
-    "rsn": "Bucket Bob",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1338,
-    "at": "2026-10-09T09:55:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1328,
-    "at": "2026-10-09T09:15:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1300,
-    "at": "2026-10-09T07:35:08.644126500Z",
-    "rsn": "Sewer Sam",
-    "team": 0,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1299,
-    "at": "2026-10-09T07:35:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
     "kind": "clue",
     "subject": "elite",
     "value": 150000,
@@ -323,31 +387,31 @@
     }
   },
   {
-    "id": 1281,
-    "at": "2026-10-09T07:15:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
+    "id": 1364,
+    "at": "2026-10-09T16:01:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
+    "subject": "Cerberus",
+    "value": 28000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Zulrah",
+      "source": "Cerberus",
       "items": [
         {
-          "name": "Tanzanite fang",
+          "name": "Primordial crystal",
           "quantity": 1,
-          "price_each": 1600000
+          "price_each": 28000000
         }
       ]
     }
   },
   {
-    "id": 1271,
-    "at": "2026-10-09T06:55:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
+    "id": 1363,
+    "at": "2026-10-09T16:01:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
     "kind": "loot",
     "subject": "Chambers of Xeric",
     "value": 30000000,
@@ -365,10 +429,10 @@
     }
   },
   {
-    "id": 1270,
-    "at": "2026-10-09T06:55:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
+    "id": 1345,
+    "at": "2026-10-09T15:41:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -383,245 +447,162 @@
           "price_each": 28000000
         }
       ]
+    }
+  },
+  {
+    "id": 1310,
+    "at": "2026-10-09T14:41:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1309,
+    "at": "2026-10-09T14:41:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "death",
+    "subject": "Hill Giant",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Hill Giant",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1308,
+    "at": "2026-10-09T14:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1307,
+    "at": "2026-10-09T14:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1306,
+    "at": "2026-10-09T14:21:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1305,
+    "at": "2026-10-09T14:21:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1303,
+    "at": "2026-10-09T14:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1286,
+    "at": "2026-10-09T13:41:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "death",
+    "subject": "Zulrah",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Zulrah",
+      "pvp": false
     }
   },
   {
     "id": 1268,
-    "at": "2026-10-09T06:15:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1259,
-    "at": "2026-10-09T06:15:08.644126500Z",
+    "at": "2026-10-09T13:41:57.623925100Z",
     "rsn": "Gnome Kid 2",
     "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1247,
-    "at": "2026-10-09T05:35:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1242,
-    "at": "2026-10-09T04:55:08.644126500Z",
-    "rsn": "Gnome Kid",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1241,
-    "at": "2026-10-09T04:35:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1240,
-    "at": "2026-10-09T04:35:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1237,
-    "at": "2026-10-09T03:55:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1235,
-    "at": "2026-10-09T03:15:08.644126500Z",
-    "rsn": "Glough Fan",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1233,
-    "at": "2026-10-09T03:15:08.644126500Z",
-    "rsn": "Wizard Ned",
-    "team": 3,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1232,
-    "at": "2026-10-09T02:55:08.644126500Z",
-    "rsn": "Sewer Sam",
-    "team": 0,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 1231,
-    "at": "2026-10-09T02:55:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1227,
-    "at": "2026-10-09T02:15:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1226,
-    "at": "2026-10-09T01:55:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
     "kind": "loot",
     "subject": "Chambers of Xeric",
     "value": 30000000,
@@ -639,150 +620,109 @@
     }
   },
   {
-    "id": 1223,
-    "at": "2026-10-09T01:35:08.644126500Z",
-    "rsn": "Bucket Bob",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1218,
-    "at": "2026-10-09T01:15:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1217,
-    "at": "2026-10-09T01:15:08.644126500Z",
-    "rsn": "Venom Vic",
+    "id": 1267,
+    "at": "2026-10-09T13:21:57.623925100Z",
+    "rsn": "Scale Mommy",
     "team": 2,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Zulrah",
+      "source": "Chambers of Xeric",
       "items": [
         {
-          "name": "Tanzanite fang",
+          "name": "Dexterous prayer scroll",
           "quantity": 1,
-          "price_each": 1600000
+          "price_each": 30000000
         }
       ]
     }
   },
   {
-    "id": 1216,
-    "at": "2026-10-09T00:55:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1215,
-    "at": "2026-10-09T00:55:08.644126500Z",
+    "id": 1266,
+    "at": "2026-10-09T13:21:57.623925100Z",
     "rsn": "Gnome Kid",
     "team": 1,
     "kind": "loot",
     "subject": "Vorkath",
-    "value": 1000000,
+    "value": 2400000,
     "count": 1,
     "observation": {
       "kind": "loot",
       "source": "Vorkath",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Dragonbone necklace",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 2400000
         }
       ]
     }
   },
   {
-    "id": 1214,
-    "at": "2026-10-09T00:35:08.644126500Z",
-    "rsn": "Bank Stander",
+    "id": 1257,
+    "at": "2026-10-09T13:01:57.623925100Z",
+    "rsn": "Wizard Ned",
     "team": 3,
     "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "General Graardor",
+      "source": "Chambers of Xeric",
       "items": [
         {
-          "name": "Bandos chestplate",
+          "name": "Dexterous prayer scroll",
           "quantity": 1,
-          "price_each": 14000000
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1222,
+    "at": "2026-10-09T12:41:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "death",
+    "subject": "Vorkath",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Vorkath",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1221,
+    "at": "2026-10-09T12:21:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
         }
       ]
     }
   },
   {
     "id": 1211,
-    "at": "2026-10-09T00:15:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 1209,
-    "at": "2026-10-09T00:15:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
+    "at": "2026-10-09T12:21:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -800,10 +740,46 @@
     }
   },
   {
-    "id": 1208,
-    "at": "2026-10-08T23:55:08.644126500Z",
-    "rsn": "Bank Sitter",
+    "id": 1210,
+    "at": "2026-10-09T12:01:57.623925100Z",
+    "rsn": "Wizard Ned",
     "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1209,
+    "at": "2026-10-09T12:01:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "death",
+    "subject": "TzKal-Zuk",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1208,
+    "at": "2026-10-09T11:41:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -822,30 +798,58 @@
   },
   {
     "id": 1207,
-    "at": "2026-10-08T23:35:08.644126500Z",
-    "rsn": "Tree Gnome",
+    "at": "2026-10-09T11:41:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1198,
+    "at": "2026-10-09T11:41:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 1197,
+    "at": "2026-10-09T11:21:57.623925100Z",
+    "rsn": "Gnome Kid",
     "team": 1,
     "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Vorkath",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 1206,
-    "at": "2026-10-08T23:35:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
+    "id": 1188,
+    "at": "2026-10-09T11:01:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -863,51 +867,29 @@
     }
   },
   {
-    "id": 1205,
-    "at": "2026-10-08T23:35:08.644126500Z",
-    "rsn": "Scale Mommy",
+    "id": 1179,
+    "at": "2026-10-09T11:01:57.623925100Z",
+    "rsn": "Snakeling",
     "team": 2,
     "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Cerberus",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Primordial crystal",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 28000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 1184,
-    "at": "2026-10-08T22:55:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 1183,
-    "at": "2026-10-08T21:55:08.644126500Z",
+    "id": 1177,
+    "at": "2026-10-09T10:41:57.623925100Z",
     "rsn": "Snakeling",
     "team": 2,
     "kind": "loot",
@@ -927,52 +909,10 @@
     }
   },
   {
-    "id": 1166,
-    "at": "2026-10-08T21:35:08.644126500Z",
-    "rsn": "Sewer Sam",
+    "id": 1168,
+    "at": "2026-10-09T10:21:57.623925100Z",
+    "rsn": "Sewer Sam II",
     "team": 0,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1165,
-    "at": "2026-10-08T21:35:08.644126500Z",
-    "rsn": "Glough Fan",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1163,
-    "at": "2026-10-08T21:35:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 1000000,
@@ -990,52 +930,31 @@
     }
   },
   {
-    "id": 1161,
-    "at": "2026-10-08T21:15:08.644126500Z",
-    "rsn": "Bucket Bob",
-    "team": 0,
+    "id": 1167,
+    "at": "2026-10-09T10:21:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
     "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Cerberus",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Primordial crystal",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 28000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 1141,
-    "at": "2026-10-08T20:15:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1140,
-    "at": "2026-10-08T20:15:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
+    "id": 1148,
+    "at": "2026-10-09T09:41:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
     "kind": "loot",
     "subject": "General Graardor",
     "value": 14000000,
@@ -1054,9 +973,30 @@
   },
   {
     "id": 1139,
-    "at": "2026-10-08T19:55:08.644126500Z",
+    "at": "2026-10-09T09:41:57.623925100Z",
     "rsn": "Bank Sitter",
     "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1138,
+    "at": "2026-10-09T09:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -1074,9 +1014,65 @@
     }
   },
   {
-    "id": 1138,
-    "at": "2026-10-08T19:55:08.644126500Z",
-    "rsn": "Venom Vic",
+    "id": 1137,
+    "at": "2026-10-09T09:21:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1120,
+    "at": "2026-10-09T09:21:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1119,
+    "at": "2026-10-09T09:21:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1118,
+    "at": "2026-10-09T09:21:57.623925100Z",
+    "rsn": "Snakeling",
     "team": 2,
     "kind": "loot",
     "subject": "Zulrah",
@@ -1095,45 +1091,10 @@
     }
   },
   {
-    "id": 1119,
-    "at": "2026-10-08T19:15:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1118,
-    "at": "2026-10-08T18:55:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1108,
-    "at": "2026-10-08T18:35:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
+    "id": 1117,
+    "at": "2026-10-09T09:01:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -1151,24 +1112,67 @@
     }
   },
   {
-    "id": 1097,
-    "at": "2026-10-08T17:55:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
+    "id": 1107,
+    "at": "2026-10-09T08:41:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
     "count": 1,
     "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
     }
   },
   {
-    "id": 1095,
-    "at": "2026-10-08T17:35:08.644126500Z",
-    "rsn": "Wizard Ned",
-    "team": 3,
+    "id": 1106,
+    "at": "2026-10-09T08:21:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "death",
+    "subject": "Zulrah",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Zulrah",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1104,
+    "at": "2026-10-09T08:21:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1103,
+    "at": "2026-10-09T08:21:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -1187,79 +1191,51 @@
   },
   {
     "id": 1094,
-    "at": "2026-10-08T17:15:08.644126500Z",
+    "at": "2026-10-09T08:21:57.623925100Z",
     "rsn": "Snakeling",
     "team": 2,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
     "count": 1,
     "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
     }
   },
   {
-    "id": 1085,
-    "at": "2026-10-08T16:55:08.644126500Z",
+    "id": 1092,
+    "at": "2026-10-09T08:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1091,
+    "at": "2026-10-09T08:01:57.623925100Z",
     "rsn": "Bucket Bob",
     "team": 0,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 1075,
-    "at": "2026-10-08T15:55:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1064,
-    "at": "2026-10-08T15:35:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1063,
-    "at": "2026-10-08T15:15:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -1277,159 +1253,12 @@
     }
   },
   {
-    "id": 1033,
-    "at": "2026-10-08T14:55:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1030,
-    "at": "2026-10-08T14:35:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1008,
-    "at": "2026-10-08T13:35:08.644126500Z",
-    "rsn": "Gnome Kid",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1006,
-    "at": "2026-10-08T13:35:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1004,
-    "at": "2026-10-08T12:35:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1003,
-    "at": "2026-10-08T12:35:08.644126500Z",
-    "rsn": "Sewer Sam II",
+    "id": 1090,
+    "at": "2026-10-09T08:01:57.623925100Z",
+    "rsn": "Sewer Sam",
     "team": 0,
     "kind": "loot",
     "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1002,
-    "at": "2026-10-08T12:35:08.644126500Z",
-    "rsn": "Gnome Kid 2",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 1001,
-    "at": "2026-10-08T12:35:08.644126500Z",
-    "rsn": "Gnome Kid",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
     "value": 1000000,
     "count": 1,
     "observation": {
@@ -1445,115 +1274,47 @@
     }
   },
   {
-    "id": 999,
-    "at": "2026-10-08T12:15:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
+    "id": 1089,
+    "at": "2026-10-09T08:01:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
+      "kind": "clue",
+      "tier": "elite",
       "items": [
         {
-          "name": "Valuable drop",
+          "name": "Coins",
           "quantity": 1,
-          "price_each": 1000000
+          "price_each": 150000
         }
-      ]
+      ],
+      "region": null
     }
   },
   {
-    "id": 995,
-    "at": "2026-10-08T11:15:08.644126500Z",
-    "rsn": "Glough Fan",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 994,
-    "at": "2026-10-08T11:15:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 992,
-    "at": "2026-10-08T10:55:08.644126500Z",
+    "id": 1088,
+    "at": "2026-10-09T08:01:57.623925100Z",
     "rsn": "Venom Vic",
     "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
+    "kind": "death",
+    "subject": "TzKal-Zuk",
+    "value": 0,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
     }
   },
   {
-    "id": 987,
-    "at": "2026-10-08T10:35:08.644126500Z",
-    "rsn": "Bank Sitter",
+    "id": 1086,
+    "at": "2026-10-09T07:41:57.623925100Z",
+    "rsn": "Bank Stander",
     "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 972,
-    "at": "2026-10-08T09:35:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -1571,29 +1332,23 @@
     }
   },
   {
-    "id": 969,
-    "at": "2026-10-08T09:15:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
+    "id": 1084,
+    "at": "2026-10-09T07:21:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "death",
     "subject": "Zulrah",
-    "value": 1600000,
+    "value": 0,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
+      "kind": "death",
+      "killer": "Zulrah",
+      "pvp": false
     }
   },
   {
-    "id": 968,
-    "at": "2026-10-08T09:15:08.644126500Z",
+    "id": 1083,
+    "at": "2026-10-09T07:21:57.623925100Z",
     "rsn": "Scale Mommy",
     "team": 2,
     "kind": "loot",
@@ -1613,72 +1368,23 @@
     }
   },
   {
-    "id": 967,
-    "at": "2026-10-08T08:55:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 956,
-    "at": "2026-10-08T08:15:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 955,
-    "at": "2026-10-08T08:15:08.644126500Z",
-    "rsn": "Gnome Kid 2",
+    "id": 1081,
+    "at": "2026-10-09T07:01:57.623925100Z",
+    "rsn": "Glough Fan",
     "team": 1,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
     }
   },
   {
-    "id": 954,
-    "at": "2026-10-08T07:35:08.644126500Z",
-    "rsn": "Bank Sitter",
+    "id": 1080,
+    "at": "2026-10-09T06:41:57.623925100Z",
+    "rsn": "Bank Stander",
     "team": 3,
     "kind": "loot",
     "subject": "Chambers of Xeric",
@@ -1697,10 +1403,330 @@
     }
   },
   {
-    "id": 953,
-    "at": "2026-10-08T07:35:08.644126500Z",
+    "id": 1078,
+    "at": "2026-10-09T06:41:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1077,
+    "at": "2026-10-09T06:41:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "death",
+    "subject": "Hill Giant",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Hill Giant",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1076,
+    "at": "2026-10-09T06:41:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 1075,
+    "at": "2026-10-09T06:41:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1073,
+    "at": "2026-10-09T06:21:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "death",
+    "subject": "Hill Giant",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Hill Giant",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1071,
+    "at": "2026-10-09T05:41:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1069,
+    "at": "2026-10-09T05:21:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1067,
+    "at": "2026-10-09T05:01:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "death",
+    "subject": "Vorkath",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Vorkath",
+      "pvp": false
+    }
+  },
+  {
+    "id": 1058,
+    "at": "2026-10-09T05:01:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1057,
+    "at": "2026-10-09T05:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1054,
+    "at": "2026-10-09T04:21:57.623925100Z",
     "rsn": "Glough Fan",
     "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1045,
+    "at": "2026-10-09T04:01:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1028,
+    "at": "2026-10-09T04:01:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1025,
+    "at": "2026-10-09T03:41:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 1024,
+    "at": "2026-10-09T03:41:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 1007,
+    "at": "2026-10-09T03:21:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "death",
+    "subject": "TzKal-Zuk",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
+    }
+  },
+  {
+    "id": 997,
+    "at": "2026-10-09T03:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 963,
+    "at": "2026-10-09T02:21:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -1719,30 +1745,9 @@
   },
   {
     "id": 952,
-    "at": "2026-10-08T07:15:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 949,
-    "at": "2026-10-08T06:55:08.644126500Z",
-    "rsn": "Gnome Kid",
-    "team": 1,
+    "at": "2026-10-09T02:01:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 2400000,
@@ -1760,9 +1765,30 @@
     }
   },
   {
-    "id": 922,
-    "at": "2026-10-08T06:35:08.644126500Z",
-    "rsn": "Gnome Kid 2",
+    "id": 943,
+    "at": "2026-10-09T02:01:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 932,
+    "at": "2026-10-09T01:41:57.623925100Z",
+    "rsn": "Tree Gnome",
     "team": 1,
     "kind": "loot",
     "subject": "Chambers of Xeric",
@@ -1781,31 +1807,10 @@
     }
   },
   {
-    "id": 918,
-    "at": "2026-10-08T05:55:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 906,
-    "at": "2026-10-08T05:15:08.644126500Z",
-    "rsn": "Gnome Kid 2",
-    "team": 1,
+    "id": 923,
+    "at": "2026-10-09T01:21:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -1824,240 +1829,127 @@
   },
   {
     "id": 897,
-    "at": "2026-10-08T04:55:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 895,
-    "at": "2026-10-08T04:55:08.644126500Z",
-    "rsn": "Gnome Kid 2",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 885,
-    "at": "2026-10-08T04:35:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 884,
-    "at": "2026-10-08T04:15:08.644126500Z",
-    "rsn": "Glough Fan",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 842,
-    "at": "2026-10-08T03:55:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 841,
-    "at": "2026-10-08T03:55:08.644126500Z",
-    "rsn": "Gnome Kid 2",
-    "team": 1,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 811,
-    "at": "2026-10-08T02:55:08.644126500Z",
-    "rsn": "Bank Sitter",
+    "at": "2026-10-09T01:01:57.623925100Z",
+    "rsn": "Bank Stander",
     "team": 3,
-    "kind": "clue",
-    "subject": "elite",
-    "value": 150000,
-    "count": 1,
-    "observation": {
-      "kind": "clue",
-      "tier": "elite",
-      "items": [
-        {
-          "name": "Coins",
-          "quantity": 1,
-          "price_each": 150000
-        }
-      ],
-      "region": null
-    }
-  },
-  {
-    "id": 810,
-    "at": "2026-10-08T02:55:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
     "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Vorkath",
+      "source": "Chambers of Xeric",
       "items": [
         {
-          "name": "Dragonbone necklace",
+          "name": "Dexterous prayer scroll",
           "quantity": 1,
-          "price_each": 2400000
+          "price_each": 30000000
         }
       ]
     }
   },
   {
-    "id": 798,
-    "at": "2026-10-08T02:35:08.644126500Z",
-    "rsn": "Glough Fan",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 789,
-    "at": "2026-10-08T02:15:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 787,
-    "at": "2026-10-08T01:55:08.644126500Z",
+    "id": 896,
+    "at": "2026-10-09T00:41:57.623925100Z",
     "rsn": "Gnome Kid",
     "team": 1,
     "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
+    "subject": "Vorkath",
+    "value": 2400000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Cerberus",
+      "source": "Vorkath",
       "items": [
         {
-          "name": "Primordial crystal",
+          "name": "Dragonbone necklace",
           "quantity": 1,
-          "price_each": 28000000
+          "price_each": 2400000
         }
       ]
     }
   },
   {
-    "id": 786,
-    "at": "2026-10-08T01:55:08.644126500Z",
+    "id": 879,
+    "at": "2026-10-09T00:41:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 878,
+    "at": "2026-10-09T00:41:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "death",
+    "subject": "Zulrah",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Zulrah",
+      "pvp": false
+    }
+  },
+  {
+    "id": 868,
+    "at": "2026-10-09T00:21:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 852,
+    "at": "2026-10-08T23:41:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 851,
+    "at": "2026-10-08T23:41:57.623925100Z",
     "rsn": "Glough Fan",
     "team": 1,
     "kind": "loot",
@@ -2077,253 +1969,50 @@
     }
   },
   {
-    "id": 785,
-    "at": "2026-10-08T01:55:08.644126500Z",
+    "id": 840,
+    "at": "2026-10-08T23:21:57.623925100Z",
     "rsn": "Venom Vic",
     "team": 2,
     "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 784,
-    "at": "2026-10-08T01:35:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 783,
-    "at": "2026-10-08T01:15:08.644126500Z",
-    "rsn": "Gnome Kid 2",
-    "team": 1,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 773,
-    "at": "2026-10-08T00:35:08.644126500Z",
-    "rsn": "Scale Mommy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 762,
-    "at": "2026-10-07T23:55:08.644126500Z",
-    "rsn": "Gnome Kid",
-    "team": 1,
-    "kind": "combat_achievement",
-    "subject": "Noxious Foe",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "combat_achievement",
-      "task": "Noxious Foe"
-    }
-  },
-  {
-    "id": 761,
-    "at": "2026-10-07T23:55:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 760,
-    "at": "2026-10-07T23:55:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 759,
-    "at": "2026-10-07T23:35:08.644126500Z",
-    "rsn": "Scale Mommy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 756,
-    "at": "2026-10-07T23:15:08.644126500Z",
-    "rsn": "Rat Catcher",
-    "team": 0,
-    "kind": "loot",
     "subject": "Vorkath",
-    "value": 2400000,
+    "value": 1000000,
     "count": 1,
     "observation": {
       "kind": "loot",
       "source": "Vorkath",
       "items": [
         {
-          "name": "Dragonbone necklace",
+          "name": "Valuable drop",
           "quantity": 1,
-          "price_each": 2400000
+          "price_each": 1000000
         }
       ]
     }
   },
   {
-    "id": 704,
-    "at": "2026-10-07T21:55:08.644126500Z",
-    "rsn": "Morgan Fan",
-    "team": 3,
-    "kind": "loot",
-    "subject": "General Graardor",
-    "value": 14000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "General Graardor",
-      "items": [
-        {
-          "name": "Bandos chestplate",
-          "quantity": 1,
-          "price_each": 14000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 677,
-    "at": "2026-10-07T21:35:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 675,
-    "at": "2026-10-07T21:15:08.644126500Z",
+    "id": 833,
+    "at": "2026-10-08T22:41:57.623925100Z",
     "rsn": "Sewer Sam",
     "team": 0,
     "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Chambers of Xeric",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Dexterous prayer scroll",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 30000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 674,
-    "at": "2026-10-07T21:15:08.644126500Z",
+    "id": 828,
+    "at": "2026-10-08T22:01:57.623925100Z",
     "rsn": "Tree Gnome",
     "team": 1,
     "kind": "loot",
@@ -2343,52 +2032,32 @@
     }
   },
   {
-    "id": 648,
-    "at": "2026-10-07T20:35:08.644126500Z",
-    "rsn": "Sewer Sam II",
-    "team": 0,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
+    "id": 827,
+    "at": "2026-10-08T22:01:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
     "count": 1,
     "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
+      "kind": "clue",
+      "tier": "elite",
       "items": [
         {
-          "name": "Dragonbone necklace",
+          "name": "Coins",
           "quantity": 1,
-          "price_each": 2400000
+          "price_each": 150000
         }
-      ]
+      ],
+      "region": null
     }
   },
   {
-    "id": 646,
-    "at": "2026-10-07T20:35:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 645,
-    "at": "2026-10-07T20:35:08.644126500Z",
-    "rsn": "Scale Mommy",
-    "team": 2,
+    "id": 826,
+    "at": "2026-10-08T21:41:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
     "kind": "loot",
     "subject": "Vorkath",
     "value": 1000000,
@@ -2406,8 +2075,43 @@
     }
   },
   {
-    "id": 635,
-    "at": "2026-10-07T20:15:08.644126500Z",
+    "id": 823,
+    "at": "2026-10-08T21:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 821,
+    "at": "2026-10-08T21:01:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 820,
+    "at": "2026-10-08T21:01:57.623925100Z",
     "rsn": "Snakeling",
     "team": 2,
     "kind": "loot",
@@ -2427,141 +2131,23 @@
     }
   },
   {
-    "id": 626,
-    "at": "2026-10-07T19:55:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 2400000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Dragonbone necklace",
-          "quantity": 1,
-          "price_each": 2400000
-        }
-      ]
-    }
-  },
-  {
-    "id": 617,
-    "at": "2026-10-07T19:55:08.644126500Z",
-    "rsn": "Bank Sitter",
+    "id": 818,
+    "at": "2026-10-08T20:41:57.623925100Z",
+    "rsn": "Morgan Fan",
     "team": 3,
-    "kind": "slayer",
-    "subject": "Dagannoth",
+    "kind": "death",
+    "subject": "TzKal-Zuk",
     "value": 0,
     "count": 1,
     "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
     }
   },
   {
-    "id": 616,
-    "at": "2026-10-07T19:35:08.644126500Z",
-    "rsn": "Snakeling",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Vorkath",
-    "value": 1000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Vorkath",
-      "items": [
-        {
-          "name": "Valuable drop",
-          "quantity": 1,
-          "price_each": 1000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 574,
-    "at": "2026-10-07T17:55:08.644126500Z",
-    "rsn": "Bank Sitter",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Zulrah",
-    "value": 1600000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Zulrah",
-      "items": [
-        {
-          "name": "Tanzanite fang",
-          "quantity": 1,
-          "price_each": 1600000
-        }
-      ]
-    }
-  },
-  {
-    "id": 571,
-    "at": "2026-10-07T17:35:08.644126500Z",
-    "rsn": "Scale Daddy",
-    "team": 2,
-    "kind": "loot",
-    "subject": "Cerberus",
-    "value": 28000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Cerberus",
-      "items": [
-        {
-          "name": "Primordial crystal",
-          "quantity": 1,
-          "price_each": 28000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 551,
-    "at": "2026-10-07T16:55:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "slayer",
-    "subject": "Dagannoth",
-    "value": 0,
-    "count": 1,
-    "observation": {
-      "kind": "slayer",
-      "task": "Dagannoth"
-    }
-  },
-  {
-    "id": 525,
-    "at": "2026-10-07T16:15:08.644126500Z",
-    "rsn": "Bank Stander",
-    "team": 3,
-    "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
-    "count": 1,
-    "observation": {
-      "kind": "loot",
-      "source": "Chambers of Xeric",
-      "items": [
-        {
-          "name": "Dexterous prayer scroll",
-          "quantity": 1,
-          "price_each": 30000000
-        }
-      ]
-    }
-  },
-  {
-    "id": 515,
-    "at": "2026-10-07T15:15:08.644126500Z",
+    "id": 817,
+    "at": "2026-10-08T20:21:57.623925100Z",
     "rsn": "Bucket Bob",
     "team": 0,
     "kind": "loot",
@@ -2581,10 +2167,10 @@
     }
   },
   {
-    "id": 506,
-    "at": "2026-10-07T15:15:08.644126500Z",
-    "rsn": "Tree Gnome",
-    "team": 1,
+    "id": 813,
+    "at": "2026-10-08T19:41:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
     "kind": "loot",
     "subject": "Zulrah",
     "value": 1600000,
@@ -2602,8 +2188,296 @@
     }
   },
   {
-    "id": 505,
-    "at": "2026-10-07T15:15:08.644126500Z",
+    "id": 809,
+    "at": "2026-10-08T19:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 804,
+    "at": "2026-10-08T18:01:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 801,
+    "at": "2026-10-08T17:21:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 800,
+    "at": "2026-10-08T17:21:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 798,
+    "at": "2026-10-08T17:01:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 797,
+    "at": "2026-10-08T16:41:57.623925100Z",
+    "rsn": "Tree Gnome",
+    "team": 1,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 795,
+    "at": "2026-10-08T16:41:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 794,
+    "at": "2026-10-08T16:01:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 793,
+    "at": "2026-10-08T15:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 792,
+    "at": "2026-10-08T15:41:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 786,
+    "at": "2026-10-08T14:41:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 785,
+    "at": "2026-10-08T14:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 784,
+    "at": "2026-10-08T14:21:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 780,
+    "at": "2026-10-08T13:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 779,
+    "at": "2026-10-08T13:01:57.623925100Z",
     "rsn": "Scale Daddy",
     "team": 2,
     "kind": "loot",
@@ -2623,30 +2497,79 @@
     }
   },
   {
-    "id": 503,
-    "at": "2026-10-07T14:55:08.644126500Z",
-    "rsn": "Venom Vic",
-    "team": 2,
+    "id": 778,
+    "at": "2026-10-08T13:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
     "kind": "loot",
-    "subject": "Chambers of Xeric",
-    "value": 30000000,
+    "subject": "Zulrah",
+    "value": 1600000,
     "count": 1,
     "observation": {
       "kind": "loot",
-      "source": "Chambers of Xeric",
+      "source": "Zulrah",
       "items": [
         {
-          "name": "Dexterous prayer scroll",
+          "name": "Tanzanite fang",
           "quantity": 1,
-          "price_each": 30000000
+          "price_each": 1600000
         }
       ]
     }
   },
   {
-    "id": 494,
-    "at": "2026-10-07T14:35:08.644126500Z",
-    "rsn": "Tree Gnome",
+    "id": 776,
+    "at": "2026-10-08T12:41:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 773,
+    "at": "2026-10-08T12:21:57.623925100Z",
+    "rsn": "Venom Vic",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 772,
+    "at": "2026-10-08T12:21:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 770,
+    "at": "2026-10-08T12:01:57.623925100Z",
+    "rsn": "Gnome Kid 2",
     "team": 1,
     "kind": "loot",
     "subject": "Zulrah",
@@ -2665,9 +2588,482 @@
     }
   },
   {
-    "id": 485,
-    "at": "2026-10-07T14:35:08.644126500Z",
+    "id": 769,
+    "at": "2026-10-08T12:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 767,
+    "at": "2026-10-08T11:41:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 766,
+    "at": "2026-10-08T11:41:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 765,
+    "at": "2026-10-08T11:41:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 764,
+    "at": "2026-10-08T11:41:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 763,
+    "at": "2026-10-08T11:01:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 762,
+    "at": "2026-10-08T10:41:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 761,
+    "at": "2026-10-08T10:41:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 760,
+    "at": "2026-10-08T10:41:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Zulrah",
+    "value": 1600000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Zulrah",
+      "items": [
+        {
+          "name": "Tanzanite fang",
+          "quantity": 1,
+          "price_each": 1600000
+        }
+      ]
+    }
+  },
+  {
+    "id": 751,
+    "at": "2026-10-08T10:21:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "death",
+    "subject": "Zulrah",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Zulrah",
+      "pvp": false
+    }
+  },
+  {
+    "id": 748,
+    "at": "2026-10-08T10:21:57.623925100Z",
+    "rsn": "Tree Gnome",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 739,
+    "at": "2026-10-08T10:21:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 738,
+    "at": "2026-10-08T10:01:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "death",
+    "subject": "TzKal-Zuk",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
+    }
+  },
+  {
+    "id": 719,
+    "at": "2026-10-08T09:21:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "combat_achievement",
+    "subject": "Noxious Foe",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "combat_achievement",
+      "task": "Noxious Foe"
+    }
+  },
+  {
+    "id": 710,
+    "at": "2026-10-08T09:21:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 709,
+    "at": "2026-10-08T09:21:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 708,
+    "at": "2026-10-08T09:01:57.623925100Z",
+    "rsn": "Tree Gnome",
+    "team": 1,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 683,
+    "at": "2026-10-08T08:41:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 666,
+    "at": "2026-10-08T08:21:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 664,
+    "at": "2026-10-08T08:01:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Chambers of Xeric",
+    "value": 30000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Chambers of Xeric",
+      "items": [
+        {
+          "name": "Dexterous prayer scroll",
+          "quantity": 1,
+          "price_each": 30000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 655,
+    "at": "2026-10-08T07:41:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "death",
+    "subject": "TzKal-Zuk",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "TzKal-Zuk",
+      "pvp": false
+    }
+  },
+  {
+    "id": 654,
+    "at": "2026-10-08T07:41:57.623925100Z",
+    "rsn": "Tree Gnome",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 652,
+    "at": "2026-10-08T07:41:57.623925100Z",
     "rsn": "Snakeling",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 643,
+    "at": "2026-10-08T07:01:57.623925100Z",
+    "rsn": "Tree Gnome",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 634,
+    "at": "2026-10-08T07:01:57.623925100Z",
+    "rsn": "Bank Sitter",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 632,
+    "at": "2026-10-08T06:41:57.623925100Z",
+    "rsn": "Venom Vic",
     "team": 2,
     "kind": "loot",
     "subject": "Zulrah",
@@ -2686,10 +3082,47 @@
     }
   },
   {
-    "id": 483,
-    "at": "2026-10-07T14:35:08.644126500Z",
-    "rsn": "Sewer Sam",
+    "id": 631,
+    "at": "2026-10-08T06:41:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "death",
+    "subject": "Hill Giant",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "death",
+      "killer": "Hill Giant",
+      "pvp": false
+    }
+  },
+  {
+    "id": 622,
+    "at": "2026-10-08T06:41:57.623925100Z",
+    "rsn": "Rat Catcher",
     "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 621,
+    "at": "2026-10-08T06:41:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
     "kind": "loot",
     "subject": "Cerberus",
     "value": 28000000,
@@ -2702,6 +3135,392 @@
           "name": "Primordial crystal",
           "quantity": 1,
           "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 619,
+    "at": "2026-10-08T06:01:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 618,
+    "at": "2026-10-08T06:01:57.623925100Z",
+    "rsn": "Wizard Ned",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 616,
+    "at": "2026-10-08T05:41:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 615,
+    "at": "2026-10-08T05:21:57.623925100Z",
+    "rsn": "Bucket Bob",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 605,
+    "at": "2026-10-08T05:01:57.623925100Z",
+    "rsn": "Scale Daddy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 604,
+    "at": "2026-10-08T04:41:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Cerberus",
+    "value": 28000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Cerberus",
+      "items": [
+        {
+          "name": "Primordial crystal",
+          "quantity": 1,
+          "price_each": 28000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 602,
+    "at": "2026-10-08T04:01:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 593,
+    "at": "2026-10-08T03:41:57.623925100Z",
+    "rsn": "Bank Stander",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 592,
+    "at": "2026-10-08T03:41:57.623925100Z",
+    "rsn": "Morgan Fan",
+    "team": 3,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 591,
+    "at": "2026-10-08T03:41:57.623925100Z",
+    "rsn": "Scale Mommy",
+    "team": 2,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 590,
+    "at": "2026-10-08T03:41:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "slayer",
+    "subject": "Dagannoth",
+    "value": 0,
+    "count": 1,
+    "observation": {
+      "kind": "slayer",
+      "task": "Dagannoth"
+    }
+  },
+  {
+    "id": 589,
+    "at": "2026-10-08T03:21:57.623925100Z",
+    "rsn": "Gnome Kid",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 587,
+    "at": "2026-10-08T03:21:57.623925100Z",
+    "rsn": "Sewer Sam",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 586,
+    "at": "2026-10-08T03:01:57.623925100Z",
+    "rsn": "Glough Fan",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 577,
+    "at": "2026-10-08T02:41:57.623925100Z",
+    "rsn": "Sewer Sam II",
+    "team": 0,
+    "kind": "clue",
+    "subject": "elite",
+    "value": 150000,
+    "count": 1,
+    "observation": {
+      "kind": "clue",
+      "tier": "elite",
+      "items": [
+        {
+          "name": "Coins",
+          "quantity": 1,
+          "price_each": 150000
+        }
+      ],
+      "region": null
+    }
+  },
+  {
+    "id": 574,
+    "at": "2026-10-08T02:21:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 565,
+    "at": "2026-10-08T02:01:57.623925100Z",
+    "rsn": "Snakeling",
+    "team": 2,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 1000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Valuable drop",
+          "quantity": 1,
+          "price_each": 1000000
+        }
+      ]
+    }
+  },
+  {
+    "id": 548,
+    "at": "2026-10-08T01:21:57.623925100Z",
+    "rsn": "Rat Catcher",
+    "team": 0,
+    "kind": "loot",
+    "subject": "Vorkath",
+    "value": 2400000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "Vorkath",
+      "items": [
+        {
+          "name": "Dragonbone necklace",
+          "quantity": 1,
+          "price_each": 2400000
+        }
+      ]
+    }
+  },
+  {
+    "id": 547,
+    "at": "2026-10-08T01:21:57.623925100Z",
+    "rsn": "Gnome Kid 2",
+    "team": 1,
+    "kind": "loot",
+    "subject": "General Graardor",
+    "value": 14000000,
+    "count": 1,
+    "observation": {
+      "kind": "loot",
+      "source": "General Graardor",
+      "items": [
+        {
+          "name": "Bandos chestplate",
+          "quantity": 1,
+          "price_each": 14000000
         }
       ]
     }

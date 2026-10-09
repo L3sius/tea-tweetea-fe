@@ -5,7 +5,7 @@ import type { GameEvent } from './events'
 import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
 import { itemEntry } from './items'
-import { NECKLACES, type Item, type Suit } from './vocabulary'
+import type { Item, Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   clubs: '♣',
@@ -181,9 +181,8 @@ const elapsed = (ms: number) => {
 }
 
 /** What a team is doing right now, in a few words. */
-export function teamStatusText(team: Team, now: Date, names: Names): string {
+export function teamStatusText(team: Team, now: Date): string {
   if (team.frozenUntil && team.frozenUntil > now) return `Frozen until ${clock(team.frozenUntil)}`
-  if (team.matchId !== null) return 'In a match'
   const { status } = team
   switch (status.kind) {
     case 'idle':
@@ -196,15 +195,7 @@ export function teamStatusText(team: Team, now: Date, names: Names): string {
       return `Drew ${cardLabel(status.card)}, choosing where to go (${stepCount(status.length)})`
     case 'moving': {
       const pause = status.move.pauses[0]
-      if (!pause) return 'On the move'
-      switch (pause.kind) {
-        case 'shop':
-          return 'Shopping'
-        case 'choose_opponent':
-          return 'Choosing an opponent'
-        case 'match':
-          return `Facing ${names.team(pause.opponent)}`
-      }
+      return pause?.kind === 'shop' ? 'Shopping' : 'On the move'
     }
   }
 }
@@ -245,7 +236,6 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'stepped':
     case 'progress':
     case 'shop_closed':
-    case 'opponent_choice':
       return null
     case 'move_confirmed':
       return `${team(event.teamId)} set off ${event.path.length - 1} tiles`
@@ -261,10 +251,6 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.teamId)} collected the ${event.gem} gem`
     case 'gem_lost':
       return `${team(event.teamId)} lost the ${event.gem} gem`
-    case 'gem_stolen':
-      return `${team(event.to)} stole the ${event.gem} gem from ${team(event.from)}`
-    case 'necklace_used':
-      return `${team(event.teamId)}’s ${itemName(NECKLACES[event.gem])} saved the ${event.gem} gem`
     case 'shop_opened':
       return `${team(event.teamId)} entered a shop`
     case 'bought':
@@ -280,7 +266,7 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
           return `${team(event.teamId)}’s ${event.item ? itemName(event.item) : 'item'} blocked a freeze`
         case 'inventory full':
           return `${team(event.teamId)}’s inventory was full, so ${held(event.teamId, event.item)} was lost`
-        // Told by `item_used` and `necklace_used`.
+        // Told by `item_used`.
         case 'used':
         case 'protected a gem':
           return null
@@ -314,12 +300,6 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
       return `${team(event.teamId)} finished the minigame in place ${event.place}`
     case 'minigame_closed':
       return 'A minigame closed'
-    case 'match_started':
-      return `${team(event.mover)} challenged ${team(event.defender)}: ${names.challenge(event.challengeId)}`
-    case 'match_won':
-      return `${team(event.winner)} beat ${team(event.loser)}`
-    case 'match_abandoned':
-      return `The match between ${team(event.mover)} and ${team(event.defender)} was abandoned`
   }
 }
 
@@ -347,6 +327,11 @@ export function observationText(observation: Observation): string {
       return `got a pet: ${observation.name}!`
     case 'combat_achievement':
       return `completed ${observation.task}`
+    case 'death':
+      if (observation.killer === null) return 'died'
+      return observation.pvp
+        ? `was killed by ${observation.killer} (PvP)`
+        : `was killed by ${observation.killer}`
   }
 }
 

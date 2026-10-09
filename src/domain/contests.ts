@@ -1,15 +1,13 @@
-// Minigames and matches as the panel shows them: what is at stake, and each team's standing in
-// order, leader first.
+// Minigames as the panel shows them: what is at stake, and each team's standing in order, leader
+// first.
 import type { Challenge } from './challenge'
 import { challengeProgress, type Names } from './describe'
-import type { GameState, Match, Minigame } from './game'
+import type { GameState, Minigame } from './game'
 import type { ChallengeId, InstanceId, TeamId } from './ids'
 
-/** What a contest pays: gold by finishing place, gold per unit up to a cap, or a gem to steal. */
+/** What a contest pays: gold by finishing place, or gold per unit up to a cap. */
 export type Stake =
-  | { kind: 'places'; payouts: number[] }
-  | { kind: 'per_unit'; goldPerUnit: number; cap: number }
-  | { kind: 'gem' }
+  { kind: 'places'; payouts: number[] } | { kind: 'per_unit'; goldPerUnit: number; cap: number }
 
 export type Standing = {
   teamId: TeamId
@@ -21,13 +19,10 @@ export type Standing = {
   place: number | null
   /** Gold it was paid, once the contest closed. */
   gold: number | null
-  /** It won the match. */
-  won: boolean
 }
 
 export type Contest = {
   key: string
-  kind: 'minigame' | 'match'
   title: string
   description: string
   deadline: Date
@@ -47,28 +42,25 @@ type Context = {
   names: Names
 }
 
-/** Every team's progress on an instance, or only those in `only`, in team order. */
-function progressOf(c: Context, instanceId: InstanceId, only?: ReadonlySet<TeamId>) {
+/** Every team's progress on an instance, in team order. */
+function progressOf(c: Context, instanceId: InstanceId) {
   const instance = c.state.instances.get(instanceId)
   const challenge = (instance && c.challenges.get(instance.challengeId)) ?? null
-  const rows = [...c.state.teams.values()]
-    .filter((team) => !only || only.has(team.id))
-    .map((team) => {
-      const p = challenge ? challengeProgress(challenge, instance, team.id) : { done: 0, needed: 1 }
-      return {
-        teamId: team.id,
-        done: p.done,
-        needed: p.needed,
-        finished: !!instance?.done.has(team.id),
-      }
-    })
+  const rows = [...c.state.teams.values()].map((team) => {
+    const p = challenge ? challengeProgress(challenge, instance, team.id) : { done: 0, needed: 1 }
+    return {
+      teamId: team.id,
+      done: p.done,
+      needed: p.needed,
+      finished: !!instance?.done.has(team.id),
+    }
+  })
   return { challenge, rows }
 }
 
 /** Placed teams by place, then the rest by how far along they are, then in team order. */
 export function byStanding(a: Standing, b: Standing): number {
   if (a.place !== null || b.place !== null) return (a.place ?? Infinity) - (b.place ?? Infinity)
-  if (a.won !== b.won) return a.won ? -1 : 1
   return b.done / b.needed - a.done / a.needed || a.teamId - b.teamId
 }
 
@@ -89,12 +81,10 @@ export function minigameContest(c: Context, m: Minigame): Contest {
         : {}),
       place: stake.kind === 'places' && place >= 0 ? place + 1 : null,
       gold: m.payouts ? (paid.get(r.teamId) ?? 0) : null,
-      won: false,
     }
   })
   return {
     key: `minigame-${m.id}`,
-    kind: 'minigame',
     title: challenge?.name ?? 'Unknown challenge',
     description: challenge?.description ?? '',
     deadline: m.deadline,
@@ -106,41 +96,9 @@ export function minigameContest(c: Context, m: Minigame): Contest {
   }
 }
 
-export function matchContest(c: Context, m: Match): Contest {
-  const { challenge, rows } = progressOf(c, m.instanceId, new Set([m.mover, m.defender]))
-  const o = m.outcome
-  const winner = o.kind === 'won' || o.kind === 'stealing' ? o.winner : null
-  const team = c.names.team
-  const result =
-    o.kind === 'won'
-      ? `${team(o.winner)} won${o.stolen ? ` and stole the ${o.stolen} gem` : ''}`
-      : o.kind === 'abandoned'
-        ? 'Abandoned: nobody finished in time'
-        : o.kind === 'stealing'
-          ? `${team(o.winner)} won and is choosing a gem to steal`
-          : null
-  return {
-    key: `match-${m.id}`,
-    kind: 'match',
-    title: `${team(m.mover)} vs ${team(m.defender)}`,
-    description: challenge ? `${challenge.name}: ${challenge.description}` : '',
-    deadline: m.deadline,
-    stake: { kind: 'gem' },
-    initiator: null,
-    standings: rows
-      .map((r): Standing => ({ ...r, place: null, gold: null, won: r.teamId === winner }))
-      .sort(byStanding),
-    result,
-    live: o.kind === 'open' || o.kind === 'stealing',
-  }
-}
-
-/** Live contests (minigames first), and finished ones, latest first. */
+/** Live minigames, and finished ones, latest first. */
 export function contests(c: Context): { live: Contest[]; past: Contest[] } {
-  const all = [
-    ...[...c.state.minigames.values()].map((m) => minigameContest(c, m)),
-    ...[...c.state.matches.values()].map((m) => matchContest(c, m)),
-  ]
+  const all = [...c.state.minigames.values()].map((m) => minigameContest(c, m))
   return {
     live: all.filter((x) => x.live),
     past: all.filter((x) => !x.live).sort((a, b) => b.deadline.getTime() - a.deadline.getTime()),
@@ -156,12 +114,11 @@ export function ordinal(n: number): string {
 
 /**
  * A team's standing in a few words: "Not yet" while a one-off task is open ("Didn't finish" once
- * the contest is over), its count while it is under way, "1st ✓" once it placed in a race,
- * "Won ✓" for a match, and the gold once paid.
+ * the contest is over), its count while it is under way, "1st ✓" once it placed in a race, and
+ * the gold once paid.
  */
 export function standingText(s: Standing, stake: Stake, live = true): string {
   const paid = s.gold !== null && s.gold > 0 ? ` +${s.gold} gold` : ''
-  if (stake.kind === 'gem' && s.won) return 'Won ✓'
   if (s.place !== null) return `${ordinal(s.place)} ✓${paid}`
   if (s.finished && stake.kind !== 'per_unit') return `Done ✓${paid}`
   const count =

@@ -1,5 +1,5 @@
 import type { Appearance, Blocker, Card, Effect, Payout, Scoring, TeamProgress } from './game'
-import type { ChallengeId, InstanceId, MatchId, MinigameId, TeamId, TileId } from './ids'
+import type { ChallengeId, InstanceId, MinigameId, TeamId, TileId } from './ids'
 import type { ItemTarget } from './commands'
 import type { Gem, Item } from './vocabulary'
 
@@ -35,10 +35,8 @@ export type GameEvent =
   | { kind: 'tile_completed'; teamId: TeamId; tileId: TileId }
   // Gems
   | { kind: 'gem_collected'; teamId: TeamId; gem: Gem; tileId: TileId }
+  /** A Joker or a random event took the gem. */
   | { kind: 'gem_lost'; teamId: TeamId; gem: Gem }
-  | { kind: 'gem_stolen'; from: TeamId; to: TeamId; gem: Gem }
-  /** A necklace kept the gem in a lost match; it is used up. */
-  | { kind: 'necklace_used'; teamId: TeamId; gem: Gem }
   // Shops and items
   | { kind: 'shop_opened'; teamId: TeamId; tileId: TileId }
   | { kind: 'shop_closed'; teamId: TeamId }
@@ -74,18 +72,6 @@ export type GameEvent =
     }
   | { kind: 'minigame_finished'; minigameId: MinigameId; teamId: TeamId; place: number }
   | { kind: 'minigame_closed'; minigameId: MinigameId; payouts: Payout[] }
-  // Matches
-  | { kind: 'opponent_choice'; teamId: TeamId; candidates: TeamId[] }
-  | {
-      kind: 'match_started'
-      matchId: MatchId
-      mover: TeamId
-      defender: TeamId
-      challengeId: ChallengeId
-      deadline: Date
-    }
-  | { kind: 'match_won'; matchId: MatchId; winner: TeamId; loser: TeamId; options: Gem[] }
-  | { kind: 'match_abandoned'; matchId: MatchId; mover: TeamId; defender: TeamId }
 
 export type GameEventKind = GameEvent['kind']
 

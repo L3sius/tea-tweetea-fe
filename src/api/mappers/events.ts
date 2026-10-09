@@ -1,5 +1,5 @@
 import type { GameEvent, JournalEntry } from '@/domain/events'
-import { challengeId, instanceId, matchId, minigameId, teamId, tileId } from '@/domain/ids'
+import { challengeId, instanceId, minigameId, teamId, tileId } from '@/domain/ids'
 import type { WireEvent, WirePublished } from '../wire/events'
 import {
   toBlocker,
@@ -93,10 +93,7 @@ export function toGameEvent(wire: WireEvent): GameEvent {
         tileId: tileId(wire.tile),
       }
     case 'gem_lost':
-    case 'necklace_used':
       return { kind: wire.type, teamId: teamId(wire.team), gem: wire.gem }
-    case 'gem_stolen':
-      return { kind: wire.type, from: teamId(wire.from), to: teamId(wire.to), gem: wire.gem }
     case 'shop_opened':
       return { kind: wire.type, teamId: teamId(wire.team), tileId: tileId(wire.tile) }
     case 'shop_closed':
@@ -171,36 +168,6 @@ export function toGameEvent(wire: WireEvent): GameEvent {
       }
     case 'minigame_closed':
       return { kind: wire.type, minigameId: minigameId(wire.id), payouts: wire.gold.map(toPayout) }
-    case 'opponent_choice':
-      return {
-        kind: wire.type,
-        teamId: teamId(wire.team),
-        candidates: wire.candidates.map(teamId),
-      }
-    case 'match_started':
-      return {
-        kind: wire.type,
-        matchId: matchId(wire.id),
-        mover: teamId(wire.mover),
-        defender: teamId(wire.defender),
-        challengeId: challengeId(wire.challenge),
-        deadline: toDate(wire.deadline),
-      }
-    case 'match_won':
-      return {
-        kind: wire.type,
-        matchId: matchId(wire.id),
-        winner: teamId(wire.winner),
-        loser: teamId(wire.loser),
-        options: wire.options,
-      }
-    case 'match_abandoned':
-      return {
-        kind: wire.type,
-        matchId: matchId(wire.id),
-        mover: teamId(wire.mover),
-        defender: teamId(wire.defender),
-      }
   }
 }
 
