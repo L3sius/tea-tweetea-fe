@@ -239,7 +239,7 @@ const shieldedRivals = computed(() => others.value.filter(isShielded))
 /** Using an item goes back to the power-up step, where targeting shows. */
 function use(item: Item) {
   my.skippedPowerup = false
-  void my.useItem(item)
+  my.useItem(item)
 }
 
 /** The item waiting on the drop dialog's answer. */
@@ -428,7 +428,8 @@ async function login() {
           </TtText>
         </template>
         <TtText v-else :size="1" color="white">
-          Click one of the orange-ringed tiles on the map (within 10 steps of you).
+          Click one of the orange-ringed tiles on the map (within
+          {{ game.rules?.blockerRange }} steps of you).
         </TtText>
         <button type="button" class="tt-link tt-1" @click="my.targeting = null">Cancel</button>
       </div>

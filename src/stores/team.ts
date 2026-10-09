@@ -19,6 +19,9 @@ const CODE_KEY = 'tweetea.teamCode'
 /** An item waiting for the player to pick what it is used on. */
 export type Targeting = { item: Item; kind: 'team' | 'tile' }
 
+/** An item use waiting for the captain to say yes, with its target if it needs one. */
+export type PendingUse = { item: Item; target?: ItemTarget }
+
 /**
  * The team this browser manages, if someone entered a team code: its actions, the route being
  * picked on the map, and an item waiting for a target.
@@ -46,6 +49,7 @@ export const useTeamStore = defineStore('team', () => {
   /** The route a click on the hovered node would leave; null when not hovering a node. */
   const preview = shallowRef<TileId[] | null>(null)
   const targeting = ref<Targeting | null>(null)
+  const confirming = shallowRef<PendingUse | null>(null)
   /** The captain chose to draw without using a power-up on this tile. */
   const skippedPowerup = ref(false)
   /**
@@ -132,20 +136,22 @@ export const useTeamStore = defineStore('team', () => {
   })
 
   /**
-   * Why the item waiting for a target can no longer be used, if it can't: the card was drawn,
-   * the team moved or froze, or the item is gone. A pick left open would keep the map waiting for
-   * a target and swallow the clicks of the walk.
+   * Why the item being used (waiting for a target or a yes) can no longer be used, if it can't:
+   * the card was drawn, the team moved or froze, or the item is gone. A pick left open would keep
+   * the map waiting for a target and swallow the clicks of the walk.
    */
-  const targetingBlocked = computed(() => {
-    const pending = targeting.value
+  const useBlocked = computed(() => {
+    const item = confirming.value?.item ?? targeting.value?.item
     const t = team.value
-    if (!pending) return null
-    if (!t || (items.value.get(pending.item) ?? 0) === 0) return 'gone'
+    if (!item) return null
+    if (!t || (items.value.get(item) ?? 0) === 0) return 'gone'
     const here = game.board?.tiles.get(t.position)
-    return whyNotUsable(t, pending.item, now.value, here, blockers.value)
+    return whyNotUsable(t, item, now.value, here, blockers.value)
   })
-  watch(targetingBlocked, (why) => {
-    if (why !== null) targeting.value = null
+  watch(useBlocked, (why) => {
+    if (why === null) return
+    targeting.value = null
+    confirming.value = null
   })
 
   // A new draw, an item that changes the length, or a move all make the shown route stale.
@@ -418,17 +424,32 @@ export const useTeamStore = defineStore('team', () => {
     if ((await act({ kind: 'confirm_path', path: full })) !== null) clearRoute()
   }
 
-  /** Uses an item at once, or waits for a target if it needs one. */
-  async function useItem(item: Item) {
+  /** Asks to use an item at once, or waits for a target first if it needs one. */
+  function useItem(item: Item) {
     const kind = ITEM_TARGET[item]
-    if (kind === 'none') return void (await act({ kind: 'use_item', item }))
-    targeting.value = { item, kind }
+    if (kind === 'none') confirming.value = { item }
+    else targeting.value = { item, kind }
   }
 
-  async function useOn(target: ItemTarget) {
+  /** The target is picked: ask before using the item on it. */
+  function useOn(target: ItemTarget) {
     const t = targeting.value
-    if (!t) return
-    if ((await act({ kind: 'use_item', item: t.item, target })) !== null) targeting.value = null
+    if (t) confirming.value = { item: t.item, target }
+  }
+
+  async function confirmUse() {
+    const c = confirming.value
+    if (!c) return
+    confirming.value = null
+    const command = c.target
+      ? { kind: 'use_item' as const, item: c.item, target: c.target }
+      : { kind: 'use_item' as const, item: c.item }
+    if ((await act(command)) !== null) targeting.value = null
+  }
+
+  /** No: a targeted item keeps waiting, so another target can be picked. */
+  function cancelUse() {
+    confirming.value = null
   }
 
   return {
@@ -447,6 +468,7 @@ export const useTeamStore = defineStore('team', () => {
     stoppedBy,
     blockers,
     targeting,
+    confirming,
     walks,
     targetableTiles,
     login,
@@ -466,6 +488,8 @@ export const useTeamStore = defineStore('team', () => {
     confirmRoute,
     useItem,
     useOn,
+    confirmUse,
+    cancelUse,
   }
 })
 

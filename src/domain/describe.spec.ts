@@ -12,6 +12,7 @@ import {
   itemName,
   observationText,
   teamParts,
+  useQuestion,
 } from './describe'
 import type { Instance } from './game'
 import { challengeId, instanceId, teamId, tileId, type ChallengeId, type TeamId } from './ids'
@@ -200,6 +201,18 @@ describe('blockers', () => {
     expect(hoursText(0.5)).toBe('30 minutes')
     expect(hoursText(1)).toBe('1 hour')
     expect(hoursText(4)).toBe('4 hours')
+  })
+})
+
+describe('useQuestion', () => {
+  it('asks in the words that fit each item', () => {
+    expect(useQuestion('ice_barrage', 'Blue')).toBe('Cast Ice Barrage on Blue?')
+    expect(useQuestion('morrigans_throwing_axe', 'Blue')).toBe(
+      "Throw Morrigan's throwing axe at Blue?",
+    )
+    expect(useQuestion('banana', null)).toBe('Place the Banana on this tile?')
+    expect(useQuestion('ogre_boat', null)).toBe('Sail away in the Ogre boat?')
+    expect(useQuestion('bronze_feather', null)).toBe('Use the Bronze feather?')
   })
 })
 

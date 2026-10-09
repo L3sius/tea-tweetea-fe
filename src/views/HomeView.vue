@@ -12,6 +12,7 @@ import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
 import TeamControls from '@/components/TeamControls.vue'
+import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
@@ -187,7 +188,7 @@ const allTiles = computed(() => new Set(board.value?.tiles.keys() ?? []))
 
 function onPick(tile: TileId) {
   if (dev.pickingTile) void dev.teleport(tile)
-  else if (my.targeting?.kind === 'tile') void my.useOn({ kind: 'tile', tileId: tile })
+  else if (my.targeting?.kind === 'tile') my.useOn({ kind: 'tile', tileId: tile })
   else my.checkpoint(tile)
 }
 
@@ -532,6 +533,14 @@ async function buyMysteryBox() {
         />
       </div>
     </aside>
+
+    <!-- Using an item asks first; a target picked on the map is part of the question. -->
+    <UseItemDialog
+      v-if="my.confirming"
+      :use="my.confirming"
+      @confirm="my.confirmUse()"
+      @cancel="my.cancelUse()"
+    />
 
     <!-- The shop opens over everything, like the event site's shop modal -->
     <div v-if="shopOpen" class="tt-overlay" @click.self="shopOpen = false">

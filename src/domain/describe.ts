@@ -28,6 +28,37 @@ export const itemName = (item: Item): string => itemEntry(item).name
 
 export const blockerName = (blocker: Blocker): string => itemName(blocker.item)
 
+/**
+ * What using an item does, as the captain is asked before it happens. `target` names the rival
+ * team for items used on one.
+ */
+export function useQuestion(item: Item, target: string | null): string {
+  const name = itemName(item)
+  const on = target ?? 'a rival'
+  switch (item) {
+    case 'morrigans_throwing_axe':
+      return `Throw ${name} at ${on}?`
+    case 'ice_barrage':
+    case 'entangle':
+      return `Cast ${name} on ${on}?`
+    case 'group_teleport':
+      return `Cast ${name}?`
+    case 'quetzal_whistle':
+      return `Blow the ${name}?`
+    case 'ogre_boat':
+      return `Sail away in the ${name}?`
+    case 'banana':
+    case 'harpie_bug_swarm':
+    case 'snake_charmer':
+    case 'wilderness_web':
+      return `Place the ${name} on this tile?`
+    case 'leprechaun_hat':
+      return `Put on the ${name}?`
+    default:
+      return `Use the ${name}?`
+  }
+}
+
 /** "30 minutes", "1 hour", "2 hours". */
 export function hoursText(hours: number): string {
   if (hours < 1) return `${Math.round(hours * 60)} minutes`
