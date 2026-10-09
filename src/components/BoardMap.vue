@@ -1226,6 +1226,10 @@ onMounted(() => {
   map.on('click', onClick)
   DomEvent.disableScrollPropagation(container.value)
   leaflet = map
+  // The board's layers go on the map only now: `drawBoard` above ran before `leaflet` was set, so
+  // its call to `applyLayers` did nothing. Without this, a map opened with no tour running (a
+  // reload, or coming back from another page) would have no roads, nodes, gems or shops.
+  applyLayers()
   zoomAroundCentre(props.follow)
   emitView()
   frame = requestAnimationFrame(renderFrame)

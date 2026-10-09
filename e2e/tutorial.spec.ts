@@ -19,6 +19,9 @@ test('a first visit opens the tutorial, which can be skipped for good', async ({
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'How to play' })).toBeHidden()
+  // With no tour running, the whole board is drawn: roads and nodes, gems and shops.
+  await expect(page.locator('.leaflet-overlay-pane canvas')).toHaveCount(1)
+  await expect(page.locator('.gem-marker').first()).toBeVisible()
 
   // "How to play" opens it again.
   await page.getByRole('button', { name: 'How to play' }).click()
