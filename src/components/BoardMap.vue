@@ -986,7 +986,8 @@ function quotesAt(
     players,
   )
   const speaker = idle ? props.state.teams.get(idle.team) : undefined
-  if (idle && speaker) {
+  // During the tutorial its guide does the talking.
+  if (idle && speaker && !props.guide) {
     const p = placements.get(idle.team)
     const frozen = speaker.frozenUntil !== null && speaker.frozenUntil.getTime() > time
     if ((p === null || p?.kind === 'still') && !frozen && !talking.has(idle.team)) out.push(idle)

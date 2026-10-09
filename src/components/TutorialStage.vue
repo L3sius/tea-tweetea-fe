@@ -142,6 +142,7 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
             :held="0"
             :inventory-limit="game.rules?.inventoryLimit ?? 0"
             :pending="false"
+            :opening="null"
             @close="tutorial.closeShop()"
           />
         </div>

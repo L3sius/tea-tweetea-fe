@@ -11,7 +11,8 @@ test('a first visit opens the tutorial, which can be skipped for good', async ({
   const chat = page.getByRole('dialog', { name: 'Earl Grey says' })
   await expect(chat).toContainText('Tweetea and the Magic Gems')
 
-  await page.getByRole('button', { name: 'Skip' }).click()
+  // Exactly "Skip": the title's "Skip the tour" may still be fading out.
+  await page.getByRole('button', { name: 'Skip', exact: true }).click()
   await expect(chat).toBeHidden()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
