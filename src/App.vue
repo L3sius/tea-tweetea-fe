@@ -64,6 +64,6 @@ const reload = () => window.location.reload()
     <main class="relative min-h-0 flex-1">
       <RouterView />
     </main>
-    <TutorialOverlay v-if="tutorial.phase === 'title'" />
+    <TutorialOverlay v-if="tutorial.cover" />
   </div>
 </template>

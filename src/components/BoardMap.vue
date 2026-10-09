@@ -109,6 +109,7 @@ let mapBounds: LatLngBounds | null = null
 let frame = 0
 
 const pieces = layerGroup()
+const gemLayer = layerGroup()
 const roadLayer = layerGroup()
 const nodeLayer = layerGroup()
 const shopLayer = layerGroup()
@@ -290,6 +291,9 @@ const SPREAD_MS = 2600
 function applyLayers() {
   const map = leaflet
   if (!map) return
+  // The map fades in, and goes at once: the tutorial hides it under black.
+  const image = terrain?.getElement()
+  if (image) image.style.transition = shown('terrain') ? '' : 'none'
   terrain?.setOpacity(shown('terrain') ? 1 : 0)
   for (const layer of [roadLayer, nodeLayer, reachLayer, routeLayer]) layer.remove()
   if (shown('roads') && !spreadFrame) roadLayer.addTo(map)
@@ -297,6 +301,7 @@ function applyLayers() {
   reachLayer.addTo(map)
   routeLayer.addTo(map)
   for (const [layer, on] of [
+    [gemLayer, shown('gems')],
     [shopLayer, shown('landmarks')],
     [pieces, shown('landmarks')],
   ] as const) {
@@ -362,6 +367,7 @@ function spreadFrom(origin: TileId) {
 /** Gems and blockers: board pieces that change as the game goes on. */
 function drawPieces() {
   pieces.clearLayers()
+  gemLayer.clearLayers()
   for (const [gem, tile] of props.state.gemTiles) {
     const at = tileLatLng(tile)
     if (!at) continue
@@ -373,7 +379,7 @@ function drawPieces() {
       }),
       zIndexOffset: 500,
       interactive: false,
-    }).addTo(pieces)
+    }).addTo(gemLayer)
   }
   for (const [tile, blocker] of props.state.blockers) {
     const at = tileLatLng(tile)

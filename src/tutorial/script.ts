@@ -11,6 +11,8 @@ export type RevealName =
   | 'terrain'
   | 'roads'
   | 'nodes'
+  | 'gems'
+  /** Shops and traps. */
   | 'landmarks'
   | 'teams'
   // Around it
@@ -19,7 +21,10 @@ export type RevealName =
   | 'controls'
 
 /** Map parts, drawn by BoardMap. */
-export type BoardLayer = Extract<RevealName, 'terrain' | 'roads' | 'nodes' | 'landmarks' | 'teams'>
+export type BoardLayer = Extract<
+  RevealName,
+  'terrain' | 'roads' | 'nodes' | 'gems' | 'landmarks' | 'teams'
+>
 
 /** Earl Grey's gestures: OSRS animations every player-rigged NPC can play. */
 export const GESTURE = {
@@ -74,58 +79,54 @@ export const TUTORIAL: Beat[] = [
     ],
     lines: [
       {
-        text: "Ah, a new arrival! Welcome to Tweetea and the Magic Gems. I'm Earl Grey, and I'll show you the ropes.",
+        text: 'Ahoy there, young adventurer! I bid you a warm welcome to Tweetea and the Magic Gems.',
         gesture: 'wave',
       },
       {
-        text: 'Your clan splits into teams. Teams race across a board by finishing Old School tasks, and collect magic gems on the way.',
-        gesture: 'nod',
+        text: 'The aim of this adventure is to gather every one of the magic gems. But how do we get them?',
+        gesture: 'think',
       },
-      { text: "Let's begin with where it all happens.", gesture: 'beckon' },
     ],
   },
   {
-    id: 'map',
+    id: 'gems',
     cues: [
-      at(1800, { kind: 'camera', to: 'all', ms: 3500 }),
+      at(300, { kind: 'camera', to: 'all', ms: 3500 }),
+      at(2600, { kind: 'reveal', what: ['gems'] }),
       at(3200, { kind: 'say', text: 'Ooh, look at that.' }),
-      at(7000, { kind: 'camera', to: 'guide', zoom: 0.5, ms: 3000 }),
     ],
     lines: [
-      { text: 'This is the board: the whole of Gielinor, laid out as a map.', gesture: 'think' },
+      { text: 'This is the map of Gielinor. Can you see the gems?', gesture: 'beckon' },
+      { text: 'You must gather them all to reign victorious!', gesture: 'cheer' },
       {
-        text: 'Every team plays on this same map, and the whole clan can watch the race unfold here.',
+        text: 'But how do we get there?',
+        gesture: 'think',
+        cues: [at(200, { kind: 'camera', to: 'guide', zoom: 0.5, ms: 3000 })],
       },
     ],
   },
   {
     id: 'roads',
-    cues: [at(300, { kind: 'reveal', what: ['roads', 'nodes'] })],
     lines: [
       {
-        text: 'Each dot is a tile, and roads join the tiles together. Teams only ever move along the roads.',
+        text: 'These are the roads, and these are the nodes.',
         gesture: 'beckon',
+        cues: [at(300, { kind: 'reveal', what: ['roads', 'nodes'] })],
       },
       {
-        text: 'A short move is a gentle stroll...',
+        text: 'A noble adventurer keeps to the path, lest he stray into the depths of darkness.',
+        gesture: 'nod',
+      },
+      {
+        text: 'A few tiles make for a short walk. Any soldier worth his salt covers such ground without haste.',
         cues: [
           at(200, { kind: 'walk', steps: 3 }),
           at(800, { kind: 'say', text: 'Mind the potholes.' }),
         ],
       },
       {
-        text: '...and a long one is a proper run!',
+        text: 'But a brisk step favours the bold, and surely the bold shall earn true victory and pride!',
         cues: [at(200, { kind: 'walk', steps: 8 }), at(900, { kind: 'say', text: 'Wheee!' })],
-      },
-    ],
-  },
-  {
-    id: 'later',
-    cues: [at(0, { kind: 'camera', to: 'all', ms: 2500 })],
-    lines: [
-      {
-        text: "That's all of the tour for now. There's more on the way. Good luck out there!",
-        gesture: 'bow',
       },
     ],
   },

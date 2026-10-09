@@ -18,10 +18,13 @@ const SEEN_KEY = 'tweetea.tutorial'
 const VERSION = '1'
 /** How long an overhead line stays up, unless the script says. */
 const SAY_MS = 2600
+/** How close the camera is on Earl Grey in the title scene and the welcome. */
+const TITLE_ZOOM = 1.5
 /** Assumed for a gesture whose length hasn't loaded. */
 const GESTURE_MS = 2000
-/** How long the page takes to fade to black before the title card (see TutorialOverlay). */
+/** How long the page takes to fade to black, then to fade in again on the title scene. */
 export const TO_BLACK_MS = 700
+export const FROM_BLACK_MS = 900
 
 /** A camera move for the map to make; a new id each time, so the same move can repeat. */
 export type CameraMove = { id: number; to: 'all' | TileId; zoom?: number; ms: number }
@@ -45,7 +48,13 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const game = useGameStore()
 
   const seen = ref(readSeen())
-  const phase = ref<'off' | 'title' | 'playing'>('off')
+  /**
+   * `fading`: the page fades to black, unchanged under it. `title`: the tour's own scene, with the
+   * map dark and Earl Grey waving over "How to play". `playing`: the tour.
+   */
+  const phase = ref<'off' | 'fading' | 'title' | 'playing'>('off')
+  /** The black cover over the page, while it fades in and out again. */
+  const cover = ref(false)
   const beat = ref(0)
   const line = ref(0)
   const revealed = shallowRef<ReadonlySet<RevealName>>(new Set())
@@ -53,6 +62,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const muted = ref(music.isMuted())
 
   const active = computed(() => phase.value !== 'off')
+  /** The page is the tour's scene: parts of it hidden, Earl Grey on the map. */
+  const staged = computed(() => phase.value === 'title' || phase.value === 'playing')
   const current = computed(() => TUTORIAL[beat.value] ?? null)
   const text = computed(() => current.value?.lines[line.value]?.text ?? '')
   const isFirst = computed(() => beat.value === 0 && line.value === 0)
@@ -61,8 +72,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
       beat.value === TUTORIAL.length - 1 && line.value === (current.value?.lines.length ?? 1) - 1,
   )
 
-  /** Whether a part of the page shows: everything does outside the tutorial. */
-  const shows = (name: RevealName) => !active.value || revealed.value.has(name)
+  /** Whether a part of the page shows: everything does outside the tutorial's scene. */
+  const shows = (name: RevealName) => !staged.value || revealed.value.has(name)
 
   // --- Earl Grey ---
 
@@ -204,27 +215,39 @@ export const useTutorialStore = defineStore('tutorial', () => {
     else if (beat.value > 0) enterBeat(beat.value - 1)
   }
 
-  let musicTimer: ReturnType<typeof setTimeout> | undefined
+  const fadeTimers: ReturnType<typeof setTimeout>[] = []
+  const clearFades = () => fadeTimers.splice(0).forEach(clearTimeout)
 
   /**
-   * Fades the page to black and opens the title card, with the music starting as it appears.
-   * Browsers only play sound after a click: from "How to play" it starts here, while a first visit
-   * opens by itself and has to wait for "Begin".
+   * Fades the page to black, sets the title scene up under the black and fades it in, with the
+   * music starting as it does. Browsers only play sound after a click: from "How to play" it starts
+   * here, while a first visit opens by itself and has to wait for "Begin".
    */
   function start() {
+    clearFades()
     flush('line')
     flush('beat')
-    beatTiles.clear()
-    revealed.value = new Set()
-    place(game.board ? startTile(game.board) : null)
     void loadAnimationInfo()
-    phase.value = 'title'
-    clearTimeout(musicTimer)
-    musicTimer = setTimeout(() => music.play(music.NEWBIE_MELODY), TO_BLACK_MS)
+    phase.value = 'fading'
+    cover.value = true
+    fadeTimers.push(
+      setTimeout(() => {
+        beatTiles.clear()
+        revealed.value = new Set()
+        place(game.board ? startTile(game.board) : null)
+        phase.value = 'title'
+        run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
+        const since = game.serverNow()
+        gesture = { anim: GESTURE.wave, since, until: Infinity }
+        music.play(music.NEWBIE_MELODY)
+      }, TO_BLACK_MS),
+      setTimeout(() => (cover.value = false), TO_BLACK_MS + FROM_BLACK_MS),
+    )
   }
 
+  /** From the title scene into the tour: the title fades out, the map and chatbox fade in. */
   function begin() {
-    clearTimeout(musicTimer)
+    if (phase.value !== 'title') return
     if (!music.isPlaying()) music.play(music.NEWBIE_MELODY)
     phase.value = 'playing'
     enterBeat(0)
@@ -232,7 +255,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   /** Ends the tour, at the end or by skipping; either way it won't open by itself again. */
   function finish() {
-    clearTimeout(musicTimer)
+    clearFades()
+    cover.value = false
     flush('line')
     flush('beat')
     music.stop()
@@ -253,7 +277,9 @@ export const useTutorialStore = defineStore('tutorial', () => {
   return {
     seen,
     phase,
+    cover,
     active,
+    staged,
     beat,
     line,
     text,

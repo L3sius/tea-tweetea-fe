@@ -258,7 +258,7 @@ async function buyMysteryBox() {
         :choreography="choreography"
         :server-now="game.serverNow"
         :selected="selected"
-        :follow="follow && !tutorial.active"
+        :follow="follow && !tutorial.staged"
         :my-team="my.team"
         :route="picking ? my.path : null"
         :checkpoints="my.checkpoints"
@@ -270,8 +270,8 @@ async function buyMysteryBox() {
         :replay="game.replay"
         :dev-quote="dev.quote"
         :appearance-of="characters.appearanceOf"
-        :layers="tutorial.active ? tutorial.revealed : null"
-        :guide="tutorial.phase === 'playing' ? tutorial.guide : null"
+        :layers="tutorial.staged ? tutorial.revealed : null"
+        :guide="tutorial.staged ? tutorial.guide : null"
         @hover="onHover"
         @pick="onPick"
         @free-roam="freeRoam"
@@ -279,7 +279,7 @@ async function buyMysteryBox() {
       />
 
       <!-- The tutorial's tour plays inside the map's frame. -->
-      <TutorialStage v-if="tutorial.phase === 'playing'" />
+      <TutorialStage v-if="tutorial.staged" />
 
       <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
@@ -310,7 +310,7 @@ async function buyMysteryBox() {
 
       <!-- Play-testing tools -->
       <div
-        v-if="dev.enabled && !tutorial.active"
+        v-if="dev.enabled && !tutorial.staged"
         class="pointer-events-none absolute top-1.5 right-1.5 z-[1060] flex justify-end"
       >
         <DevTools />
@@ -318,7 +318,7 @@ async function buyMysteryBox() {
 
       <!-- Alerts -->
       <div
-        v-if="!tutorial.active"
+        v-if="!tutorial.staged"
         class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3"
       >
         <AlertToasts
