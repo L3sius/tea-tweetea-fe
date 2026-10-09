@@ -717,8 +717,9 @@ type GuideMarker = {
   saying: string | null
 }
 let guideMarker: GuideMarker | null = null
-/** Where the guide was last drawn, for the camera to follow. */
+/** Where the guide was last drawn, for the camera to follow while he walks. */
 let guideAt: LatLng | null = null
+let guideWalking = false
 /** Screen pixels from his tile up to the middle of his (larger) body. */
 const GUIDE_LIFT = 48
 
@@ -772,6 +773,7 @@ function drawGuide(map: LeafletMap, time: number) {
   if (!p || !where) return
   entry.marker.setLatLng(where.at)
   guideAt = where.at
+  guideWalking = p.kind === 'walk'
   if (p.kind === 'walk' && (where.dx !== 0 || where.dy !== 0))
     entry.heading = headingOf(where.dx, where.dy)
   // He faces the way he walks, and turns to the viewer to talk.
@@ -927,11 +929,12 @@ function renderFrame() {
 
   // Follow camera: ease towards the selected team instead of jumping. It waits out a flight, since
   // moving the view would cut the flight short, and a zoom, which it would make jerk.
-  // The tutorial's guide is followed the same way while he's on the board.
+  // The tutorial's guide is followed the same way, only while he walks: standing, he leaves the
+  // camera to the tutorial's own moves.
   if (!flying && !zooming && !glideFrame) {
     const zoom = map.getZoom()
     const want =
-      props.guide && guideAt
+      props.guide && guideAt && guideWalking
         ? centreOn(map, guideAt, GUIDE_LIFT * pieceScale(zoom), zoom)
         : props.follow && props.selected !== null
           ? followCentre(map, props.selected, zoom)

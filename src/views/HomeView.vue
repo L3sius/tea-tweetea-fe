@@ -12,6 +12,7 @@ import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
 import TeamControls from '@/components/TeamControls.vue'
+import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
 import type { JournalEntry } from '@/domain/events'
@@ -276,6 +277,9 @@ async function buyMysteryBox() {
         @free-roam="freeRoam"
         @view="view = $event"
       />
+
+      <!-- The tutorial's tour plays inside the map's frame. -->
+      <TutorialStage v-if="tutorial.phase === 'playing'" />
 
       <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
