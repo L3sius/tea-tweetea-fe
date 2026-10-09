@@ -22,6 +22,8 @@ import { useCharacterStore } from '@/stores/characters'
 import { useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
+import { useTutorialStore } from '@/stores/tutorial'
+import { vTutorial } from '@/tutorial/directive'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { TtButton, TtPanel, TtText } from '@/ui/tt'
 
@@ -29,10 +31,21 @@ const game = useGameStore()
 const my = useTeamStore()
 const dev = useDevStore()
 const characters = useCharacterStore()
+const tutorial = useTutorialStore()
 const { board, challenges, state, feed, log, loading, standings, alerts, choreography } =
   storeToRefs(game)
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
 const boardMap = useTemplateRef('boardMap')
+
+// The tutorial flies the camera as its script says.
+watch(
+  () => tutorial.camera,
+  (move) => {
+    if (!move) return
+    if (move.to === 'all') boardMap.value?.showAll(move.ms)
+    else boardMap.value?.locate(move.to, move.zoom, move.ms)
+  },
+)
 
 /**
  * The overview is all most players need: the followed team's tile and the minigames on now. The
@@ -244,7 +257,7 @@ async function buyMysteryBox() {
         :choreography="choreography"
         :server-now="game.serverNow"
         :selected="selected"
-        :follow="follow"
+        :follow="follow && !tutorial.active"
         :my-team="my.team"
         :route="picking ? my.path : null"
         :checkpoints="my.checkpoints"
@@ -256,6 +269,8 @@ async function buyMysteryBox() {
         :replay="game.replay"
         :dev-quote="dev.quote"
         :appearance-of="characters.appearanceOf"
+        :layers="tutorial.active ? tutorial.revealed : null"
+        :guide="tutorial.phase === 'playing' ? tutorial.guide : null"
         @hover="onHover"
         @pick="onPick"
         @free-roam="freeRoam"
@@ -264,6 +279,7 @@ async function buyMysteryBox() {
 
       <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
+        v-tutorial="'teams'"
         class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1 max-sm:hidden"
         aria-label="Teams"
       >
@@ -290,14 +306,17 @@ async function buyMysteryBox() {
 
       <!-- Play-testing tools -->
       <div
-        v-if="dev.enabled"
+        v-if="dev.enabled && !tutorial.active"
         class="pointer-events-none absolute top-1.5 right-1.5 z-[1060] flex justify-end"
       >
         <DevTools />
       </div>
 
       <!-- Alerts -->
-      <div class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3">
+      <div
+        v-if="!tutorial.active"
+        class="absolute top-14 left-1/2 z-[1050] -translate-x-1/2 sm:top-3"
+      >
         <AlertToasts
           :alerts="alerts"
           @dismiss="game.dismiss"
@@ -309,6 +328,7 @@ async function buyMysteryBox() {
            on), then who the camera follows. -->
       <div
         v-if="game.replay || game.missedMoves > 0 || followed"
+        v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-1"
       >
         <div
@@ -368,7 +388,10 @@ async function buyMysteryBox() {
       </div>
 
       <!-- Map controls, folded under a menu button -->
-      <div class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1">
+      <div
+        v-tutorial="'controls'"
+        class="absolute right-1.5 bottom-1.5 z-[1000] flex flex-col items-end gap-1"
+      >
         <template v-if="controlsOpen">
           <div class="tt-sprite-display flex flex-col gap-0.5 px-1 py-0" aria-label="Map legend">
             <span v-for="l in LEGEND" :key="l.label" class="flex items-center gap-1.5">
@@ -432,6 +455,7 @@ async function buyMysteryBox() {
       <!-- Overview -->
       <div
         v-if="insetOpen"
+        v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1.5 z-[1000] w-36 sm:w-52 lg:w-64"
         :class="
           game.replay || game.missedMoves > 0
@@ -455,6 +479,7 @@ async function buyMysteryBox() {
 
     <!-- Side panel (desktop) / bottom sheet (phone) -->
     <aside
+      v-tutorial="'panel'"
       class="z-[1000] flex min-h-0 flex-col gap-1.5 lg:w-[456px]"
       :class="sheetOpen ? 'max-lg:h-[46dvh]' : ''"
     >

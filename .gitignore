@@ -49,3 +49,5 @@ tweetea-design-system/
 
 # Catalogs written by tools/characters/catalog.mjs
 tools/characters/out/
+# Music and sounds, uploaded with the character assets (tools/characters/upload.sh)
+tools/characters/audio/

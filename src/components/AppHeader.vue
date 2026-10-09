@@ -2,16 +2,25 @@
 import { useMediaQuery } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
+import { useTutorialStore } from '@/stores/tutorial'
 import { teamColor } from '@/ui/colors'
 import { TtButton, TtText } from '@/ui/tt'
 
 const game = useGameStore()
 const { connection } = storeToRefs(game)
 const my = useTeamStore()
+const tutorial = useTutorialStore()
+const router = useRouter()
 const wide = useMediaQuery('(min-width: 1024px)')
+
+/** The tutorial plays on the board. */
+async function howToPlay() {
+  await router.push('/')
+  tutorial.start()
+}
 
 const CONNECTION = {
   connecting: { label: 'Connecting', color: 'var(--text-muted)' },
@@ -58,6 +67,7 @@ const LINKS = [
       </RouterLink>
     </nav>
     <div class="flex flex-wrap items-center justify-center gap-3 lg:ml-auto">
+      <TtButton size="sm" @click="howToPlay">How to play</TtButton>
       <!-- The team this browser plays for, and the way out. -->
       <span v-if="my.team" class="flex items-center gap-2">
         <TtText
