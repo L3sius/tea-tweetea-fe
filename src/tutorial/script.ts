@@ -91,8 +91,9 @@ export const TUTORIAL: Beat[] = [
   {
     id: 'gems',
     cues: [
-      at(300, { kind: 'camera', to: 'all', ms: 3500 }),
-      at(2600, { kind: 'reveal', what: ['gems'] }),
+      // The gems fade in as the camera pulls out, before he mentions them.
+      at(0, { kind: 'camera', to: 'all', ms: 3500 }),
+      at(200, { kind: 'reveal', what: ['gems'] }),
       at(3200, { kind: 'say', text: 'Ooh, look at that.' }),
     ],
     lines: [
@@ -109,7 +110,7 @@ export const TUTORIAL: Beat[] = [
     id: 'roads',
     lines: [
       {
-        text: 'These are the roads, and these are the nodes.',
+        text: 'These are the roads, and they are made up of nodes. Every node is a tile, and an adventurer who lands upon one must complete it.',
         gesture: 'beckon',
         cues: [at(300, { kind: 'reveal', what: ['roads', 'nodes'] })],
       },

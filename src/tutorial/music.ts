@@ -36,8 +36,9 @@ function fade(to: number, done?: () => void) {
   const from = track.volume
   const start = performance.now()
   const step = (now: number) => {
-    const t = Math.min(1, (now - start) / FADE_MS)
-    track.volume = from + (to - from) * t
+    // A frame's timestamp can come a moment before `start`, and volume refuses anything outside 0–1.
+    const t = Math.min(1, Math.max(0, (now - start) / FADE_MS))
+    track.volume = Math.min(1, Math.max(0, from + (to - from) * t))
     if (t < 1) fading = requestAnimationFrame(step)
     else done?.()
   }

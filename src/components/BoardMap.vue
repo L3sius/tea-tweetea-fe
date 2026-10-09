@@ -300,6 +300,8 @@ function applyLayers() {
   if (shown('nodes') && !spreadFrame) nodeLayer.addTo(map)
   reachLayer.addTo(map)
   routeLayer.addTo(map)
+  // Gems the tutorial brings in fade in, rather than appearing at once.
+  if (shown('gems') && !map.hasLayer(gemLayer) && props.layers) fadeIn('fade-gems')
   for (const [layer, on] of [
     [gemLayer, shown('gems')],
     [shopLayer, shown('landmarks')],
@@ -310,6 +312,15 @@ function applyLayers() {
   }
   map.getContainer().classList.toggle('hide-teams', !shown('teams'))
 }
+
+/** Marks the map with `name` for a moment, so pieces added now play their entrance (see CSS). */
+function fadeIn(name: string) {
+  const el = leaflet?.getContainer()
+  if (!el) return
+  el.classList.add(name)
+  setTimeout(() => el.classList.remove(name), GEM_FADE_MS)
+}
+const GEM_FADE_MS = 1600
 
 /** Draws the roads and nodes ring by ring outwards from `origin`, then the whole board. */
 function spreadFrom(origin: TileId) {
@@ -1474,6 +1485,17 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   /* The tutorial fades the map in. */
   transition: opacity 1.8s ease;
   image-rendering: pixelated;
+}
+/* Gems the tutorial brings in fade in, glinting as ever. */
+.board-map.fade-gems .gem-marker {
+  animation:
+    gem-fade-in 1.5s ease both,
+    gem-glint 2.4s steps(2, end) infinite;
+}
+@keyframes gem-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 /* Teams the tutorial hasn't introduced yet; its guide and his lines still show. */
 .board-map.hide-teams .sprite-icon:not(.guide-icon),
