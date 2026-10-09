@@ -298,15 +298,15 @@ async function buyMysteryBox() {
         :names="names"
         :choreography="choreography"
         :server-now="game.serverNow"
-        :selected="selected"
+        :selected="world ? null : selected"
         :follow="follow && !tutorial.staged"
-        :my-team="my.team"
-        :route="picking ? my.path : null"
-        :checkpoints="my.checkpoints"
-        :preview="picking ? my.preview : null"
+        :my-team="world ? null : my.team"
+        :route="!world && picking ? my.path : null"
+        :checkpoints="world ? [] : my.checkpoints"
+        :preview="!world && picking ? my.preview : null"
         :steps-left="my.stepsLeft"
-        :options="picking ? my.options : null"
-        :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
+        :options="!world && picking ? my.options : null"
+        :target-tiles="world ? null : dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
         :replay="world ? null : game.replay"
         :dev-quote="world ? null : dev.quote"
@@ -624,15 +624,16 @@ async function buyMysteryBox() {
     </aside>
 
     <!-- Using an item asks first; a target picked on the map is part of the question. -->
+    <!-- During the tutorial, the player's own dialogs and the live game's slot machine wait. -->
     <UseItemDialog
-      v-if="my.confirming"
+      v-if="my.confirming && !world"
       :use="my.confirming"
       @confirm="my.confirmUse()"
       @cancel="my.cancelUse()"
     />
 
     <!-- The shop opens over everything, like the event site's shop modal -->
-    <div v-if="shopOpen" class="tt-overlay" @click.self="closeShop">
+    <div v-if="shopOpen && !world" class="tt-overlay" @click.self="closeShop">
       <ShopPanel
         :buyer="buyer"
         :stock="shopStock"
@@ -648,7 +649,7 @@ async function buyMysteryBox() {
     </div>
 
     <!-- A minigame being picked: a slot machine over the map, which can't be skipped. -->
-    <div v-if="spin" class="tt-overlay">
+    <div v-if="spin && !world" class="tt-overlay">
       <MinigameSpin
         :key="spin.id"
         :spin="spin"

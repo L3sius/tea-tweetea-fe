@@ -126,6 +126,8 @@ type TeamMarker = {
   pose: string
   /** The NPC the team plays as, or null for a bird. */
   npc: number | null
+  /** What the piece was drawn as (character, name, colour); a change redraws it. */
+  look: string
   /** Draws the character, once three.js has loaded. */
   piece: Stage.CharacterPiece | null
 }
@@ -314,6 +316,8 @@ function applyLayers() {
     else layer.remove()
   }
   map.getContainer().classList.toggle('hide-teams', !shown('teams'))
+  // During the tutorial only the card it points at shows (see .board-map.in-tour below).
+  map.getContainer().classList.toggle('in-tour', !!props.layers)
 }
 
 /** Marks the map with `name` for a moment, so pieces added now play their entrance (see CSS). */
@@ -612,13 +616,12 @@ const loadStage = () => (stage ??= import('@/characters/stage'))
 
 function ensureTeamMarker(map: LeafletMap, team: Team) {
   const npc = props.appearanceOf(team.id)?.npc ?? null
+  const look = `${npc}|${team.name}|${teamColor(team)}`
   let entry = teamMarkers.get(team.id)
-  if (entry && entry.npc === npc) return entry
-  // New, or the team changed character: rebuild the piece.
-  if (entry) {
-    entry.marker.remove()
-    entry.piece?.dispose()
-  }
+  if (entry && entry.look === look) return entry
+  // New, or the team looks different (another character, or another game's team, as when the
+  // tutorial swaps in its own): rebuild the piece.
+  if (entry) removeTeamMarker(team.id)
   const canvas = document.createElement('canvas')
   canvas.width = CHARACTER_SIZE.width
   // The body box leaves 4px at the bottom for the shadow.
@@ -641,7 +644,7 @@ function ensureTeamMarker(map: LeafletMap, team: Team) {
     interactive: false,
   })
   m.addTo(map)
-  const created: TeamMarker = { marker: m, el, pose: '', npc, piece: null }
+  const created: TeamMarker = { marker: m, el, pose: '', npc, look, piece: null }
   if (npc !== null) {
     void loadAnimationInfo()
     void loadStage().then(({ CharacterPiece }) => {
@@ -651,6 +654,13 @@ function ensureTeamMarker(map: LeafletMap, team: Team) {
   entry = created
   teamMarkers.set(team.id, entry)
   return entry
+}
+
+function removeTeamMarker(team: TeamId) {
+  const entry = teamMarkers.get(team)
+  entry?.marker.remove()
+  entry?.piece?.dispose()
+  teamMarkers.delete(team)
 }
 
 /** Where to draw a placement, and how far its move goes east (`dx`) and north (`dy`). */
@@ -844,6 +854,9 @@ function renderFrame() {
     const tile = p === null ? team.position : p.kind === 'still' ? p.tile : null
     if (tile !== null) still.set(tile, [...(still.get(tile) ?? []), team.id])
   }
+
+  // Pieces of teams the game no longer has (another game's, as the tutorial swaps games) go.
+  for (const id of teamMarkers.keys()) if (!props.state.teams.has(id)) removeTeamMarker(id)
 
   for (const team of props.state.teams.values()) {
     const entry = ensureTeamMarker(map, team)
@@ -1258,19 +1271,19 @@ watch(
   () => props.inspect,
   (tile) => {
     showInfo(tile ?? null, true)
-    // A task card the tutorial points at fades in; hovering one stays instant.
-    const card = tile != null ? infoTip.getElement() : null
+    // A task card the tutorial points at is its own, and fades in; hovering one stays instant.
+    const card = infoTip.getElement()
+    card?.classList.toggle('tour-card', tile != null)
     card?.classList.remove('tip-reveal')
     void card?.offsetWidth
-    card?.classList.add('tip-reveal')
+    if (tile != null) card?.classList.add('tip-reveal')
   },
 )
 watch(
   () => props.layers,
   (now, before) => {
-    // A tile hovered just before the tutorial opened would keep its card up over the tour's scene,
-    // since the tour covers the map and no hover ever ends; only its own card shows.
-    if (now && !before) showInfo(props.inspect ?? null, true)
+    // A click marker still playing as the tutorial opens goes with the page it was on.
+    if (now && !before) click.value = null
     // Roads appearing with the guide on the board spread out from him.
     const tile = props.guide?.placement(props.serverNow())
     const origin = tile?.kind === 'still' ? tile.tile : null
@@ -1508,6 +1521,13 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   transition: opacity 1.8s ease;
   image-rendering: pixelated;
 }
+/*
+ * During the tutorial only the task card it points at shows. A card hovered on the page as the tour
+ * opened would otherwise linger over it: the tour covers the map, so that hover never ends.
+ */
+.board-map.in-tour .leaflet-tooltip.tile-tip:not(.tour-card) {
+  display: none;
+}
 /* A task card the tutorial points at. */
 .board-map .leaflet-tooltip.tip-reveal {
   animation: gem-fade-in 0.8s ease both;
@@ -1527,8 +1547,11 @@ defineExpose({ locate, panTo, zoomBy, showAll })
     opacity: 0;
   }
 }
-/* Teams the tutorial hasn't introduced yet; its guide and his lines still show. They fade in. */
-.board-map .sprite-icon:not(.guide-icon) {
+/*
+ * Teams the tutorial hasn't introduced yet; its guide and his lines still show. They fade in when
+ * revealed, and go at once when hidden, so nothing of the page before lingers into the tour.
+ */
+.board-map:not(.hide-teams) .sprite-icon:not(.guide-icon) {
   transition:
     opacity 1.2s ease,
     visibility 1.2s;
