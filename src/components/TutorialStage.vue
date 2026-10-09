@@ -8,6 +8,7 @@ import { HEADING } from '@/characters/heading'
 import { useGameStore } from '@/stores/game'
 import { useTutorialStore } from '@/stores/tutorial'
 import { GUIDE } from '@/tutorial/guide'
+import { TUTORIAL } from '@/tutorial/script'
 import { TtButton, TtText } from '@/ui/tt'
 
 // The tutorial's scene, inside the map's frame: first the title over Earl Grey waving on the dark
@@ -58,8 +59,17 @@ useRafFn(() => {
   typed.value = Math.min(tutorial.text.length, letters)
 })
 
+/** The tour's contents: its chapters, to jump between. */
+const contentsOpen = ref(false)
+function jump(index: number) {
+  contentsOpen.value = false
+  tutorial.jumpTo(index)
+}
+
 function advance() {
   if (!playing.value) return
+  // A click away from the open contents just closes them.
+  if (contentsOpen.value) return void (contentsOpen.value = false)
   if (typing.value) typed.value = tutorial.text.length
   else tutorial.next()
 }
@@ -96,16 +106,61 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
       </div>
     </Transition>
 
-    <div class="absolute top-3 right-3 flex items-center gap-1.5">
-      <TtButton
-        size="sm"
-        :aria-pressed="tutorial.muted"
-        :title="tutorial.muted ? 'Unmute the music' : 'Mute the music'"
-        @click="tutorial.toggleMute()"
-      >
-        {{ tutorial.muted ? '♪ Off' : '♪ On' }}
-      </TtButton>
-      <TtButton size="sm" @click="tutorial.finish()">Skip</TtButton>
+    <!-- Contents, skip and the music -->
+    <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+      <div class="flex items-center gap-1.5">
+        <TtButton
+          v-if="playing"
+          size="sm"
+          :selected="contentsOpen"
+          :aria-expanded="contentsOpen"
+          @click="contentsOpen = !contentsOpen"
+        >
+          Contents
+        </TtButton>
+        <TtButton size="sm" @click="tutorial.finish()">Skip</TtButton>
+      </div>
+      <div class="tt-sprite-display flex items-center gap-2 py-0 pr-2 pl-0">
+        <TtButton
+          size="sm"
+          class="!min-h-9"
+          :aria-pressed="tutorial.muted"
+          :title="tutorial.muted ? 'Unmute the music' : 'Mute the music'"
+          @click="tutorial.toggleMute()"
+        >
+          {{ tutorial.muted ? '♪ Off' : '♪ On' }}
+        </TtButton>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          class="volume"
+          :class="{ 'opacity-50': tutorial.muted }"
+          :value="Math.round(tutorial.volume * 100)"
+          aria-label="Music volume"
+          @input="tutorial.setVolume(Number(($event.target as HTMLInputElement).value) / 100)"
+        />
+      </div>
+      <Transition name="fade-quick">
+        <nav
+          v-if="contentsOpen"
+          class="tt-frame-iron tt-1 flex flex-col p-1.5"
+          aria-label="Tour contents"
+        >
+          <button
+            v-for="(chapter, index) in TUTORIAL"
+            :key="chapter.id"
+            type="button"
+            class="chapter text-left"
+            :class="{ 'chapter-on': index === tutorial.beat }"
+            :aria-current="index === tutorial.beat ? 'step' : undefined"
+            @click="jump(index)"
+          >
+            {{ index + 1 }}. {{ chapter.title }}
+          </button>
+        </nav>
+      </Transition>
     </div>
 
     <!-- What he shows on the board: a minigame's slot machine, a shop's wares. Each fades. -->
@@ -213,6 +268,30 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 <style scoped>
 .chatbox {
   cursor: pointer;
+}
+.volume {
+  width: 96px;
+  accent-color: var(--osrs-orange);
+}
+.chapter {
+  padding: 2px 8px;
+  color: var(--osrs-yellow);
+  white-space: nowrap;
+}
+.chapter:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+.chapter-on {
+  color: var(--osrs-white);
+  background: rgb(255 152 31 / 0.25);
+}
+.fade-quick-enter-active,
+.fade-quick-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-quick-enter-from,
+.fade-quick-leave-to {
+  opacity: 0;
 }
 /* A pulsing gold outline, like a quest marker, cut out of a dimmed page. */
 .spotlight {

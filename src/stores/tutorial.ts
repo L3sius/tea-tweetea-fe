@@ -10,6 +10,7 @@ import type { GameState } from '@/domain/game'
 import { GUIDE, GUIDE_TEAM } from '@/tutorial/guide'
 import * as music from '@/tutorial/music'
 import { PretendGame } from '@/tutorial/pretend'
+import { actionsOf, chapterStart } from '@/tutorial/chapters'
 import { loadTutorialWorld, type TutorialWorld } from '@/tutorial/world'
 import {
   GESTURE,
@@ -29,6 +30,8 @@ const VERSION = '1'
 const SAY_MS = 2600
 /** How close the camera is on Earl Grey in the title scene and the welcome. */
 const TITLE_ZOOM = 1.5
+/** How close it is on him after a jump to a chapter that doesn't move the camera itself. */
+const JUMP_ZOOM = 0.5
 /** Assumed for a gesture whose length hasn't loaded. */
 const GESTURE_MS = 2000
 /** How long the page takes to fade to black, then to fade in again on the title scene. */
@@ -88,6 +91,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const tourNames = computed(() => (void changes.value, pretend?.names() ?? null))
   const guideTeam = computed(() => (void changes.value, pretend ? { ...pretend.team } : null))
   const muted = ref(music.isMuted())
+  const volume = ref(music.getVolume())
 
   const active = computed(() => phase.value !== 'off')
   /** The page is the tour's scene: parts of it hidden, Earl Grey on the map. */
@@ -110,8 +114,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
   let tile: TileId | null = null
   let gesture: { anim: number; since: number; until: number } | null = null
   let saying: { text: string; until: number } | null = null
-  /** Where he stood as each beat began, so going back puts him there again. */
-  const beatTiles = new Map<number, TileId>()
   let cameraId = 0
 
   const guide: Guide = markRaw({
@@ -269,15 +271,22 @@ export const useTutorialStore = defineStore('tutorial', () => {
     schedule('line', shown?.cues)
   }
 
-  /** Starts beat `index`, with the page revealed as the beats before it left it. */
-  function enterBeat(index: number) {
+  /**
+   * Starts beat `index`, with the page revealed as the beats before it left it. Played into, Earl
+   * Grey carries on from where he is; gone back or jumped to (`reset`), he and his pretend game are
+   * set up as that beat starts.
+   */
+  function enterBeat(index: number, reset = false) {
     flush('line')
     flush('beat')
     beat.value = index
-    revealed.value = new Set(TUTORIAL.slice(0, index).flatMap(revealsOf))
-    const at = beatTiles.get(index)
-    if (at !== undefined) place(at)
-    else if (tile !== null) beatTiles.set(index, tile)
+    const start = chapterStart(index)
+    revealed.value = start.revealed
+    if (reset && world.value) {
+      pretend = new PretendGame(world.value, tileId(TOUR_START))
+      if (start.minigameOpen) pretend.openMinigame(new Date(game.serverNow()))
+      place(tileId(start.tile))
+    }
     saying = null
     inspecting.value = null
     shopTile.value = null
@@ -296,7 +305,19 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   function back() {
     if (line.value > 0) showLine(line.value - 1)
-    else if (beat.value > 0) enterBeat(beat.value - 1)
+    else if (beat.value > 0) enterBeat(beat.value - 1, true)
+  }
+
+  /** Jumps to chapter `index` from the contents, through a dip to black. */
+  function jumpTo(index: number) {
+    const chapter = TUTORIAL[index]
+    if (phase.value !== 'playing' || !chapter) return
+    void throughBlack(DIP, () => {
+      // Close on him unless the chapter moves the camera itself.
+      enterBeat(index, true)
+      if (!actionsOf(chapter).some((a) => a.kind === 'camera'))
+        run({ kind: 'camera', to: 'guide', zoom: JUMP_ZOOM, ms: 0 })
+    })
   }
 
   const fadeTimers: ReturnType<typeof setTimeout>[] = []
@@ -337,7 +358,6 @@ export const useTutorialStore = defineStore('tutorial', () => {
       () => {
         if (phase.value !== 'fading' || !world.value) return
         pretend = new PretendGame(world.value, tileId(TOUR_START))
-        beatTiles.clear()
         revealed.value = new Set()
         place(tileId(TOUR_START))
         phase.value = 'title'
@@ -397,6 +417,13 @@ export const useTutorialStore = defineStore('tutorial', () => {
     music.setMuted(muted.value)
   }
 
+  /** Sets the music's volume (0–1); moving it up unmutes. */
+  function setVolume(to: number) {
+    music.setVolume(to)
+    volume.value = music.getVolume()
+    if (muted.value && to > 0) toggleMute()
+  }
+
   return {
     seen,
     phase,
@@ -420,6 +447,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
     shopTile,
     world,
     muted,
+    volume,
+    setVolume,
     guide,
     shows,
     start,
@@ -429,6 +458,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
     finish,
     toggleMute,
     endSpin,
+    jumpTo,
     closeShop: () => (shopTile.value = null),
   }
 })
@@ -439,10 +469,4 @@ function readSeen(): boolean {
   } catch {
     return false
   }
-}
-
-/** Every part of the page a beat reveals, in its own cues and its lines'. */
-function revealsOf(beat: (typeof TUTORIAL)[number]): RevealName[] {
-  const cues = [...(beat.cues ?? []), ...beat.lines.flatMap((l) => l.cues ?? [])]
-  return cues.flatMap((c) => (c.action.kind === 'reveal' ? c.action.what : []))
 }

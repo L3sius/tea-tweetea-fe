@@ -2,14 +2,42 @@
 // after a click, so `play` must run from one.
 import { readConfig } from '@/config/env'
 
-const VOLUME = 0.4
+/** The music's volume (0–1) until a player moves the slider. */
+export const DEFAULT_VOLUME = 0.4
 const FADE_MS = 1500
 const MUTE_KEY = 'tweetea.muted'
+const VOLUME_KEY = 'tweetea.volume'
 
 export const NEWBIE_MELODY = 'newbie-melody.ogg'
 
 let audio: HTMLAudioElement | null = null
 let fading = 0
+let volume = readVolume()
+
+function readVolume(): number {
+  try {
+    const saved = Number(localStorage.getItem(VOLUME_KEY) ?? NaN)
+    return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : DEFAULT_VOLUME
+  } catch {
+    return DEFAULT_VOLUME
+  }
+}
+
+export const getVolume = () => volume
+
+/** Sets the volume (0–1) at once, and remembers it for this browser. */
+export function setVolume(to: number) {
+  volume = Math.min(1, Math.max(0, to))
+  if (audio && !audio.paused) {
+    cancelAnimationFrame(fading)
+    audio.volume = volume
+  }
+  try {
+    localStorage.setItem(VOLUME_KEY, String(volume))
+  } catch {
+    // Kept for this visit only.
+  }
+}
 
 export function isMuted(): boolean {
   try {
@@ -59,7 +87,7 @@ export function play(track: string) {
   audio.muted = isMuted()
   // A refused start (no click yet, or no file) just leaves the tutorial silent.
   audio.play().then(
-    () => fade(VOLUME),
+    () => fade(volume),
     () => {},
   )
 }

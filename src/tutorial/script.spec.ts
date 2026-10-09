@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { ROSTER } from '@/characters/roster'
 import { tileId, type TileId } from '@/domain/ids'
 import { GUIDE } from './guide'
-import { GESTURE, TOUR_START, TUTORIAL, type Action } from './script'
+import { actionsOf, chapterStart } from './chapters'
+import { GESTURE, TOUR_START, TUTORIAL } from './script'
 import { decodeTutorialWorld } from './world'
 import board from './world/board.json'
 import challenges from './world/challenges.json'
@@ -10,15 +11,8 @@ import state from './world/state.json'
 
 const world = decodeTutorialWorld({ board, state, challenges })
 
-/** Every action in the order the tour plays it: each beat's cues, then each line's, by time. */
-function actionsInOrder(): Action[] {
-  const byTime = (cues: { at: number; action: Action }[] = []) =>
-    [...cues].sort((a, b) => a.at - b.at).map((c) => c.action)
-  return TUTORIAL.flatMap((beat) => [
-    ...byTime(beat.cues),
-    ...beat.lines.flatMap((line) => byTime(line.cues)),
-  ])
-}
+/** Every action in the order the tour plays it. */
+const actionsInOrder = () => TUTORIAL.flatMap(actionsOf)
 
 describe('the tutorial script', () => {
   it("only uses animations the export ships (it ships the roster's)", () => {
@@ -61,5 +55,23 @@ describe("Earl Grey's routes on the tutorial's board", () => {
         seen[action.kind] = kindOf(here)
     }
     expect(seen).toEqual({ inspect: 'normal', spin: 'red', shop: 'shop' })
+  })
+})
+
+describe('the chapters', () => {
+  const index = (id: string) => TUTORIAL.findIndex((beat) => beat.id === id)
+
+  it('each have a title for the contents', () => {
+    const titles = TUTORIAL.map((beat) => beat.title)
+    expect(titles.every((t) => t.length > 0)).toBe(true)
+    expect(new Set(titles).size).toBe(titles.length)
+  })
+
+  it('start where playing up to them leaves Earl Grey and the page', () => {
+    expect(chapterStart(0)).toEqual({ revealed: new Set(), tile: TOUR_START, minigameOpen: false })
+    const tile = chapterStart(index('tile'))
+    expect(tile.tile).toBe(44)
+    expect([...tile.revealed].sort()).toEqual(['gems', 'nodes', 'roads', 'terrain'])
+    expect(chapterStart(index('shop'))).toMatchObject({ tile: 308, minigameOpen: true })
   })
 })

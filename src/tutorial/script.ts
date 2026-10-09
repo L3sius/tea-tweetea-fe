@@ -82,6 +82,8 @@ export type Line = {
 
 export type Beat = {
   id: string
+  /** Its name in the tour's contents, which can jump to it. */
+  title: string
   cues?: Cue[]
   lines: Line[]
 }
@@ -107,6 +109,7 @@ const spun = (ms: number, action: Action): Cue => ({ at: ms, action, after: 'spi
 export const TUTORIAL: Beat[] = [
   {
     id: 'welcome',
+    title: 'Welcome',
     cues: [
       // Close on him, with the map fading in behind him.
       at(0, { kind: 'camera', to: 'guide', zoom: 1.5, ms: 0 }),
@@ -126,6 +129,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'gems',
+    title: 'The gems',
     cues: [
       // The gems fade in as the camera pulls out, before he mentions them.
       at(0, { kind: 'camera', to: 'all', ms: 3500 }),
@@ -144,6 +148,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'roads',
+    title: 'Roads and nodes',
     lines: [
       {
         text: 'These are the roads, and they are made up of nodes. Every node is a tile, and an adventurer who lands upon one must complete it.',
@@ -172,6 +177,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'tile',
+    title: 'Tiles and tasks',
     lines: [
       {
         text: 'Aha! It appears we have landed on a tile. Click or hover over a node, and we shall gaze upon the task at hand.',
@@ -196,6 +202,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'minigame',
+    title: 'Minigames',
     lines: [
       {
         text: 'Let us proceed forth onto the next tile.',
@@ -222,6 +229,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'shop',
+    title: 'Shops',
     lines: [
       {
         text: 'But dost thou ask where one can spend their hard-earned tender? Why, at the shop of course!',
@@ -240,6 +248,7 @@ export const TUTORIAL: Beat[] = [
   },
   {
     id: 'farewell',
+    title: 'Farewell',
     lines: [
       {
         text: "That's all from me for now. I wish thee good fortune in thy adventure!",
