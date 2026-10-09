@@ -230,6 +230,7 @@ export function toGameState(wire: WireState): GameState {
     tileChallenges: new Map(wire.tiles.map((id, index) => [tileId(index), challengeId(id)])),
     gemTiles: new Map([...byGemOrder(wire.gems)].map(([gem, id]) => [gem, tileId(id)])),
     blockers: mapIdKeyed(wire.blockers, tileId, toBlocker),
+    shops: mapIdKeyed(wire.shops, tileId, (items) => [...items]),
     instances: mapIdKeyed(wire.instances, instanceId, (value, id) =>
       toInstance(value, instanceId(id)),
     ),

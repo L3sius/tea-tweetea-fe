@@ -45,7 +45,6 @@ export const ITEMS = [
   'zenyte_necklace',
   'topaz_necklace',
   'diamond_necklace',
-  'mystery_box',
 ] as const
 export type Item = (typeof ITEMS)[number]
 

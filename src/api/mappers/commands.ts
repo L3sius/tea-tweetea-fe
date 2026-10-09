@@ -25,6 +25,7 @@ export function toWireTeamRequest(
         ? { ...base, action: 'use_item', item: command.item }
         : { ...base, action: 'use_item', item: command.item, target: toWireTarget(command.target) }
     case 'draw':
+    case 'buy_mystery_box':
     case 'close_shop':
       return { ...base, action: command.kind }
     case 'confirm_path':

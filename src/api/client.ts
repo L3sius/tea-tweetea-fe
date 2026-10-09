@@ -4,10 +4,9 @@ import type { Challenge } from '@/domain/challenge'
 import type { AdminCommand, AdminReply, CommandAccepted, TeamCommand } from '@/domain/commands'
 import type { JournalEntry } from '@/domain/events'
 import type { GameState } from '@/domain/game'
-import type { ItemEntry } from '@/domain/items'
+import type { ItemCatalogue } from '@/domain/items'
 import type { ChallengeId } from '@/domain/ids'
 import type { Hello, Me } from '@/domain/server'
-import type { Item } from '@/domain/vocabulary'
 
 /** `live` while connected; `reconnecting` while the browser retries; `offline` when it gave up. */
 export type StreamConnection = 'live' | 'reconnecting' | 'offline'
@@ -48,8 +47,8 @@ export type AdminCommandRequest = { adminCode: string; command: AdminCommand }
 export type ApiClient = {
   getBoard(): Promise<Board>
   getChallenges(): Promise<Map<ChallengeId, Challenge>>
-  /** The item catalogue: names, descriptions and pictures. */
-  getItems(): Promise<Map<Item, ItemEntry>>
+  /** The item catalogue: names, descriptions, pictures and prices, plus the mystery box. */
+  getItems(): Promise<ItemCatalogue>
   getState(): Promise<GameState>
   /** Journal entries, oldest first. */
   getJournal(page?: JournalPage): Promise<JournalEntry[]>

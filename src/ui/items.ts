@@ -13,7 +13,6 @@ const ICONS: Partial<Record<Item, string>> = {
   silver_feather: 'feather',
   gold_feather: 'feather',
   banana: 'banana',
-  mystery_box: 'mystery-box',
 }
 
 const NECKLACE_GEMS = new Map<Item, Gem>(GEMS.map((gem) => [NECKLACES[gem], gem]))

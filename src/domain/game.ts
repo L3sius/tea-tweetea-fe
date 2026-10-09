@@ -172,6 +172,8 @@ export type GameState = {
   /** Where each gem currently sits. */
   gemTiles: Map<Gem, TileId>
   blockers: Map<TileId, Blocker>
+  /** What each shop tile stocks; every shop also sells the mystery box. */
+  shops: Map<TileId, Item[]>
   /** Active tile instances plus every minigame and match instance. */
   instances: Map<InstanceId, Instance>
   minigames: Map<MinigameId, Minigame>

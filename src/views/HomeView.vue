@@ -202,12 +202,22 @@ const buyer = computed(() => {
   return paused || standing ? t : null
 })
 
+/** What the shop the team stands on stocks. */
+const shopStock = computed(() => {
+  const t = my.team
+  return (t && state.value?.shops.get(t.position)) ?? []
+})
+
 function openShop() {
   shopOpen.value = true
 }
 
 async function buy(item: Item) {
   await my.act({ kind: 'buy', item })
+}
+
+async function buyMysteryBox() {
+  await my.act({ kind: 'buy_mystery_box' })
 }
 </script>
 
@@ -527,9 +537,11 @@ async function buy(item: Item) {
     <div v-if="shopOpen" class="tt-overlay" @click.self="shopOpen = false">
       <ShopPanel
         :buyer="buyer"
+        :stock="shopStock"
         :held="inventorySize(my.items)"
         :pending="my.pending"
         @buy="buy"
+        @buy-mystery-box="buyMysteryBox"
         @close="shopOpen = false"
       />
     </div>

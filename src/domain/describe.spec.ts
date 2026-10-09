@@ -161,6 +161,13 @@ describe('private items', () => {
     expect(gained(teamId(1))).toBe('Blue got an item')
   })
 
+  it('tells of a mystery box without naming what came out of it', () => {
+    const bought = (teamId: TeamId) =>
+      describeEvent({ kind: 'bought', teamId, item: null, price: 40, mysteryBox: true }, names)
+    expect(bought(red)).toBe('Red bought a mystery box for 40 gold')
+    expect(bought(teamId(1))).toBe('Blue bought a mystery box for 40 gold')
+  })
+
   it('still names an item a team uses, since its effect is public', () => {
     const used = { kind: 'item_used', teamId: teamId(1), item: 'banana', target: null } as const
     expect(describeEvent(used, names)).toBe('Blue used a Banana')

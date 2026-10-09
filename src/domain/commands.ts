@@ -12,6 +12,8 @@ export type TeamCommand =
   /** The whole walk, start tile included. */
   | { kind: 'confirm_path'; path: TileId[] }
   | { kind: 'buy'; item: Item }
+  /** A random item, straight into the inventory; every shop sells it. */
+  | { kind: 'buy_mystery_box' }
   | { kind: 'close_shop' }
   | { kind: 'choose_opponent'; opponent: TeamId }
   | { kind: 'steal_gem'; gem: Gem }

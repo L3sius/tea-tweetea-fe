@@ -46,7 +46,13 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('shop_closed', { team: Id }),
   // Inventories are private: the public journal blanks the item here, except for items lost in
   // plain sight (used, blocked a freeze, protected a gem).
-  event('bought', { team: Id, item: Item.nullable(), price: z.number() }),
+  event('bought', {
+    team: Id,
+    item: Item.nullable(),
+    price: z.number(),
+    /** A mystery box: the item was drawn at random. */
+    mystery_box: z.boolean(),
+  }),
   event('item_gained', { team: Id, item: Item.nullable(), reason: z.string() }),
   event('item_lost', { team: Id, item: Item.nullable(), reason: z.string() }),
   event('item_used', { team: Id, item: Item, target: WireTarget.nullable() }),

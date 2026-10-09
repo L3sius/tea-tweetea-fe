@@ -237,7 +237,10 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'shop_opened':
       return `${team(event.teamId)} entered a shop`
     case 'bought':
-      return `${team(event.teamId)} bought ${held(event.teamId, event.item)} for ${event.price} gold`
+      // A box's item is told by the `item_gained` that follows it.
+      return event.mysteryBox
+        ? `${team(event.teamId)} bought a mystery box for ${event.price} gold`
+        : `${team(event.teamId)} bought ${held(event.teamId, event.item)} for ${event.price} gold`
     case 'item_gained':
       return `${team(event.teamId)} got ${held(event.teamId, event.item)}`
     case 'item_lost':

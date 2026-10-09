@@ -98,6 +98,7 @@ describe('game state', () => {
     tiles: ['a', 'b', 'c'],
     gems: [0, 1, 2, 0, 1, 2, 0, 1],
     blockers: { '1': { item: 'wilderness_web', owner: 2, until: '2026-10-05T14:00:00Z' } },
+    shops: { '2': ['banana', 'ice_barrage'] },
     instances: {
       '17': {
         challenge: 'a',
@@ -118,6 +119,7 @@ describe('game state', () => {
       owner: 2,
       until: new Date('2026-10-05T14:00:00Z'),
     })
+    expect(state.shops.get(tileId(2))).toEqual(['banana', 'ice_barrage'])
     const instance = state.instances.get(instanceId(17))
     expect(instance?.id).toBe(17)
     expect(instance?.progress.get(teamId(2))).toEqual({

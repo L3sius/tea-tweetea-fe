@@ -171,6 +171,8 @@ export const WireState = z.object({
   /** Gem tile per gem, indexed in gem order. */
   gems: z.array(Id).length(GEMS.length),
   blockers: idKeyed(WireBlocker),
+  /** Each shop tile's stock; every shop also sells the mystery box. */
+  shops: idKeyed(z.array(Item)),
   instances: idKeyed(WireInstance),
   minigames: idKeyed(WireMinigame),
   matches: idKeyed(WireMatch),

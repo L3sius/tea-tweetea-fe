@@ -43,7 +43,7 @@ export type GameEvent =
   | { kind: 'shop_opened'; teamId: TeamId; tileId: TileId }
   | { kind: 'shop_closed'; teamId: TeamId }
   /** The item is null when it is private: the public journal names only items lost in plain sight. */
-  | { kind: 'bought'; teamId: TeamId; item: Item | null; price: number }
+  | { kind: 'bought'; teamId: TeamId; item: Item | null; price: number; mysteryBox: boolean }
   | { kind: 'item_gained'; teamId: TeamId; item: Item | null; reason: string }
   | { kind: 'item_lost'; teamId: TeamId; item: Item | null; reason: string }
   | { kind: 'item_used'; teamId: TeamId; item: Item; target: ItemTarget | null }

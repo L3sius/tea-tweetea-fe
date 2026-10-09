@@ -9,6 +9,7 @@ type TeamAction =
   | { action: 'use_item'; item: Item; target?: WireTarget }
   | { action: 'confirm_path'; path: number[] }
   | { action: 'buy'; item: Item }
+  | { action: 'buy_mystery_box' }
   | { action: 'close_shop' }
   | { action: 'choose_opponent'; opponent: number }
   | { action: 'steal_gem'; gem: Gem }
