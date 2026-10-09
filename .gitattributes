@@ -1,1 +1,3 @@
 * text=auto eol=lf
+# The tutorial's frozen world: copied data, collapsed in diffs on GitHub.
+src/tutorial/world/*.json linguist-generated=true
