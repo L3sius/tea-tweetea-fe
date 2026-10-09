@@ -3,13 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { cardLabel, itemName, teamStatusText } from '@/domain/describe'
 import type { Card } from '@/domain/game'
-import {
-  INVENTORY_LIMIT,
-  ITEM_GROUP,
-  ITEM_GROUPS,
-  inventorySize,
-  type ItemGroup,
-} from '@/domain/items'
+import { ITEM_GROUP, ITEM_GROUPS, inventorySize, type ItemGroup } from '@/domain/items'
 import { ITEMS, SUITS, type Item, type Suit } from '@/domain/vocabulary'
 import { SAMPLE_TEAM_CODES } from '@/api/fixtures/fixtureClient'
 import type { TeamId } from '@/domain/ids'
@@ -64,7 +58,9 @@ const statusLine = computed(() => {
   const now = new Date(game.serverNow())
   const line = `${teamStatusText(t, now, game.names)} · tile #${t.position} · ${t.gold}g`
   // Items are private: only the team this browser plays as shows its count.
-  return t.id === my.teamId ? `${line} · ${inventorySize(my.items)}/${INVENTORY_LIMIT} items` : line
+  return t.id === my.teamId
+    ? `${line} · ${inventorySize(my.items)}/${game.rules?.inventoryLimit ?? '?'} items`
+    : line
 })
 
 const last = computed(() => {

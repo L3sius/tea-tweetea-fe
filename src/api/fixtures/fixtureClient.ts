@@ -14,6 +14,7 @@ type FixtureName =
   | 'board'
   | 'challenges'
   | 'items'
+  | 'rules'
   | 'state'
   | 'events'
   | 'feed'
@@ -70,6 +71,9 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
 
     getItems: async () =>
       decode('fixture:items', endpoints.items.schema, endpoints.items.map, await load('items')),
+
+    getRules: async () =>
+      decode('fixture:rules', endpoints.rules.schema, endpoints.rules.map, await load('rules')),
 
     getState,
 

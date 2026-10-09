@@ -3,6 +3,8 @@ import type { z } from 'zod'
 import type { StatsGroup } from '@/domain/activity'
 import { decode } from '../decode'
 import { endpoints } from '../endpoints'
+import { ITEM_TARGET } from '@/domain/items'
+import { ITEMS } from '@/domain/vocabulary'
 
 // Recorded responses from a real server must pass our schemas. When the backend changes, refresh
 // the recordings (`npm run fixtures:refresh`) and these tests point at what moved.
@@ -29,6 +31,29 @@ function fromFixture<S extends z.ZodType, D>(
 const board = fromFixture(endpoints.board, 'board')
 const challenges = fromFixture(endpoints.challenges, 'challenges')
 const state = fromFixture(endpoints.state, 'state')
+const items = fromFixture(endpoints.items, 'items')
+const rules = fromFixture(endpoints.rules, 'rules')
+
+describe('recorded /items and /rules', () => {
+  it('describes every item, with the numbers the site shows', () => {
+    expect(ITEMS.filter((item) => !items.items.has(item))).toEqual([])
+    const blockers = ITEMS.filter((item) => ITEM_TARGET[item] === 'tile')
+    expect(blockers.filter((item) => !items.items.get(item)?.freezeHours)).toEqual([])
+    const feathers = ['bronze_feather', 'silver_feather', 'gold_feather'] as const
+    expect(feathers.filter((item) => !items.items.get(item)?.multiplier)).toEqual([])
+  })
+
+  it('quotes no placeholders the server failed to fill in', () => {
+    for (const entry of [...items.items.values(), items.mysteryBox])
+      expect(entry.description).not.toMatch(/[{}]/)
+  })
+
+  it('serves the limits the site checks against', () => {
+    expect(rules.blockerRange).toBeGreaterThan(0)
+    expect(rules.blockersPerTeam).toBeGreaterThan(0)
+    expect(rules.inventoryLimit).toBeGreaterThan(0)
+  })
+})
 
 describe('recorded /board', () => {
   it('connects roads only between known tiles', () => {

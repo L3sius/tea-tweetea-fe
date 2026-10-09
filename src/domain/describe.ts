@@ -4,7 +4,7 @@ import type { Challenge, Criterion } from './challenge'
 import type { GameEvent } from './events'
 import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
-import { BLOCKER_FREEZE_HOURS, itemEntry } from './items'
+import { itemEntry } from './items'
 import { NECKLACES, type Item, type Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
@@ -34,10 +34,10 @@ export function hoursText(hours: number): string {
   return hours === 1 ? '1 hour' : `${hours} hours`
 }
 
-/** How long a blocker freezes the team it catches, as text; null if the item is not a blocker. */
+/** How long a blocker freezes the team it catches, as text, from the catalogue; null if unknown. */
 export function blockerFreezeText(blocker: Blocker): string | null {
-  const hours = BLOCKER_FREEZE_HOURS[blocker.item]
-  return hours === undefined ? null : hoursText(hours)
+  const hours = itemEntry(blocker.item).freezeHours
+  return hours === null ? null : hoursText(hours)
 }
 
 /** `seesItems`: whether the viewer may know which item a gift was (its own team's only). */

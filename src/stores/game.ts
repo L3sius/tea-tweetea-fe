@@ -9,6 +9,7 @@ import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import { useItemCatalogue } from '@/domain/items'
+import type { Rules } from '@/domain/rules'
 import { Choreography } from '@/domain/motion'
 import {
   RETURN_COUNTDOWN_S,
@@ -83,6 +84,8 @@ export const useGameStore = defineStore('game', () => {
 
   const board = shallowRef<Board | null>(null)
   const challenges = shallowRef(new Map<ChallengeId, Challenge>())
+  /** Game-wide numbers (limits, ranges); loaded with the board, before anything is shown. */
+  const rules = shallowRef<Rules | null>(null)
   const state = shallowRef<GameState | null>(null)
   const feed = shallowRef<FeedItem[]>([])
   const log = shallowRef<JournalEntry[]>([])
@@ -121,16 +124,18 @@ export const useGameStore = defineStore('game', () => {
     loading.value = true
     error.value = null
     try {
-      const [loadedBoard, loadedChallenges, loadedItems, loadedState, loadedFeed] =
+      // Every number the site shows comes from the items and rules, so they load with the board.
+      const [loadedBoard, loadedChallenges, loadedItems, loadedRules, loadedState, loadedFeed] =
         await Promise.all([
           api.getBoard(),
           api.getChallenges(),
-          // Items still read well from the built-in copy if the catalogue can't be had.
-          api.getItems().catch(() => null),
+          api.getItems(),
+          api.getRules(),
           api.getState(),
           api.getFeed({ limit: FEED_LIMIT }),
         ])
-      if (loadedItems) useItemCatalogue(loadedItems)
+      useItemCatalogue(loadedItems)
+      rules.value = loadedRules
       board.value = loadedBoard
       challenges.value = loadedChallenges
       feed.value = loadedFeed
@@ -359,6 +364,7 @@ export const useGameStore = defineStore('game', () => {
     finishSpin,
     board,
     challenges,
+    rules,
     state,
     feed,
     log,

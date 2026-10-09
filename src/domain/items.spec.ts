@@ -87,10 +87,12 @@ describe('whyNotUsable', () => {
     expect(whyNotUsable(ready, 'ogre_boat', NOW, land)).toBe('Only works at sea')
   })
 
-  it('allows only two blockers out at a time', () => {
-    expect(whyNotUsable(ready, 'banana', NOW, undefined, 1)).toBeNull()
-    expect(whyNotUsable(ready, 'wilderness_web', NOW, undefined, 2)).toMatch(/2 blockers out/)
-    expect(whyNotUsable(ready, 'ice_barrage', NOW, undefined, 2)).toBeNull()
+  it('allows only as many blockers out as the rules say', () => {
+    const one = { placed: 1, limit: 2 }
+    const two = { placed: 2, limit: 2 }
+    expect(whyNotUsable(ready, 'banana', NOW, undefined, one)).toBeNull()
+    expect(whyNotUsable(ready, 'wilderness_web', NOW, undefined, two)).toMatch(/2 blockers out/)
+    expect(whyNotUsable(ready, 'ice_barrage', NOW, undefined, two)).toBeNull()
   })
 })
 

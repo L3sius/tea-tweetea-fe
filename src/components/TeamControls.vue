@@ -108,8 +108,7 @@ const usableCount = computed(() => {
   const t = team.value
   if (!t) return 0
   return [...my.items].filter(
-    ([item, n]) =>
-      n > 0 && whyNotUsable(t, item, now.value, here.value, my.blockersPlaced) === null,
+    ([item, n]) => n > 0 && whyNotUsable(t, item, now.value, here.value, my.blockers) === null,
   ).length
 })
 
@@ -439,7 +438,8 @@ async function login() {
         :items="my.items"
         :here="here"
         :now="now"
-        :blockers-placed="my.blockersPlaced"
+        :blockers="my.blockers"
+        :inventory-limit="game.rules?.inventoryLimit ?? 0"
         :pending="my.pending"
         @use="my.useItem"
         @discard="discard"
@@ -602,7 +602,8 @@ async function login() {
         :items="my.items"
         :here="here"
         :now="now"
-        :blockers-placed="my.blockersPlaced"
+        :blockers="my.blockers"
+        :inventory-limit="game.rules?.inventoryLimit ?? 0"
         :pending="my.pending"
         :locked="step === 'tile'"
         @use="use"

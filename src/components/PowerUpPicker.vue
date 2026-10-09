@@ -4,14 +4,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Tile } from '@/domain/board'
 import type { Team } from '@/domain/game'
-import {
-  INVENTORY_LIMIT,
-  ITEM_GROUP,
-  ITEM_GROUPS,
-  itemEntry,
-  inventorySize,
-  whyNotUsable,
-} from '@/domain/items'
+import { ITEM_GROUP, ITEM_GROUPS, itemEntry, inventorySize, whyNotUsable } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { TtContextMenu, TtText } from '@/ui/tt'
 import type { MenuOption } from '@/ui/tt/TtContextMenu.vue'
@@ -25,7 +18,9 @@ const props = defineProps<{
   here?: Tile
   now: Date
   /** How many blockers the team has on the board, against the per-team limit. */
-  blockersPlaced: number
+  blockers?: { placed: number; limit: number }
+  /** Items a team may hold. */
+  inventoryLimit: number
   pending: boolean
   /** Locked items are listed but the menu says why they can't be used yet. */
   locked?: boolean
@@ -56,14 +51,14 @@ const items = computed(() =>
         text: itemEntry(item).description,
         group: ITEM_GROUPS[group],
         held: group === 'held',
-        why: whyNotUsable(props.team, item, props.now, props.here, props.blockersPlaced),
+        why: whyNotUsable(props.team, item, props.now, props.here, props.blockers),
       }
     }),
 )
 /** Item slots, then empty ones up to the inventory limit (and on to whole rows past it). */
 const empties = computed(() => {
   const n = items.value.length
-  return Math.max(INVENTORY_LIMIT, Math.ceil(n / COLUMNS) * COLUMNS) - n
+  return Math.max(props.inventoryLimit, Math.ceil(n / COLUMNS) * COLUMNS) - n
 })
 
 const selected = ref<Item | null>(null)
@@ -127,7 +122,7 @@ onClickOutside(grid, () => (menuOpen.value = false))
 <template>
   <div ref="root" class="flex w-full flex-col items-center gap-2">
     <TtText :size="1" color="orange">
-      Inventory ({{ inventorySize(props.items) }}/{{ INVENTORY_LIMIT }})
+      Inventory ({{ inventorySize(props.items) }}/{{ inventoryLimit }})
     </TtText>
     <div
       ref="grid"

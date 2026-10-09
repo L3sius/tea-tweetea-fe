@@ -37,7 +37,7 @@ export function createHttpClient({
 
   async function fetchOrThrow(url: string, init: RequestInit): Promise<Response> {
     try {
-      // ETags on /board, /challenges and /items are handled by the browser's HTTP cache.
+      // ETags on /board, /challenges, /items and /rules are handled by the browser's HTTP cache.
       return await fetch(url, init)
     } catch (error) {
       throw new ApiError({ kind: 'network', message: String(error) })
@@ -54,6 +54,7 @@ export function createHttpClient({
     getBoard: () => send(endpoints.board),
     getChallenges: () => send(endpoints.challenges),
     getItems: () => send(endpoints.items),
+    getRules: () => send(endpoints.rules),
     getState: () => send(endpoints.state, { cache: 'no-store' }),
     getJournal: (page = {}) =>
       send(endpoints.journal, { query: { after: page.after, limit: page.limit } }),

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
-import { INVENTORY_LIMIT, itemEntry, mysteryBoxEntry } from '@/domain/items'
+import { itemEntry, mysteryBoxEntry } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { TtButton, TtDisplayBox, TtPanel, TtSlot, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
@@ -14,6 +14,7 @@ const props = defineProps<{
   stock: readonly Item[]
   /** How many items the buyer holds, against the inventory limit. */
   held: number
+  inventoryLimit: number
   pending: boolean
 }>()
 const emit = defineEmits<{ buy: [item: Item]; buyMysteryBox: []; close: [] }>()
@@ -22,7 +23,7 @@ const emit = defineEmits<{ buy: [item: Item]; buyMysteryBox: []; close: [] }>()
 function whyNot(price: number): string | null {
   if (!props.buyer) return null
   if (price > props.buyer.gold) return 'Not enough gold'
-  if (props.held >= INVENTORY_LIMIT) return 'Inventory full'
+  if (props.held >= props.inventoryLimit) return 'Inventory full'
   return null
 }
 

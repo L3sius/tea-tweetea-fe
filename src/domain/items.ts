@@ -14,22 +14,8 @@ const TARGETS: Partial<Record<Item, ItemTargetKind>> = {
   wilderness_web: 'tile',
 }
 
-/** `team`: a rival team. `tile`: a free tile within `BLOCKER_RANGE` steps. */
+/** `team`: a rival team. `tile`: a free tile within the rules' blocker range. */
 export type ItemTargetKind = 'none' | 'team' | 'tile'
-
-/** How far from the team a blocker may be placed (`blocker_range` in the game config). */
-export const BLOCKER_RANGE = 10
-
-/** How many blockers a team may have on the board at once (`blockers_per_team`). */
-export const BLOCKERS_PER_TEAM = 2
-
-/** Hours a blocker freezes the team it catches (`blocker_hours` in the game config). */
-export const BLOCKER_FREEZE_HOURS: Partial<Record<Item, number>> = {
-  banana: 0.5,
-  harpie_bug_swarm: 1,
-  snake_charmer: 2,
-  wilderness_web: 4,
-}
 
 /** The blockers a team has on the board that have not worn off by `now`. */
 export function blockersOut(
@@ -54,7 +40,7 @@ export const HOSTILE_ITEMS: ReadonlySet<Item> = new Set<Item>([
   'entangle',
 ])
 
-/** An item as the catalogue (`GET /items`) describes it. */
+/** An item as the catalogue (`GET /items`) describes it, numbers included. */
 export type ItemEntry = {
   name: string
   description: string
@@ -62,177 +48,32 @@ export type ItemEntry = {
   icon: string | null
   /** Gold, at any shop that stocks it. */
   price: number
+  /** How long the item freezes a team: blockers, Ice Barrage, Entangle. */
+  freezeHours: number | null
+  /** The factor a feather applies to the next move. */
+  multiplier: number | null
 }
 
 /** `GET /items`: every item, plus the mystery box, which every shop sells but is not an item. */
 export type ItemCatalogue = { items: Map<Item, ItemEntry>; mysteryBox: ItemEntry }
 
 /**
- * The server's catalogue as of writing, so items read well before `/items` arrives or if it fails.
- * The served catalogue replaces it (`useItemCatalogue`); keep it in step with `config/items.toml`.
+ * Stands in for an entry the catalogue lacks. The catalogue loads with the board, before anything
+ * is shown, so this only covers an item the server stopped describing. It copies no numbers.
  */
-const FALLBACK_CATALOGUE: Record<Item, ItemEntry> = {
-  bronze_feather: {
-    name: 'Bronze feather',
-    description: 'Your next move is 1.5 times as long (rounded).',
-    icon: 'https://oldschool.runescape.wiki/images/Bronze_feather.png',
-    price: 40,
-  },
-  silver_feather: {
-    name: 'Silver feather',
-    description: 'Your next move is twice as long.',
-    icon: 'https://oldschool.runescape.wiki/images/Silver_feather.png',
-    price: 80,
-  },
-  gold_feather: {
-    name: 'Gold feather',
-    description: 'Your next move is 2.5 times as long (rounded).',
-    icon: null,
-    price: 100,
-  },
-  morrigans_throwing_axe: {
-    name: "Morrigan's throwing axe",
-    description:
-      "Halves a rival team's next move. Hostile: the target is then shielded for 12 hours.",
-    icon: 'https://oldschool.runescape.wiki/images/Morrigan%27s_throwing_axe.png',
-    price: 30,
-  },
-  quetzal_whistle: {
-    name: 'Quetzal whistle',
-    description: 'On land only: fly to a random land tile away from the gems.',
-    icon: 'https://oldschool.runescape.wiki/images/Perfected_quetzal_whistle.png',
-    price: 20,
-  },
-  ogre_boat: {
-    name: 'Ogre boat',
-    description: 'At sea only: sail to a random sea tile away from the gems.',
-    icon: 'https://oldschool.runescape.wiki/images/thumb/Ogre_boat.png/300px-Ogre_boat.png',
-    price: 20,
-  },
-  group_teleport: {
-    name: 'Group teleport',
-    description: 'Sends every team that is not moving or in a match to a random shop.',
-    icon: 'https://oldschool.runescape.wiki/images/Ice_plateau_teleport_%28tablet%29.png',
-    price: 50,
-  },
-  banana: {
-    name: 'Banana',
-    description:
-      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 30 minutes.',
-    icon: 'https://oldschool.runescape.wiki/images/Banana.png',
-    price: 10,
-  },
-  harpie_bug_swarm: {
-    name: 'Harpie bug swarm',
-    description:
-      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 1 hour.',
-    icon: 'https://oldschool.runescape.wiki/images/Harpie_Bug_Swarm.png',
-    price: 15,
-  },
-  snake_charmer: {
-    name: 'Snake charmer',
-    description:
-      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 2 hours.',
-    icon: 'https://oldschool.runescape.wiki/images/thumb/Ali_the_Snake_Charmer.png/180px-Ali_the_Snake_Charmer.png',
-    price: 25,
-  },
-  wilderness_web: {
-    name: 'Wilderness web',
-    description:
-      'Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is frozen for 4 hours.',
-    icon: 'https://oldschool.runescape.wiki/images/Web.png',
-    price: 40,
-  },
-  ice_barrage: {
-    name: 'Ice Barrage',
-    description:
-      'Freezes a rival team for 6 hours. Hostile: the target is then shielded for 12 hours.',
-    icon: 'https://oldschool.runescape.wiki/images/Ice_Barrage.png',
-    price: 30,
-  },
-  entangle: {
-    name: 'Entangle',
-    description:
-      'Freezes a rival team for 3 hours. Hostile: the target is then shielded for 12 hours.',
-    icon: 'https://oldschool.runescape.wiki/images/Entangle.png',
-    price: 20,
-  },
-  protect_from_magic: {
-    name: 'Protect from Magic',
-    description: 'Passive: blocks the next freeze on your team, then is used up.',
-    icon: 'https://oldschool.runescape.wiki/images/Protect_from_Magic.png',
-    price: 20,
-  },
-  leprechaun_hat: {
-    name: 'Leprechaun hat',
-    description: 'For your next 5 draws, a club pays gold.',
-    icon: 'https://oldschool.runescape.wiki/images/Leprechaun_hat.png',
-    price: 30,
-  },
-  saturated_heart: {
-    name: 'Saturated heart',
-    description: 'For your next 5 draws, a heart pays gold.',
-    icon: 'https://oldschool.runescape.wiki/images/Saturated_heart.png',
-    price: 30,
-  },
-  sapphire_necklace: {
-    name: 'Sapphire necklace',
-    description: 'Passive: protects your blue gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Sapphire_necklace.png',
-    price: 30,
-  },
-  emerald_necklace: {
-    name: 'Emerald necklace',
-    description: 'Passive: protects your green gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Emerald_necklace.png',
-    price: 30,
-  },
-  dragon_necklace: {
-    name: 'Dragon necklace',
-    description: 'Passive: protects your purple gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Dragon_necklace.png',
-    price: 30,
-  },
-  ruby_necklace: {
-    name: 'Ruby necklace',
-    description: 'Passive: protects your red gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Ruby_necklace.png',
-    price: 30,
-  },
-  onyx_necklace: {
-    name: 'Onyx necklace',
-    description: 'Passive: protects your yellow gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Onyx_necklace.png',
-    price: 30,
-  },
-  zenyte_necklace: {
-    name: 'Zenyte necklace',
-    description: 'Passive: protects your orange gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Zenyte_necklace.png',
-    price: 30,
-  },
-  topaz_necklace: {
-    name: 'Topaz necklace',
-    description: 'Passive: protects your pink gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Topaz_necklace.png',
-    price: 30,
-  },
-  diamond_necklace: {
-    name: 'Diamond necklace',
-    description: 'Passive: protects your white gem when you lose a match.',
-    icon: 'https://oldschool.runescape.wiki/images/Diamond_necklace.png',
-    price: 30,
-  },
-}
-
-const FALLBACK_MYSTERY_BOX: ItemEntry = {
-  name: 'Mystery box',
-  description: 'Sold in every shop. A random item goes straight into your inventory.',
+const placeholder = (name: string): ItemEntry => ({
+  name,
+  description: '',
   icon: null,
-  price: 40,
-}
+  price: 0,
+  freezeHours: null,
+  multiplier: null,
+})
 
-let catalogue: ItemCatalogue = { items: new Map(), mysteryBox: FALLBACK_MYSTERY_BOX }
+/** "harpie_bug_swarm" -> "Harpie bug swarm". */
+const fromId = (id: string) => id.charAt(0).toUpperCase() + id.slice(1).replaceAll('_', ' ')
+
+let catalogue: ItemCatalogue = { items: new Map(), mysteryBox: placeholder('Mystery box') }
 
 /** Adopts the served catalogue; it is loaded with the board, before anything is shown. */
 export function useItemCatalogue(served: ItemCatalogue) {
@@ -240,7 +81,7 @@ export function useItemCatalogue(served: ItemCatalogue) {
 }
 
 export const itemEntry = (item: Item): ItemEntry =>
-  catalogue.items.get(item) ?? FALLBACK_CATALOGUE[item]
+  catalogue.items.get(item) ?? placeholder(fromId(item))
 
 export const mysteryBoxEntry = (): ItemEntry => catalogue.mysteryBox
 
@@ -249,8 +90,6 @@ export const PASSIVE_ITEMS: ReadonlySet<Item> = new Set<Item>([
   'protect_from_magic',
   ...Object.values(NECKLACES),
 ])
-
-export const INVENTORY_LIMIT = 10
 
 export const inventorySize = (items: ReadonlyMap<Item, number>) =>
   [...items.values()].reduce((a, b) => a + b, 0)
@@ -307,18 +146,18 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
  * Why the team cannot use an item right now, or null if it can. Mirrors the server's rule
  * (`use_item` in docs/api.md): power-ups are a decision taken between finishing a tile and drawing,
  * one per tile, never while frozen or in a match. `here` is the team's tile, for the items that
- * only work on land or at sea; `placed` is how many blockers the team has out.
+ * only work on land or at sea; `blockers` is how many the team has out against its limit.
  */
 export function whyNotUsable(
   team: Team,
   item: Item,
   now: Date,
   here?: Tile,
-  placed = 0,
+  blockers?: { placed: number; limit: number },
 ): string | null {
   if (PASSIVE_ITEMS.has(item)) return 'Works while held'
-  if (BLOCKER_FREEZE_HOURS[item] !== undefined && placed >= BLOCKERS_PER_TEAM)
-    return `You already have ${BLOCKERS_PER_TEAM} blockers out`
+  if (ITEM_TARGET[item] === 'tile' && blockers && blockers.placed >= blockers.limit)
+    return `You already have ${blockers.limit} blockers out`
   if (here && item === 'quetzal_whistle' && here.sea) return 'Only works on land'
   if (here && item === 'ogre_boat' && !here.sea) return 'Only works at sea'
   if (team.frozenUntil !== null && team.frozenUntil > now) return 'Not while frozen'

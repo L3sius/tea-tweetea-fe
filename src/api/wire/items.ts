@@ -7,7 +7,12 @@ export const WireItemInfo = z.object({
   icon: z.string().nullable(),
   /** Gold, at any shop that stocks it. */
   price: z.number(),
+  /** How long the item freezes a team: blockers, Ice Barrage, Entangle. */
+  freeze_hours: z.number().nullable(),
+  /** The factor a feather applies to the next move. */
+  multiplier: z.number().nullable(),
 })
+export type WireItemInfo = z.infer<typeof WireItemInfo>
 
 /**
  * `GET /items`: item id to its catalogue entry, keyed loosely so an item the frontend does not

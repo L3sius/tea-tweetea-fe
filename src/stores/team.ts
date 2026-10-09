@@ -7,7 +7,7 @@ import { drawOutcome, type DrawOutcome } from '@/domain/draw'
 import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { Blocker, Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
-import { BLOCKER_RANGE, ITEM_TARGET, blockersOut, gainedItem } from '@/domain/items'
+import { ITEM_TARGET, blockersOut, gainedItem } from '@/domain/items'
 import { adjacency, blockerTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
@@ -105,19 +105,24 @@ export const useTeamStore = defineStore('team', () => {
     return w && p && end !== undefined && blocker && w.stopped(p) ? { tileId: end, blocker } : null
   })
   /** How many blockers the team has on the board, against the per-team limit. */
-  const blockersPlaced = computed(() =>
-    team.value && game.state ? blockersOut(game.state.blockers, team.value.id, now.value) : 0,
-  )
+  const blockers = computed(() => {
+    const t = team.value
+    const limit = game.rules?.blockersPerTeam
+    if (!t || !game.state || limit === undefined) return undefined
+    return { placed: blockersOut(game.state.blockers, t.id, now.value), limit }
+  })
 
   /** Tiles a tile-targeted item may go on: in range, not a shop, free of teams, gems and blockers. */
   const targetableTiles = computed(() => {
     const t = team.value
     const state = game.state
     const board = game.board
-    if (!t || !state || !board || targeting.value?.kind !== 'tile') return null
+    const range = game.rules?.blockerRange
+    if (!t || !state || !board || range === undefined || targeting.value?.kind !== 'tile')
+      return null
     const occupied = new Set([...state.teams.values()].map((x) => x.position))
     const gems = new Set(state.gemTiles.values())
-    const tiles = tilesWithin(adj.value, t.position, BLOCKER_RANGE)
+    const tiles = tilesWithin(adj.value, t.position, range)
     for (const tile of tiles) {
       const kind = board.tiles.get(tile)?.kind
       if (kind !== 'normal' && kind !== 'red') tiles.delete(tile)
@@ -423,7 +428,7 @@ export const useTeamStore = defineStore('team', () => {
     stepsLeft,
     options,
     stoppedBy,
-    blockersPlaced,
+    blockers,
     targeting,
     walks,
     targetableTiles,

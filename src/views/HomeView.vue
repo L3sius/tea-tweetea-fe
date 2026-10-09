@@ -539,6 +539,7 @@ async function buyMysteryBox() {
         :buyer="buyer"
         :stock="shopStock"
         :held="inventorySize(my.items)"
+        :inventory-limit="game.rules?.inventoryLimit ?? 0"
         :pending="my.pending"
         @buy="buy"
         @buy-mystery-box="buyMysteryBox"

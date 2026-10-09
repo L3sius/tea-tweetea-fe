@@ -5,6 +5,7 @@ import type { AdminCommand, AdminReply, CommandAccepted, TeamCommand } from '@/d
 import type { JournalEntry } from '@/domain/events'
 import type { GameState } from '@/domain/game'
 import type { ItemCatalogue } from '@/domain/items'
+import type { Rules } from '@/domain/rules'
 import type { ChallengeId } from '@/domain/ids'
 import type { Hello, Me } from '@/domain/server'
 
@@ -49,6 +50,8 @@ export type ApiClient = {
   getChallenges(): Promise<Map<ChallengeId, Challenge>>
   /** The item catalogue: names, descriptions, pictures and prices, plus the mystery box. */
   getItems(): Promise<ItemCatalogue>
+  /** Game-wide numbers: limits, ranges, lifetimes. */
+  getRules(): Promise<Rules>
   getState(): Promise<GameState>
   /** Journal entries, oldest first. */
   getJournal(page?: JournalPage): Promise<JournalEntry[]>

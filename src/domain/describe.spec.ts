@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { decode } from '@/api/decode'
+import { endpoints } from '@/api/endpoints'
+import recordedItems from '@/api/fixtures/data/items.json'
 import type { Challenge } from './challenge'
 import {
   cardLabel,
@@ -12,6 +15,13 @@ import {
 } from './describe'
 import type { Instance } from './game'
 import { challengeId, instanceId, teamId, tileId, type ChallengeId, type TeamId } from './ids'
+import { useItemCatalogue } from './items'
+
+// Item names come from the server's catalogue, as in the app: here, the one recorded from it.
+beforeAll(() => {
+  const { path, schema, map } = endpoints.items
+  useItemCatalogue(decode(path, schema, map, recordedItems))
+})
 
 const names = {
   team: (id: TeamId) => ['Red', 'Blue'][id] ?? '?',

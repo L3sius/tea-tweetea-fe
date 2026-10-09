@@ -1,0 +1,15 @@
+{
+  "start": "2026-10-01T00:00:00Z",
+  "end": "2027-12-31T00:00:00Z",
+  "inventory_limit": 10,
+  "blocker_range": 10,
+  "blocker_lifetime_hours": 24,
+  "blockers_per_team": 2,
+  "shield_hours": 12,
+  "suit_gold_draws": 5,
+  "suit_gold_per_rank": 2,
+  "initiator_multiplier": 2,
+  "random_event_chance": 0.2,
+  "steal_minutes": 30,
+  "min_gem_distance": 3
+}
