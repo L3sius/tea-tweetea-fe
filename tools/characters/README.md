@@ -30,8 +30,9 @@ npm run characters:catalog                 # out/human-npcs.tsv: every NPC rigge
   (a CDN bucket, say), `characters:export -- /some/dir` and set `VITE_OSRS_ASSETS_URL`; the host
   must send `Access-Control-Allow-Origin`.
 - Without a cache, nobody needs to export: the app loads the hosted copy.
-- The upload also sends `tools/characters/audio/` (not in git): the site's music and sounds, served
-  at `https://api.tea-osrs.com/osrs/audio/`. The tutorial plays `newbie-melody.ogg` from there.
+- The upload also sends `tools/characters/audio/` (not in git): the site's music, served at
+  `https://api.tea-osrs.com/osrs/audio/`. The tutorial plays `newbie-melody.ogg` from there. The
+  sound effects are small and ship with the site instead (`public/sounds/`).
 
 ## What it writes
 

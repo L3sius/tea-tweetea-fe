@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import * as music from '@/tutorial/music'
+import * as music from '@/sound/music'
 
 /**
  * The site's sound settings: muted or not, and the volume, kept for this browser. They apply to

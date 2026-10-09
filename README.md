@@ -22,7 +22,7 @@ To use a running game API instead, copy `.env.example` to `.env.development.loca
 | `npm run format`            | Prettier                                            |
 | `npm run fixtures:refresh`  | Re-record API responses from a running server       |
 | `npm run characters:export` | Export OSRS characters (tools/characters/)          |
-| `npm run characters:upload` | Put them on the server                              |
+| `npm run characters:upload` | Put them and the music on the server                |
 
 ### Play-testing tools
 
@@ -76,6 +76,13 @@ A team's piece can be any OSRS NPC built like a player instead of a bird.
   swim), reactions to moments on the board, and rare easter eggs.
 - `/characters` tries looks on any NPC. A team logged in with its code saves its own look there (the
   `set_appearance` team action); the server keeps it on the team and every board picks it up.
+
+### Sounds
+
+The board plays OSRS sounds as moments show on the map, at the volume of the ♪ control in the
+header. They ship with the site in `public/sounds/`; `src/domain/sounds.ts` says which event makes
+which sound and who hears it. [docs/sounds.md](docs/sounds.md) lists where each file comes from and
+how to add or swap one (levelled to one loudness). The tour's music is on the asset server instead.
 
 ### Tutorial
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Puts the exported assets (out/osrs/, from export.mjs) and the site's music and sounds (audio/, not
-# in git) on the server, where Caddy serves them at https://api.tea-osrs.com/osrs/. The new set is copied beside the live one, then swapped in, so
-# pages never see half an upload.
+# Puts the exported assets (out/osrs/, from export.mjs) and the site's music (audio/, not in git)
+# on the server, where Caddy serves them at https://api.tea-osrs.com/osrs/. The new set is copied
+# beside the live one, then swapped in, so pages never see half an upload.
 # Usage: ./upload.sh [user@host]
 set -euo pipefail
 cd "$(dirname "$0")"

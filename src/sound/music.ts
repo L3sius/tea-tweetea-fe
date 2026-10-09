@@ -1,5 +1,5 @@
-// Music for the tutorial: OSRS tracks served with the other OSRS assets. Browsers only start sound
-// after a click, so `play` must run from one.
+// The site's sound settings (volume and mute, for this browser) and its music: OSRS tracks served
+// with the other OSRS assets. Browsers only start sound after a click, so `play` must run from one.
 import { readConfig } from '@/config/env'
 
 /** The music's volume (0–1) until a player moves the slider. */

@@ -19,6 +19,7 @@ import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
+import { useSoundEffects } from '@/sound/effects'
 import { useCharacterStore } from '@/stores/characters'
 import { byStanding, useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
@@ -201,6 +202,16 @@ function freeRoam() {
 const followed = computed(() =>
   selected.value === null ? null : (state.value?.teams.get(selected.value) ?? null),
 )
+
+// Sounds play as their moment shows on the board, replays included: big moments for everyone,
+// small ones only for your own team or the team you follow. The tour's pretend game stays quiet.
+useSoundEffects({
+  sources: () => [game.choreography, game.replay?.choreography],
+  hears: (cue) =>
+    cue.audience === 'everyone' || cue.teamId === my.teamId || cue.teamId === selected.value,
+  serverNow: game.serverNow,
+  quiet: () => tutorial.staged,
+})
 const isAnimating = (id: TeamId) => choreography.value.isAnimating(id, game.serverNow())
 /** The tile a team's piece is on or walking from; refreshed each second through `now`. */
 function shownAt(id: TeamId): TileId {

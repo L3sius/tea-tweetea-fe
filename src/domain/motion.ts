@@ -8,6 +8,7 @@ import { blockerName, cardLabel, effectText, itemName } from './describe'
 import type { GameEvent, JournalEntry } from './events'
 import type { Card } from './game'
 import type { TeamId, TileId } from './ids'
+import { entryContext, soundFor, type SoundAudience, type SoundName } from './sounds'
 
 /** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
 export const STEP_MS = 840
@@ -49,6 +50,18 @@ export type Cue = {
   card?: Card
 }
 
+/** A sound to play as a moment shows on the board (see sounds.ts). */
+export type SoundCue = {
+  id: string
+  teamId: TeamId
+  sound: SoundName
+  audience: SoundAudience
+  at: number
+}
+
+/** How long sounds are kept after their moment, for a player that looks only now and then. */
+const SOUND_KEEP_MS = 10_000
+
 /** Where to draw a piece at one moment. */
 export type Placement =
   | { kind: 'still'; tile: TileId }
@@ -75,6 +88,7 @@ export class Choreography {
   /** When each team's queued segments end; later entries queue behind them. */
   private readonly busyUntil = new Map<TeamId, number>()
   private cues: Cue[] = []
+  private sounds: SoundCue[] = []
   private reactions: Reaction[] = []
   /** When each entry's last animation ends, so text about it can wait until then. */
   private readonly reveal = new Map<number, number>()
@@ -133,7 +147,14 @@ export class Choreography {
       this.busyUntil.set(team, Math.max(this.busyUntil.get(team) ?? 0, end))
     }
 
+    const context = entryContext(entry)
     entry.events.forEach((event, index) => {
+      // A sound goes with its moment: before a teleport moves the piece, after a walk lands.
+      const sound = soundFor(event, context)
+      if (sound) {
+        const { team, ...rest } = sound
+        this.sounds.push({ id: `${entry.seq}.${index}`, teamId: team, ...rest, at: now(team) })
+      }
       switch (event.kind) {
         case 'game_started':
           event.positions.forEach((tile, team) => this.lastTile.set(team as TeamId, tile))
@@ -237,6 +258,11 @@ export class Choreography {
     return this.cues.filter((c) => time >= c.at && time < c.at + CUE_MS)
   }
 
+  /** Sounds whose moment came after `from` and by `to`, in order. */
+  soundsBetween(from: number, to: number): SoundCue[] {
+    return this.sounds.filter((s) => s.at > from && s.at <= to)
+  }
+
   /** Forgets everything that finished before `time`. */
   prune(time: number): void {
     for (const [team, list] of this.segments) {
@@ -245,6 +271,7 @@ export class Choreography {
       else this.segments.set(team, live)
     }
     this.cues = this.cues.filter((c) => c.at + CUE_MS > time)
+    this.sounds = this.sounds.filter((s) => s.at + SOUND_KEEP_MS > time)
     this.reactions = this.reactions.filter((r) => r.at + REACTION_KEEP_MS > time)
     for (const [seq, at] of this.reveal) if (at <= time) this.reveal.delete(seq)
   }

@@ -4,6 +4,7 @@ import { itemName } from '@/domain/describe'
 import type { Team } from '@/domain/game'
 import { itemEntry, mysteryBoxEntry } from '@/domain/items'
 import { ITEMS, type Item } from '@/domain/vocabulary'
+import { playEffect } from '@/sound/effects'
 import { TtButton, TtDisplayBox, TtPanel, TtSlot, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import SlotReel from './SlotReel.vue'
@@ -33,6 +34,7 @@ const reelNames = [...REEL_ITEMS.keys()]
 const gotFromBox = ref<Item | null>(null)
 
 function onLanded() {
+  playEffect('casket-open')
   gotFromBox.value = props.opening
   emit('opened')
 }
