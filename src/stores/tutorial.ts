@@ -6,8 +6,10 @@ import { RUN_FROM_STEPS } from '@/characters/roster'
 import type { GameEvent } from '@/domain/events'
 import { tileId, type TileId } from '@/domain/ids'
 import { Choreography, type Placement } from '@/domain/motion'
+import type { GameState } from '@/domain/game'
 import { GUIDE, GUIDE_TEAM } from '@/tutorial/guide'
 import * as music from '@/tutorial/music'
+import { PretendGame } from '@/tutorial/pretend'
 import { loadTutorialWorld, type TutorialWorld } from '@/tutorial/world'
 import {
   GESTURE,
@@ -30,8 +32,10 @@ const TITLE_ZOOM = 1.5
 /** Assumed for a gesture whose length hasn't loaded. */
 const GESTURE_MS = 2000
 /** How long the page takes to fade to black, then to fade in again on the title scene. */
-export const TO_BLACK_MS = 700
-export const FROM_BLACK_MS = 900
+const TO_BLACK_MS = 700
+const FROM_BLACK_MS = 900
+/** A quick dip to black and back, around a change that moves the layout. */
+const DIP = { in: 350, hold: 200, out: 650 }
 
 /** A camera move for the map to make; a new id each time, so the same move can repeat. */
 export type CameraMove = { id: number; to: 'all' | TileId; zoom?: number; ms: number }
@@ -60,8 +64,9 @@ export const useTutorialStore = defineStore('tutorial', () => {
    * map dark and Earl Grey waving over "How to play". `playing`: the tour.
    */
   const phase = ref<'off' | 'fading' | 'title' | 'playing'>('off')
-  /** The black cover over the page, while it fades in and out again. */
-  const cover = ref(false)
+  /** The black cover over the page: fading in, or out again; and how long each takes. */
+  const cover = ref<'off' | 'in' | 'out'>('off')
+  const coverMs = ref({ in: TO_BLACK_MS, out: FROM_BLACK_MS })
   const beat = ref(0)
   const line = ref(0)
   const revealed = shallowRef<ReadonlySet<RevealName>>(new Set())
@@ -76,6 +81,12 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const shopTile = ref<TileId | null>(null)
   /** The board and game the tour is shown on (tutorial/world), once loaded. */
   const world = shallowRef<TutorialWorld | null>(null)
+  /** Earl Grey's own team in it (tutorial/pretend); `changes` counts its changes for the page. */
+  let pretend: PretendGame | null = null
+  const changes = ref(0)
+  const tourState = computed<GameState | null>(() => (void changes.value, pretend?.state() ?? null))
+  const tourNames = computed(() => (void changes.value, pretend?.names() ?? null))
+  const guideTeam = computed(() => (void changes.value, pretend ? { ...pretend.team } : null))
   const muted = ref(music.isMuted())
 
   const active = computed(() => phase.value !== 'off')
@@ -122,8 +133,23 @@ export const useTutorialStore = defineStore('tutorial', () => {
   function place(at: TileId | null) {
     choreography = new Choreography()
     tile = at
-    if (at !== null) choreography.know(GUIDE_TEAM, at)
+    if (at !== null) {
+      choreography.know(GUIDE_TEAM, at)
+      land(at)
+    }
   }
+
+  /** He arrives on `at`: in the pretend game, he takes on its task. */
+  function land(at: TileId) {
+    clearTimeout(landing?.timer)
+    landing = null
+    pretend?.landOn(at, new Date(game.serverNow()))
+    changes.value++
+  }
+  /** Where his walk under way will land him, and when. */
+  let landing: { timer: ReturnType<typeof setTimeout>; at: TileId } | null = null
+  /** Lands him now if he's due to land, for what waits on his arrival. */
+  const settle = () => landing && land(landing.at)
 
   /** Walks him along `route` (tiles of the tutorial's board, from where he stands). */
   function walk(route: readonly number[]) {
@@ -134,7 +160,10 @@ export const useTutorialStore = defineStore('tutorial', () => {
       ...path.slice(1).map((t): GameEvent => ({ kind: 'stepped', teamId: GUIDE_TEAM, tileId: t })),
     ]
     choreography.apply({ seq: ++seq, at: new Date(game.serverNow()), events })
-    tile = path[path.length - 1] ?? tile
+    const end = path[path.length - 1] ?? tile
+    tile = end
+    clearTimeout(landing?.timer)
+    landing = end === null ? null : { timer: setTimeout(() => land(end), walkLeft()), at: end }
   }
 
   function gestureNow(name: keyof typeof GESTURE) {
@@ -152,9 +181,15 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   function run(action: Action) {
     switch (action.kind) {
-      case 'reveal':
-        revealed.value = new Set([...revealed.value, ...action.what])
-        return
+      case 'reveal': {
+        const show = () => (revealed.value = new Set([...revealed.value, ...action.what]))
+        if (!action.dip) return void show()
+        // Under the black, the layout settles and the camera finds him again.
+        return void throughBlack(DIP, () => {
+          show()
+          setTimeout(() => run({ kind: 'camera', to: 'guide', ms: 0 }), DIP.hold / 2)
+        })
+      }
       case 'camera': {
         const to = action.to === 'all' ? 'all' : tile
         if (to !== null) camera.value = { id: ++cameraId, to, zoom: action.zoom, ms: action.ms }
@@ -169,7 +204,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
         spotlight.value = action.target
         return
       case 'spin':
-        spin.value = { id: ++spinId, winner: action.winner }
+        spin.value = { id: ++spinId, winner: pretend?.minigameName() ?? 'A minigame' }
         return
       case 'shop':
         shopTile.value = tile
@@ -182,6 +217,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
   }
 
   let spinId = 0
+  /** How often a cue waiting for the slot machine checks whether it has landed. */
+  const SPIN_POLL_MS = 300
 
   /** How long until Earl Grey stops walking (0 when he stands). */
   const walkLeft = () => Math.max(0, choreography.settlesAt(GUIDE_TEAM) - game.serverNow())
@@ -191,16 +228,19 @@ export const useTutorialStore = defineStore('tutorial', () => {
       const entry: Pending = { timer: undefined, action: cue.action }
       // A cue for his arrival waits for any walk under way when it's due, even one that started
       // after it was scheduled.
+      const waiting = () =>
+        cue.after === 'walk' ? walkLeft() : cue.after === 'spin' && spin.value ? SPIN_POLL_MS : 0
       const due = () => {
-        const left = cue.afterWalk ? walkLeft() : 0
+        const left = waiting()
         if (left > 0) {
           entry.timer = setTimeout(due, left + cue.at)
           return
         }
         pending[owner] = pending[owner].filter((p) => p !== entry)
+        if (cue.after === 'walk') settle()
         run(cue.action)
       }
-      entry.timer = setTimeout(due, cue.at + (cue.afterWalk ? walkLeft() : 0))
+      entry.timer = setTimeout(due, cue.at + waiting())
       pending[owner].push(entry)
     }
   }
@@ -241,7 +281,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
     saying = null
     inspecting.value = null
     shopTile.value = null
-    spin.value = null
+    // A spin cut short still opens his minigame, as later lines expect.
+    if (spin.value) endSpin()
     schedule('beat', TUTORIAL[index]?.cues)
     showLine(0)
   }
@@ -260,6 +301,23 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   const fadeTimers: ReturnType<typeof setTimeout>[] = []
   const clearFades = () => fadeTimers.splice(0).forEach(clearTimeout)
+  const after = (ms: number) => new Promise((done) => fadeTimers.push(setTimeout(done, ms)))
+
+  /** Fades the page to black, runs `during` under it (once `ready`), then fades back in. */
+  async function throughBlack(
+    timing: { in: number; hold: number; out: number },
+    during: () => void,
+    ready: Promise<unknown> = Promise.resolve(),
+  ) {
+    coverMs.value = { in: timing.in, out: timing.out }
+    cover.value = 'in'
+    await Promise.all([after(timing.in), ready])
+    during()
+    await after(timing.hold)
+    cover.value = 'out'
+    await after(timing.out)
+    cover.value = 'off'
+  }
 
   /**
    * Fades the page to black, sets the title scene up under the black and fades it in, with the
@@ -272,24 +330,24 @@ export const useTutorialStore = defineStore('tutorial', () => {
     flush('beat')
     void loadAnimationInfo()
     const loaded = world.value ? Promise.resolve(world.value) : loadTutorialWorld()
+    void loaded.then((w) => (world.value = w))
     phase.value = 'fading'
-    cover.value = true
-    // Once the page is black and the world has loaded, the title scene is set up under the black,
-    // which then lifts.
-    const black = new Promise((done) => fadeTimers.push(setTimeout(done, TO_BLACK_MS)))
-    void Promise.all([loaded, black]).then(([loadedWorld]) => {
-      if (phase.value !== 'fading') return
-      world.value = loadedWorld
-      beatTiles.clear()
-      revealed.value = new Set()
-      place(tileId(TOUR_START))
-      phase.value = 'title'
-      run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
-      const since = game.serverNow()
-      gesture = { anim: GESTURE.wave, since, until: Infinity }
-      music.play(music.NEWBIE_MELODY)
-      fadeTimers.push(setTimeout(() => (cover.value = false), FROM_BLACK_MS))
-    })
+    void throughBlack(
+      { in: TO_BLACK_MS, hold: 0, out: FROM_BLACK_MS },
+      () => {
+        if (phase.value !== 'fading' || !world.value) return
+        pretend = new PretendGame(world.value, tileId(TOUR_START))
+        beatTiles.clear()
+        revealed.value = new Set()
+        place(tileId(TOUR_START))
+        phase.value = 'title'
+        run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
+        const since = game.serverNow()
+        gesture = { anim: GESTURE.wave, since, until: Infinity }
+        music.play(music.NEWBIE_MELODY)
+      },
+      loaded,
+    )
   }
 
   /** From the title scene into the tour: the title fades out, the map and chatbox fade in. */
@@ -300,20 +358,38 @@ export const useTutorialStore = defineStore('tutorial', () => {
     enterBeat(0)
   }
 
-  /** Ends the tour, at the end or by skipping; either way it won't open by itself again. */
+  /**
+   * Ends the tour, at the end or by skipping, dipping to black and back into the live game; either
+   * way it won't open by itself again.
+   */
   function finish() {
+    if (phase.value === 'off') return
     clearFades()
-    cover.value = false
     flush('line')
     flush('beat')
     music.stop()
-    phase.value = 'off'
     seen.value = true
     try {
       localStorage.setItem(SEEN_KEY, VERSION)
     } catch {
       // Shown again next visit.
     }
+    void throughBlack({ in: DIP.in, hold: DIP.hold, out: FROM_BLACK_MS }, () => {
+      phase.value = 'off'
+      spotlight.value = null
+      inspecting.value = null
+      shopTile.value = null
+      spin.value = null
+      clearTimeout(landing?.timer)
+      landing = null
+    })
+  }
+
+  /** The slot machine has landed: his minigame opens in the side panel. */
+  function endSpin() {
+    spin.value = null
+    pretend?.openMinigame(new Date(game.serverNow()))
+    changes.value++
   }
 
   function toggleMute() {
@@ -325,6 +401,10 @@ export const useTutorialStore = defineStore('tutorial', () => {
     seen,
     phase,
     cover,
+    coverMs,
+    tourState,
+    tourNames,
+    guideTeam,
     active,
     staged,
     beat,
@@ -348,7 +428,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
     back,
     finish,
     toggleMute,
-    endSpin: () => (spin.value = null),
+    endSpin,
     closeShop: () => (shopTile.value = null),
   }
 })

@@ -21,7 +21,7 @@ export type RevealName =
   | 'controls'
 
 /** Parts of the page the tutorial can outline (marked with `data-tutorial-spot`). */
-export type SpotName = 'current-tile'
+export type SpotName = 'current-tile' | 'minigames'
 
 /** Map parts, drawn by BoardMap. */
 export type BoardLayer = Extract<
@@ -43,8 +43,11 @@ export const GESTURE = {
 export type Gesture = keyof typeof GESTURE
 
 export type Action =
-  /** Shows parts of the page; roads and nodes spread out from Earl Grey. */
-  | { kind: 'reveal'; what: RevealName[] }
+  /**
+   * Shows parts of the page; roads and nodes spread out from Earl Grey. With `dip`, the page dips
+   * to black and back around it, for parts that move the layout (the side panel).
+   */
+  | { kind: 'reveal'; what: RevealName[]; dip?: boolean }
   /** Flies the camera to the whole map, or to Earl Grey at a zoom. */
   | { kind: 'camera'; to: 'all' | 'guide'; zoom?: number; ms: number }
   /**
@@ -54,10 +57,10 @@ export type Action =
   | { kind: 'walk'; path: number[] }
   /** Shows the task card of the tile he stands on, as hovering a node does, until the beat ends. */
   | { kind: 'inspect' }
-  /** Outlines a part of the page until the line ends. */
+  /** Outlines a part of the page, dimming the rest, until the line ends. */
   | { kind: 'spotlight'; target: SpotName }
-  /** Spins the minigame slot machine, landing on `winner`. */
-  | { kind: 'spin'; winner: string }
+  /** Spins the minigame slot machine; when it lands, Earl Grey's minigame opens in the side panel. */
+  | { kind: 'spin' }
   /** Opens the shop panel of the shop he stands on, until the beat ends. */
   | { kind: 'shop' }
   | { kind: 'gesture'; gesture: Gesture }
@@ -65,10 +68,10 @@ export type Action =
   | { kind: 'say'; text: string; ms?: number }
 
 /**
- * An action at a time (ms) after its beat or line starts; with `afterWalk`, that long after Earl
- * Grey has finished walking, so it waits for him to arrive.
+ * An action at a time (ms) after its beat or line starts; with `after`, that long after Earl Grey
+ * has finished walking, or the slot machine spinning, so it waits for him to arrive or it to land.
  */
-export type Cue = { at: number; action: Action; afterWalk?: boolean }
+export type Cue = { at: number; action: Action; after?: 'walk' | 'spin' }
 
 export type Line = {
   text: string
@@ -98,7 +101,8 @@ const ROUTE = {
 }
 
 const at = (ms: number, action: Action): Cue => ({ at: ms, action })
-const arrived = (ms: number, action: Action): Cue => ({ at: ms, action, afterWalk: true })
+const arrived = (ms: number, action: Action): Cue => ({ at: ms, action, after: 'walk' })
+const spun = (ms: number, action: Action): Cue => ({ at: ms, action, after: 'spin' })
 
 export const TUTORIAL: Beat[] = [
   {
@@ -115,7 +119,7 @@ export const TUTORIAL: Beat[] = [
         gesture: 'wave',
       },
       {
-        text: 'The aim of this adventure is to gather every one of the magic gems. But how do we get them?',
+        text: 'The aim of this adventure is to gather all the magic gems. But how do we get them?',
         gesture: 'think',
       },
     ],
@@ -177,8 +181,9 @@ export const TUTORIAL: Beat[] = [
       {
         text: 'In this manner you may see the path that lies ahead. The tile you must currently conquer is shown in the sidebar of glory.',
         cues: [
-          at(200, { kind: 'reveal', what: ['panel'] }),
-          at(900, { kind: 'spotlight', target: 'current-tile' }),
+          // He has landed by the time the panel shows, so it shows his tile.
+          arrived(200, { kind: 'reveal', what: ['panel'], dip: true }),
+          arrived(1600, { kind: 'spotlight', target: 'current-tile' }),
         ],
       },
       {
@@ -204,14 +209,18 @@ export const TUTORIAL: Beat[] = [
         text: 'Ha! What a gracious day this is! We appear to have landed on a minigame.',
         gesture: 'cheer',
         cues: [
-          arrived(200, { kind: 'spin', winner: 'First to touch grass' }),
+          arrived(200, { kind: 'spin' }),
           arrived(600, { kind: 'say', text: 'Ooh, a red one!' }),
         ],
       },
-      { text: 'Minigames can be started at any time, and any team can take part.' },
+      {
+        text: 'Minigames can be started at any time, and any team can take part.',
+        cues: [spun(200, { kind: 'spotlight', target: 'minigames' })],
+      },
       {
         text: 'They are a sport worthy of a true champion, and reward the valiant with gold with which to purchase wares.',
         gesture: 'clap',
+        cues: [spun(200, { kind: 'spotlight', target: 'minigames' })],
       },
     ],
   },

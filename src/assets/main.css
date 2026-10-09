@@ -210,3 +210,11 @@ select {
 .tutorial-hidden {
   display: none !important;
 }
+.tutorial-reveal {
+  animation: tutorial-reveal 0.9s ease both;
+}
+@keyframes tutorial-reveal {
+  from {
+    opacity: 0;
+  }
+}

@@ -45,14 +45,15 @@ const {
   choreography: liveChoreography,
 } = storeToRefs(game)
 
-// The tutorial plays on its own frozen world (tutorial/world), so the tour looks the same whatever
-// the live game does; the live game comes back when it ends.
+// The tutorial plays on its own frozen world (tutorial/world) with Earl Grey as a team in it
+// (tutorial/pretend), so the tour looks the same whatever the live game does; the live game comes
+// back when it ends.
 const world = computed(() => (tutorial.staged ? tutorial.world : null))
 const board = computed(() => world.value?.board ?? liveBoard.value)
-const state = computed(() => world.value?.state ?? liveState.value)
+const state = computed(() => (world.value ? tutorial.tourState : null) ?? liveState.value)
 const challenges = computed(() => world.value?.challenges ?? liveChallenges.value)
 const choreography = computed(() => world.value?.choreography ?? liveChoreography.value)
-const names = computed(() => world.value?.names ?? game.names)
+const names = computed(() => (world.value ? tutorial.tourNames : null) ?? game.names)
 const standings = computed(() =>
   world.value ? [...world.value.state.teams.values()].sort(byStanding) : liveStandings.value,
 )
@@ -176,8 +177,8 @@ function watchedTeam(): TeamId | null {
 }
 
 /** The team the overview shows: the one followed, else the captain's own, else the leader. */
-const focus = computed(
-  () => followed.value ?? (world.value ? null : my.team) ?? standings.value[0] ?? null,
+const focus = computed(() =>
+  world.value ? tutorial.guideTeam : (followed.value ?? my.team ?? standings.value[0] ?? null),
 )
 
 /** A team picked on the map: follow it and show it in the overview. */
@@ -593,7 +594,13 @@ async function buyMysteryBox() {
               :moving="isAnimating(focus.id)"
             />
           </TtPanel>
-          <EventsPanel :state="state" :challenges="challenges" :names="names" :now="now" />
+          <EventsPanel
+            :state="state"
+            :challenges="challenges"
+            :names="names"
+            :now="now"
+            data-tutorial-spot="minigames"
+          />
         </div>
         <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" />
         <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />

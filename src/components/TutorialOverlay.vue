@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { FROM_BLACK_MS, TO_BLACK_MS, useTutorialStore } from '@/stores/tutorial'
+import { useTutorialStore } from '@/stores/tutorial'
 
-// Black over the whole page as the tutorial opens: it fades in over the page as it was, and out
-// again over the tutorial's own scene (TutorialStage), set up underneath while it was black.
+// Black over the whole page while the tutorial changes scene under it: as a tour opens (from the
+// page as it was to the tour's own scene), around changes that move the layout, and as it ends.
 
 const tutorial = useTutorialStore()
 </script>
@@ -10,8 +10,8 @@ const tutorial = useTutorialStore()
 <template>
   <div
     class="cover fixed inset-0 z-[3000] bg-black"
-    :class="tutorial.phase === 'fading' ? 'cover-in' : 'cover-out'"
-    :style="{ '--in': `${TO_BLACK_MS}ms`, '--out': `${FROM_BLACK_MS}ms` }"
+    :class="tutorial.cover === 'in' ? 'cover-in' : 'cover-out'"
+    :style="{ '--in': `${tutorial.coverMs.in}ms`, '--out': `${tutorial.coverMs.out}ms` }"
     aria-hidden="true"
   />
 </template>
@@ -22,7 +22,7 @@ const tutorial = useTutorialStore()
 }
 .cover-out {
   animation: cover-out var(--out) ease both;
-  /* Begin works while the black lifts. */
+  /* What's underneath works while the black lifts. */
   pointer-events: none;
 }
 @keyframes cover-in {

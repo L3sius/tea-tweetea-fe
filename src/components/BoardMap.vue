@@ -1251,7 +1251,14 @@ watch(
 watch(() => props.follow, zoomAroundCentre)
 watch(
   () => props.inspect,
-  (tile) => showInfo(tile ?? null, true),
+  (tile) => {
+    showInfo(tile ?? null, true)
+    // A task card the tutorial points at fades in; hovering one stays instant.
+    const card = tile != null ? infoTip.getElement() : null
+    card?.classList.remove('tip-reveal')
+    void card?.offsetWidth
+    card?.classList.add('tip-reveal')
+  },
 )
 watch(
   () => props.layers,
@@ -1492,6 +1499,10 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   /* The tutorial fades the map in. */
   transition: opacity 1.8s ease;
   image-rendering: pixelated;
+}
+/* A task card the tutorial points at. */
+.board-map .leaflet-tooltip.tip-reveal {
+  animation: gem-fade-in 0.8s ease both;
 }
 /* Shops and traps the tutorial brings in. */
 .board-map.fade-landmarks :is(.shop-marker, .blocker-marker) {

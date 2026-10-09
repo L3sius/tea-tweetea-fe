@@ -106,50 +106,62 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
       <TtButton size="sm" @click="tutorial.finish()">Skip</TtButton>
     </div>
 
-    <!-- What he shows on the board: a minigame's slot machine, a shop's wares. -->
-    <div
-      v-if="tutorial.spin || tutorial.shopTile !== null"
-      class="pointer-events-none absolute inset-x-3 top-16 bottom-56 flex justify-center"
-    >
-      <div class="pointer-events-auto max-h-full w-[min(720px,100%)] overflow-y-auto">
-        <MinigameSpin
-          v-if="tutorial.spin"
-          :key="tutorial.spin.id"
-          :spin="{
-            id: `tour-${tutorial.spin.id}`,
-            teamId: null,
-            winner: tutorial.spin.winner,
-            alert: null,
-          }"
-          :team-name="GUIDE.name"
-          team-color="var(--osrs-orange)"
-          @done="tutorial.endSpin()"
-        />
-        <ShopPanel
-          v-else
-          :buyer="null"
-          :stock="shopStock"
-          :held="0"
-          :inventory-limit="game.rules?.inventoryLimit ?? 0"
-          :pending="false"
-          @close="tutorial.closeShop()"
-        />
-      </div>
-    </div>
-
-    <!-- The outline round the part of the page he's pointing at. -->
-    <Teleport to="body">
+    <!-- What he shows on the board: a minigame's slot machine, a shop's wares. Each fades. -->
+    <Transition name="fade-slow">
       <div
-        v-if="spot"
-        class="spotlight"
-        :style="{
-          left: `${spot.left - 6}px`,
-          top: `${spot.top - 6}px`,
-          width: `${spot.width + 12}px`,
-          height: `${spot.height + 12}px`,
-        }"
-        aria-hidden="true"
-      />
+        v-if="tutorial.spin"
+        class="pointer-events-none absolute inset-x-3 top-16 bottom-56 flex justify-center"
+      >
+        <div class="pointer-events-auto max-h-full w-[min(720px,100%)] overflow-y-auto">
+          <MinigameSpin
+            :key="tutorial.spin.id"
+            :spin="{
+              id: `tour-${tutorial.spin.id}`,
+              teamId: null,
+              winner: tutorial.spin.winner,
+              alert: null,
+            }"
+            :team-name="GUIDE.name"
+            team-color="var(--osrs-orange)"
+            @done="tutorial.endSpin()"
+          />
+        </div>
+      </div>
+    </Transition>
+    <Transition name="fade-slow">
+      <div
+        v-if="tutorial.shopTile !== null"
+        class="pointer-events-none absolute inset-x-3 top-16 bottom-56 flex justify-center"
+      >
+        <div class="pointer-events-auto max-h-full w-[min(720px,100%)] overflow-y-auto">
+          <ShopPanel
+            :buyer="null"
+            :stock="shopStock"
+            :held="0"
+            :inventory-limit="game.rules?.inventoryLimit ?? 0"
+            :pending="false"
+            @close="tutorial.closeShop()"
+          />
+        </div>
+      </div>
+    </Transition>
+
+    <!-- The part of the page he points at, outlined in a dimmed page. It sits under this stage, so
+         the chatbox and what he shows stay bright; the dim fades, and the outline glides. -->
+    <Teleport to="body">
+      <Transition name="spot">
+        <div
+          v-if="spot"
+          class="spotlight"
+          :style="{
+            left: `${spot.left - 6}px`,
+            top: `${spot.top - 6}px`,
+            width: `${spot.width + 12}px`,
+            height: `${spot.height + 12}px`,
+          }"
+          aria-hidden="true"
+        />
+      </Transition>
     </Teleport>
 
     <Transition name="fade-slow">
@@ -196,12 +208,24 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 .chatbox {
   cursor: pointer;
 }
-/* A pulsing gold outline, like a quest marker. */
+/* A pulsing gold outline, like a quest marker, cut out of a dimmed page. */
 .spotlight {
   position: fixed;
-  z-index: 3500;
+  /* Over the page and its panels (1000s), under the tour's own stage (1100). */
+  z-index: 1090;
   pointer-events: none;
   border: 3px solid var(--osrs-yellow);
+  box-shadow: 0 0 0 200vmax rgb(0 0 0 / 0.55);
+  transition:
+    left 0.45s ease,
+    top 0.45s ease,
+    width 0.45s ease,
+    height 0.45s ease;
+}
+.spotlight::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
   box-shadow:
     0 0 0 2px #000,
     0 0 18px 4px rgb(255 255 0 / 0.55);
@@ -213,6 +237,14 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
       0 0 0 2px #000,
       0 0 6px 1px rgb(255 255 0 / 0.3);
   }
+}
+.spot-enter-active,
+.spot-leave-active {
+  transition: opacity 0.6s ease;
+}
+.spot-enter-from,
+.spot-leave-to {
+  opacity: 0;
 }
 /* Begin: the title fades out as the chatbox (and, on the map, the board) fade in. */
 .fade-slow-enter-active,
