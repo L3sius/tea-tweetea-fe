@@ -10,6 +10,8 @@ const TICK_MS = 100
 
 /** One loaded copy of each sound; each play is a clone, so a sound can overlap itself. */
 const loaded = new Map<SoundName, HTMLAudioElement>()
+/** Sounds playing now, so a change of volume or mute reaches them mid-play (a jingle runs 9 s). */
+const playing = new Set<HTMLAudioElement>()
 
 export function playEffect(name: SoundName) {
   if (isMuted()) return
@@ -21,7 +23,19 @@ export function playEffect(name: SoundName) {
   }
   const copy = audio.cloneNode() as HTMLAudioElement
   copy.volume = getVolume()
-  copy.play().catch(() => {})
+  const done = () => playing.delete(copy)
+  copy.addEventListener('ended', done, { once: true })
+  copy.addEventListener('error', done, { once: true })
+  playing.add(copy)
+  copy.play().catch(done)
+}
+
+/** Brings the sounds playing now to the site's volume and mute, after the player changes them. */
+export function followSettings() {
+  for (const audio of playing) {
+    audio.volume = getVolume()
+    audio.muted = isMuted()
+  }
 }
 
 /** Where scheduled sounds come from: the live board, and a replay while one plays. */
