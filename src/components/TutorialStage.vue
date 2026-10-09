@@ -41,6 +41,8 @@ const typed = ref(0)
 let typingFrom = performance.now()
 const typing = computed(() => typed.value < tutorial.text.length)
 const shownText = computed(() => tutorial.text.slice(0, typed.value))
+/** The rest of the line, laid out but invisible, so typed letters appear where they end up. */
+const untypedText = computed(() => tutorial.text.slice(typed.value))
 
 watch(
   () => tutorial.text,
@@ -184,7 +186,10 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
         </div>
         <div class="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
           <TtText :size="1" font="bold" color="orange">{{ GUIDE.name }}</TtText>
-          <p class="tt-1 min-h-[3lh] text-white" aria-live="polite">{{ shownText }}</p>
+          <p class="tt-1 min-h-[3lh] text-white">
+            <span aria-live="polite">{{ shownText }}</span
+            ><span class="invisible" aria-hidden="true">{{ untypedText }}</span>
+          </p>
           <div class="relative mt-auto flex w-full items-center justify-center">
             <button
               v-if="!tutorial.isFirst"

@@ -263,13 +263,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
   function showLine(index: number) {
     flush('line')
     line.value = index
+    spotlight.value = null
     const shown = current.value?.lines[index]
-    // A highlight ends with its line, unless the next line highlights the same part, when it stays
-    // put instead of fading out and in again.
-    const keeps = shown?.cues?.some(
-      (c) => c.action.kind === 'spotlight' && c.action.target === spotlight.value,
-    )
-    if (!keeps) spotlight.value = null
     if (shown?.gesture) gestureNow(shown.gesture)
     schedule('line', shown?.cues)
   }

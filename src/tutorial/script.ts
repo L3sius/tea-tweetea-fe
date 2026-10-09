@@ -191,10 +191,7 @@ export const TUTORIAL: Beat[] = [
         gesture: 'nod',
         cues: [at(300, { kind: 'reveal', what: ['teams'] })],
       },
-      {
-        text: "Every player's contribution adds to the progress of the tile.",
-        cues: [at(300, { kind: 'spotlight', target: 'current-tile' })],
-      },
+      { text: "Every player's contribution adds to the progress of the tile." },
     ],
   },
   {
@@ -220,7 +217,6 @@ export const TUTORIAL: Beat[] = [
       {
         text: 'They are a sport worthy of a true champion, and reward the valiant with gold with which to purchase wares.',
         gesture: 'clap',
-        cues: [spun(200, { kind: 'spotlight', target: 'minigames' })],
       },
     ],
   },
