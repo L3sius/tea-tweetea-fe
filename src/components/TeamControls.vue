@@ -17,6 +17,7 @@ import type { Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
 import { teamColor } from '@/ui/colors'
+import { count } from '@/ui/format'
 import {
   GEM_NAMES,
   TtButton,
@@ -524,7 +525,9 @@ async function login() {
         <div class="flex items-center gap-3">
           <PlayingCard :card="team.status.card" />
           <div class="flex flex-col items-center gap-1">
-            <TtText :size="2" color="white" glow>Move {{ team.status.length }} tiles</TtText>
+            <TtText :size="2" color="white" glow
+              >Move {{ count(team.status.length, 'tile') }}</TtText
+            >
             <TtText v-if="team.status.length < team.status.steps" :size="1" color="muted">
               The card is worth {{ team.status.steps }}, but no walk is that long.
             </TtText>

@@ -13,6 +13,7 @@ import type { ChallengeId } from '@/domain/ids'
 import { itemEntry } from '@/domain/items'
 import { GEMS, type Item } from '@/domain/vocabulary'
 import { teamColor } from '@/ui/colors'
+import { count } from '@/ui/format'
 import { TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
@@ -66,7 +67,7 @@ const items = computed(() =>
       </TtText>
       <TtText :size="1" color="white">
         {{ team.gems.size }} / {{ GEMS.length }} gems · {{ team.gold }} gold ·
-        {{ team.tilesCompleted }} tiles
+        {{ count(team.tilesCompleted, 'tile') }}
       </TtText>
     </header>
 

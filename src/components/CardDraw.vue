@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import jester from '@/assets/cards/jacky-jester.png'
 import { cardLabel } from '@/domain/describe'
 import type { Card } from '@/domain/game'
 
@@ -104,7 +105,7 @@ function fanStyle(i: number) {
             <span class="corner bottom">{{ rank }}<br />{{ suit }}</span>
           </template>
           <template v-else-if="result">
-            <span class="pip joker tt-sprite tt-icon-mystery-box" />
+            <img class="pip joker" :src="jester" alt="" />
             <span class="big joker-text">JOKER</span>
           </template>
         </span>
@@ -219,9 +220,10 @@ function fanStyle(i: number) {
   margin-top: -14px;
 }
 .draw-card-face .pip.joker {
-  width: 39px;
-  height: 42px;
-  background-size: contain;
+  width: 64px;
+  margin-top: 0;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0 #000);
 }
 .draw-card-face .big {
   position: absolute;

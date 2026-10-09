@@ -51,6 +51,7 @@ import type { BoardLayer, RevealName } from '@/tutorial/script'
 import { characterElement, spriteElement } from '@/map/sprite'
 import { itemEntry } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
+import jester from '@/assets/cards/jacky-jester.png'
 import { liveCanvas } from '@/map/liveCanvas'
 import { tileTheme } from '@/map/tileTheme'
 import { CRS_ORIGIN, imageBounds, terrainScene, tileCentre, worldMap } from '@/map/world'
@@ -1112,7 +1113,13 @@ function cardCue(card: Card): HTMLElement {
   el.innerHTML =
     '<span class="mini"><span class="mini-back"></span><span class="mini-face"></span></span>'
   const face = el.querySelector('.mini-face')
-  if (face) face.textContent = card.kind === 'joker' ? '🃏' : cardLabel(card)
+  if (face && card.kind === 'joker') {
+    const img = document.createElement('img')
+    img.src = jester
+    img.alt = ''
+    img.className = 'mini-jester'
+    face.append(img)
+  } else if (face) face.textContent = cardLabel(card)
   return el
 }
 
@@ -2067,6 +2074,10 @@ defineExpose({ locate, panTo, zoomBy, showAll })
     inset 0 0 0 2px var(--stone-hi),
     2px 2px 0 #000;
   transform: rotateY(180deg);
+}
+.board-map .cue-card .mini-jester {
+  width: 88%;
+  image-rendering: pixelated;
 }
 .board-map .cue-card .mini-face {
   background: #e8dcb8;

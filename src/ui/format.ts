@@ -18,6 +18,9 @@ export function timeFrom(date: Date, now: Date): string {
   return relative.format(Math.trunc(amount), 'day')
 }
 
+/** "1 tile", "3 tiles": a count with its noun, in the plural unless it is one. */
+export const count = (n: number, noun: string) => `${n} ${n === 1 ? noun : `${noun}s`}`
+
 /** OSRS-style gp: 950, 12.5k, 2.4m, 1.1b. */
 export function formatGp(value: number): string {
   const units: [number, string][] = [
