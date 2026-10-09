@@ -20,7 +20,7 @@ import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { useCharacterStore } from '@/stores/characters'
-import { useGameStore } from '@/stores/game'
+import { byStanding, useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
 import { useTutorialStore } from '@/stores/tutorial'
@@ -33,8 +33,33 @@ const my = useTeamStore()
 const dev = useDevStore()
 const characters = useCharacterStore()
 const tutorial = useTutorialStore()
-const { board, challenges, state, feed, log, loading, standings, alerts, choreography } =
-  storeToRefs(game)
+const {
+  board: liveBoard,
+  challenges: liveChallenges,
+  state: liveState,
+  feed,
+  log,
+  loading,
+  standings: liveStandings,
+  alerts,
+  choreography: liveChoreography,
+} = storeToRefs(game)
+
+// The tutorial plays on its own frozen world (tutorial/world), so the tour looks the same whatever
+// the live game does; the live game comes back when it ends.
+const world = computed(() => (tutorial.staged ? tutorial.world : null))
+const board = computed(() => world.value?.board ?? liveBoard.value)
+const state = computed(() => world.value?.state ?? liveState.value)
+const challenges = computed(() => world.value?.challenges ?? liveChallenges.value)
+const choreography = computed(() => world.value?.choreography ?? liveChoreography.value)
+const names = computed(() => world.value?.names ?? game.names)
+const standings = computed(() =>
+  world.value ? [...world.value.state.teams.values()].sort(byStanding) : liveStandings.value,
+)
+const appearanceOf = (team: TeamId) =>
+  world.value
+    ? (world.value.state.teams.get(team)?.appearance ?? null)
+    : characters.appearanceOf(team)
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
 const boardMap = useTemplateRef('boardMap')
 
@@ -100,6 +125,12 @@ function openTab(id: Tab) {
   sheetOpen.value = true
 }
 
+// The tutorial shows the side panel on its overview, where the current tile is.
+watch(
+  () => tutorial.staged && tutorial.revealed.has('panel'),
+  (shown) => shown && openTab('overview'),
+)
+
 /** The team this viewer last chose to follow, so the overview opens on it next time. */
 const WATCH_KEY = 'tweetea.watchTeam'
 
@@ -145,7 +176,9 @@ function watchedTeam(): TeamId | null {
 }
 
 /** The team the overview shows: the one followed, else the captain's own, else the leader. */
-const focus = computed(() => followed.value ?? my.team ?? standings.value[0] ?? null)
+const focus = computed(
+  () => followed.value ?? (world.value ? null : my.team) ?? standings.value[0] ?? null,
+)
 
 /** A team picked on the map: follow it and show it in the overview. */
 function showTeam(id: TeamId) {
@@ -254,7 +287,7 @@ async function buyMysteryBox() {
         :board="board"
         :state="state"
         :challenges="challenges"
-        :names="game.names"
+        :names="names"
         :choreography="choreography"
         :server-now="game.serverNow"
         :selected="selected"
@@ -267,11 +300,12 @@ async function buyMysteryBox() {
         :options="picking ? my.options : null"
         :target-tiles="dev.pickingTile ? allTiles : my.targetableTiles"
         :hide-cues-for="my.drawPhase !== 'idle' ? my.teamId : null"
-        :replay="game.replay"
-        :dev-quote="dev.quote"
-        :appearance-of="characters.appearanceOf"
+        :replay="world ? null : game.replay"
+        :dev-quote="world ? null : dev.quote"
+        :appearance-of="appearanceOf"
         :layers="tutorial.staged ? tutorial.revealed : null"
         :guide="tutorial.staged ? tutorial.guide : null"
+        :inspect="tutorial.staged ? tutorial.inspecting : null"
         @hover="onHover"
         @pick="onPick"
         @free-roam="freeRoam"
@@ -521,7 +555,13 @@ async function buyMysteryBox() {
         class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
       >
         <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
-          <TtPanel title="Current tile" width="100%" :padding="12" :gap="10">
+          <TtPanel
+            title="Current tile"
+            width="100%"
+            :padding="12"
+            :gap="10"
+            data-tutorial-spot="current-tile"
+          >
             <!-- Which team to watch, on phones only: wider screens pick it on the map's team strip,
                  which phones hide to keep the small map clear. -->
             <div
@@ -545,22 +585,22 @@ async function buyMysteryBox() {
             <TeamCard
               v-if="focus"
               :team="focus"
-              :items="my.team?.id === focus.id ? my.items : null"
+              :items="!world && my.team?.id === focus.id ? my.items : null"
               :state="state"
               :challenges="challenges"
-              :names="game.names"
+              :names="names"
               :now="now"
               :moving="isAnimating(focus.id)"
             />
           </TtPanel>
-          <EventsPanel :state="state" :challenges="challenges" :names="game.names" :now="now" />
+          <EventsPanel :state="state" :challenges="challenges" :names="names" :now="now" />
         </div>
         <TeamControls v-else-if="tab === 'play'" @open-shop="openShop" />
         <ActivityFeed v-else-if="tab === 'feed'" :feed="feed" :teams="state.teams" :now="now" />
         <GameLog
           v-else
           :log="log"
-          :names="game.names"
+          :names="names"
           :teams="state.teams"
           :now="now"
           :revealed="revealed"

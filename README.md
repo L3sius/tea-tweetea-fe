@@ -83,6 +83,9 @@ A first visit opens a guided tour of the board (and "How to play" replays it): E
 player through it while the page builds itself up part by part.
 
 - `src/tutorial/script.ts` holds the lines, gestures, camera moves and what each beat reveals.
+- The tour plays on its own frozen world (`src/tutorial/world/`: a copy of the board and of the
+  sample game), so it looks the same whatever the live map and game become. Earl Grey's routes are
+  tiles of that board, checked by `script.spec.ts`.
 - `stores/tutorial.ts` plays it; parts of the page are named with `v-tutorial="'panel'"`, and the
   map's layers with BoardMap's `layers` prop, so the script never depends on particular markup.
 - Whether a browser has seen it is kept in `localStorage` (`tweetea.tutorial`); bump `VERSION` in

@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { ROSTER } from '@/characters/roster'
-import type { Board } from '@/domain/board'
-import { tileId } from '@/domain/ids'
-import { pathFrom } from '@/stores/tutorial'
+import { tileId, type TileId } from '@/domain/ids'
 import { GUIDE } from './guide'
-import { GESTURE, TUTORIAL } from './script'
+import { GESTURE, TOUR_START, TUTORIAL, type Action } from './script'
+import { decodeTutorialWorld } from './world'
+import board from './world/board.json'
+import challenges from './world/challenges.json'
+import state from './world/state.json'
+
+const world = decodeTutorialWorld({ board, state, challenges })
+
+/** Every action in the order the tour plays it: each beat's cues, then each line's, by time. */
+function actionsInOrder(): Action[] {
+  const byTime = (cues: { at: number; action: Action }[] = []) =>
+    [...cues].sort((a, b) => a.at - b.at).map((c) => c.action)
+  return TUTORIAL.flatMap((beat) => [
+    ...byTime(beat.cues),
+    ...beat.lines.flatMap((line) => byTime(line.cues)),
+  ])
+}
 
 describe('the tutorial script', () => {
   it("only uses animations the export ships (it ships the roster's)", () => {
@@ -22,32 +36,30 @@ describe('the tutorial script', () => {
   })
 })
 
-describe('pathFrom', () => {
-  // A crossroads at 1: 0 west, 2 east, 3 further east, 4 north.
-  const tiles = [
-    [0, -1, 0],
-    [1, 0, 0],
-    [2, 1, 0],
-    [3, 2, 0],
-    [4, 0, 1],
-  ] as const
-  const board = {
-    tiles: new Map(
-      tiles.map(([id, x, y]) => [tileId(id), { id: tileId(id), x, y, kind: 'normal' }]),
-    ),
-    roads: [
-      [0, 1],
-      [1, 2],
-      [2, 3],
-      [1, 4],
-    ].map(([a, b]) => [tileId(a ?? 0), tileId(b ?? 0)]),
-  } as unknown as Board
+describe("Earl Grey's routes on the tutorial's board", () => {
+  const roads = new Set(world.board.roads.flatMap(([a, b]) => [`${a}-${b}`, `${b}-${a}`]))
+  const kindOf = (tile: TileId) => world.board.tiles.get(tile)?.kind
 
-  it('walks along roads, heading away from where it set off', () => {
-    expect(pathFrom(board, tileId(1), 2)).toEqual([1, 2, 3])
+  it('follow its roads, each starting where the last one ended', () => {
+    let here = tileId(TOUR_START)
+    for (const action of actionsInOrder()) {
+      if (action.kind !== 'walk') continue
+      const path = action.path.map(tileId)
+      expect(path[0]).toBe(here)
+      for (let i = 1; i < path.length; i++)
+        expect(roads.has(`${path[i - 1]}-${path[i]}`)).toBe(true)
+      here = path.at(-1) ?? here
+    }
   })
 
-  it('stops at a dead end instead of doubling back', () => {
-    expect(pathFrom(board, tileId(0), 5)).toEqual([0, 1, 2, 3])
+  it('land where his lines say: a plain tile, a red tile for the minigame, then a shop', () => {
+    let here = tileId(TOUR_START)
+    const seen: Record<string, string | undefined> = {}
+    for (const action of actionsInOrder()) {
+      if (action.kind === 'walk') here = tileId(action.path.at(-1) ?? here)
+      if (action.kind === 'inspect' || action.kind === 'spin' || action.kind === 'shop')
+        seen[action.kind] = kindOf(here)
+    }
+    expect(seen).toEqual({ inspect: 'normal', spin: 'red', shop: 'shop' })
   })
 })

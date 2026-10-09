@@ -2,7 +2,10 @@
 import { useEventListener, useRafFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import CharacterPreview from '@/components/CharacterPreview.vue'
+import MinigameSpin from '@/components/MinigameSpin.vue'
+import ShopPanel from '@/components/ShopPanel.vue'
 import { HEADING } from '@/characters/heading'
+import { useGameStore } from '@/stores/game'
 import { useTutorialStore } from '@/stores/tutorial'
 import { GUIDE } from '@/tutorial/guide'
 import { TtButton, TtText } from '@/ui/tt'
@@ -13,7 +16,23 @@ import { TtButton, TtText } from '@/ui/tt'
 // moves on; ← goes back and Esc skips.
 
 const tutorial = useTutorialStore()
+const game = useGameStore()
 const playing = computed(() => tutorial.phase === 'playing')
+
+/** Where the outlined part of the page is on screen, followed as the page moves. */
+const spot = ref<{ left: number; top: number; width: number; height: number } | null>(null)
+useRafFn(() => {
+  const name = tutorial.spotlight
+  const el = name ? document.querySelector(`[data-tutorial-spot="${name}"]`) : null
+  const r = el?.getBoundingClientRect()
+  const next =
+    r && r.width > 0 ? { left: r.left, top: r.top, width: r.width, height: r.height } : null
+  if (JSON.stringify(next) !== JSON.stringify(spot.value)) spot.value = next
+})
+
+const shopStock = computed(() =>
+  tutorial.shopTile === null ? [] : (game.state?.shops.get(tutorial.shopTile) ?? []),
+)
 
 /** Letters typed per second, as the chatbox spells his lines out. */
 const TYPE_RATE = 45
@@ -87,6 +106,52 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
       <TtButton size="sm" @click="tutorial.finish()">Skip</TtButton>
     </div>
 
+    <!-- What he shows on the board: a minigame's slot machine, a shop's wares. -->
+    <div
+      v-if="tutorial.spin || tutorial.shopTile !== null"
+      class="pointer-events-none absolute inset-x-3 top-16 bottom-56 flex justify-center"
+    >
+      <div class="pointer-events-auto max-h-full w-[min(720px,100%)] overflow-y-auto">
+        <MinigameSpin
+          v-if="tutorial.spin"
+          :key="tutorial.spin.id"
+          :spin="{
+            id: `tour-${tutorial.spin.id}`,
+            teamId: null,
+            winner: tutorial.spin.winner,
+            alert: null,
+          }"
+          :team-name="GUIDE.name"
+          team-color="var(--osrs-orange)"
+          @done="tutorial.endSpin()"
+        />
+        <ShopPanel
+          v-else
+          :buyer="null"
+          :stock="shopStock"
+          :held="0"
+          :inventory-limit="game.rules?.inventoryLimit ?? 0"
+          :pending="false"
+          @close="tutorial.closeShop()"
+        />
+      </div>
+    </div>
+
+    <!-- The outline round the part of the page he's pointing at. -->
+    <Teleport to="body">
+      <div
+        v-if="spot"
+        class="spotlight"
+        :style="{
+          left: `${spot.left - 6}px`,
+          top: `${spot.top - 6}px`,
+          width: `${spot.width + 12}px`,
+          height: `${spot.height + 12}px`,
+        }"
+        aria-hidden="true"
+      />
+    </Teleport>
+
     <Transition name="fade-slow">
       <section
         v-if="playing"
@@ -130,6 +195,24 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
 <style scoped>
 .chatbox {
   cursor: pointer;
+}
+/* A pulsing gold outline, like a quest marker. */
+.spotlight {
+  position: fixed;
+  z-index: 3500;
+  pointer-events: none;
+  border: 3px solid var(--osrs-yellow);
+  box-shadow:
+    0 0 0 2px #000,
+    0 0 18px 4px rgb(255 255 0 / 0.55);
+  animation: spotlight-pulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes spotlight-pulse {
+  to {
+    box-shadow:
+      0 0 0 2px #000,
+      0 0 6px 1px rgb(255 255 0 / 0.3);
+  }
 }
 /* Begin: the title fades out as the chatbox (and, on the map, the board) fade in. */
 .fade-slow-enter-active,

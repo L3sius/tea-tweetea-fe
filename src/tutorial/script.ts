@@ -20,6 +20,9 @@ export type RevealName =
   | 'panel'
   | 'controls'
 
+/** Parts of the page the tutorial can outline (marked with `data-tutorial-spot`). */
+export type SpotName = 'current-tile'
+
 /** Map parts, drawn by BoardMap. */
 export type BoardLayer = Extract<
   RevealName,
@@ -44,14 +47,28 @@ export type Action =
   | { kind: 'reveal'; what: RevealName[] }
   /** Flies the camera to the whole map, or to Earl Grey at a zoom. */
   | { kind: 'camera'; to: 'all' | 'guide'; zoom?: number; ms: number }
-  /** Walks Earl Grey this many steps along the roads; 7 or more and he runs. */
-  | { kind: 'walk'; steps: number }
+  /**
+   * Walks Earl Grey along `path`: tiles of the tutorial's own board (tutorial/world), starting where
+   * he stands. 7 steps or more and he runs.
+   */
+  | { kind: 'walk'; path: number[] }
+  /** Shows the task card of the tile he stands on, as hovering a node does, until the beat ends. */
+  | { kind: 'inspect' }
+  /** Outlines a part of the page until the line ends. */
+  | { kind: 'spotlight'; target: SpotName }
+  /** Spins the minigame slot machine, landing on `winner`. */
+  | { kind: 'spin'; winner: string }
+  /** Opens the shop panel of the shop he stands on, until the beat ends. */
+  | { kind: 'shop' }
   | { kind: 'gesture'; gesture: Gesture }
   /** Flavour over his head, like overhead chat in the game; nothing the player must read. */
   | { kind: 'say'; text: string; ms?: number }
 
-/** An action at a time (ms) after its beat or line starts. */
-export type Cue = { at: number; action: Action }
+/**
+ * An action at a time (ms) after its beat or line starts; with `afterWalk`, that long after Earl
+ * Grey has finished walking, so it waits for him to arrive.
+ */
+export type Cue = { at: number; action: Action; afterWalk?: boolean }
 
 export type Line = {
   text: string
@@ -66,7 +83,22 @@ export type Beat = {
   lines: Line[]
 }
 
+/**
+ * Where Earl Grey starts: a tile in Ardougne. His routes below were picked on the tutorial's board
+ * so that each lands where his lines say (script.spec.ts checks them).
+ */
+export const TOUR_START = 130
+
+const ROUTE = {
+  stroll: [130, 131, 262, 77],
+  run: [77, 40, 45, 493, 310, 284, 283, 466, 44],
+  /** On to the red tile next door. */
+  toMinigame: [44, 308],
+  toShop: [308, 306, 307],
+}
+
 const at = (ms: number, action: Action): Cue => ({ at: ms, action })
+const arrived = (ms: number, action: Action): Cue => ({ at: ms, action, afterWalk: true })
 
 export const TUTORIAL: Beat[] = [
   {
@@ -121,13 +153,92 @@ export const TUTORIAL: Beat[] = [
       {
         text: 'A few tiles make for a short walk. Any soldier worth his salt covers such ground without haste.',
         cues: [
-          at(200, { kind: 'walk', steps: 3 }),
+          at(200, { kind: 'walk', path: ROUTE.stroll }),
           at(800, { kind: 'say', text: 'Mind the potholes.' }),
         ],
       },
       {
         text: 'But a brisk step favours the bold, and surely the bold shall earn true victory and pride!',
-        cues: [at(200, { kind: 'walk', steps: 8 }), at(900, { kind: 'say', text: 'Wheee!' })],
+        cues: [
+          at(200, { kind: 'walk', path: ROUTE.run }),
+          at(900, { kind: 'say', text: 'Wheee!' }),
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tile',
+    lines: [
+      {
+        text: 'Aha! It appears we have landed on a tile. Click or hover over a node, and we shall gaze upon the task at hand.',
+        gesture: 'beckon',
+        cues: [arrived(300, { kind: 'inspect' })],
+      },
+      {
+        text: 'In this manner you may see the path that lies ahead. The tile you must currently conquer is shown in the sidebar of glory.',
+        cues: [
+          at(200, { kind: 'reveal', what: ['panel'] }),
+          at(900, { kind: 'spotlight', target: 'current-tile' }),
+        ],
+      },
+      {
+        text: 'The road ahead is a dangerous one, and only as a team can you expect to take the crown.',
+        gesture: 'nod',
+        cues: [at(300, { kind: 'reveal', what: ['teams'] })],
+      },
+      {
+        text: "Every player's contribution adds to the progress of the tile.",
+        cues: [at(300, { kind: 'spotlight', target: 'current-tile' })],
+      },
+    ],
+  },
+  {
+    id: 'minigame',
+    lines: [
+      {
+        text: 'Let us proceed forth onto the next tile.',
+        gesture: 'beckon',
+        cues: [at(200, { kind: 'walk', path: ROUTE.toMinigame })],
+      },
+      {
+        text: 'Ha! What a gracious day this is! We appear to have landed on a minigame.',
+        gesture: 'cheer',
+        cues: [
+          arrived(200, { kind: 'spin', winner: 'First to touch grass' }),
+          arrived(600, { kind: 'say', text: 'Ooh, a red one!' }),
+        ],
+      },
+      { text: 'Minigames can be started at any time, and any team can take part.' },
+      {
+        text: 'They are a sport worthy of a true champion, and reward the valiant with gold with which to purchase wares.',
+        gesture: 'clap',
+      },
+    ],
+  },
+  {
+    id: 'shop',
+    lines: [
+      {
+        text: 'But dost thou ask where one can spend their hard-earned tender? Why, at the shop of course!',
+        gesture: 'laugh',
+        cues: [
+          at(200, { kind: 'reveal', what: ['landmarks'] }),
+          at(900, { kind: 'walk', path: ROUTE.toShop }),
+          arrived(400, { kind: 'say', text: '*rattles coin purse*' }),
+        ],
+      },
+      {
+        text: 'Every shop sells different items, and you must travel the globe to acquire all you can to achieve your goal.',
+        cues: [arrived(200, { kind: 'shop' })],
+      },
+    ],
+  },
+  {
+    id: 'farewell',
+    lines: [
+      {
+        text: "That's all from me for now. I wish thee good fortune in thy adventure!",
+        gesture: 'bow',
       },
     ],
   },

@@ -91,6 +91,8 @@ const props = defineProps<{
   layers?: ReadonlySet<RevealName> | null
   /** The tutorial's guide, walking the board. */
   guide?: Guide | null
+  /** A tile whose task card shows as if hovered (the tutorial points at one). */
+  inspect?: TileId | null
 }>()
 
 const emit = defineEmits<{
@@ -300,8 +302,9 @@ function applyLayers() {
   if (shown('nodes') && !spreadFrame) nodeLayer.addTo(map)
   reachLayer.addTo(map)
   routeLayer.addTo(map)
-  // Gems the tutorial brings in fade in, rather than appearing at once.
-  if (shown('gems') && !map.hasLayer(gemLayer) && props.layers) fadeIn('fade-gems')
+  // Pieces the tutorial brings in fade in, rather than appearing at once.
+  if (props.layers && shown('gems') && !map.hasLayer(gemLayer)) fadeIn('fade-gems')
+  if (props.layers && shown('landmarks') && !map.hasLayer(shopLayer)) fadeIn('fade-landmarks')
   for (const [layer, on] of [
     [gemLayer, shown('gems')],
     [shopLayer, shown('landmarks')],
@@ -1247,6 +1250,10 @@ watch(
 )
 watch(() => props.follow, zoomAroundCentre)
 watch(
+  () => props.inspect,
+  (tile) => showInfo(tile ?? null, true),
+)
+watch(
   () => props.layers,
   (now, before) => {
     // Roads appearing with the guide on the board spread out from him.
@@ -1486,6 +1493,10 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   transition: opacity 1.8s ease;
   image-rendering: pixelated;
 }
+/* Shops and traps the tutorial brings in. */
+.board-map.fade-landmarks :is(.shop-marker, .blocker-marker) {
+  animation: gem-fade-in 1.5s ease both;
+}
 /* Gems the tutorial brings in fade in, glinting as ever. */
 .board-map.fade-gems .gem-marker {
   animation:
@@ -1497,9 +1508,15 @@ defineExpose({ locate, panTo, zoomBy, showAll })
     opacity: 0;
   }
 }
-/* Teams the tutorial hasn't introduced yet; its guide and his lines still show. */
+/* Teams the tutorial hasn't introduced yet; its guide and his lines still show. They fade in. */
+.board-map .sprite-icon:not(.guide-icon) {
+  transition:
+    opacity 1.2s ease,
+    visibility 1.2s;
+}
 .board-map.hide-teams .sprite-icon:not(.guide-icon),
 .board-map.hide-teams .cue-icon:not(.guide-say) {
+  opacity: 0;
   visibility: hidden;
 }
 /* The guide stands a head taller than the teams' pieces. */

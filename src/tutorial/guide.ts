@@ -12,6 +12,3 @@ export const GUIDE = {
 
 /** The guide moves through a Choreography of his own, under an id no team has. */
 export const GUIDE_TEAM = teamId(-1)
-
-/** Where he starts: the tile nearest Lumbridge, where every adventure begins (world x, y). */
-export const LUMBRIDGE = { x: 3222, y: 3218 }

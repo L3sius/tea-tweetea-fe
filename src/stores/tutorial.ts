@@ -3,14 +3,21 @@ import { computed, markRaw, ref, shallowRef } from 'vue'
 import { ticksToMs, type Performance } from '@/characters/acting'
 import { animationInfoOf, loadAnimationInfo } from '@/characters/assets'
 import { RUN_FROM_STEPS } from '@/characters/roster'
-import type { Board } from '@/domain/board'
 import type { GameEvent } from '@/domain/events'
-import type { TileId } from '@/domain/ids'
+import { tileId, type TileId } from '@/domain/ids'
 import { Choreography, type Placement } from '@/domain/motion'
-import { adjacency } from '@/domain/paths'
-import { GUIDE, GUIDE_TEAM, LUMBRIDGE } from '@/tutorial/guide'
+import { GUIDE, GUIDE_TEAM } from '@/tutorial/guide'
 import * as music from '@/tutorial/music'
-import { GESTURE, TUTORIAL, type Action, type Cue, type RevealName } from '@/tutorial/script'
+import { loadTutorialWorld, type TutorialWorld } from '@/tutorial/world'
+import {
+  GESTURE,
+  TOUR_START,
+  TUTORIAL,
+  type Action,
+  type Cue,
+  type RevealName,
+  type SpotName,
+} from '@/tutorial/script'
 import { useGameStore } from './game'
 
 const SEEN_KEY = 'tweetea.tutorial'
@@ -59,6 +66,16 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const line = ref(0)
   const revealed = shallowRef<ReadonlySet<RevealName>>(new Set())
   const camera = shallowRef<CameraMove | null>(null)
+  /** The tile whose task card shows, as when hovering a node. */
+  const inspecting = ref<TileId | null>(null)
+  /** The part of the page outlined. */
+  const spotlight = ref<SpotName | null>(null)
+  /** The minigame slot machine, while it spins. */
+  const spin = shallowRef<{ id: number; winner: string } | null>(null)
+  /** The shop whose panel is open. */
+  const shopTile = ref<TileId | null>(null)
+  /** The board and game the tour is shown on (tutorial/world), once loaded. */
+  const world = shallowRef<TutorialWorld | null>(null)
   const muted = ref(music.isMuted())
 
   const active = computed(() => phase.value !== 'off')
@@ -108,11 +125,9 @@ export const useTutorialStore = defineStore('tutorial', () => {
     if (at !== null) choreography.know(GUIDE_TEAM, at)
   }
 
-  /** Walks him `steps` steps along the roads, heading away from where he set off. */
-  function walk(steps: number) {
-    const board = game.board
-    if (!board || tile === null) return
-    const path = pathFrom(board, tile, steps)
+  /** Walks him along `route` (tiles of the tutorial's board, from where he stands). */
+  function walk(route: readonly number[]) {
+    const path = route.map(tileId)
     if (path.length < 2) return
     const events: GameEvent[] = [
       { kind: 'move_confirmed', teamId: GUIDE_TEAM, path },
@@ -131,7 +146,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   // --- The script ---
 
-  type Pending = { timer: ReturnType<typeof setTimeout>; action: Action }
+  type Pending = { timer: ReturnType<typeof setTimeout> | undefined; action: Action }
   /** Cues waiting to happen: the beat's own, and the showing line's. */
   const pending: Record<'beat' | 'line', Pending[]> = { beat: [], line: [] }
 
@@ -146,7 +161,19 @@ export const useTutorialStore = defineStore('tutorial', () => {
         return
       }
       case 'walk':
-        return walk(action.steps)
+        return walk(action.path)
+      case 'inspect':
+        inspecting.value = tile
+        return
+      case 'spotlight':
+        spotlight.value = action.target
+        return
+      case 'spin':
+        spin.value = { id: ++spinId, winner: action.winner }
+        return
+      case 'shop':
+        shopTile.value = tile
+        return
       case 'gesture':
         return gestureNow(action.gesture)
       case 'say':
@@ -154,15 +181,26 @@ export const useTutorialStore = defineStore('tutorial', () => {
     }
   }
 
+  let spinId = 0
+
+  /** How long until Earl Grey stops walking (0 when he stands). */
+  const walkLeft = () => Math.max(0, choreography.settlesAt(GUIDE_TEAM) - game.serverNow())
+
   function schedule(owner: 'beat' | 'line', cues: readonly Cue[] = []) {
     for (const cue of cues) {
-      const entry: Pending = {
-        timer: setTimeout(() => {
-          pending[owner] = pending[owner].filter((p) => p !== entry)
-          run(cue.action)
-        }, cue.at),
-        action: cue.action,
+      const entry: Pending = { timer: undefined, action: cue.action }
+      // A cue for his arrival waits for any walk under way when it's due, even one that started
+      // after it was scheduled.
+      const due = () => {
+        const left = cue.afterWalk ? walkLeft() : 0
+        if (left > 0) {
+          entry.timer = setTimeout(due, left + cue.at)
+          return
+        }
+        pending[owner] = pending[owner].filter((p) => p !== entry)
+        run(cue.action)
       }
+      entry.timer = setTimeout(due, cue.at + (cue.afterWalk ? walkLeft() : 0))
       pending[owner].push(entry)
     }
   }
@@ -176,7 +214,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
     const left = pending[owner]
     pending[owner] = []
     for (const p of left) clearTimeout(p.timer)
-    for (const p of left) if (p.action.kind === 'reveal' || p.action.kind === 'walk') run(p.action)
+    const builds = ['reveal', 'walk']
+    for (const p of left) if (builds.includes(p.action.kind)) run(p.action)
     const lastCamera = left.filter((p) => p.action.kind === 'camera').at(-1)
     if (lastCamera) run(lastCamera.action)
   }
@@ -184,6 +223,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
   function showLine(index: number) {
     flush('line')
     line.value = index
+    spotlight.value = null
     const shown = current.value?.lines[index]
     if (shown?.gesture) gestureNow(shown.gesture)
     schedule('line', shown?.cues)
@@ -199,6 +239,9 @@ export const useTutorialStore = defineStore('tutorial', () => {
     if (at !== undefined) place(at)
     else if (tile !== null) beatTiles.set(index, tile)
     saying = null
+    inspecting.value = null
+    shopTile.value = null
+    spin.value = null
     schedule('beat', TUTORIAL[index]?.cues)
     showLine(0)
   }
@@ -228,21 +271,25 @@ export const useTutorialStore = defineStore('tutorial', () => {
     flush('line')
     flush('beat')
     void loadAnimationInfo()
+    const loaded = world.value ? Promise.resolve(world.value) : loadTutorialWorld()
     phase.value = 'fading'
     cover.value = true
-    fadeTimers.push(
-      setTimeout(() => {
-        beatTiles.clear()
-        revealed.value = new Set()
-        place(game.board ? startTile(game.board) : null)
-        phase.value = 'title'
-        run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
-        const since = game.serverNow()
-        gesture = { anim: GESTURE.wave, since, until: Infinity }
-        music.play(music.NEWBIE_MELODY)
-      }, TO_BLACK_MS),
-      setTimeout(() => (cover.value = false), TO_BLACK_MS + FROM_BLACK_MS),
-    )
+    // Once the page is black and the world has loaded, the title scene is set up under the black,
+    // which then lifts.
+    const black = new Promise((done) => fadeTimers.push(setTimeout(done, TO_BLACK_MS)))
+    void Promise.all([loaded, black]).then(([loadedWorld]) => {
+      if (phase.value !== 'fading') return
+      world.value = loadedWorld
+      beatTiles.clear()
+      revealed.value = new Set()
+      place(tileId(TOUR_START))
+      phase.value = 'title'
+      run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
+      const since = game.serverNow()
+      gesture = { anim: GESTURE.wave, since, until: Infinity }
+      music.play(music.NEWBIE_MELODY)
+      fadeTimers.push(setTimeout(() => (cover.value = false), FROM_BLACK_MS))
+    })
   }
 
   /** From the title scene into the tour: the title fades out, the map and chatbox fade in. */
@@ -287,6 +334,11 @@ export const useTutorialStore = defineStore('tutorial', () => {
     isLast,
     revealed,
     camera,
+    inspecting,
+    spotlight,
+    spin,
+    shopTile,
+    world,
     muted,
     guide,
     shows,
@@ -296,6 +348,8 @@ export const useTutorialStore = defineStore('tutorial', () => {
     back,
     finish,
     toggleMute,
+    endSpin: () => (spin.value = null),
+    closeShop: () => (shopTile.value = null),
   }
 })
 
@@ -311,47 +365,4 @@ function readSeen(): boolean {
 function revealsOf(beat: (typeof TUTORIAL)[number]): RevealName[] {
   const cues = [...(beat.cues ?? []), ...beat.lines.flatMap((l) => l.cues ?? [])]
   return cues.flatMap((c) => (c.action.kind === 'reveal' ? c.action.what : []))
-}
-
-/** The tile nearest Lumbridge. */
-function startTile(board: Board): TileId | null {
-  let best: TileId | null = null
-  let bestDistance = Infinity
-  for (const tile of board.tiles.values()) {
-    const d = Math.hypot(tile.x - LUMBRIDGE.x, tile.y - LUMBRIDGE.y)
-    if (tile.kind === 'normal' && d < bestDistance) {
-      best = tile.id
-      bestDistance = d
-    }
-  }
-  return best
-}
-
-/**
- * A walk of up to `steps` steps along the roads from `from` that never doubles back: the longest
- * there is, ending as far from `from` as it can. Roads branch little, so every walk is tried.
- */
-export function pathFrom(board: Board, from: TileId, steps: number): TileId[] {
-  const roads = adjacency(board.roads)
-  const origin = board.tiles.get(from)
-  const away = (t: TileId) => {
-    const at = board.tiles.get(t)
-    return at && origin ? Math.hypot(at.x - origin.x, at.y - origin.y) : 0
-  }
-  let best = [from]
-  const better = (path: TileId[]) =>
-    path.length > best.length ||
-    (path.length === best.length && away(path.at(-1) ?? from) > away(best.at(-1) ?? from))
-  const walk = (path: TileId[]) => {
-    if (better(path)) best = [...path]
-    if (path.length > steps) return
-    for (const next of roads.get(path.at(-1) ?? from) ?? []) {
-      if (path.includes(next)) continue
-      path.push(next)
-      walk(path)
-      path.pop()
-    }
-  }
-  walk([from])
-  return best
 }
