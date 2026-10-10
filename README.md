@@ -15,17 +15,17 @@ npm run dev        # offline, against recorded responses (see .env.development)
 
 To use a running game API instead, copy `.env.example` to `.env.development.local`.
 
-| Command                     | What it does                                        |
-| --------------------------- | --------------------------------------------------- |
-| `npm run dev`               | Dev server on http://localhost:5173                 |
-| `npm test`                  | Unit and component tests once (`test:unit` watches) |
-| `npm run test:e2e`          | Playwright end-to-end tests                         |
-| `npm run build`             | Type-check and production build                     |
-| `npm run lint`              | oxlint, then ESLint                                 |
-| `npm run format`            | Prettier                                            |
-| `npm run fixtures:refresh`  | Re-record API responses from a running server       |
-| `npm run characters:export` | Export OSRS characters (tools/characters/)          |
-| `npm run characters:upload` | Put them and the music on the server                |
+| Command                     | What it does                                             |
+| --------------------------- | -------------------------------------------------------- |
+| `npm run dev`               | Dev server on http://localhost:5173                      |
+| `npm test`                  | Unit and component tests once (`test:unit` watches)      |
+| `npm run test:e2e`          | Playwright end-to-end tests ([docs/e2e.md](docs/e2e.md)) |
+| `npm run build`             | Type-check and production build                          |
+| `npm run lint`              | oxlint, then ESLint                                      |
+| `npm run format`            | Prettier                                                 |
+| `npm run fixtures:refresh`  | Re-record API responses from a running server            |
+| `npm run characters:export` | Export OSRS characters (tools/characters/)               |
+| `npm run characters:upload` | Put them and the music on the server                     |
 
 ### Play-testing tools
 

@@ -37,7 +37,7 @@ import {
   type Names,
 } from '@/domain/describe'
 import type { Blocker, Card, GameState, Team } from '@/domain/game'
-import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
+import { tileId, type ChallengeId, type TeamId, type TileId } from '@/domain/ids'
 import type { Choreography, Cue, Placement } from '@/domain/motion'
 import type { Replay } from '@/domain/replay'
 import { adjacency, nearestTile, sharedLength, type WalkOptions } from '@/domain/paths'
@@ -1259,7 +1259,40 @@ onMounted(() => {
   zoomAroundCentre(props.follow)
   emitView()
   frame = requestAnimationFrame(renderFrame)
+  if (import.meta.env.DEV) window.__tweeteaMap = mapProbe(map)
 })
+
+/**
+ * Nodes are drawn on a canvas, so end-to-end tests can't find them in the page. Development builds
+ * say where a node is on screen, and which nodes a click can pick right now.
+ */
+function mapProbe(map: LeafletMap): MapProbe {
+  // A node measured while the map pans or zooms is somewhere else by the time it is clicked.
+  let moving = false
+  map.on('movestart zoomstart', () => (moving = true))
+  map.on('moveend zoomend', () => (moving = false))
+  return {
+    still: () => !moving,
+    point(tile) {
+      const at = tileLatLng(tileId(tile))
+      if (!at) return null
+      const container = map.getContainer()
+      const onPage = () => {
+        const p = map.latLngToContainerPoint(at)
+        const box = container.getBoundingClientRect()
+        return { x: box.left + p.x, y: box.top + p.y }
+      }
+      // The map's own buttons and the page's bars over it would take the click instead.
+      const hit = document.elementFromPoint(onPage().x, onPage().y)
+      if (!hit || !container.contains(hit) || hit.closest('.leaflet-control'))
+        map.panTo(at, { animate: false })
+      return onPage()
+    },
+    options: () =>
+      props.options ? { near: [...props.options.near], far: [...props.options.far] } : null,
+    targets: () => (props.targetTiles ? [...props.targetTiles] : null),
+  }
+}
 
 watch(
   () => props.state,
@@ -1327,6 +1360,7 @@ function zoomAroundCentre(following: boolean) {
 }
 
 onBeforeUnmount(() => {
+  if (import.meta.env.DEV) delete window.__tweeteaMap
   stopFlight()
   stopGlide()
   cancelAnimationFrame(spreadFrame)

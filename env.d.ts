@@ -15,3 +15,20 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** Where the board map's nodes are on screen, for end-to-end tests (see BoardMap.vue). */
+interface MapProbe {
+  /** The map is not panning or zooming, so a node's point stays put. */
+  still(): boolean
+  /** The node's point in the viewport, centring it first if something on the page covers it. */
+  point(tile: number): { x: number; y: number } | null
+  /** Where the next checkpoint of a walk can go: one step away, or further. */
+  options(): { near: number[]; far: number[] } | null
+  /** Tiles a tile-targeted item can go on. */
+  targets(): number[] | null
+}
+
+interface Window {
+  /** Set in development builds only. */
+  __tweeteaMap?: MapProbe
+}

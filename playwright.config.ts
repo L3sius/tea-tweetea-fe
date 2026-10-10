@@ -2,109 +2,77 @@ import process from 'node:process'
 import { defineConfig, devices } from '@playwright/test'
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * Two kinds of end-to-end test, each against its own dev server:
+ * - `fixtures` (e2e/fixtures): the site on recorded API responses, no backend needed.
+ * - `live` (e2e/live): the site on a real tweety, started on an empty game by
+ *   scripts/e2e-backend.mjs. Each test resets it and seeds its own teams. Tests that need the
+ *   play-testing admin actions skip when tweety has none.
+ *
+ * The ports are not the usual 5173 and 8080, so a play-testing setup can keep running.
+ * See docs/e2e.md.
  */
-// require('dotenv').config();
+const FIXTURES_PORT = 5174
+const LIVE_PORT = 5175
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+/** Playwright's bundled browsers are out of date on Windows here; Edge is always installed. */
+const chromium = process.platform === 'win32' ? { channel: 'msedge' } : {}
+
 export default defineConfig({
-  testDir: './e2e',
-  /* Maximum time one test can run for. */
   timeout: 30 * 1000,
-  expect: {
-    /**
-     * Maximum time expect() should wait for the condition to be met.
-     * For example in `await expect(locator).toHaveText();`
-     */
-    timeout: 5000,
-  },
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  expect: { timeout: 5000 },
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  retries: 0,
+  // Live tests share one backend, so they can't run side by side.
+  workers: 1,
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-
-    /* Only on CI systems run the tests headless */
-    headless: !!process.env.CI,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    // VIDEO=1 records every page, to watch in the HTML report (npx playwright show-report).
+    video: process.env.VIDEO ? 'on' : 'off',
+    headless: !process.env.HEADED,
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'fixtures',
+      testDir: './e2e/fixtures',
       use: {
         ...devices['Desktop Chrome'],
+        ...chromium,
+        baseURL: `http://localhost:${FIXTURES_PORT}`,
       },
     },
     {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-      },
+      name: 'live',
+      testDir: './e2e/live',
+      // A whole turn waits on card flips and walk animations.
+      timeout: 120 * 1000,
+      expect: { timeout: 10_000 },
+      use: { ...devices['Desktop Chrome'], ...chromium, baseURL: `http://localhost:${LIVE_PORT}` },
     },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-      },
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: {
-    //     ...devices['Pixel 5'],
-    //   },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: {
-    //     ...devices['iPhone 12'],
-    //   },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: {
-    //     channel: 'msedge',
-    //   },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: {
-    //     channel: 'chrome',
-    //   },
-    // },
   ],
 
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
-
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    /**
-     * Use the dev server by default for faster feedback loop.
-     * Use the preview server on CI for more realistic testing.
-     * Playwright will re-use the local server if there is already a dev-server running.
-     */
-    command: process.env.CI ? 'npm run preview' : 'npm run dev',
-    port: process.env.CI ? 4173 : 5173,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: `npx vite --port ${FIXTURES_PORT} --strictPort`,
+      port: FIXTURES_PORT,
+      env: { VITE_API_MODE: 'fixtures' },
+      reuseExistingServer: true,
+    },
+    {
+      command: `npx vite --port ${LIVE_PORT} --strictPort`,
+      port: LIVE_PORT,
+      env: { VITE_API_MODE: 'http', VITE_API_BASE_URL: 'http://127.0.0.1:8090' },
+      reuseExistingServer: true,
+    },
+    {
+      command: 'node scripts/e2e-backend.mjs',
+      url: 'http://127.0.0.1:8091/health',
+      // The first run may build tweety.
+      timeout: 10 * 60 * 1000,
+      reuseExistingServer: true,
+    },
+  ],
 })
