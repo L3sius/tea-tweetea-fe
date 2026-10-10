@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useIntervalFn, useMediaQuery, useNow } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import ActivityFeed from '@/components/ActivityFeed.vue'
 import AlertToasts from '@/components/AlertToasts.vue'
 import BoardMap from '@/components/BoardMap.vue'
@@ -15,6 +15,9 @@ import TeamControls from '@/components/TeamControls.vue'
 import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
+import crossBox from '@/assets/tt/img/boxes/cross_box.png'
+import tickBox from '@/assets/tt/img/boxes/check_box.png'
+import { MOMENT_LABEL, direct, type Shot } from '@/domain/director'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
@@ -155,7 +158,9 @@ watch(
 function selectTeam(id: TeamId) {
   const team = state.value?.teams.get(id)
   if (!team) return
-  if (selected.value === id && follow.value) {
+  // Picking a team makes it the camera's home; an action on screen gives the camera back.
+  const borrowed = dropActions()
+  if (!borrowed && selected.value === id && follow.value) {
     follow.value = false
     return
   }
@@ -193,7 +198,104 @@ function showTeam(id: TeamId) {
 
 function freeRoam() {
   follow.value = false
+  dropActions()
 }
+
+// --- Actions: the camera visits whatever is happening, then goes home (see domain/director.ts) ---
+
+const ACTIONS_KEY = 'tweetea.followActions'
+/** The Actions option, remembered for this browser. */
+const followActions = ref(readActions())
+const shot = shallowRef<Shot | null>(null)
+/**
+ * The viewer's own camera while an action borrows it: the team followed, or free roam (no team
+ * followed). The camera goes back to it once nothing is left to show.
+ */
+let home: { team: TeamId | null; follow: boolean } | null = null
+/** Actions that started before this (server ms) are left alone: the viewer chose to look elsewhere. */
+let ignoreBefore = 0
+
+function readActions(): boolean {
+  try {
+    return localStorage.getItem(ACTIONS_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+watch(followActions, (on) => {
+  try {
+    localStorage.setItem(ACTIONS_KEY, on ? '1' : '0')
+  } catch {
+    // Kept for this visit only.
+  }
+  if (!on) goHome()
+})
+
+/** An action is on screen now. */
+const actionShown = computed(() => followActions.value && !!shot.value && !shot.value.quiet)
+
+/**
+ * Lets go of the camera without going home, because the viewer just moved it (picked a team,
+ * dragged the map). Actions under way stay ignored. True if an action was on screen.
+ */
+function dropActions(): boolean {
+  const borrowed = actionShown.value
+  ignoreBefore = game.serverNow()
+  home = null
+  if (shot.value) shot.value = { ...shot.value, quiet: true }
+  return borrowed
+}
+
+/** Back to the viewer's own camera: the team it follows, or the whole map from free roam. */
+function goHome() {
+  const back = home
+  home = null
+  if (shot.value) shot.value = { ...shot.value, quiet: true }
+  if (!back) return
+  const team = back.team === null ? undefined : state.value?.teams.get(back.team)
+  selected.value = back.team
+  if (back.follow && team) {
+    follow.value = true
+    boardMap.value?.locate(shownAt(team.id), 0.5)
+  } else {
+    follow.value = false
+    boardMap.value?.showAll()
+  }
+}
+
+/** "Back" on the action bar: home now, and leave the actions under way alone. */
+function skipAction() {
+  ignoreBefore = game.serverNow()
+  goHome()
+}
+
+/**
+ * Points the camera at the action the director picks, flying to a new team and following it, and
+ * goes home once the action is over and nothing else is happening.
+ */
+function directCamera() {
+  if (!followActions.value || world.value || game.replay) return
+  const time = game.serverNow()
+  const before = shot.value
+  const moments = game.choreography.momentsAt(time).filter((m) => m.at >= ignoreBefore)
+  const next = direct(before, moments, time)
+  if (!next || next.quiet) {
+    if (before && !before.quiet) goHome()
+    else shot.value = next
+    return
+  }
+  shot.value = next
+  if (before && !before.quiet && before.moment.id === next.moment.id) return
+  // The first action to borrow the camera remembers where to bring it back to.
+  home ??= { team: selected.value, follow: follow.value }
+  const team = next.moment.teamId
+  const fly = !before || before.quiet || team !== before.moment.teamId || !follow.value
+  selected.value = team
+  follow.value = true
+  if (fly) boardMap.value?.locate(shownAt(team), 0.5)
+}
+useIntervalFn(directCamera, 250)
 
 const followed = computed(() =>
   selected.value === null ? null : (state.value?.teams.get(selected.value) ?? null),
@@ -356,6 +458,19 @@ async function buyMysteryBox() {
             />
           </button>
         </li>
+        <li class="pointer-events-auto">
+          <button
+            type="button"
+            role="checkbox"
+            class="tt-sprite-display tt-press relative flex items-center gap-1.5 px-2 hover:brightness-[1.18]"
+            :aria-checked="followActions"
+            title="Actions: the camera visits whatever is happening, then comes back"
+            @click="followActions = !followActions"
+          >
+            <img :src="followActions ? tickBox : crossBox" alt="" class="size-5" />
+            <TtText :size="1" font="bold" color="orange">Actions</TtText>
+          </button>
+        </li>
       </ol>
 
       <!-- Play-testing tools -->
@@ -381,7 +496,7 @@ async function buyMysteryBox() {
       <!-- Bars at the bottom middle, stacked so they never overlap: a replay (or moves to catch up
            on), then who the camera follows. -->
       <div
-        v-if="game.replay || game.missedMoves > 0 || followed"
+        v-if="game.replay || game.missedMoves > 0 || followed || actionShown"
         v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-1"
       >
@@ -424,8 +539,20 @@ async function buyMysteryBox() {
           </template>
         </div>
 
+        <!-- Following the action: the team the camera is on, and what it is doing -->
+        <div
+          v-if="actionShown && shot && followed"
+          class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
+          role="status"
+        >
+          <TtText :size="1" color="white" class="whitespace-nowrap">
+            🎬 <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span> ·
+            {{ MOMENT_LABEL[shot.moment.kind] }}
+          </TtText>
+          <TtButton size="sm" class="!min-h-9" @click="skipAction()">Back</TtButton>
+        </div>
         <!-- Follow / free roam -->
-        <div v-if="followed" class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1">
+        <div v-else-if="followed" class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1">
           <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
             Following
             <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span>
@@ -514,7 +641,7 @@ async function buyMysteryBox() {
         :class="
           game.replay || game.missedMoves > 0
             ? 'bottom-26 sm:bottom-1.5'
-            : followed
+            : followed || actionShown
               ? 'bottom-14 sm:bottom-1.5'
               : ''
         "
@@ -596,6 +723,18 @@ async function buyMysteryBox() {
                 @click="selectTeam(team.id)"
               >
                 <span :style="{ color: teamColor(team) }">{{ team.name }}</span>
+              </TtButton>
+              <TtButton
+                size="sm"
+                class="!min-w-0"
+                role="checkbox"
+                :aria-checked="followActions"
+                @click="followActions = !followActions"
+              >
+                <span class="flex items-center gap-1.5">
+                  <img :src="followActions ? tickBox : crossBox" alt="" class="size-5" />
+                  Actions
+                </span>
               </TtButton>
             </div>
             <TeamCard

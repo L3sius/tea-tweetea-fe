@@ -9,6 +9,7 @@ import type { GameEvent, JournalEntry } from './events'
 import type { Card } from './game'
 import type { TeamId, TileId } from './ids'
 import { entryContext, soundFor, type SoundAudience, type SoundName } from './sounds'
+import { moment, momentOf, type Moment } from './director'
 
 /** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
 export const STEP_MS = 840
@@ -89,6 +90,8 @@ export class Choreography {
   private readonly busyUntil = new Map<TeamId, number>()
   private cues: Cue[] = []
   private sounds: SoundCue[] = []
+  /** What is worth showing, for the "Follow actions" camera (see director.ts). */
+  private moments: Moment[] = []
   private reactions: Reaction[] = []
   /** When each entry's last animation ends, so text about it can wait until then. */
   private readonly reveal = new Map<number, number>()
@@ -118,9 +121,17 @@ export class Choreography {
       if (event.kind === 'move_confirmed') this.walkSteps.set(event.teamId, event.path.length - 1)
       if (event.kind === 'stepped') steps.set(event.teamId, (steps.get(event.teamId) ?? 0) + 1)
     }
+    // Each team's movement in this entry, as one moment: from its first step until it settles.
+    const moving = new Map<TeamId, { start: number; end: number; teleport: boolean }>()
     const move = (team: TeamId, to: TileId, kind: SegmentKind) => {
       const from = this.lastTile.get(team) ?? to
       const start = now(team)
+      const span = moving.get(team)
+      moving.set(team, {
+        start: span?.start ?? start,
+        end: start + (kind === 'walk' ? STEP_MS : TELEPORT_MS),
+        teleport: (span?.teleport ?? false) || kind === 'teleport',
+      })
       const length = kind === 'walk' ? STEP_MS : TELEPORT_MS
       const end = start + length
       const walked = kind === 'walk' ? (this.walkSteps.get(team) ?? steps.get(team) ?? 1) : 1
@@ -150,6 +161,9 @@ export class Choreography {
     const context = entryContext(entry)
     entry.events.forEach((event, index) => {
       // A sound goes with its moment: before a teleport moves the piece, after a walk lands.
+      const shown = momentOf(event)
+      if (shown)
+        this.moments.push(moment(`${entry.seq}.${index}`, shown.team, shown.kind, now(shown.team)))
       const sound = soundFor(event, context)
       if (sound) {
         const { team, ...rest } = sound
@@ -191,6 +205,10 @@ export class Choreography {
       const callout = cueFor(event, seesItems)
       if (callout) cue(callout.team, callout.text, callout.tone, index)
     })
+    for (const [team, span] of moving) {
+      const kind = span.teleport ? 'teleporting' : 'walking'
+      this.moments.push(moment(`${entry.seq}.move.${team}`, team, kind, span.start, span.end))
+    }
     this.reveal.set(entry.seq, Math.max(at, ...cursor.values()))
   }
 
@@ -258,6 +276,11 @@ export class Choreography {
     return this.cues.filter((c) => time >= c.at && time < c.at + CUE_MS)
   }
 
+  /** Moments not yet over at `time`, for the "Follow actions" camera. */
+  momentsAt(time: number): Moment[] {
+    return this.moments.filter((m) => m.until > time)
+  }
+
   /** Sounds whose moment came after `from` and by `to`, in order. */
   soundsBetween(from: number, to: number): SoundCue[] {
     return this.sounds.filter((s) => s.at > from && s.at <= to)
@@ -272,6 +295,7 @@ export class Choreography {
     }
     this.cues = this.cues.filter((c) => c.at + CUE_MS > time)
     this.sounds = this.sounds.filter((s) => s.at + SOUND_KEEP_MS > time)
+    this.moments = this.moments.filter((m) => m.until > time)
     this.reactions = this.reactions.filter((r) => r.at + REACTION_KEEP_MS > time)
     for (const [seq, at] of this.reveal) if (at <= time) this.reveal.delete(seq)
   }
