@@ -23,6 +23,7 @@ import type { TeamId, TileId } from '@/domain/ids'
 import { inventorySize } from '@/domain/items'
 import type { Item } from '@/domain/vocabulary'
 import { useSoundEffects } from '@/sound/effects'
+import { useGameMusic } from '@/sound/gameMusic'
 import { useCharacterStore } from '@/stores/characters'
 import { byStanding, useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
@@ -310,6 +311,8 @@ useSoundEffects({
   serverNow: game.serverNow,
   quiet: () => tutorial.staged,
 })
+// Classic OSRS tracks play under the game, and give way to the tour's own from its first fade.
+useGameMusic({ quiet: () => tutorial.active })
 const isAnimating = (id: TeamId) => choreography.value.isAnimating(id, game.serverNow())
 /** The tile a team's piece is on or walking from; refreshed each second through `now`. */
 function shownAt(id: TeamId): TileId {

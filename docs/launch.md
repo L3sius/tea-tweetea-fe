@@ -65,11 +65,11 @@ It needs SSH access to the droplet (`root@161.35.173.209`). See `tools/character
 ```sh
 npm install --prefix tools/characters   # once
 npm run characters:export                # needs a qodat OSRS cache; writes tools/characters/out/osrs/
-npm run characters:upload                # also uploads tools/characters/audio/ (the tour's music)
+npm run characters:upload                # also uploads tools/characters/audio/ (the music)
 ```
 
 - [ ] `https://api.tea-osrs.com/osrs/anims.json` opens.
-- [ ] `https://api.tea-osrs.com/osrs/audio/newbie-melody.ogg` plays.
+- [ ] `https://api.tea-osrs.com/osrs/audio/newbie-melody.ogg` and `.../audio/harmony.ogg` play.
 
 Browsers keep these files for up to an hour, so upload at least an hour before the start. Without
 a `tools/characters/audio/` folder on your machine, the upload leaves the music on the server as it

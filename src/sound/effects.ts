@@ -1,9 +1,9 @@
-// Plays the game's sound effects (public/sounds/, levelled to one loudness) at the site's volume.
+// Plays the game's sound effects (public/sounds/, levelled to one loudness) at the effects volume.
 // A sound that fails to load or play (no click on the page yet, or a missing file) stays silent.
 import { useIntervalFn } from '@vueuse/core'
 import type { SoundCue } from '@/domain/motion'
 import type { SoundName } from '@/domain/sounds'
-import { getVolume, isMuted } from './music'
+import { getEffectsVolume, isMuted } from './settings'
 
 /** How often the board looks for sounds whose moment has come. */
 const TICK_MS = 100
@@ -22,7 +22,7 @@ export function playEffect(name: SoundName) {
     loaded.set(name, audio)
   }
   const copy = audio.cloneNode() as HTMLAudioElement
-  copy.volume = getVolume()
+  copy.volume = getEffectsVolume()
   const done = () => playing.delete(copy)
   copy.addEventListener('ended', done, { once: true })
   copy.addEventListener('error', done, { once: true })
@@ -30,10 +30,10 @@ export function playEffect(name: SoundName) {
   copy.play().catch(done)
 }
 
-/** Brings the sounds playing now to the site's volume and mute, after the player changes them. */
+/** Brings the sounds playing now to the effects volume and the site's mute, after the player changes them. */
 export function followSettings() {
   for (const audio of playing) {
-    audio.volume = getVolume()
+    audio.volume = getEffectsVolume()
     audio.muted = isMuted()
   }
 }

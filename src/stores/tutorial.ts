@@ -9,6 +9,7 @@ import { Choreography, type Placement } from '@/domain/motion'
 import type { GameState } from '@/domain/game'
 import { GUIDE, GUIDE_TEAM } from '@/tutorial/guide'
 import * as music from '@/sound/music'
+import { NEWBIE_MELODY } from '@/sound/playlist'
 import { PretendGame } from '@/tutorial/pretend'
 import { actionsOf, chapterStart } from '@/tutorial/chapters'
 import { loadTutorialWorld, type TutorialWorld } from '@/tutorial/world'
@@ -362,7 +363,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
         run({ kind: 'camera', to: 'guide', zoom: TITLE_ZOOM, ms: 0 })
         const since = game.serverNow()
         gesture = { anim: GESTURE.wave, since, until: Infinity }
-        music.play(music.NEWBIE_MELODY)
+        music.play(NEWBIE_MELODY)
       },
       loaded,
     )
@@ -371,7 +372,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
   /** From the title scene into the tour: the title fades out, the map and chatbox fade in. */
   function begin() {
     if (phase.value !== 'title') return
-    if (!music.isPlaying()) music.play(music.NEWBIE_MELODY)
+    if (!music.isPlaying()) music.play(NEWBIE_MELODY)
     phase.value = 'playing'
     enterBeat(0)
   }

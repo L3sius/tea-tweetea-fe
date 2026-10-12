@@ -82,10 +82,12 @@ A team's piece can be any OSRS NPC built like a player instead of a bird.
 
 ### Sounds
 
-The board plays OSRS sounds as moments show on the map, at the volume of the ♪ control in the
-header. They ship with the site in `public/sounds/`; `src/domain/sounds.ts` says which event makes
-which sound and who hears it. [docs/sounds.md](docs/sounds.md) lists where each file comes from and
-how to add or swap one (levelled to one loudness). The tour's music is on the asset server instead.
+The board plays OSRS sounds as moments show on the map. They ship with the site in
+`public/sounds/`; `src/domain/sounds.ts` says which event makes which sound and who hears it.
+Quietly under them, classic OSRS tracks play shuffled (Newbie Melody under the tour), from the
+asset server. The ♪ control in the header mutes all sound and has a volume each for the music and
+the effects. [docs/sounds.md](docs/sounds.md) lists where each sound and track comes from and how
+to add or swap one (levelled to one loudness).
 
 ### Tutorial
 

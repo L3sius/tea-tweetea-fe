@@ -1,30 +1,45 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { followSettings } from '@/sound/effects'
+import * as effects from '@/sound/effects'
 import * as music from '@/sound/music'
+import * as settings from '@/sound/settings'
 
 /**
- * The site's sound settings: muted or not, and the volume, kept for this browser. They apply to
- * all sound on the site, wherever the control shows (the header, or the tour while it hides it),
- * including music and sounds already playing.
+ * The site's sound settings: muted or not, and a volume each for the music and the sound effects,
+ * kept for this browser. They apply wherever the control shows (the header, or the tour while it
+ * hides it), sounds already playing included.
  */
 export const useSoundStore = defineStore('sound', () => {
-  const muted = ref(music.isMuted())
-  const volume = ref(music.getVolume())
+  const muted = ref(settings.isMuted())
+  const musicVolume = ref(settings.getMusicVolume())
+  const effectsVolume = ref(settings.getEffectsVolume())
+
+  function follow() {
+    music.followSettings()
+    effects.followSettings()
+  }
 
   function toggleMute() {
     muted.value = !muted.value
-    music.setMuted(muted.value)
-    followSettings()
+    settings.setMuted(muted.value)
+    follow()
   }
 
-  /** Sets the volume (0–1); moving it up unmutes. */
-  function setVolume(to: number) {
-    music.setVolume(to)
-    volume.value = music.getVolume()
-    followSettings()
+  /** Sets the music's volume (0–1); moving it up unmutes. */
+  function setMusicVolume(to: number) {
+    settings.setMusicVolume(to)
+    musicVolume.value = settings.getMusicVolume()
+    follow()
     if (muted.value && to > 0) toggleMute()
   }
 
-  return { muted, volume, toggleMute, setVolume }
+  /** Sets the sound effects' volume (0–1); moving it up unmutes. */
+  function setEffectsVolume(to: number) {
+    settings.setEffectsVolume(to)
+    effectsVolume.value = settings.getEffectsVolume()
+    follow()
+    if (muted.value && to > 0) toggleMute()
+  }
+
+  return { muted, musicVolume, effectsVolume, toggleMute, setMusicVolume, setEffectsVolume }
 })

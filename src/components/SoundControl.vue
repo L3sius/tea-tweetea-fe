@@ -4,15 +4,25 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useSoundStore } from '@/stores/sound'
 import { TtButton, TtText } from '@/ui/tt'
 
-// Mute and volume for all sound on the site: a small button that says how loud it is, and opens
-// the controls. It sits in the header, and in the tour's corner while the tour hides the header.
+// Mute, and a volume each for the music and the sound effects: a small button that opens the
+// controls, with the volumes on hover. It sits in the header, and in the tour's corner while the
+// tour hides the header.
 const sound = useSoundStore()
 
 const open = ref(false)
 const root = useTemplateRef('root')
 onClickOutside(root, () => (open.value = false))
 
-const percent = computed(() => Math.round(sound.volume * 100))
+const percent = (volume: number) => Math.round(volume * 100)
+const sliders = computed(() => [
+  { label: 'Music', value: percent(sound.musicVolume), set: sound.setMusicVolume },
+  { label: 'Effects', value: percent(sound.effectsVolume), set: sound.setEffectsVolume },
+])
+const summary = computed(() =>
+  sound.muted
+    ? 'Sound is off'
+    : `Music ${percent(sound.musicVolume)}% · Effects ${percent(sound.effectsVolume)}%`,
+)
 </script>
 
 <template>
@@ -22,10 +32,10 @@ const percent = computed(() => Math.round(sound.volume * 100))
       :selected="open"
       :aria-expanded="open"
       aria-haspopup="dialog"
-      :title="sound.muted ? 'Sound is off' : `Volume ${percent}%`"
+      :title="summary"
       @click="open = !open"
     >
-      {{ sound.muted ? '♪ Off' : `♪ ${percent}%` }}
+      {{ sound.muted ? '♪ Off' : '♪ On' }}
     </TtButton>
     <div
       v-if="open"
@@ -39,8 +49,8 @@ const percent = computed(() => Math.round(sound.volume * 100))
           {{ sound.muted ? 'Unmute' : 'Mute' }}
         </TtButton>
       </div>
-      <label class="flex items-center gap-2">
-        <TtText :size="1" color="white">Volume</TtText>
+      <label v-for="slider in sliders" :key="slider.label" class="flex items-center gap-2">
+        <TtText :size="1" color="white" class="w-12 shrink-0">{{ slider.label }}</TtText>
         <input
           type="range"
           min="0"
@@ -48,8 +58,9 @@ const percent = computed(() => Math.round(sound.volume * 100))
           step="1"
           class="volume min-w-0 flex-1"
           :class="{ 'opacity-50': sound.muted }"
-          :value="percent"
-          @input="sound.setVolume(Number(($event.target as HTMLInputElement).value) / 100)"
+          :value="slider.value"
+          :title="`${slider.label} ${slider.value}%`"
+          @input="slider.set(Number(($event.target as HTMLInputElement).value) / 100)"
         />
       </label>
     </div>

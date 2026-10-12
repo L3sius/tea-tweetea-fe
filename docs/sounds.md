@@ -2,8 +2,8 @@
 
 The board plays OSRS sounds as moments show on the map: a card turning, a spell landing, a gem
 collected. They ship with the site in `public/sounds/` (34 files, about 0.6 MB), so a deploy always
-carries the sounds its code plays. The tour's music is bigger and lives on the asset server instead
-(`tools/characters/audio/`, see `tools/characters/README.md`).
+carries the sounds its code plays. The music is bigger and lives on the asset server instead (see
+[Music](#music) below).
 
 ## How it works
 
@@ -14,7 +14,7 @@ carries the sounds its code plays. The tour's music is bigger and lives on the a
 - `Choreography` (`src/domain/motion.ts`) schedules each sound at the moment its event shows on the
   board, like the callouts: a gem sounds when the walk reaches it, not when the server says so.
   Replays play their sounds too.
-- `src/sound/effects.ts` plays them at the site's volume (the ♪ control in the header). It stays
+- `src/sound/effects.ts` plays them at the effects volume (the ♪ control in the header). It stays
   quiet while the tab is hidden and during the tour. A sound that can't play stays silent.
 - `sounds.spec.ts` fails if a sound named in `SOUNDS` has no file in `public/sounds/`.
 
@@ -86,3 +86,31 @@ takes to be too quiet to hear, and turning it up afterwards brings out the damag
    ```
 
 4. Add the name to `SOUNDS` in `src/domain/sounds.ts`, use it in `soundFor`, and add a row above.
+
+## Music
+
+Classic OSRS tracks play quietly under the game, shuffled, once the player has clicked on the page
+(browsers only start sound after a click). The tour plays Newbie Melody instead, from its first fade
+to its end. The music pauses while the tab is hidden, while it's muted or at zero, and doesn't
+download at all until then. The ♪ control has a volume each for the music and the effects; the
+music starts at 35%, as a background to the effects' 40%: its slider is on a curve (the volume
+squared), so 35% plays at 12% and the quiet end of the slider is heard. Each visit starts with a different track
+from the one this browser heard last.
+
+- `src/sound/playlist.ts` lists the tracks; `src/sound/music.ts` plays them, crossfading from one to
+  the next; `src/sound/gameMusic.ts` says when the game's playlist plays.
+- The files are in `tools/characters/audio/` (not in git, about 34 MB) and go to the asset server
+  with `npm run characters:upload`, which serves them at `https://api.tea-osrs.com/osrs/audio/`.
+  The upload makes the server's music match that folder, so keep every track in it, the tour's too.
+- They come from the OSRS Wiki (`https://oldschool.runescape.wiki/images/<Track_name>.ogg`), where
+  Jagex owns them. They are levelled to **-24 LUFS** integrated loudness (a whole track, not its
+  loudest moment), with a limiter for the quiet ones a gain would push past full scale. The wiki
+  has only `.ogg` files, so these are levelled from those; at this level the damage isn't heard.
+
+To add a track, download it, level it and add its file name to `GAME_TRACKS`:
+
+```sh
+curl -L -o original.ogg https://oldschool.runescape.wiki/images/Sea_Shanty_2.ogg
+ffmpeg -i original.ogg -af ebur128 -f null - 2>&1 | grep "I:"   # the last one is the track's loudness
+ffmpeg -i original.ogg -af "volume=<-24 minus that>dB,alimiter=limit=0.95:level=false" -c:a libvorbis -q:a 5 tools/characters/audio/sea-shanty-2.ogg
+```
