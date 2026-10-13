@@ -7,10 +7,12 @@ import NpcPicker from '@/components/NpcPicker.vue'
 import StylePicker from '@/components/StylePicker.vue'
 import { HEADING } from '@/characters/heading'
 import {
+  RANDOM_STYLES,
   ROSTER,
   RUN_FROM_STEPS,
   STYLES,
   defaultAppearance,
+  optionIds,
   type Appearance,
   type Style,
 } from '@/characters/roster'
@@ -107,6 +109,7 @@ const heading = ref<number>(HEADING.south)
               :key="style"
               :npc="draft.npc"
               :anim="draft[style]"
+              :pool="optionIds(style)"
               :heading="heading"
               :width="44"
               :height="56"
@@ -135,6 +138,7 @@ const heading = ref<number>(HEADING.south)
               :npc="draft.npc"
               :options="ROSTER.styles[style]"
               :heading="heading"
+              :random="RANDOM_STYLES.includes(style)"
             />
           </section>
         </TtPanel>

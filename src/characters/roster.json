@@ -1,15 +1,41 @@
 {
   "styles": {
-    "idle": [{ "id": 808, "label": "Standing" }],
+    "idle": [
+      { "id": 808, "label": "Standing" },
+      { "id": 2256, "label": "Arms crossed" },
+      { "id": 12313, "label": "Hands on hips" },
+      { "id": 1322, "label": "Tankard" },
+      { "id": 1321, "label": "Lyre" },
+      { "id": 7542, "label": "Lute" },
+      { "id": 1350, "label": "Reading" },
+      { "id": 2770, "label": "Drunk" },
+      { "id": 10680, "label": "Nervous" },
+      { "id": 13997, "label": "Disgruntled" },
+      { "id": 14004, "label": "Dazed" },
+      { "id": 10060, "label": "Cute" },
+      { "id": 1837, "label": "Ready to skip" },
+      { "id": 4851, "label": "Cross-legged" },
+      { "id": 9341, "label": "On skis" }
+    ],
     "walk": [
       { "id": 819, "label": "Walk" },
       { "id": 762, "label": "Log balance" },
       { "id": 844, "label": "Crawl" },
       { "id": 1306, "label": "Zombie" },
-      { "id": 1440, "label": "Long crawl" },
       { "id": 1702, "label": "Spear spin" },
-      { "id": 2752, "label": "Under the net" },
-      { "id": 12083, "label": "Party strut" }
+      { "id": 12083, "label": "Party strut" },
+      { "id": 1836, "label": "Skipping" },
+      { "id": 2769, "label": "Drunk" },
+      { "id": 6378, "label": "Floppy drunk" },
+      { "id": 4626, "label": "Sneaking" },
+      { "id": 10682, "label": "Sneaking with a bag" },
+      { "id": 6468, "label": "Limp" },
+      { "id": 5471, "label": "Heavy limp" },
+      { "id": 1146, "label": "Walking stick" },
+      { "id": 12282, "label": "Hands bound" },
+      { "id": 14003, "label": "Dazed" },
+      { "id": 3544, "label": "Zombie emote" },
+      { "id": 9342, "label": "Skiing" }
     ],
     "run": [
       { "id": 824, "label": "Run" },
@@ -19,12 +45,28 @@
       { "id": 2433, "label": "Conveyor belt" },
       { "id": 2750, "label": "Over the log" },
       { "id": 3854, "label": "Rune runner" },
-      { "id": 4031, "label": "Slip and slide" }
+      { "id": 4031, "label": "Slip and slide" },
+      { "id": 6277, "label": "Ape run" },
+      { "id": 7934, "label": "Bob run" },
+      { "id": 1831, "label": "Rubber chicken" },
+      { "id": 7274, "label": "Casket" },
+      { "id": 7273, "label": "Clue scroll" },
+      { "id": 7540, "label": "Balloon" },
+      { "id": 10411, "label": "Quick sprint" },
+      { "id": 14233, "label": "Agility sprint" },
+      { "id": 1995, "label": "Ice run" },
+      { "id": 1825, "label": "Oddskull" },
+      { "id": 14005, "label": "Dazed" },
+      { "id": 2322, "label": "Toad cannon" },
+      { "id": 9346, "label": "Ski run" }
     ],
     "swim": [
       { "id": 772, "label": "Swim" },
       { "id": 3415, "label": "Front crawl" },
-      { "id": 3418, "label": "Tread water" }
+      { "id": 3418, "label": "Tread water" },
+      { "id": 7703, "label": "Fast swim" },
+      { "id": 6995, "label": "Underwater" },
+      { "id": 2048, "label": "Float across" }
     ]
   },
   "reactions": {

@@ -25,6 +25,18 @@ export const ROSTER = rosterJson as Roster
 /** A team's appearance holds one animation per style. */
 export type { Appearance }
 
+/**
+ * Stored instead of an animation id for a style that picks a new option from its pool on every
+ * move. The game has no animation 0 in the roster, and the backend keeps whatever id it is sent.
+ */
+export const RANDOM = 0
+
+/** The styles a team may leave to chance: the ones that play while moving. */
+export const RANDOM_STYLES: readonly Style[] = ['walk', 'run', 'swim']
+
+/** The animation ids a style offers. */
+export const optionIds = (style: Style) => ROSTER.styles[style].map((o) => o.id)
+
 /** Walks of at least this many steps run. */
 export const RUN_FROM_STEPS = 7
 

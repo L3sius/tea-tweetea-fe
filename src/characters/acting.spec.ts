@@ -2,16 +2,24 @@ import { describe, expect, it } from 'vitest'
 import { teamId, tileId, type TileId } from '@/domain/ids'
 import { STEP_MS, type Placement, type Reaction } from '@/domain/motion'
 import { chance, perform, pick, type Situation } from './acting'
-import { ROSTER, RUN_FROM_STEPS, defaultAppearance } from './roster'
+import {
+  RANDOM,
+  RANDOM_STYLES,
+  ROSTER,
+  RUN_FROM_STEPS,
+  defaultAppearance,
+  optionIds,
+  type Style,
+} from './roster'
 
 const red = teamId(0)
 const T0 = Date.parse('2026-10-08T12:00:00Z')
 const look = { ...defaultAppearance(), walk: 1306, run: 2251, swim: 3415 }
-const walkOf = (steps: number, seq = 1): Placement => ({
+const walkOf = (steps: number, seq = 1, progress = 0.5): Placement => ({
   kind: 'walk',
   from: tileId(1),
   to: tileId(2),
-  progress: 0.5,
+  progress,
   steps,
   seq,
 })
@@ -46,6 +54,28 @@ describe('perform', () => {
   it('swims at sea', () => {
     const sea = (tile: TileId) => tile === tileId(2)
     expect(perform(situation({ placement: walkOf(3), isSea: sea })).anim).toBe(3415)
+  })
+
+  it('picks a new gait from the pool on each move when the style is random', () => {
+    const random = { ...look, walk: RANDOM, run: RANDOM, swim: RANDOM }
+    const gaits = (style: Style) =>
+      Array.from({ length: 200 }, (_, seq) => {
+        const steps = style === 'run' ? RUN_FROM_STEPS : 3
+        const isSea = () => style === 'swim'
+        return perform(situation({ appearance: random, placement: walkOf(steps, seq), isSea })).anim
+      })
+    for (const style of RANDOM_STYLES) {
+      const picked = new Set(gaits(style))
+      expect([...picked].every((anim) => optionIds(style).includes(anim))).toBe(true)
+      expect(picked.size).toBeGreaterThan(optionIds(style).length / 2)
+    }
+  })
+
+  it('keeps one random gait for the whole move, the same for everyone watching', () => {
+    const random = { ...look, walk: RANDOM }
+    const at = (progress: number) =>
+      perform(situation({ appearance: random, placement: walkOf(3, 7, progress) })).anim
+    expect(at(0.1)).toBe(at(0.9))
   })
 
   it('now and then walks in another style, the same for everyone watching', () => {

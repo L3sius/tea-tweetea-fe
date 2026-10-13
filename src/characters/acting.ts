@@ -3,7 +3,7 @@
 // thing, and a reloaded page picks up where it was.
 import type { TeamId, TileId } from '@/domain/ids'
 import { STEP_MS, type Placement, type Reaction } from '@/domain/motion'
-import { ROSTER, RUN_FROM_STEPS, type Appearance } from './roster'
+import { RANDOM, ROSTER, RUN_FROM_STEPS, optionIds, type Appearance } from './roster'
 
 /** An animation to play: frame 0 shows at `since` (ms), and it plays `rate` times as fast. */
 export type Performance = { anim: number; since: number; rate: number }
@@ -57,11 +57,15 @@ function walking(s: Situation, p: Walk): Performance {
   return { anim: gait(s, p), since: 0, rate: 1 }
 }
 
-/** The team's walk, run or swim, now and then swapped for someone else's style. */
+/**
+ * The team's walk, run or swim, now and then swapped for someone else's style. A style left to
+ * chance picks once per move, so a move keeps one gait from start to end.
+ */
 function gait(s: Situation, p: Walk): number {
   const style =
     s.isSea(p.from) || s.isSea(p.to) ? 'swim' : p.steps >= RUN_FROM_STEPS ? 'run' : 'walk'
   const own = s.appearance[style]
+  if (own === RANDOM) return pick(optionIds(style), s.team, p.seq, 'random', style) ?? own
   if (style === 'swim' || chance(s.team, p.seq, 'gait') >= ROSTER.easterEggs.gaitChancePerWalk)
     return own
   const others = [...ROSTER.styles.walk, ...ROSTER.styles.run]
