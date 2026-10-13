@@ -8,7 +8,7 @@ import type { Team } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
 import { teamColor } from '@/ui/colors'
 import { formatGp, timeFrom } from '@/ui/format'
-import { TtPanel, TtText, stack } from '@/ui/tt'
+import { TtPanel, TtText, TtTooltip, stack } from '@/ui/tt'
 
 const props = defineProps<{
   feed: readonly FeedItem[]
@@ -37,12 +37,17 @@ const colorOf = (id: TeamId | null) => {
   return team ? teamColor(team) : 'var(--text-muted)'
 }
 
-/** The whole row as plain text, for the hover box when it is cut short. */
-function rowText(item: FeedItem, count: number, value: number): string {
-  const parts = [item.rsn, observationText(item.observation)]
-  if (count > 1) parts.push(`x${count}`)
-  if (value > 0) parts.push(`(${formatGp(value)})`)
-  return parts.join(' ')
+type Part = { text: string; color: string; bold?: boolean }
+
+/** A row's pieces in order, coloured: who, what, how many and what it was worth. */
+function rowParts(item: FeedItem, count: number, value: number): Part[] {
+  const parts: Part[] = [
+    { text: item.rsn, color: colorOf(item.teamId), bold: true },
+    { text: observationText(item.observation), color: 'white' },
+  ]
+  if (count > 1) parts.push({ text: `x${count}`, color: 'muted' })
+  if (value > 0) parts.push({ text: `(${formatGp(value)})`, color: stack(value).color })
+  return parts
 }
 
 function expand(rsn: string) {
@@ -93,37 +98,37 @@ function reset() {
       {{ active ? 'Nothing matches these filters.' : 'No activity yet.' }}
     </TtText>
     <ol v-else class="flex w-full flex-col gap-1.5 text-left">
-      <li v-for="(row, i) in rows" :key="row.key" class="flex flex-col gap-0.5">
-        <template v-if="row.kind === 'item'">
-          <time
-            class="feed-time"
-            :datetime="row.item.at.toISOString()"
-            :title="row.item.at.toLocaleString()"
-          >
-            {{ timeFrom(row.item.at, now) }}
-          </time>
-          <!-- One line: who, what, how many and what it was worth. Hover shows it whole. -->
-          <p
-            :class="openRow === row.key ? 'break-words' : 'truncate'"
-            :title="rowText(row.item, row.count, row.value)"
-            @click="toggleRow(row.key)"
-          >
-            <TtText :size="1" font="bold" :color="colorOf(row.item.teamId)">{{
-              row.item.rsn
-            }}</TtText>
-            {{ ' ' }}
-            <TtText :size="1" color="white">{{ observationText(row.item.observation) }}</TtText>
-            <template v-if="row.count > 1">
-              {{ ' ' }}<TtText :size="1" color="muted">x{{ row.count }}</TtText>
-            </template>
-            <template v-if="row.value > 0">
-              {{ ' '
-              }}<TtText :size="1" :color="stack(row.value).color"
-                >({{ formatGp(row.value) }})</TtText
-              >
+      <li v-for="(row, i) in rows" :key="row.key" class="flex flex-col">
+        <!-- One line: who, what, how many and what it was worth, then when. Hover shows it whole. -->
+        <TtTooltip
+          v-if="row.kind === 'item'"
+          as="div"
+          class="flex items-baseline gap-1.5"
+          :disabled="!canHover"
+          :max-width="280"
+          @click="toggleRow(row.key)"
+        >
+          <p class="min-w-0 flex-1" :class="openRow === row.key ? 'break-words' : 'truncate'">
+            <template v-for="(part, p) in rowParts(row.item, row.count, row.value)" :key="p">
+              {{ p > 0 ? ' ' : ''
+              }}<TtText :size="1" :font="part.bold ? 'bold' : undefined" :color="part.color">{{
+                part.text
+              }}</TtText>
             </template>
           </p>
-        </template>
+          <time class="feed-time shrink-0" :datetime="row.item.at.toISOString()">
+            {{ timeFrom(row.item.at, now) }}
+          </time>
+          <template #tip>
+            <template v-for="(part, p) in rowParts(row.item, row.count, row.value)" :key="p">
+              {{ p > 0 ? ' ' : ''
+              }}<TtText :size="1" :font="part.bold ? 'bold' : undefined" :color="part.color">{{
+                part.text
+              }}</TtText>
+            </template>
+            <span class="feed-time block">{{ row.item.at.toLocaleString() }}</span>
+          </template>
+        </TtTooltip>
         <button v-else type="button" class="tt-link tt-1 self-start" @click="expand(row.rsn)">
           <span :style="{ color: colorOf(row.teamId) }">{{ row.rsn }}</span
           >: {{ row.hidden.length }} more
@@ -156,7 +161,7 @@ function reset() {
 .filter-tab.on {
   background: #6b2a1f;
 }
-/* When it happened, small above the row: the native 16px step of the pixel font. */
+/* When it happened, small at the end of the row: the native 16px step of the pixel font. */
 .feed-time {
   color: var(--text-muted);
   font-family: var(--font-small);

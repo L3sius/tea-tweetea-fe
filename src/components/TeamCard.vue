@@ -14,7 +14,7 @@ import { itemEntry } from '@/domain/items'
 import { GEMS, type Item } from '@/domain/vocabulary'
 import { teamColor } from '@/ui/colors'
 import { count } from '@/ui/format'
-import { TtGemTracker, TtProgressBar, TtText } from '@/ui/tt'
+import { TtGemTracker, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 
@@ -100,57 +100,31 @@ const items = computed(() =>
 
     <!-- Pictures, not names: hover (or tap) one for what it does. -->
     <ul v-if="items.length" class="flex flex-wrap justify-center gap-1" aria-label="Items">
-      <li
+      <TtTooltip
         v-for="i in items"
         :key="i.item"
+        as="li"
         class="item"
         tabindex="0"
         :aria-label="`${i.name}: ${i.text}`"
       >
         <ItemSlot :item="i.item" :count="i.count" :size="74" hint="" />
-        <span class="item-tip" role="tooltip">
+        <template #tip>
           <span class="item-tip-name">{{ i.name }}</span>
           {{ i.text }}
-        </span>
-      </li>
+        </template>
+      </TtTooltip>
     </ul>
   </article>
 </template>
 
 <style scoped>
-/* What an item does, in the game's examine-box style, over the item while hovered or focused. */
+/* What an item does shows in the game's examine box (TtTooltip) while hovered or focused. */
 .item {
-  position: relative;
   outline: none;
-}
-.item-tip {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  z-index: 20;
-  display: none;
-  width: max-content;
-  max-width: 220px;
-  padding: 4px 8px;
-  border: 3px solid #000;
-  background: var(--tooltip-bg);
-  box-shadow: 4px 4px 0 #000;
-  color: var(--osrs-white);
-  font-family: var(--font-small);
-  font-size: var(--fs-1);
-  line-height: 1.15;
-  text-align: center;
-  text-shadow: 1px 1px 0 #000;
-  transform: translateX(-50%);
-  pointer-events: none;
 }
 .item-tip-name {
   display: block;
   color: var(--osrs-orange);
-}
-.item:hover .item-tip,
-.item:focus-visible .item-tip,
-.item:focus .item-tip {
-  display: block;
 }
 </style>
