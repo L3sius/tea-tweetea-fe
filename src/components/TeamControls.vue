@@ -157,6 +157,9 @@ const step = computed<Step | null>(() => {
       return 'walk'
     case 'idle':
       return null
+    default:
+      // Every status has a case above, so a new one fails type-checking here.
+      return t.status satisfies never
   }
 })
 const stepIndex = computed(() => STEPS.findIndex((s) => s.id === step.value))

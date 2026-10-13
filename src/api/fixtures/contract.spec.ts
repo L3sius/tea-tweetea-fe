@@ -86,11 +86,10 @@ describe('recorded /state', () => {
   })
 
   it('points working teams at an active instance', () => {
-    for (const team of state.teams.values()) {
-      if (team.status.kind === 'working') {
-        expect(state.instances.has(team.status.instanceId)).toBe(true)
-      }
-    }
+    const working = [...state.teams.values()].flatMap((team) =>
+      team.status.kind === 'working' ? [team.status.instanceId] : [],
+    )
+    expect(working.filter((id) => !state.instances.has(id))).toEqual([])
   })
 })
 
