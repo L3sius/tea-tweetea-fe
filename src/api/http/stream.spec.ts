@@ -61,6 +61,34 @@ describe('openStream', () => {
     ])
   })
 
+  it('decodes the Dink activity it announces', () => {
+    const { source, messages } = open()
+
+    source.emit('feed', {
+      id: 9,
+      at: '2026-10-05T14:02:36Z',
+      rsn: 'Zezima',
+      team: 1,
+      kind: 'death',
+      subject: 'Vorkath',
+      value: 0,
+      count: 1,
+      observation: { kind: 'death', killer: 'Vorkath', pvp: false },
+    })
+
+    expect(messages).toMatchObject([
+      {
+        kind: 'feed',
+        item: {
+          id: 9,
+          rsn: 'Zezima',
+          teamId: 1,
+          observation: { kind: 'death', killer: 'Vorkath' },
+        },
+      },
+    ])
+  })
+
   it('reports the connection and closes on request', () => {
     const { source, messages, close } = open()
 

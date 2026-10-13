@@ -16,8 +16,8 @@ export type StreamMessage =
   | { kind: 'connection'; connection: StreamConnection }
   | { kind: 'hello'; hello: Hello }
   | { kind: 'entry'; entry: JournalEntry }
-  /** New Dink activity; refetch the feed. */
-  | { kind: 'feed' }
+  /** New Dink activity, as the feed shows it. Rate-limited per player, so the feed is refetched. */
+  | { kind: 'feed'; item: FeedItem }
   /** The stream lost its place; refetch the state and subscribe again from its seq. */
   | { kind: 'resync' }
 

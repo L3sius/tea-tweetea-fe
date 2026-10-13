@@ -193,12 +193,15 @@ export const useGameStore = defineStore('game', () => {
         return
       }
       case 'feed':
-        feedRefresh.schedule()
+        // The board needs deaths at once, for its taunts; other activity only where the feed shows.
+        if (feedWatchers > 0 || message.item.observation.kind === 'death') feedRefresh.schedule()
+        else feedStale = true
         return
       case 'resync':
         stop()
         void guard(async () => {
           await adopt(await api.getState())
+          feedStale = false
           feed.value = await api.getFeed({ limit: FEED_LIMIT })
         })
     }
@@ -337,9 +340,29 @@ export const useGameStore = defineStore('game', () => {
   )
   const feedRefresh = debounced(() =>
     guard(async () => {
+      feedStale = false
       feed.value = await api.getFeed({ limit: FEED_LIMIT })
     }),
   )
+
+  /** Views showing the feed now (the Activity tab, the Stats page). */
+  let feedWatchers = 0
+  /** Activity arrived while nothing showed the feed, so the next view to show it refetches. */
+  let feedStale = false
+
+  /**
+   * Keeps the feed live while a view shows it, and catches it up first if it is behind. Returns
+   * the function that stops watching.
+   */
+  function watchFeed(): () => void {
+    feedWatchers++
+    if (feedStale) feedRefresh.schedule()
+    let watching = true
+    return () => {
+      if (watching) feedWatchers--
+      watching = false
+    }
+  }
 
   /** Fetches the state now, after an action, instead of waiting for the stream. */
   const refreshState = () => guard(async () => setState(await api.getState()))
@@ -387,6 +410,7 @@ export const useGameStore = defineStore('game', () => {
     stop,
     dismiss,
     refreshState,
+    watchFeed,
   }
 })
 

@@ -65,6 +65,7 @@ export const useStatsStore = defineStore('stats', () => {
   }
 
   let timer: ReturnType<typeof setTimeout> | undefined
+  let unwatchFeed: (() => void) | null = null
   watch(
     () => game.feed,
     () => {
@@ -78,11 +79,14 @@ export const useStatsStore = defineStore('stats', () => {
   /** Starts loading and keeping the stats live while the page shows them. */
   function open() {
     active = true
+    unwatchFeed ??= game.watchFeed()
     void load()
   }
   function close() {
     active = false
     clearTimeout(timer)
+    unwatchFeed?.()
+    unwatchFeed = null
   }
 
   return { filter, tables, loading, error, open, close }

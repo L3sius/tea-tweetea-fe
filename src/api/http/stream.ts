@@ -1,8 +1,10 @@
 import type { StreamListener } from '../client'
 import { decode, parseJson } from '../decode'
 import { isApiError } from '../errors'
+import { toFeedItem } from '../mappers/activity'
 import { toJournalEntry } from '../mappers/events'
 import { toHello } from '../mappers/server'
+import { WireFeedItem } from '../wire/activity'
 import { WirePublished } from '../wire/events'
 import { WireHello } from '../wire/server'
 
@@ -59,7 +61,9 @@ export function openStream(
       entry: decode('/stream entry', WirePublished, toJournalEntry, data),
     }),
   )
-  handle('feed', () => listener({ kind: 'feed' }))
+  handle('feed', (data) =>
+    listener({ kind: 'feed', item: decode('/stream feed', WireFeedItem, toFeedItem, data) }),
+  )
   handle('resync', () => listener({ kind: 'resync' }))
 
   return () => source.close()

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref } from 'vue'
 import filterIcon from '@/assets/tt/img/icons/account-management.png'
 import type { FeedItem } from '@/domain/activity'
 import { observationText } from '@/domain/describe'
 import { NO_FILTER, feedRows, type FeedFilter } from '@/domain/feed'
 import type { Team } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
+import { useGameStore } from '@/stores/game'
 import { teamColor } from '@/ui/colors'
 import { formatGp, timeFrom } from '@/ui/format'
 import { TtPanel, TtText, TtTooltip, stack } from '@/ui/tt'
@@ -15,6 +16,9 @@ const props = defineProps<{
   teams: ReadonlyMap<TeamId, Team>
   now: Date
 }>()
+
+// While shown, the feed stays live; other views skip refetching it on every drop.
+onBeforeUnmount(useGameStore().watchFeed())
 
 const filter = reactive<FeedFilter>({ ...NO_FILTER })
 const expanded = ref(new Set<string>())
