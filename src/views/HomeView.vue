@@ -15,8 +15,6 @@ import TeamControls from '@/components/TeamControls.vue'
 import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
-import crossBox from '@/assets/tt/img/boxes/cross_box.png'
-import tickBox from '@/assets/tt/img/boxes/check_box.png'
 import { MOMENT_LABEL, direct, type Shot } from '@/domain/director'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
@@ -32,7 +30,7 @@ import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
 import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
-import { TtButton, TtPanel, TtText } from '@/ui/tt'
+import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -207,6 +205,7 @@ function freeRoam() {
 const ACTIONS_KEY = 'tweetea.followActions'
 /** The Actions option, remembered for this browser. */
 const followActions = ref(readActions())
+const ACTIONS_TIP = 'The camera visits whatever is happening, then comes back'
 const shot = shallowRef<Shot | null>(null)
 /**
  * The viewer's own camera while an action borrows it: the team followed, or free roam (no team
@@ -461,19 +460,20 @@ async function buyMysteryBox() {
             />
           </button>
         </li>
-        <li class="pointer-events-auto">
+        <TtTooltip as="li" class="pointer-events-auto">
           <button
             type="button"
-            role="checkbox"
-            class="tt-sprite-display tt-press relative flex items-center gap-1.5 px-2 hover:brightness-[1.18]"
-            :aria-checked="followActions"
-            title="Actions: the camera visits whatever is happening, then comes back"
+            class="tt-sprite-display tt-press relative px-2 hover:brightness-[1.18]"
+            :class="{ 'tt-pressed': followActions }"
+            :aria-pressed="followActions"
             @click="followActions = !followActions"
           >
-            <img :src="followActions ? tickBox : crossBox" alt="" class="size-5" />
             <TtText :size="1" font="bold" color="orange">Actions</TtText>
+            <!-- On: pressed in and outlined like a followed team. -->
+            <span v-if="followActions" class="tt-select-ring" aria-hidden="true" />
           </button>
-        </li>
+          <template #tip>{{ ACTIONS_TIP }}</template>
+        </TtTooltip>
       </ol>
 
       <!-- Play-testing tools -->
@@ -727,18 +727,18 @@ async function buyMysteryBox() {
               >
                 <span :style="{ color: teamColor(team) }">{{ team.name }}</span>
               </TtButton>
-              <TtButton
-                size="sm"
-                class="!min-w-0"
-                role="checkbox"
-                :aria-checked="followActions"
-                @click="followActions = !followActions"
-              >
-                <span class="flex items-center gap-1.5">
-                  <img :src="followActions ? tickBox : crossBox" alt="" class="size-5" />
+              <TtTooltip>
+                <TtButton
+                  size="sm"
+                  class="!min-w-0"
+                  :selected="followActions"
+                  :aria-pressed="followActions"
+                  @click="followActions = !followActions"
+                >
                   Actions
-                </span>
-              </TtButton>
+                </TtButton>
+                <template #tip>{{ ACTIONS_TIP }}</template>
+              </TtTooltip>
             </div>
             <TeamCard
               v-if="focus"

@@ -67,15 +67,58 @@ test('a captain logs in with the team code, and out again', async ({ page }) => 
 
 test('the Actions camera option is remembered', async ({ page }) => {
   await open(page, '/')
-  const actions = page.getByRole('checkbox', { name: 'Actions' }).first()
-  await expect(actions).toHaveAttribute('aria-checked', 'false')
+  const actions = page.getByRole('button', { name: 'Actions' }).first()
+  await expect(actions).toHaveAttribute('aria-pressed', 'false')
   await actions.click()
-  await expect(actions).toHaveAttribute('aria-checked', 'true')
+  await expect(actions).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
-  await expect(page.getByRole('checkbox', { name: 'Actions' }).first()).toHaveAttribute(
-    'aria-checked',
+  await expect(page.getByRole('button', { name: 'Actions' }).first()).toHaveAttribute(
+    'aria-pressed',
     'true',
   )
+})
+
+/** Fails when anything is drawn over the open hover box: its corners and middle must be its own. */
+async function expectTooltipOnTop(page: Page) {
+  const tip = page.getByRole('tooltip')
+  await expect(tip).toBeVisible()
+  const covered = await tip.evaluate((box) => {
+    // The box lets the pointer through, which hit-testing would skip; take hits for the check.
+    box.style.pointerEvents = 'auto'
+    const r = box.getBoundingClientRect()
+    const inset = 4
+    const points: [number, number][] = [
+      [r.left + inset, r.top + inset],
+      [r.right - inset, r.top + inset],
+      [r.left + inset, r.bottom - inset],
+      [r.right - inset, r.bottom - inset],
+      [r.left + r.width / 2, r.top + r.height / 2],
+    ]
+    const hidden = points
+      .filter(([x, y]) => !box.contains(document.elementFromPoint(x, y)))
+      .map(([x, y]) => `${Math.round(x)},${Math.round(y)}`)
+    box.style.pointerEvents = ''
+    return hidden
+  })
+  expect(covered, 'points of the hover box drawn over by something else').toEqual([])
+}
+
+test('hover boxes show whole, over the header and panels', async ({ page }) => {
+  // Wide enough that the map's buttons fit on one row, so the Actions box rises into the header.
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await open(page, '/')
+  await page.getByRole('button', { name: 'Actions' }).first().hover()
+  await expect(page.getByRole('tooltip')).toContainText('The camera visits')
+  const tip = await page.getByRole('tooltip').boundingBox()
+  const header = await page.getByRole('banner').boundingBox()
+  expect(tip && header && tip.y < header.y + header.height, 'the box reaches into the header').toBe(
+    true,
+  )
+  await expectTooltipOnTop(page)
+
+  await page.getByRole('tab', { name: 'Activity' }).click()
+  await page.locator('ol time').first().hover()
+  await expectTooltipOnTop(page)
 })
 
 test('the log and activity tabs list the recorded game', async ({ page }) => {
