@@ -13,6 +13,9 @@ test('draws characters from the exported OSRS assets', async ({ page }) => {
   const canvases = page.locator('canvas.character-preview')
   await expect(canvases.first()).toBeVisible()
 
+  // Previews only draw on screen, so pass each one on the way down the page.
+  for (const canvas of await canvases.all()) await canvas.scrollIntoViewIfNeeded()
+
   // Every canvas ends up with some opaque pixels once its model and animation have loaded.
   await expect
     .poll(

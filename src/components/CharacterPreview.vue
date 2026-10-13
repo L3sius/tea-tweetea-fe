@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRafFn } from '@vueuse/core'
+import { useIntersectionObserver, useRafFn } from '@vueuse/core'
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import { RANDOM } from '@/characters/roster'
 import { CharacterPiece } from '@/characters/stage'
@@ -37,11 +37,16 @@ onMounted(mount)
 // The canvas resizes (and clears) before the watcher runs, so the new piece draws afresh.
 watch(() => [props.npc, props.width, props.height], mount, { flush: 'post' })
 onBeforeUnmount(() => piece?.dispose())
-useRafFn(() => {
+const drawing = useRafFn(() => {
   const now = performance.now()
   const pool = props.anim === RANDOM ? props.pool : []
   const anim = pool[Math.floor(now / CYCLE_MS) % pool.length] ?? props.anim
   piece?.draw({ anim, since: 0, rate: 1 }, props.heading, now)
+})
+// A page of previews (the style pickers) only animates the ones on screen.
+useIntersectionObserver(canvas, ([entry]) => {
+  if (entry?.isIntersecting) drawing.resume()
+  else drawing.pause()
 })
 </script>
 
