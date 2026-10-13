@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import * as effects from '@/sound/effects'
 import * as music from '@/sound/music'
 import * as settings from '@/sound/settings'
+import * as voice from '@/sound/voice'
 
 /**
- * The site's sound settings: muted or not, and a volume each for the music and the sound effects,
- * kept for this browser. They apply wherever the control shows (the header, or the tour while it
+ * The site's sound settings: muted or not, and a volume each for the music and the sound effects
+ * (Earl Grey's voice in the tour goes with the effects), kept for this browser. They apply wherever the control shows (the header, or the tour while it
  * hides it), sounds already playing included.
  */
 export const useSoundStore = defineStore('sound', () => {
@@ -17,6 +18,7 @@ export const useSoundStore = defineStore('sound', () => {
   function follow() {
     music.followSettings()
     effects.followSettings()
+    voice.followSettings()
   }
 
   function toggleMute() {

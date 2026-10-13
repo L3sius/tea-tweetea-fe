@@ -51,3 +51,7 @@ tweetea-design-system/
 tools/characters/out/
 # Music, uploaded with the character assets (tools/characters/upload.sh)
 tools/characters/audio/
+# Raw voice recordings, split into public/voice/ (see tools/voice/README.md)
+tools/voice/*.mp3
+tools/voice/*.wav
+tools/voice/*.m4a

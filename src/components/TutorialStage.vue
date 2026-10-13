@@ -36,8 +36,10 @@ const shopStock = computed(() =>
   tutorial.shopTile === null ? [] : (game.state?.shops.get(tutorial.shopTile) ?? []),
 )
 
-/** Letters typed per second, as the chatbox spells his lines out. */
+/** Letters typed per second, as the chatbox spells his lines out when he isn't heard. */
 const TYPE_RATE = 45
+/** While he speaks, the typing keeps pace with him, ending this long before the clip does. */
+const SPOKEN_TAIL_MS = 250
 
 const typed = ref(0)
 let typingFrom = performance.now()
@@ -56,7 +58,12 @@ watch(
 )
 useRafFn(() => {
   if (!typing.value) return
-  const letters = Math.floor(((performance.now() - typingFrom) / 1000) * TYPE_RATE)
+  const spoken = tutorial.spokenMs
+  const rate =
+    spoken === null
+      ? TYPE_RATE
+      : tutorial.text.length / (Math.max(spoken - SPOKEN_TAIL_MS, 500) / 1000)
+  const letters = Math.floor(((performance.now() - typingFrom) / 1000) * rate)
   typed.value = Math.min(tutorial.text.length, letters)
 })
 

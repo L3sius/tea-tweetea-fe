@@ -10,8 +10,10 @@ import type { GameState } from '@/domain/game'
 import { GUIDE, GUIDE_TEAM } from '@/tutorial/guide'
 import * as music from '@/sound/music'
 import { NEWBIE_MELODY } from '@/sound/playlist'
+import * as voice from '@/sound/voice'
 import { PretendGame } from '@/tutorial/pretend'
 import { actionsOf, chapterStart } from '@/tutorial/chapters'
+import { voiceOf } from '@/tutorial/voice'
 import { loadTutorialWorld, type TutorialWorld } from '@/tutorial/world'
 import {
   GESTURE,
@@ -268,6 +270,28 @@ export const useTutorialStore = defineStore('tutorial', () => {
     const shown = current.value?.lines[index]
     if (shown?.gesture) gestureNow(shown.gesture)
     schedule('line', shown?.cues)
+    speakLine(beat.value, index)
+  }
+
+  /** How long Earl Grey speaks the line on screen, while his voice plays; null when silent. */
+  const spokenMs = ref<number | null>(null)
+
+  /** Plays the line's recording, cutting off the last one, and loads the next line's. */
+  function speakLine(beatIndex: number, index: number) {
+    const voiced = lineVoice(beatIndex, index)
+    spokenMs.value = voiced && voice.speak(voiced.clip) ? voiced.ms : null
+    if (!voiced) voice.silence()
+    const following =
+      index + 1 < (TUTORIAL[beatIndex]?.lines.length ?? 0)
+        ? lineVoice(beatIndex, index + 1)
+        : lineVoice(beatIndex + 1, 0)
+    if (following) voice.preload(following.clip)
+  }
+
+  function lineVoice(beatIndex: number, index: number) {
+    const chapter = TUTORIAL[beatIndex]
+    const text = chapter?.lines[index]?.text
+    return chapter && text !== undefined ? voiceOf(chapter.id, index, text) : null
   }
 
   /**
@@ -346,6 +370,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
    */
   function start() {
     clearFades()
+    voice.silence()
     flush('line')
     flush('beat')
     void loadAnimationInfo()
@@ -384,6 +409,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
   function finish() {
     if (phase.value === 'off') return
     clearFades()
+    voice.silence()
     flush('line')
     flush('beat')
     music.stop()
@@ -424,6 +450,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
     beat,
     line,
     text,
+    spokenMs,
     isFirst,
     isLast,
     revealed,

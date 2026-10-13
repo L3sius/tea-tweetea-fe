@@ -1,0 +1,82 @@
+{
+  "welcome-1": {
+    "text": "Ahoy there, young adventurer! I bid you a warm welcome to Tweetea and the Magic Gems.",
+    "ms": 6726
+  },
+  "welcome-2": {
+    "text": "The aim of this adventure is to gather all the magic gems. But how do we get them?",
+    "ms": 5862
+  },
+  "gems-1": {
+    "text": "This is the map of Gielinor. Can you see the gems?",
+    "ms": 4025
+  },
+  "gems-2": {
+    "text": "You must gather them all to reign victorious!",
+    "ms": 3105
+  },
+  "gems-3": {
+    "text": "But how do we get there?",
+    "ms": 1603
+  },
+  "roads-1": {
+    "text": "These are the roads, and they are made up of nodes. Every node is a tile, and an adventurer who lands upon one must complete it.",
+    "ms": 9271
+  },
+  "roads-2": {
+    "text": "A noble adventurer keeps to the path, lest he stray into the depths of darkness.",
+    "ms": 5493
+  },
+  "roads-3": {
+    "text": "A few tiles make for a short walk. Any soldier worth his salt covers such ground without haste.",
+    "ms": 6437
+  },
+  "roads-4": {
+    "text": "But a brisk step favours the bold, and surely the bold shall earn true victory and pride!",
+    "ms": 6834
+  },
+  "tile-1": {
+    "text": "Aha! It appears we have landed on a tile. Click or hover over a node, and we shall gaze upon the task at hand.",
+    "ms": 8124
+  },
+  "tile-2": {
+    "text": "In this manner you may see the path that lies ahead. The tile you must currently conquer is shown in the sidebar of glory.",
+    "ms": 8055
+  },
+  "tile-3": {
+    "text": "The road ahead is a dangerous one, and only as a team can you expect to take the crown.",
+    "ms": 5825
+  },
+  "tile-4": {
+    "text": "Every player's contribution adds to the progress of the tile.",
+    "ms": 3797
+  },
+  "minigame-1": {
+    "text": "Let us proceed forth onto the next tile.",
+    "ms": 2776
+  },
+  "minigame-2": {
+    "text": "Ha! What a gracious day this is! We appear to have landed on a minigame.",
+    "ms": 5222
+  },
+  "minigame-3": {
+    "text": "Minigames can be started at any time, and any team can take part.",
+    "ms": 4511
+  },
+  "minigame-4": {
+    "text": "They are a sport worthy of a true champion, and reward the valiant with gold with which to purchase wares.",
+    "ms": 6938
+  },
+  "shop-1": {
+    "text": "But dost thou ask where one can spend their hard-earned tender? Why, at the shop of course!",
+    "ms": 6221
+  },
+  "shop-2": {
+    "text": "Every shop sells different items, and you must travel the globe to acquire all you can to achieve your goal.",
+    "ms": 6869
+  },
+  "farewell-1": {
+    "text": "That's all from me for now. I wish thee good fortune in thy adventure!",
+    "ms": 4230
+  }
+}

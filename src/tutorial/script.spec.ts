@@ -1,9 +1,12 @@
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { ROSTER } from '@/characters/roster'
 import { tileId, type TileId } from '@/domain/ids'
 import { GUIDE } from './guide'
 import { actionsOf, chapterStart } from './chapters'
 import { GESTURE, TOUR_START, TUTORIAL } from './script'
+import { voiceOf } from './voice'
 import { decodeTutorialWorld } from './world'
 import board from './world/board.json'
 import challenges from './world/challenges.json'
@@ -73,5 +76,30 @@ describe('the chapters', () => {
     expect(tile.tile).toBe(44)
     expect([...tile.revealed].sort()).toEqual(['gems', 'nodes', 'roads', 'terrain'])
     expect(chapterStart(index('shop'))).toMatchObject({ tile: 308, minigameOpen: true })
+  })
+})
+
+describe("Earl Grey's voice", () => {
+  const lines = TUTORIAL.flatMap((beat) =>
+    beat.lines.map((line, i) => ({
+      id: `${beat.id}-${i + 1}`,
+      voiced: voiceOf(beat.id, i, line.text),
+    })),
+  )
+
+  // A line reworded after the recording would play words it no longer shows, so it goes silent
+  // instead; this catches that. Record it again and rerun tools/voice/split.mjs.
+  it('has a recording of every line as the script words it now', () => {
+    expect(lines.filter((l) => l.voiced === null).map((l) => l.id)).toEqual([])
+  })
+
+  it('ships a clip for every recording', () => {
+    const missing = lines.filter(
+      (l) =>
+        !existsSync(
+          fileURLToPath(new URL(`../../public/voice/tutorial/${l.id}.ogg`, import.meta.url)),
+        ),
+    )
+    expect(missing.map((l) => l.id)).toEqual([])
   })
 })

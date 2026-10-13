@@ -6,6 +6,9 @@ import { shuffle } from './playlist'
 import { getMusicGain, isMuted } from './settings'
 
 const FADE_MS = 1500
+/** How far the music dips under Earl Grey's voice, and how fast. */
+const DUCK_GAIN = 0.45
+const DUCK_MS = 300
 /** The last playlist track this browser played, so the next visit starts with another. */
 const LAST_TRACK_KEY = 'tweetea.lastTrack'
 
@@ -17,6 +20,11 @@ let list: { tracks: readonly string[]; order: string[]; at: number; failures: nu
 const fading = new Map<HTMLAudioElement, number>()
 /** A playlist fading out to pause, which a change of volume mustn't undo. */
 let pausing = false
+/** Dipped under the voice (see voice.ts). */
+let ducked = false
+
+/** The volume the music plays at now. */
+const gain = () => getMusicGain() * (ducked ? DUCK_GAIN : 1)
 
 function cancelFade(track: HTMLAudioElement) {
   cancelAnimationFrame(fading.get(track) ?? 0)
@@ -24,13 +32,13 @@ function cancelFade(track: HTMLAudioElement) {
 }
 
 /** Fades `track`'s volume to `to`, then runs `done`. */
-function fade(track: HTMLAudioElement, to: number, done?: () => void) {
+function fade(track: HTMLAudioElement, to: number, done?: () => void, ms = FADE_MS) {
   cancelFade(track)
   const from = track.volume
   const start = performance.now()
   const step = (now: number) => {
     // A frame's timestamp can come a moment before `start`, and volume refuses anything outside 0–1.
-    const t = Math.min(1, Math.max(0, (now - start) / FADE_MS))
+    const t = Math.min(1, Math.max(0, (now - start) / ms))
     track.volume = Math.min(1, Math.max(0, from + (to - from) * t))
     if (t < 1) fading.set(track, requestAnimationFrame(step))
     else {
@@ -47,7 +55,7 @@ function fadeIn(track: HTMLAudioElement) {
   // A refused start (no click yet, or no file) just leaves the page silent.
   track.play().then(
     () => {
-      if (audio === track) fade(track, getMusicGain())
+      if (audio === track) fade(track, gain())
     },
     () => {},
   )
@@ -102,8 +110,15 @@ export function followSettings() {
   audio.muted = isMuted()
   if (!audio.paused && !pausing) {
     cancelFade(audio)
-    audio.volume = getMusicGain()
+    audio.volume = gain()
   }
+}
+
+/** Dips the music under the voice, or brings it back up. */
+export function duck(on: boolean) {
+  if (ducked === on) return
+  ducked = on
+  if (audio && !audio.paused && !pausing) fade(audio, gain(), undefined, DUCK_MS)
 }
 
 /** Whether a track is playing (a start the browser refused isn't). */
