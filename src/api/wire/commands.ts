@@ -19,15 +19,23 @@ export type WireTeamRequest = { version: number; key?: string } & TeamAction
 
 /** `POST /admin/action`. */
 export type WireAdminAction =
-  | { action: 'create_team'; name: string; code: string }
+  | { action: 'create_team'; name: string }
+  | { action: 'delete_team'; team: number }
+  | { action: 'rename_team'; team: number; name: string }
+  | { action: 'reset_team_code'; team: number }
+  | { action: 'set_withdrawn'; team: number; withdrawn: boolean }
   | { action: 'add_member'; team: number; name: string }
+  | { action: 'rename_member'; team: number; member: string; name: string }
+  | { action: 'remove_member'; team: number; member: string }
   | { action: 'add_account'; team: number; member: string; rsn: string }
+  | { action: 'remove_account'; team: number; member: string; rsn: string }
   | { action: 'set_appearance'; team: number; appearance: WireAppearance | null }
   | { action: 'start_game' }
-  | { action: 'complete_tile'; team: number }
+  | { action: 'complete_tile'; team: number; member: string }
   | { action: 'contribute'; team: number; instance: number; key: string; amount: number }
   | { action: 'adjust_gold'; team: number; delta: number }
   | { action: 'discard_item'; team: number; item: Item }
+  | { action: 'give_item'; team: number; item: Item }
   | { action: 'observe'; rsn: string; observation: WireObservation }
   | { action: 'revert'; seq: number }
   // Play-testing shortcuts; the server refuses them unless it runs with DEV_TOOLS=1.

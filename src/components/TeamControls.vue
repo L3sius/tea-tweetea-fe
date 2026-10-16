@@ -220,8 +220,9 @@ const baseSteps = computed(() => {
  * shielded from them for a while, so shielded teams are left out and listed apart.
  */
 const isShielded = (t: Team) => t.shieldUntil !== null && t.shieldUntil > now.value
+// Withdrawn teams cannot be targeted at all, so they are not even listed as shielded.
 const others = computed(() =>
-  [...state.value.teams.values()].filter((t) => t.id !== team.value?.id),
+  [...state.value.teams.values()].filter((t) => t.id !== team.value?.id && !t.withdrawn),
 )
 const rivals = computed(() => others.value.filter((t) => !isShielded(t)))
 const shieldedRivals = computed(() => others.value.filter(isShielded))
@@ -249,6 +250,15 @@ async function login() {
   await my.login(codeInput.value)
   if (my.team) codeInput.value = ''
 }
+
+/** Seconds left on the lock after too many wrong codes; 0 when the form is open. */
+const lockSeconds = computed(() => {
+  const until = my.loginLockedUntil
+  return until === null ? 0 : Math.max(0, Math.ceil((until - now.value.getTime()) / 1000))
+})
+const lockClock = computed(
+  () => `${Math.floor(lockSeconds.value / 60)}:${String(lockSeconds.value % 60).padStart(2, '0')}`,
+)
 </script>
 
 <template>
@@ -277,8 +287,13 @@ async function login() {
           style="color: var(--osrs-white); caret-color: var(--osrs-yellow)"
         />
       </div>
-      <TtText v-if="my.error" role="alert" :size="1" color="red">{{ my.error }}</TtText>
-      <TtButton type="submit" :disabled="my.pending || !codeInput.trim()">Log in</TtButton>
+      <TtText v-if="lockSeconds > 0" role="alert" :size="1" color="red">
+        Too many wrong codes. Try again in {{ lockClock }}.
+      </TtText>
+      <template v-else>
+        <TtText v-if="my.error" role="alert" :size="1" color="red">{{ my.error }}</TtText>
+        <TtButton type="submit" :disabled="my.pending || !codeInput.trim()">Log in</TtButton>
+      </template>
     </form>
   </TtPanel>
 
@@ -300,270 +315,279 @@ async function login() {
 
     <TtDivider />
 
-    <!-- Turn steps -->
-    <ol
-      v-if="step"
-      class="flex flex-wrap items-center justify-center gap-x-2"
-      aria-label="Your turn"
-    >
-      <li
-        v-for="(s, i) in STEPS"
-        :key="s.id"
-        class="flex items-center gap-2"
-        :aria-current="i === stepIndex ? 'step' : undefined"
+    <!-- An admin took the team out: the server refuses its actions, so none are offered. -->
+    <TtText v-if="team.withdrawn" :size="1" color="orange" class="text-center">
+      Your team has withdrawn from the game. Ask an admin if this is a mistake.
+    </TtText>
+
+    <template v-else>
+      <!-- Turn steps -->
+      <ol
+        v-if="step"
+        class="flex flex-wrap items-center justify-center gap-x-2"
+        aria-label="Your turn"
       >
-        <TtText
-          :size="1"
-          :font="i === stepIndex ? 'bold' : 'small'"
-          :color="i === stepIndex ? 'yellow' : i < stepIndex ? 'green' : 'muted'"
-          :glow="i === stepIndex"
+        <li
+          v-for="(s, i) in STEPS"
+          :key="s.id"
+          class="flex items-center gap-2"
+          :aria-current="i === stepIndex ? 'step' : undefined"
         >
-          {{ s.label }}
-        </TtText>
-        <TtText v-if="i < STEPS.length - 1" :size="1" color="muted" aria-hidden="true">&gt;</TtText>
-      </li>
-    </ol>
+          <TtText
+            :size="1"
+            :font="i === stepIndex ? 'bold' : 'small'"
+            :color="i === stepIndex ? 'yellow' : i < stepIndex ? 'green' : 'muted'"
+            :glow="i === stepIndex"
+          >
+            {{ s.label }}
+          </TtText>
+          <TtText v-if="i < STEPS.length - 1" :size="1" color="muted" aria-hidden="true"
+            >&gt;</TtText
+          >
+        </li>
+      </ol>
 
-    <!-- What holds the team outside its turn -->
-    <div v-if="blocker" class="flex flex-col items-center gap-1.5">
-      <TtText v-if="blocker === 'phase'" :size="2" color="white">
-        {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
-      </TtText>
-      <template v-else-if="blocker === 'frozen' && frozen">
-        <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
-        <TtText :size="1" color="white" class="max-w-[340px]">
-          You can't draw or use power-ups while frozen. Hold Protect from Magic to block the next
-          freeze.
+      <!-- What holds the team outside its turn -->
+      <div v-if="blocker" class="flex flex-col items-center gap-1.5">
+        <TtText v-if="blocker === 'phase'" :size="2" color="white">
+          {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
         </TtText>
-      </template>
-      <TtText v-else :size="2" color="white">Walking...</TtText>
-    </div>
+        <template v-else-if="blocker === 'frozen' && frozen">
+          <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
+          <TtText :size="1" color="white" class="max-w-[340px]">
+            You can't draw or use power-ups while frozen. Hold Protect from Magic to block the next
+            freeze.
+          </TtText>
+        </template>
+        <TtText v-else :size="2" color="white">Walking...</TtText>
+      </div>
 
-    <!-- Step 1: the tile -->
-    <div v-else-if="step === 'tile'" class="flex w-full flex-col items-center gap-1.5">
-      <TtText :size="1" color="orange">Current tile</TtText>
-      <template v-if="task">
-        <TtText :size="2">{{ task.challenge.name }}</TtText>
-        <TtText :size="1" color="white" class="max-w-[340px]">
-          {{ task.challenge.description }}
+      <!-- Step 1: the tile -->
+      <div v-else-if="step === 'tile'" class="flex w-full flex-col items-center gap-1.5">
+        <TtText :size="1" color="orange">Current tile</TtText>
+        <template v-if="task">
+          <TtText :size="2">{{ task.challenge.name }}</TtText>
+          <TtText :size="1" color="white" class="max-w-[340px]">
+            {{ task.challenge.description }}
+          </TtText>
+          <TtProgressBar
+            :value="task.done"
+            :max="task.needed"
+            :label="`${task.done} / ${task.needed}`"
+            :width="330"
+            class="max-w-full"
+          />
+          <TtText v-if="task.effort" :size="1" color="cyan">{{ task.effort }}</TtText>
+        </template>
+        <TtText :size="1" color="muted" class="max-w-[340px]">
+          Tiles complete automatically from Dink drops. Power-ups unlock when the tile is done.
         </TtText>
-        <TtProgressBar
-          :value="task.done"
-          :max="task.needed"
-          :label="`${task.done} / ${task.needed}`"
-          :width="330"
-          class="max-w-full"
+      </div>
+
+      <!-- Step 2: power-up -->
+      <div v-else-if="step === 'powerup'" class="flex w-full flex-col items-center gap-2">
+        <TtText :size="2" color="white">Use a power-up before you draw?</TtText>
+        <TtText :size="1" color="muted" class="max-w-[340px]">
+          You may use one item on this tile. Once the card is drawn it's too late, so decide now.
+        </TtText>
+
+        <div
+          v-if="my.targeting"
+          class="tt-sprite-display flex w-full flex-col items-center gap-1.5 px-2 py-1"
+          role="status"
+        >
+          <TtText :size="1" color="orange">Using {{ itemName(my.targeting.item) }}</TtText>
+          <template v-if="my.targeting.kind === 'team'">
+            <TtText :size="1" color="white">
+              {{ rivals.length ? 'Pick a rival team.' : 'Every rival is shielded right now.' }}
+            </TtText>
+            <div class="flex flex-wrap justify-center gap-1.5">
+              <TtButton
+                v-for="rival in rivals"
+                :key="rival.id"
+                size="sm"
+                :disabled="my.pending"
+                @click="my.useOn({ kind: 'team', teamId: rival.id })"
+              >
+                <span :style="{ color: teamColor(rival) }">{{ rival.name }}</span>
+              </TtButton>
+            </div>
+            <TtText v-for="t in shieldedRivals" :key="t.id" :size="1" color="muted">
+              {{ t.name }} is shielded until {{ clock(t.shieldUntil!) }}.
+            </TtText>
+          </template>
+          <TtText v-else :size="1" color="white">
+            Click one of the orange-ringed tiles on the map (within
+            {{ game.rules?.blockerRange }} steps of you).
+          </TtText>
+          <button type="button" class="tt-link tt-1" @click="my.targeting = null">Cancel</button>
+        </div>
+
+        <PowerUpPicker
+          :team="team"
+          :items="my.items"
+          :here="here"
+          :now="now"
+          :blockers="my.blockers"
+          :inventory-limit="game.rules?.inventoryLimit ?? 0"
+          :pending="my.pending"
+          @use="my.useItem"
+          @discard="discard"
         />
-        <TtText v-if="task.effort" :size="1" color="cyan">{{ task.effort }}</TtText>
-      </template>
-      <TtText :size="1" color="muted" class="max-w-[340px]">
-        Tiles complete automatically from Dink drops. Power-ups unlock when the tile is done.
-      </TtText>
-    </div>
 
-    <!-- Step 2: power-up -->
-    <div v-else-if="step === 'powerup'" class="flex w-full flex-col items-center gap-2">
-      <TtText :size="2" color="white">Use a power-up before you draw?</TtText>
-      <TtText :size="1" color="muted" class="max-w-[340px]">
-        You may use one item on this tile. Once the card is drawn it's too late, so decide now.
-      </TtText>
+        <TtButton @click="my.skippedPowerup = true">Skip to the draw</TtButton>
+      </div>
 
-      <div
-        v-if="my.targeting"
-        class="tt-sprite-display flex w-full flex-col items-center gap-1.5 px-2 py-1"
-        role="status"
-      >
-        <TtText :size="1" color="orange">Using {{ itemName(my.targeting.item) }}</TtText>
-        <template v-if="my.targeting.kind === 'team'">
-          <TtText :size="1" color="white">
-            {{ rivals.length ? 'Pick a rival team.' : 'Every rival is shielded right now.' }}
+      <!-- Step 3: draw -->
+      <div v-else-if="step === 'draw'" class="flex w-full flex-col items-center gap-1.5">
+        <TtText :size="2" color="white">
+          {{ my.drawPhase === 'revealed' ? 'Your card' : 'Pick a card' }}
+        </TtText>
+
+        <template v-if="my.drawPhase !== 'revealed'">
+          <TtText v-if="usedHere" :size="1" color="green">
+            Used {{ itemName(usedHere) }} on this tile.
+          </TtText>
+          <TtText v-else-if="usableCount === 0" :size="1" color="muted">
+            No power-ups to use right now.
+          </TtText>
+          <TtText v-else :size="1" color="muted">
+            Drawing without a power-up.
+            <button
+              v-if="my.drawPhase === 'idle'"
+              type="button"
+              class="tt-link"
+              @click="my.skippedPowerup = false"
+            >
+              Back to power-ups
+            </button>
+          </TtText>
+          <ul v-if="drawEffects.length" class="flex flex-wrap justify-center gap-x-3">
+            <li v-for="fx in drawEffects" :key="fx.text">
+              <TtText :size="1" :color="fx.tone === 'good' ? 'green' : 'red'">{{ fx.text }}</TtText>
+            </li>
+          </ul>
+        </template>
+
+        <CardDraw
+          ref="cardDraw"
+          class="w-full"
+          :result="my.lastDraw?.card ?? null"
+          :disabled="my.pending || my.drawPhase === 'revealed'"
+          @pick="onPick"
+          @revealed="my.cardRevealed()"
+        />
+        <TtText v-if="my.drawPhase === 'idle'" :size="1" color="muted"
+          >Click a card to draw it.</TtText
+        >
+        <TtText v-else-if="my.drawPhase === 'picking'" :size="1" color="white">Drawing...</TtText>
+
+        <div
+          v-if="my.drawPhase === 'revealed' && my.lastDraw"
+          class="reveal-in flex flex-col items-center gap-1.5"
+        >
+          <TtText
+            v-for="line in outcomeLines"
+            :key="line.text"
+            :size="2"
+            :color="TONE_COLOR[line.tone]"
+            glow
+          >
+            {{ line.text }}
+          </TtText>
+          <TtText
+            v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps"
+            :size="1"
+            color="white"
+          >
+            {{ cardLabel(my.lastDraw.card) }} is worth {{ baseSteps }}; your effects made it
+            {{ my.lastDraw.steps }}.
+          </TtText>
+          <TtButton class="mt-1.5" @click="my.finishDraw()"> Choose a path </TtButton>
+        </div>
+      </div>
+
+      <!-- Step 4: walk -->
+      <div v-else-if="step === 'walk'" class="flex w-full flex-col items-center gap-2">
+        <template v-if="team.status.kind === 'drawn'">
+          <div class="flex items-center gap-3">
+            <PlayingCard :card="team.status.card" />
+            <div class="flex flex-col items-center gap-1">
+              <TtText :size="2" color="white" glow
+                >Move {{ count(team.status.length, 'tile') }}</TtText
+              >
+              <TtText v-if="team.status.length < team.status.steps" :size="1" color="muted">
+                The card is worth {{ team.status.steps }}, but no walk is that long.
+              </TtText>
+            </div>
+          </div>
+          <TtDisplayBox
+            label="Steps left"
+            :value="my.stepsLeft"
+            :value-color="my.stepsLeft === 0 ? 'var(--osrs-green)' : 'var(--osrs-yellow)'"
+            :width="150"
+          />
+          <TtText v-if="stopText" :size="1" color="red" class="max-w-[340px]">
+            {{ stopText }} Press Go! to walk it.
+          </TtText>
+          <TtText v-else-if="my.stepsLeft > 0" :size="1" color="white" class="max-w-[340px]">
+            Click nodes on the map to walk there, one checkpoint at a time. Yellow squares are one
+            step away.
+          </TtText>
+          <TtText v-else :size="1" color="green">Route complete. Press Go! to walk it.</TtText>
+          <TtText v-if="my.route" :size="1" color="muted" class="max-w-[340px]">
+            Click back along your route to undo steps, or a node off it to reroute from there.
           </TtText>
           <div class="flex flex-wrap justify-center gap-1.5">
             <TtButton
-              v-for="rival in rivals"
-              :key="rival.id"
-              size="sm"
-              :disabled="my.pending"
-              @click="my.useOn({ kind: 'team', teamId: rival.id })"
+              :disabled="my.stepsLeft !== 0 || !my.route || my.pending"
+              @click="my.confirmRoute()"
             >
-              <span :style="{ color: teamColor(rival) }">{{ rival.name }}</span>
+              Go!
+            </TtButton>
+            <TtButton size="sm" :disabled="!my.checkpoints.length" @click="my.undoCheckpoint()">
+              Undo
+            </TtButton>
+            <TtButton size="sm" :disabled="!my.route" @click="my.clearRoute()">Clear</TtButton>
+          </div>
+        </template>
+        <template v-else-if="pause?.kind === 'shop'">
+          <TtText :size="2">You're passing a shop.</TtText>
+          <TtText :size="1" color="white">Buy what you like, then carry on walking.</TtText>
+          <div class="flex flex-wrap justify-center gap-1.5">
+            <TtButton @click="emit('openShop')">Browse</TtButton>
+            <TtButton :disabled="my.pending" @click="my.act({ kind: 'close_shop' })">
+              Walk on
             </TtButton>
           </div>
-          <TtText v-for="t in shieldedRivals" :key="t.id" :size="1" color="muted">
-            {{ t.name }} is shielded until {{ clock(t.shieldUntil!) }}.
-          </TtText>
         </template>
-        <TtText v-else :size="1" color="white">
-          Click one of the orange-ringed tiles on the map (within
-          {{ game.rules?.blockerRange }} steps of you).
-        </TtText>
-        <button type="button" class="tt-link tt-1" @click="my.targeting = null">Cancel</button>
+        <TtText v-else :size="2" color="white">Walking...</TtText>
       </div>
 
-      <PowerUpPicker
-        :team="team"
-        :items="my.items"
-        :here="here"
-        :now="now"
-        :blockers="my.blockers"
-        :inventory-limit="game.rules?.inventoryLimit ?? 0"
-        :pending="my.pending"
-        @use="my.useItem"
-        @discard="discard"
-      />
-
-      <TtButton @click="my.skippedPowerup = true">Skip to the draw</TtButton>
-    </div>
-
-    <!-- Step 3: draw -->
-    <div v-else-if="step === 'draw'" class="flex w-full flex-col items-center gap-1.5">
-      <TtText :size="2" color="white">
-        {{ my.drawPhase === 'revealed' ? 'Your card' : 'Pick a card' }}
-      </TtText>
-
-      <template v-if="my.drawPhase !== 'revealed'">
-        <TtText v-if="usedHere" :size="1" color="green">
-          Used {{ itemName(usedHere) }} on this tile.
-        </TtText>
-        <TtText v-else-if="usableCount === 0" :size="1" color="muted">
-          No power-ups to use right now.
-        </TtText>
-        <TtText v-else :size="1" color="muted">
-          Drawing without a power-up.
-          <button
-            v-if="my.drawPhase === 'idle'"
-            type="button"
-            class="tt-link"
-            @click="my.skippedPowerup = false"
-          >
-            Back to power-ups
-          </button>
-        </TtText>
-        <ul v-if="drawEffects.length" class="flex flex-wrap justify-center gap-x-3">
-          <li v-for="fx in drawEffects" :key="fx.text">
-            <TtText :size="1" :color="fx.tone === 'good' ? 'green' : 'red'">{{ fx.text }}</TtText>
-          </li>
-        </ul>
-      </template>
-
-      <CardDraw
-        ref="cardDraw"
-        class="w-full"
-        :result="my.lastDraw?.card ?? null"
-        :disabled="my.pending || my.drawPhase === 'revealed'"
-        @pick="onPick"
-        @revealed="my.cardRevealed()"
-      />
-      <TtText v-if="my.drawPhase === 'idle'" :size="1" color="muted"
-        >Click a card to draw it.</TtText
+      <TtButton
+        v-if="atShop && pause?.kind !== 'shop' && !blocker"
+        size="sm"
+        @click="emit('openShop')"
       >
-      <TtText v-else-if="my.drawPhase === 'picking'" :size="1" color="white">Drawing...</TtText>
+        You're on a shop: browse it
+      </TtButton>
 
-      <div
-        v-if="my.drawPhase === 'revealed' && my.lastDraw"
-        class="reveal-in flex flex-col items-center gap-1.5"
-      >
-        <TtText
-          v-for="line in outcomeLines"
-          :key="line.text"
-          :size="2"
-          :color="TONE_COLOR[line.tone]"
-          glow
-        >
-          {{ line.text }}
-        </TtText>
-        <TtText
-          v-if="baseSteps !== null && baseSteps !== my.lastDraw.steps"
-          :size="1"
-          color="white"
-        >
-          {{ cardLabel(my.lastDraw.card) }} is worth {{ baseSteps }}; your effects made it
-          {{ my.lastDraw.steps }}.
-        </TtText>
-        <TtButton class="mt-1.5" @click="my.finishDraw()"> Choose a path </TtButton>
-      </div>
-    </div>
-
-    <!-- Step 4: walk -->
-    <div v-else-if="step === 'walk'" class="flex w-full flex-col items-center gap-2">
-      <template v-if="team.status.kind === 'drawn'">
-        <div class="flex items-center gap-3">
-          <PlayingCard :card="team.status.card" />
-          <div class="flex flex-col items-center gap-1">
-            <TtText :size="2" color="white" glow
-              >Move {{ count(team.status.length, 'tile') }}</TtText
-            >
-            <TtText v-if="team.status.length < team.status.steps" :size="1" color="muted">
-              The card is worth {{ team.status.steps }}, but no walk is that long.
-            </TtText>
-          </div>
-        </div>
-        <TtDisplayBox
-          label="Steps left"
-          :value="my.stepsLeft"
-          :value-color="my.stepsLeft === 0 ? 'var(--osrs-green)' : 'var(--osrs-yellow)'"
-          :width="150"
+      <!-- Inventory, outside the power-up step (which shows it above) -->
+      <template v-if="step !== 'powerup'">
+        <TtDivider />
+        <PowerUpPicker
+          :team="team"
+          :items="my.items"
+          :here="here"
+          :now="now"
+          :blockers="my.blockers"
+          :inventory-limit="game.rules?.inventoryLimit ?? 0"
+          :pending="my.pending"
+          :locked="step === 'tile'"
+          @use="use"
+          @discard="discard"
         />
-        <TtText v-if="stopText" :size="1" color="red" class="max-w-[340px]">
-          {{ stopText }} Press Go! to walk it.
-        </TtText>
-        <TtText v-else-if="my.stepsLeft > 0" :size="1" color="white" class="max-w-[340px]">
-          Click nodes on the map to walk there, one checkpoint at a time. Yellow squares are one
-          step away.
-        </TtText>
-        <TtText v-else :size="1" color="green">Route complete. Press Go! to walk it.</TtText>
-        <TtText v-if="my.route" :size="1" color="muted" class="max-w-[340px]">
-          Click back along your route to undo steps, or a node off it to reroute from there.
-        </TtText>
-        <div class="flex flex-wrap justify-center gap-1.5">
-          <TtButton
-            :disabled="my.stepsLeft !== 0 || !my.route || my.pending"
-            @click="my.confirmRoute()"
-          >
-            Go!
-          </TtButton>
-          <TtButton size="sm" :disabled="!my.checkpoints.length" @click="my.undoCheckpoint()">
-            Undo
-          </TtButton>
-          <TtButton size="sm" :disabled="!my.route" @click="my.clearRoute()">Clear</TtButton>
-        </div>
       </template>
-      <template v-else-if="pause?.kind === 'shop'">
-        <TtText :size="2">You're passing a shop.</TtText>
-        <TtText :size="1" color="white">Buy what you like, then carry on walking.</TtText>
-        <div class="flex flex-wrap justify-center gap-1.5">
-          <TtButton @click="emit('openShop')">Browse</TtButton>
-          <TtButton :disabled="my.pending" @click="my.act({ kind: 'close_shop' })">
-            Walk on
-          </TtButton>
-        </div>
-      </template>
-      <TtText v-else :size="2" color="white">Walking...</TtText>
-    </div>
-
-    <TtButton
-      v-if="atShop && pause?.kind !== 'shop' && !blocker"
-      size="sm"
-      @click="emit('openShop')"
-    >
-      You're on a shop: browse it
-    </TtButton>
-
-    <!-- Inventory, outside the power-up step (which shows it above) -->
-    <template v-if="step !== 'powerup'">
-      <TtDivider />
-      <PowerUpPicker
-        :team="team"
-        :items="my.items"
-        :here="here"
-        :now="now"
-        :blockers="my.blockers"
-        :inventory-limit="game.rules?.inventoryLimit ?? 0"
-        :pending="my.pending"
-        :locked="step === 'tile'"
-        @use="use"
-        @discard="discard"
-      />
     </template>
 
     <ConfirmDialog

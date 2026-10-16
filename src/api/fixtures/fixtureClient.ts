@@ -1,5 +1,6 @@
 import type { StatsGroup } from '@/domain/activity'
 import { teamId } from '@/domain/ids'
+import type { Me, Overview } from '@/domain/server'
 import type { ApiClient } from '../client'
 import { decode, parseJson } from '../decode'
 import { endpoints } from '../endpoints'
@@ -57,6 +58,15 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
     return { team, seq: state.seq }
   }
 
+  // Only some teams' inventories are recorded; the others hold nothing.
+  async function getMe(teamCode: string): Promise<Me> {
+    const { team, seq } = await teamForCode(teamCode)
+    const name = `me-${teamCode}` as const
+    if (!files[`./data/${name}.json`])
+      return { teamId: team.id, name: team.name, items: new Map(), seq }
+    return decode(`fixture:${name}`, endpoints.me.schema, endpoints.me.map, await load(name))
+  }
+
   return {
     getBoard: async () =>
       decode('fixture:board', endpoints.board.schema, endpoints.board.map, await load('board')),
@@ -109,14 +119,7 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
         await load(`stats-by-${query.by}`),
       ),
 
-    // Only some teams' inventories are recorded; the others hold nothing.
-    async getMe(teamCode) {
-      const { team, seq } = await teamForCode(teamCode)
-      const name = `me-${teamCode}` as const
-      if (!files[`./data/${name}.json`])
-        return { teamId: team.id, name: team.name, items: new Map(), seq }
-      return decode(`fixture:${name}`, endpoints.me.schema, endpoints.me.map, await load(name))
-    },
+    getMe,
 
     async sendTeamCommand({ teamCode, version }) {
       const { team, seq } = await teamForCode(teamCode)
@@ -128,6 +131,19 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
       if (adminCode !== FIXTURE_ADMIN_CODE) throw new ApiError({ kind: 'unauthorized' })
       const state = await getState()
       return { kind: 'accepted', seq: state.seq }
+    },
+
+    // Inventories come from the recorded ones; Dink activity is not recorded.
+    async getOverview(adminCode) {
+      if (adminCode !== FIXTURE_ADMIN_CODE) throw new ApiError({ kind: 'unauthorized' })
+      const state = await getState()
+      const teams: Overview['teams'] = new Map()
+      for (const team of state.teams.values()) {
+        const code = SAMPLE_TEAM_CODES[team.id]
+        const items = code ? (await getMe(code)).items : new Map()
+        teams.set(team.id, { items, codeIssued: false })
+      }
+      return { seq: state.seq, teams, accounts: [] }
     },
 
     // Recordings never change, so there is nothing to stream.

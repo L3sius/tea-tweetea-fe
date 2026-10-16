@@ -8,6 +8,13 @@ import type { GameEvent, JournalEntry } from '@/domain/events'
 import type { Blocker, Team } from '@/domain/game'
 import { tileId, type TeamId, type TileId } from '@/domain/ids'
 import { ITEM_TARGET, blockersOut, gainedItem, whyNotUsable } from '@/domain/items'
+import {
+  NO_THROTTLE,
+  afterFailure,
+  lockLeft,
+  parseThrottle,
+  type LoginThrottle,
+} from '@/domain/loginThrottle'
 import { adjacency, blockerTiles, sharedLength, tilesWithin, Walks } from '@/domain/paths'
 import type { Item } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
@@ -15,6 +22,7 @@ import { useDevStore } from './dev'
 import { useGameStore } from './game'
 
 const CODE_KEY = 'tweetea.teamCode'
+const THROTTLE_KEY = 'tweetea.loginThrottle'
 
 /** An item waiting for the player to pick what it is used on. */
 export type Targeting = { item: Item; kind: 'team' | 'tile' }
@@ -48,6 +56,10 @@ export const useTeamStore = defineStore('team', () => {
   let itemsSeq = 0
   const pending = ref(false)
   const error = ref<string | null>(null)
+  /** Wrong codes typed in this browser; kept across reloads so a refresh does not reset it. */
+  const throttle = shallowRef<LoginThrottle>(readThrottle())
+  /** Epoch ms until which the login form is locked after too many wrong codes, or null. */
+  const loginLockedUntil = computed(() => throttle.value.lockedUntil)
 
   /**
    * The walk the captain is building, start tile first. It changes by clicking checkpoints;
@@ -217,9 +229,17 @@ export const useTeamStore = defineStore('team', () => {
     itemsTimer = setTimeout(() => void refreshItems(), 300)
   }
 
+  /** Logs in with a code the captain typed; wrong codes lock the form for a while. */
   async function login(entered: string) {
+    if (lockLeft(throttle.value, Date.now()) > 0) return
+    const result = await attempt(entered)
+    if (result === 'accepted') setThrottle(NO_THROTTLE)
+    else if (result === 'unknown_code') setThrottle(afterFailure(throttle.value, Date.now()))
+  }
+
+  async function attempt(entered: string): Promise<'accepted' | 'unknown_code' | 'failed' | null> {
     const trimmed = entered.trim()
-    if (!trimmed) return
+    if (!trimmed) return null
     pending.value = true
     error.value = null
     try {
@@ -233,10 +253,22 @@ export const useTeamStore = defineStore('team', () => {
       } catch {
         // Storage can be blocked; the login still works for this visit.
       }
+      return 'accepted'
     } catch (e) {
       error.value = messageOf(e)
+      return isApiError(e) && e.problem.kind === 'unauthorized' ? 'unknown_code' : 'failed'
     } finally {
       pending.value = false
+    }
+  }
+
+  function setThrottle(next: LoginThrottle) {
+    throttle.value = next
+    try {
+      if (next.failures === 0) localStorage.removeItem(THROTTLE_KEY)
+      else localStorage.setItem(THROTTLE_KEY, JSON.stringify(next))
+    } catch {
+      // Storage blocked: the lock lasts for this visit only.
     }
   }
 
@@ -250,7 +282,8 @@ export const useTeamStore = defineStore('team', () => {
       return
     }
     if (!saved) return
-    await login(saved)
+    // The saved code worked before, so it does not count against the throttle.
+    await attempt(saved)
     if (teamId.value === null) forget()
   }
 
@@ -489,6 +522,7 @@ export const useTeamStore = defineStore('team', () => {
     items,
     pending,
     error,
+    loginLockedUntil,
     route,
     path,
     checkpoints,
@@ -531,6 +565,14 @@ const INVENTORY_EVENTS = new Set<GameEvent['kind']>(['bought', 'item_gained', 'i
 
 const sameRoute = (a: readonly TileId[], b: readonly TileId[]) =>
   a.length === b.length && sharedLength(a, b) === a.length
+
+function readThrottle(): LoginThrottle {
+  try {
+    return parseThrottle(localStorage.getItem(THROTTLE_KEY))
+  } catch {
+    return NO_THROTTLE
+  }
+}
 
 function messageOf(error: unknown): string {
   if (isApiError(error)) return describeProblem(error.problem)

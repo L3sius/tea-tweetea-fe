@@ -19,7 +19,7 @@ test('a captain plays a whole turn, and a viewer sees it live', async ({
   await expect(turn.locator('[aria-current="step"]')).toHaveText(/^Tile/)
 
   // Dink would complete the tile; the admin fallback does the same.
-  await backend.admin({ action: 'complete_tile', team: red.id })
+  await backend.admin({ action: 'complete_tile', team: red.id, member: red.member })
   await expect(turn.locator('[aria-current="step"]')).toHaveText(/^Draw/)
 
   // The cards are fanned; the last one lies on top.

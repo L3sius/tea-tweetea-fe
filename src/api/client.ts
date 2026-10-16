@@ -7,7 +7,7 @@ import type { GameState } from '@/domain/game'
 import type { ItemCatalogue } from '@/domain/items'
 import type { Rules } from '@/domain/rules'
 import type { ChallengeId } from '@/domain/ids'
-import type { Hello, Me } from '@/domain/server'
+import type { Hello, Me, Overview } from '@/domain/server'
 
 /** `live` while connected; `reconnecting` while the browser retries; `offline` when it gave up. */
 export type StreamConnection = 'live' | 'reconnecting' | 'offline'
@@ -62,6 +62,8 @@ export type ApiClient = {
   getMe(teamCode: string): Promise<Me>
   sendTeamCommand(request: TeamCommandRequest): Promise<CommandAccepted>
   sendAdminCommand(request: AdminCommandRequest): Promise<AdminReply>
+  /** Inventories, code status and Dink activity, for the admin page. */
+  getOverview(adminCode: string): Promise<Overview>
   /** Live journal entries after `afterSeq`, in order. Returns a function that closes the stream. */
   subscribe(afterSeq: number, listener: StreamListener): () => void
 }

@@ -50,6 +50,7 @@ export class PretendGame {
         run: GUIDE.run,
         swim: GUIDE.idle,
       },
+      withdrawn: false,
     }
   }
 

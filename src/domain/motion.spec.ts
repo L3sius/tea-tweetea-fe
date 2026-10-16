@@ -55,7 +55,7 @@ describe('Choreography', () => {
     c.apply(walk(1, T0, [10, 11, 12]))
     c.apply(
       entry(2, T0, [
-        { kind: 'tile_completed', teamId: red, tileId: tileId(12) },
+        { kind: 'tile_completed', teamId: red, tileId: tileId(12), by: null },
         { kind: 'card_drawn', teamId: blue, card: { kind: 'joker' }, steps: 1 },
         {
           kind: 'card_drawn',

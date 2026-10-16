@@ -45,6 +45,12 @@ describe('admin actions', () => {
     ).toEqual({ action: 'contribute', team: 1, instance: 17, key: 'Dragon pickaxe', amount: 1 })
   })
 
+  it('names the member who gets the credit for a tile completed by hand', () => {
+    expect(
+      toWireAdminAction({ kind: 'complete_tile', teamId: teamId(1), member: 'Zezima' }),
+    ).toEqual({ action: 'complete_tile', team: 1, member: 'Zezima' })
+  })
+
   it('sends dev cards in the server’s card shape', () => {
     const team = teamId(2)
     expect(
@@ -79,5 +85,29 @@ describe('admin actions', () => {
         items: [{ name: 'Dragon pickaxe', quantity: 1, price_each: 2_000_000 }],
       },
     })
+  })
+})
+
+describe('roster admin actions', () => {
+  it('names the team by id and never sends a team code', () => {
+    expect(toWireAdminAction({ kind: 'create_team', name: 'Red' })).toEqual({
+      action: 'create_team',
+      name: 'Red',
+    })
+    expect(toWireAdminAction({ kind: 'reset_team_code', teamId: teamId(2) })).toEqual({
+      action: 'reset_team_code',
+      team: 2,
+    })
+    expect(
+      toWireAdminAction({
+        kind: 'remove_account',
+        teamId: teamId(0),
+        member: 'Zez',
+        rsn: 'Zez Alt',
+      }),
+    ).toEqual({ action: 'remove_account', team: 0, member: 'Zez', rsn: 'Zez Alt' })
+    expect(
+      toWireAdminAction({ kind: 'set_withdrawn', teamId: teamId(1), withdrawn: true }),
+    ).toEqual({ action: 'set_withdrawn', team: 1, withdrawn: true })
   })
 })

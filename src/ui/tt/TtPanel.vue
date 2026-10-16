@@ -11,6 +11,8 @@ const props = defineProps({
   height: { type: [Number, String], default: undefined },
   padding: { type: Number, default: 18 },
   gap: { type: Number, default: 12 },
+  /** Content starts at the top and fills the panel, for panels stretched to a row's height. */
+  top: Boolean,
 })
 const slots = useSlots()
 const hasTitle = computed(() => props.title != null || !!slots.title)
@@ -27,7 +29,7 @@ const iron = computed(() => props.variant === 'iron')
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: hasTitle ? 'flex-start' : 'center',
+      justifyContent: hasTitle || top ? 'flex-start' : 'center',
     }"
   >
     <div
@@ -54,14 +56,14 @@ const iron = computed(() => props.variant === 'iron')
     </div>
     <div
       :style="{
-        flex: hasTitle ? 1 : 'none',
+        flex: hasTitle || top ? 1 : 'none',
         width: '100%',
         boxSizing: 'border-box',
         padding: `${padding}px`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: hasTitle ? 'flex-start' : 'center',
+        justifyContent: hasTitle || top ? 'flex-start' : 'center',
         gap: `${gap}px`,
         textAlign: 'center',
       }"

@@ -68,6 +68,11 @@ select {
   color: var(--text-muted);
   opacity: 0.7;
 }
+/* An input beside a small TtButton: as tall as the button's face (48px less its 4px drop shadow).
+   Line the row up by the tops (items-start) so the faces match. */
+.tt-input.tt-field {
+  height: 44px;
+}
 .tt-input option,
 .tt-input optgroup {
   background: var(--brown-deep);

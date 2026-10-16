@@ -220,9 +220,23 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
   switch (event.kind) {
     case 'team_created':
       return `${event.name} joined the game`
+    case 'team_deleted':
+      return `${event.name} left the game`
+    case 'team_renamed':
+      return `A team is now called ${event.name}`
+    case 'withdrawn':
+      return `${team(event.teamId)} withdrew from the game`
+    case 'reinstated':
+      return `${team(event.teamId)} is back in the game`
     case 'member_added':
       return `${event.member} joined ${team(event.teamId)}`
+    case 'member_renamed':
+      return `${event.member} is now called ${event.name}`
+    case 'member_removed':
+      return `${event.member} left ${team(event.teamId)}`
+    case 'code_changed':
     case 'account_added':
+    case 'account_removed':
       return null
     case 'appearance_set':
       return `${team(event.teamId)} has a new look`
@@ -246,7 +260,9 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'blocker_triggered':
       return `${team(event.teamId)} was stopped by ${a(blockerName(event.blocker).toLowerCase())}`
     case 'tile_completed':
-      return `${team(event.teamId)} completed a tile`
+      return event.by
+        ? `${team(event.teamId)} completed a tile, credited to ${event.by}`
+        : `${team(event.teamId)} completed a tile`
     case 'gem_collected':
       return `${team(event.teamId)} collected the ${event.gem} gem`
     case 'gem_lost':

@@ -5,7 +5,7 @@ const [red, blue] = TEAMS
 test.beforeEach(async ({ backend, devTools }) => {
   void devTools
   // Items are used after the tile is done and before the draw.
-  await backend.admin({ action: 'complete_tile', team: red.id })
+  await backend.admin({ action: 'complete_tile', team: red.id, member: red.member })
 })
 
 test('Ice Barrage freezes a rival, who sees it on their own page', async ({

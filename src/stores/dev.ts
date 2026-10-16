@@ -111,11 +111,19 @@ export const useDevStore = defineStore('dev', () => {
     return run(make(t), done())
   }
 
-  const completeTile = () =>
-    withTeam(
-      (t) => ({ kind: 'complete_tile', teamId: t }),
+  /** The server wants someone to credit; a play-testing shortcut credits the first member. */
+  const firstMember = (t: TeamId) => game.state?.teams.get(t)?.members[0]?.name ?? null
+  const noMember = () => void (message.value = { text: `${name()} has no members.`, tone: 'error' })
+
+  async function completeTile() {
+    const t = team()
+    const member = t === null ? null : firstMember(t)
+    if (t !== null && member === null) return noMember() ?? null
+    return withTeam(
+      (t) => ({ kind: 'complete_tile', teamId: t, member: member ?? '' }),
       () => `${name()}’s tile is complete.`,
     )
+  }
   const adjustGold = (delta: number) =>
     withTeam(
       (t) => ({ kind: 'adjust_gold', teamId: t, delta }),
@@ -181,7 +189,9 @@ export const useDevStore = defineStore('dev', () => {
     const current = game.state?.teams.get(id)
     if (current?.status.kind === 'ready')
       return void (message.value = { text: `${name()} is ready to draw.`, tone: 'ok' })
-    await run({ kind: 'complete_tile', teamId: id }, `${name()} is ready to draw.`)
+    const member = firstMember(id)
+    if (member === null) return noMember()
+    await run({ kind: 'complete_tile', teamId: id, member }, `${name()} is ready to draw.`)
   }
 
   /** What undo would take back: the newest journal entry, described. */

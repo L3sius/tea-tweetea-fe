@@ -16,8 +16,12 @@ withDefaults(
     note?: string
     confirmLabel?: string
     cancelLabel?: string
+    /** One width for both buttons, so a label that changes (Copy, Copied) doesn't resize them. */
+    buttonWidth?: number
+    /** Until the answer is complete, such as a required choice in the `fields` slot. */
+    confirmDisabled?: boolean
   }>(),
-  { note: undefined, confirmLabel: 'Yes', cancelLabel: 'No' },
+  { note: undefined, confirmLabel: 'Yes', cancelLabel: 'No', buttonWidth: undefined },
 )
 const emit = defineEmits<{ confirm: []; cancel: [] }>()
 
@@ -49,9 +53,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <slot />
         <TtText :size="2" color="white" align="center">{{ question }}</TtText>
         <TtText v-if="note" :size="1" color="orange" align="center">{{ note }}</TtText>
+        <!-- Anything the answer needs, such as who gets the credit. -->
+        <slot name="fields" />
         <div class="flex justify-center gap-3">
-          <TtButton @click="emit('confirm')">{{ confirmLabel }}</TtButton>
-          <TtButton ref="no" @click="emit('cancel')">{{ cancelLabel }}</TtButton>
+          <TtButton :width="buttonWidth" :disabled="confirmDisabled" @click="emit('confirm')">{{
+            confirmLabel
+          }}</TtButton>
+          <TtButton ref="no" :width="buttonWidth" @click="emit('cancel')">{{
+            cancelLabel
+          }}</TtButton>
         </div>
       </TtPanel>
     </div>

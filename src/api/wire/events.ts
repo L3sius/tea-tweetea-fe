@@ -16,8 +16,17 @@ const event = <T extends string, S extends z.ZodRawShape>(type: T, shape: S) =>
 
 export const WireEvent = z.discriminatedUnion('type', [
   event('team_created', { team: Id, name: z.string() }),
+  // The teams after `team` now have one id less.
+  event('team_deleted', { team: Id, name: z.string() }),
+  event('team_renamed', { team: Id, name: z.string() }),
+  event('code_changed', { team: Id }),
+  event('withdrawn', { team: Id }),
+  event('reinstated', { team: Id }),
   event('member_added', { team: Id, member: z.string() }),
+  event('member_renamed', { team: Id, member: z.string(), name: z.string() }),
+  event('member_removed', { team: Id, member: z.string() }),
   event('account_added', { team: Id, member: z.string(), rsn: z.string() }),
+  event('account_removed', { team: Id, member: z.string(), rsn: z.string() }),
   event('appearance_set', { team: Id, appearance: WireAppearance.nullable() }),
   event('game_started', { tiles: z.array(z.string()), gems: z.array(Id), positions: z.array(Id) }),
   event('game_ended', { winner: Id.nullable(), ranking: z.array(Id) }),
@@ -37,7 +46,8 @@ export const WireEvent = z.discriminatedUnion('type', [
     amount: z.number(),
     progress: WireTeamProgress,
   }),
-  event('tile_completed', { team: Id, tile: Id }),
+  // `by` is the member an admin credited, null when Dink completed it; older servers leave it out.
+  event('tile_completed', { team: Id, tile: Id, by: z.string().nullable().default(null) }),
   event('gem_collected', { team: Id, gem: Gem, tile: Id }),
   event('gem_lost', { team: Id, gem: Gem }),
   event('shop_opened', { team: Id, tile: Id }),

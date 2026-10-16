@@ -6,7 +6,7 @@ import { toJournalEntry } from './mappers/events'
 import { toGameState } from './mappers/game'
 import { toItemCatalogue } from './mappers/items'
 import { toRules } from './mappers/rules'
-import { toAccepted, toAdminReply, toMe } from './mappers/server'
+import { toAccepted, toAdminReply, toMe, toOverview } from './mappers/server'
 import { WireFeedItem, WireStatRow } from './wire/activity'
 import { WireBoard } from './wire/board'
 import { WireChallenges } from './wire/challenge'
@@ -14,7 +14,7 @@ import { WirePublished } from './wire/events'
 import { WireState } from './wire/game'
 import { WireItems } from './wire/items'
 import { WireRules } from './wire/rules'
-import { WireAccepted, WireAdminReply, WireMe } from './wire/server'
+import { WireAccepted, WireAdminReply, WireMe, WireOverview } from './wire/server'
 
 type Endpoint<S extends z.ZodType, D> = { path: string; schema: S; map: (wire: z.output<S>) => D }
 
@@ -37,4 +37,5 @@ export const endpoints = {
   me: endpoint('/team/me', WireMe, toMe),
   teamAction: endpoint('/team/action', WireAccepted, toAccepted),
   adminAction: endpoint('/admin/action', WireAdminReply, toAdminReply),
+  overview: endpoint('/admin/overview', WireOverview, toOverview),
 }

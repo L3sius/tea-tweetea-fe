@@ -15,10 +15,20 @@ import { toDate } from './shared'
 export function toGameEvent(wire: WireEvent): GameEvent {
   switch (wire.type) {
     case 'team_created':
+    case 'team_deleted':
+    case 'team_renamed':
       return { kind: wire.type, teamId: teamId(wire.team), name: wire.name }
+    case 'code_changed':
+    case 'withdrawn':
+    case 'reinstated':
+      return { kind: wire.type, teamId: teamId(wire.team) }
     case 'member_added':
+    case 'member_removed':
       return { kind: wire.type, teamId: teamId(wire.team), member: wire.member }
+    case 'member_renamed':
+      return { kind: wire.type, teamId: teamId(wire.team), member: wire.member, name: wire.name }
     case 'account_added':
+    case 'account_removed':
       return { kind: wire.type, teamId: teamId(wire.team), member: wire.member, rsn: wire.rsn }
     case 'appearance_set':
       return { kind: wire.type, teamId: teamId(wire.team), appearance: wire.appearance }
@@ -84,7 +94,7 @@ export function toGameEvent(wire: WireEvent): GameEvent {
         progress: toTeamProgress(wire.progress),
       }
     case 'tile_completed':
-      return { kind: wire.type, teamId: teamId(wire.team), tileId: tileId(wire.tile) }
+      return { kind: wire.type, teamId: teamId(wire.team), tileId: tileId(wire.tile), by: wire.by }
     case 'gem_collected':
       return {
         kind: wire.type,

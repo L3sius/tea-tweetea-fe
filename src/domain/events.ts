@@ -7,9 +7,19 @@ import type { Gem, Item } from './vocabulary'
 export type GameEvent =
   // Setup and end
   | { kind: 'team_created'; teamId: TeamId; name: string }
+  /** Before the start only; the teams after it now have one id less. */
+  | { kind: 'team_deleted'; teamId: TeamId; name: string }
+  | { kind: 'team_renamed'; teamId: TeamId; name: string }
+  /** The team's code changed; the code itself is never in the journal. */
+  | { kind: 'code_changed'; teamId: TeamId }
+  | { kind: 'withdrawn'; teamId: TeamId }
+  | { kind: 'reinstated'; teamId: TeamId }
   | { kind: 'member_added'; teamId: TeamId; member: string }
+  | { kind: 'member_renamed'; teamId: TeamId; member: string; name: string }
+  | { kind: 'member_removed'; teamId: TeamId; member: string }
   | { kind: 'appearance_set'; teamId: TeamId; appearance: Appearance | null }
   | { kind: 'account_added'; teamId: TeamId; member: string; rsn: string }
+  | { kind: 'account_removed'; teamId: TeamId; member: string; rsn: string }
   | { kind: 'game_started'; tileChallenges: ChallengeId[]; gemTiles: TileId[]; positions: TileId[] }
   | { kind: 'game_ended'; winner: TeamId | null; ranking: TeamId[] }
   // Movement
@@ -32,7 +42,8 @@ export type GameEvent =
       /** The team's whole standing after it, to replace the old one. */
       progress: TeamProgress
     }
-  | { kind: 'tile_completed'; teamId: TeamId; tileId: TileId }
+  /** `by`: the member an admin credited, or null when Dink completed it. */
+  | { kind: 'tile_completed'; teamId: TeamId; tileId: TileId; by: string | null }
   // Gems
   | { kind: 'gem_collected'; teamId: TeamId; gem: Gem; tileId: TileId }
   /** A Joker or a random event took the gem. */

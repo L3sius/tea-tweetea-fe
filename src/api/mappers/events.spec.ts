@@ -71,4 +71,17 @@ describe('journal entries', () => {
       target: { kind: 'team', teamId: 2 },
     })
   })
+
+  it('keeps who an admin credited for a completed tile', () => {
+    expect(mapOne({ type: 'tile_completed', team: 0, tile: 5, by: 'Zezima' })).toEqual({
+      kind: 'tile_completed',
+      teamId: 0,
+      tileId: 5,
+      by: 'Zezima',
+    })
+  })
+
+  it('credits nobody for a tile completed before the server named anyone', () => {
+    expect(mapOne({ type: 'tile_completed', team: 0, tile: 5 })).toMatchObject({ by: null })
+  })
 })

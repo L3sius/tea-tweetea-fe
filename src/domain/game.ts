@@ -82,6 +82,8 @@ export type Team = {
   version: number
   /** How the team's piece looks; null draws the default piece. The team or an admin changes it. */
   appearance: Appearance | null
+  /** An admin took the team out of the game: it cannot act, be targeted or score. */
+  withdrawn: boolean
 }
 
 /**

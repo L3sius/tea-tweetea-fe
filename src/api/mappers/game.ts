@@ -128,6 +128,7 @@ export function toTeam(wire: WireTeam): Team {
     tilesCompleted: wire.tiles_completed,
     version: wire.version,
     appearance: wire.appearance,
+    withdrawn: wire.withdrawn,
   }
 }
 
@@ -177,7 +178,10 @@ export function toGameState(wire: WireState): GameState {
     phase: wire.phase,
     teams: new Map(wire.teams.map((team) => [teamId(team.id), toTeam(team)])),
     tileChallenges: new Map(wire.tiles.map((id, index) => [tileId(index), challengeId(id)])),
-    gemTiles: new Map([...byGemOrder(wire.gems)].map(([gem, id]) => [gem, tileId(id)])),
+    gemTiles:
+      wire.gems.length === 0
+        ? new Map()
+        : new Map([...byGemOrder(wire.gems)].map(([gem, id]) => [gem, tileId(id)])),
     blockers: mapIdKeyed(wire.blockers, tileId, toBlocker),
     shops: mapIdKeyed(wire.shops, tileId, (items) => [...items]),
     instances: mapIdKeyed(wire.instances, instanceId, (value, id) =>

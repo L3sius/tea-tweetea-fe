@@ -15,7 +15,7 @@ test('a death from Dink shows in the activity feed', async ({ page, backend }) =
 
 test('a frozen team can only wait, until it thaws', async ({ page, backend, devTools }) => {
   void devTools
-  await backend.admin({ action: 'complete_tile', team: red.id })
+  await backend.admin({ action: 'complete_tile', team: red.id, member: red.member })
   await open(page, red)
   await page.getByRole('tab', { name: 'Play' }).click()
   await expect(page.getByRole('button', { name: /^Face-down card/ }).first()).toBeVisible()
@@ -31,7 +31,7 @@ test('a frozen team can only wait, until it thaws', async ({ page, backend, devT
 
 test('a rigged Joker shows its effect on the reveal', async ({ page, backend, devTools }) => {
   void devTools
-  await backend.admin({ action: 'complete_tile', team: red.id })
+  await backend.admin({ action: 'complete_tile', team: red.id, member: red.member })
   await open(page, red)
   await page.getByRole('tab', { name: 'Play' }).click()
 

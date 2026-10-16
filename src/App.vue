@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, watch } from 'vue'
-import { RouterView } from 'vue-router'
-import { useRouter } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import TutorialOverlay from '@/components/TutorialOverlay.vue'
 import { useGameStore } from '@/stores/game'
@@ -18,12 +17,15 @@ const { error, newBuildAvailable } = storeToRefs(game)
 const frontendUpdated = useFrontendUpdates()
 const tutorial = useTutorialStore()
 const router = useRouter()
+const route = useRoute()
 
-// A first visit opens the tutorial on the board, once the board has loaded.
+// A first visit opens the tutorial on the board, once the board has loaded. Not for admins:
+// it would take them off the admin page.
 watch(
   () => game.board,
   async (board) => {
-    if (!board || tutorial.seen || tutorial.active) return
+    await router.isReady()
+    if (!board || tutorial.seen || tutorial.active || route.meta.admin) return
     await router.push('/')
     tutorial.start()
   },

@@ -20,16 +20,30 @@ export type TeamCommand =
   | { kind: 'set_appearance'; appearance: Appearance | null }
 
 export type AdminCommand =
-  | { kind: 'create_team'; name: string; code: string }
+  /** The server makes the team's code and replies with it, once. */
+  | { kind: 'create_team'; name: string }
+  /** Only before the game starts; the teams after it move down one id. */
+  | { kind: 'delete_team'; teamId: TeamId }
+  | { kind: 'rename_team'; teamId: TeamId; name: string }
+  /** A new random code; the old one stops working at once. */
+  | { kind: 'reset_team_code'; teamId: TeamId }
+  /** Take a team out of the running game, or back in. */
+  | { kind: 'set_withdrawn'; teamId: TeamId; withdrawn: boolean }
   | { kind: 'add_member'; teamId: TeamId; name: string }
+  | { kind: 'rename_member'; teamId: TeamId; member: string; name: string }
+  /** Removes the member and all their accounts. */
+  | { kind: 'remove_member'; teamId: TeamId; member: string }
   | { kind: 'add_account'; teamId: TeamId; member: string; rsn: string }
+  | { kind: 'remove_account'; teamId: TeamId; member: string; rsn: string }
   /** Dress the team's piece as an OSRS character, or back to the default piece with null. */
   | { kind: 'set_appearance'; teamId: TeamId; appearance: Appearance | null }
   | { kind: 'start_game' }
-  | { kind: 'complete_tile'; teamId: TeamId }
+  | { kind: 'complete_tile'; teamId: TeamId; member: string }
   | { kind: 'contribute'; teamId: TeamId; instanceId: InstanceId; key: string; amount: number }
   | { kind: 'adjust_gold'; teamId: TeamId; delta: number }
   | { kind: 'discard_item'; teamId: TeamId; item: Item }
+  /** Lost if the inventory is full. */
+  | { kind: 'give_item'; teamId: TeamId; item: Item }
   /** Inject an observation as if Dink had sent it. */
   | { kind: 'observe'; rsn: string; observation: Observation }
   /** Remove a journal entry and replay the rest. */
@@ -49,4 +63,7 @@ export type CommandAccepted = { kind: 'accepted'; seq: number }
 /** Journal entries a revert dropped. */
 export type CommandReverted = { kind: 'reverted'; droppedSeqs: number[] }
 
-export type AdminReply = CommandAccepted | CommandReverted
+/** A team's new code. The server keeps only its hash, so this is the one time anyone sees it. */
+export type CodeIssued = { kind: 'issued'; seq: number; teamId: TeamId; code: string }
+
+export type AdminReply = CommandAccepted | CommandReverted | CodeIssued

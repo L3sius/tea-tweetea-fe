@@ -55,7 +55,7 @@ describe('openStream', () => {
         entry: {
           seq: 6,
           at: new Date('2026-10-05T14:02:36Z'),
-          events: [{ kind: 'tile_completed', teamId: 1, tileId: 42 }],
+          events: [{ kind: 'tile_completed', teamId: 1, tileId: 42, by: null }],
         },
       },
     ])

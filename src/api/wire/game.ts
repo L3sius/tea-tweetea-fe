@@ -94,6 +94,8 @@ export const WireTeam = z.object({
   tiles_completed: z.int(),
   version: z.int(),
   appearance: WireAppearance.nullable(),
+  // Servers from before withdrawing existed leave it out.
+  withdrawn: z.boolean().default(false),
 })
 export type WireTeam = z.infer<typeof WireTeam>
 
@@ -139,8 +141,10 @@ export const WireState = z.object({
   teams: z.array(WireTeam),
   /** Challenge id per tile, indexed by tile id. */
   tiles: z.array(z.string()),
-  /** Gem tile per gem, indexed in gem order. */
-  gems: z.array(Id).length(GEMS.length),
+  /** Gem tile per gem, indexed in gem order. Empty in setup: the server places gems at the start. */
+  gems: z.array(Id).refine((gems) => gems.length === 0 || gems.length === GEMS.length, {
+    message: `Expected no gems or exactly ${GEMS.length}`,
+  }),
   blockers: idKeyed(WireBlocker),
   /** Each shop tile's stock; every shop also sells the mystery box. */
   shops: idKeyed(z.array(Item)),

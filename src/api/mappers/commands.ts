@@ -67,10 +67,26 @@ function toWireObservation(observation: Observation): WireObservation {
 export function toWireAdminAction(command: AdminCommand): WireAdminAction {
   switch (command.kind) {
     case 'create_team':
-      return { action: command.kind, name: command.name, code: command.code }
+      return { action: command.kind, name: command.name }
+    case 'delete_team':
+    case 'reset_team_code':
+      return { action: command.kind, team: command.teamId }
+    case 'rename_team':
     case 'add_member':
       return { action: command.kind, team: command.teamId, name: command.name }
+    case 'set_withdrawn':
+      return { action: command.kind, team: command.teamId, withdrawn: command.withdrawn }
+    case 'rename_member':
+      return {
+        action: command.kind,
+        team: command.teamId,
+        member: command.member,
+        name: command.name,
+      }
+    case 'remove_member':
+      return { action: command.kind, team: command.teamId, member: command.member }
     case 'add_account':
+    case 'remove_account':
       return {
         action: command.kind,
         team: command.teamId,
@@ -82,7 +98,7 @@ export function toWireAdminAction(command: AdminCommand): WireAdminAction {
     case 'start_game':
       return { action: command.kind }
     case 'complete_tile':
-      return { action: command.kind, team: command.teamId }
+      return { action: command.kind, team: command.teamId, member: command.member }
     case 'contribute':
       return {
         action: command.kind,
@@ -94,6 +110,7 @@ export function toWireAdminAction(command: AdminCommand): WireAdminAction {
     case 'adjust_gold':
       return { action: command.kind, team: command.teamId, delta: command.delta }
     case 'discard_item':
+    case 'give_item':
       return { action: command.kind, team: command.teamId, item: command.item }
     case 'observe':
       return {

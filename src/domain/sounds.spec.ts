@@ -27,9 +27,9 @@ describe('soundFor', () => {
     expect(
       soundsOf([{ kind: 'gem_collected', teamId: red, gem: 'blue', tileId: tileId(3) }]),
     ).toEqual([{ sound: 'level-up', team: red, audience: 'everyone' }])
-    expect(soundsOf([{ kind: 'tile_completed', teamId: red, tileId: tileId(3) }])).toEqual([
-      { sound: 'fanfare', team: red, audience: 'team' },
-    ])
+    expect(
+      soundsOf([{ kind: 'tile_completed', teamId: red, tileId: tileId(3), by: null }]),
+    ).toEqual([{ sound: 'fanfare', team: red, audience: 'team' }])
   })
 
   it('makes a Joker heard by everyone, other cards only by their team', () => {

@@ -90,6 +90,8 @@ export function createHttpClient({
         endpoints.adminAction,
         postJson({ 'X-Admin-Code': adminCode }, toWireAdminAction(command)),
       ),
+    getOverview: (adminCode) =>
+      send(endpoints.overview, { headers: { 'X-Admin-Code': adminCode }, cache: 'no-store' }),
     subscribe: (afterSeq, listener) =>
       openStream(root + '/stream' + toQueryString({ after: afterSeq }), listener, eventSource),
   }

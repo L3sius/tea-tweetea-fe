@@ -22,6 +22,7 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   tiles_completed: 12,
   version: 7,
   appearance: null,
+  withdrawn: false,
   ...overrides,
 })
 
@@ -137,6 +138,13 @@ describe('game state', () => {
 
   it('rejects a state without exactly one tile per gem', () => {
     expect(WireState.safeParse({ ...wireState, gems: [0, 1] }).success).toBe(false)
+  })
+
+  it('reads a game in setup, before tiles are dealt and gems placed', () => {
+    const setup = { ...wireState, phase: 'setup', teams: [], tiles: [], gems: [], shops: {} }
+    const state = toGameState(WireState.parse(setup))
+    expect(state.gemTiles.size).toBe(0)
+    expect(state.tileChallenges.size).toBe(0)
   })
 
   it('rejects non-numeric map keys', () => {
