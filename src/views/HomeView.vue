@@ -164,8 +164,10 @@ function selectTeam(id: TeamId) {
     return
   }
   selected.value = id
-  follow.value = true
-  boardMap.value?.locate(team.position, 0.5)
+  // Before the start the team has no piece on the board to follow.
+  const placed = state.value?.phase !== 'setup'
+  follow.value = placed
+  if (placed) boardMap.value?.locate(team.position, 0.5)
   try {
     localStorage.setItem(WATCH_KEY, String(id))
   } catch {
@@ -554,8 +556,11 @@ async function buyMysteryBox() {
           </TtText>
           <TtButton size="sm" class="!min-h-9" @click="skipAction()">Back</TtButton>
         </div>
-        <!-- Follow / free roam -->
-        <div v-else-if="followed" class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1">
+        <!-- Follow / free roam; before the start there is no piece to follow -->
+        <div
+          v-else-if="followed && state?.phase !== 'setup'"
+          class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
+        >
           <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
             Following
             <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span>
@@ -750,6 +755,9 @@ async function buyMysteryBox() {
               :now="now"
               :moving="isAnimating(focus.id)"
             />
+            <TtText v-else-if="state.teams.size === 0" :size="1" color="muted"
+              >No teams yet. The game starts once the admin has made them.</TtText
+            >
           </TtPanel>
           <EventsPanel
             :state="state"

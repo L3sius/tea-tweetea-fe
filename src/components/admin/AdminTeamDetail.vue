@@ -12,7 +12,7 @@ import { ITEMS, type Item, type Phase } from '@/domain/vocabulary'
 import { useAdminStore } from '@/stores/admin'
 import { useGameStore } from '@/stores/game'
 import { teamColor } from '@/ui/colors'
-import { timeFrom } from '@/ui/format'
+import { count, timeFrom } from '@/ui/format'
 import { TtButton, TtGemTracker, TtPanel, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
 
 const props = defineProps<{ team: Team; phase: Phase; now: Date }>()
@@ -231,9 +231,11 @@ async function renameMember() {
             class="[overflow-wrap:anywhere]"
             >{{ team.name }}</TtText
           >
-          <TtGemTracker :held="team.gems" :scale="1" :slots="false" />
+          <TtGemTracker :held="team.gems" :scale="1" :slots="false" class="self-start" />
           <span class="tt-1 flex flex-wrap gap-x-3" style="color: var(--text-muted)">
-            <span>{{ team.tilesCompleted }} tiles completed · Tile #{{ team.position }}</span>
+            <span
+              >{{ count(team.tilesCompleted, 'tile') }} completed · Tile #{{ team.position }}</span
+            >
             <span v-if="team.withdrawn" style="color: var(--osrs-red)">Withdrawn</span>
           </span>
         </div>
@@ -483,7 +485,7 @@ async function renameMember() {
         <div class="flex flex-wrap items-center gap-3">
           <TtText as="h3" :size="1" font="bold" color="orange" align="left">Team roster</TtText>
           <span class="tt-1" style="color: var(--text-muted)"
-            >{{ team.members.length }} members · {{ accountCount }} accounts</span
+            >{{ count(team.members.length, 'member') }} · {{ count(accountCount, 'account') }}</span
           >
           <input
             v-if="team.members.length >= FILTER_FROM"

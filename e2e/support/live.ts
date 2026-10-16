@@ -12,11 +12,16 @@ export const API = 'http://127.0.0.1:8090'
 const CONTROL = 'http://127.0.0.1:8091'
 export const ADMIN_CODE = 'admin'
 
-/** The seeded teams, in id order. Codes equal the lower-case names, as in tweety's demo seed. */
-export const TEAMS = [
+type SeedTeam = { id: number; name: string; code: string; member: string; rsn: string }
+
+/**
+ * The seeded teams, in id order. The seed asks for the lower-case name as each team's code; a
+ * tweety that picks codes itself returns its own, and the seed keeps that one in `code`.
+ */
+export const TEAMS: readonly [SeedTeam, SeedTeam] = [
   { id: 0, name: 'Red', code: 'red', member: 'red-one', rsn: 'red-alt' },
   { id: 1, name: 'Blue', code: 'blue', member: 'blue-one', rsn: 'blue-alt' },
-] as const
+]
 
 /** The parts of `/state` the tests read, as the server sends them. */
 export type WireTeam = {
@@ -60,17 +65,18 @@ export class Backend {
     return new Set(tiles.filter((t) => kinds.includes(t.kind)).map((t) => t.id))
   }
 
-  /** Sends an admin action and fails the test if the server refuses it. */
-  async admin(action: Record<string, unknown>): Promise<void> {
+  /** Sends an admin action, fails the test if the server refuses it, and gives the reply. */
+  async admin(action: Record<string, unknown>): Promise<Record<string, unknown>> {
     const response = await this.request.post(`${API}/admin/action`, {
       headers: { 'X-Admin-Code': ADMIN_CODE },
       data: action,
     })
     expect(response.ok(), `${action.action}: ${await response.text()}`).toBe(true)
+    return response.json()
   }
 
   /** Sends a team action at the team's current version, as the site does. */
-  async act(team: (typeof TEAMS)[number], action: Record<string, unknown>): Promise<void> {
+  async act(team: SeedTeam, action: Record<string, unknown>): Promise<void> {
     const { version } = await this.team(team.id)
     const response = await this.request.post(`${API}/team/action`, {
       headers: { 'X-Team-Code': team.code },
@@ -90,7 +96,9 @@ export class Backend {
   /** Each team with a member and an alt account, in the order tweety needs them, then the start. */
   async seed() {
     for (const t of TEAMS) {
-      await this.admin({ action: 'create_team', name: t.name, code: t.code })
+      const asked = t.name.toLowerCase()
+      const { code } = await this.admin({ action: 'create_team', name: t.name, code: asked })
+      t.code = typeof code === 'string' ? code : asked
       await this.admin({ action: 'add_member', team: t.id, name: t.member })
       await this.admin({ action: 'add_account', team: t.id, member: t.member, rsn: t.rsn })
     }
@@ -150,7 +158,7 @@ export const test = base.extend<Fixtures>({
 export { expect }
 
 /** Opens the site with the tutorial already seen, as a viewer or logged in as a team's captain. */
-export async function open(page: Page, as?: (typeof TEAMS)[number], path = '/') {
+export async function open(page: Page, as?: SeedTeam, path = '/') {
   await page.addInitScript((code) => {
     localStorage.setItem('tweetea.tutorial', '1')
     if (code) localStorage.setItem('tweetea.teamCode', code)

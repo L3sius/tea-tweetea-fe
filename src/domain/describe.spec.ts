@@ -12,9 +12,10 @@ import {
   itemName,
   observationText,
   teamParts,
+  teamStatusText,
   useQuestion,
 } from './describe'
-import type { Instance } from './game'
+import type { Instance, Team } from './game'
 import { challengeId, instanceId, teamId, tileId, type ChallengeId, type TeamId } from './ids'
 import { useItemCatalogue } from './items'
 
@@ -140,6 +141,34 @@ describe('describeEvent', () => {
 
   it('leaves out bookkeeping events', () => {
     expect(describeEvent({ kind: 'stepped', teamId: red, tileId: 3 as never }, names)).toBeNull()
+  })
+
+  it('counts a one-tile walk in the singular', () => {
+    const path = [tileId(1), tileId(2)]
+    expect(describeEvent({ kind: 'move_confirmed', teamId: red, path }, names)).toBe(
+      'Red set off 1 tile',
+    )
+  })
+
+  it('names who an admin credited for a tile', () => {
+    const done = { kind: 'tile_completed', teamId: red, tileId: tileId(3) } as const
+    expect(describeEvent({ ...done, by: 'Zezima' }, names)).toBe(
+      'Red completed a tile, credited to Zezima',
+    )
+    expect(describeEvent({ ...done, by: null }, names)).toBe('Red completed a tile')
+  })
+})
+
+describe('teamStatusText', () => {
+  // Only the status and the freeze matter here.
+  const team = { status: { kind: 'ready' }, frozenUntil: null } as unknown as Team
+
+  it('tells what the team is doing while the game runs', () => {
+    expect(teamStatusText(team, new Date(), 'running')).toBe('Ready to draw a card')
+  })
+
+  it('says the game is over after the end, whatever the last status was', () => {
+    expect(teamStatusText(team, new Date(), 'ended')).toBe('The game is over')
   })
 })
 

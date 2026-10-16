@@ -179,6 +179,9 @@ function tileLatLng(tile: TileId): LatLng | null {
 
 const tileGems = () => new Map([...props.state.gemTiles].map(([gem, tile]) => [tile, gem]))
 
+/** Teams with a piece on the board: none before the start, when the server places them all. */
+const placedTeams = () => (props.state.phase === 'setup' ? [] : [...props.state.teams.values()])
+
 /** What a blocker does to whoever walks onto it, who placed it and when it goes. */
 function blockerText(blocker: Blocker): string {
   const freeze = blockerFreezeText(blocker)
@@ -199,7 +202,7 @@ function tileView(tile: Tile): TileView {
   const challengeId = props.state.tileChallenges.get(tile.id)
   const challenge = challengeId ? props.challenges.get(challengeId) : undefined
   const blocker = props.state.blockers.get(tile.id)
-  const teams = [...props.state.teams.values()]
+  const teams = placedTeams()
     .filter((team) => team.position === tile.id)
     .map((team) => {
       const { status } = team
@@ -859,17 +862,20 @@ function renderFrame() {
   // Teams standing still on the same tile fan out side by side.
   const still = new Map<TileId, TeamId[]>()
   const placements = new Map<TeamId, Placement | null>()
-  for (const team of props.state.teams.values()) {
+  const onBoard = placedTeams()
+  for (const team of onBoard) {
     const p = placementOf(team.id, time)
     placements.set(team.id, p)
     const tile = p === null ? team.position : p.kind === 'still' ? p.tile : null
     if (tile !== null) still.set(tile, [...(still.get(tile) ?? []), team.id])
   }
 
-  // Pieces of teams the game no longer has (another game's, as the tutorial swaps games) go.
-  for (const id of teamMarkers.keys()) if (!props.state.teams.has(id)) removeTeamMarker(id)
+  // Pieces of teams not on the board go: another game's (the tutorial swaps games), or all of
+  // them before the start.
+  const ids = new Set(onBoard.map((t) => t.id))
+  for (const id of teamMarkers.keys()) if (!ids.has(id)) removeTeamMarker(id)
 
-  for (const team of props.state.teams.values()) {
+  for (const team of onBoard) {
     const entry = ensureTeamMarker(map, team)
     const p = placements.get(team.id) ?? { kind: 'still' as const, tile: team.position }
     const where = placementLatLng(p)

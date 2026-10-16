@@ -5,7 +5,7 @@ import GemRow from '@/components/GemRow.vue'
 import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
 import { teamColor } from '@/ui/colors'
-import { formatGp } from '@/ui/format'
+import { count, formatGp } from '@/ui/format'
 import { TtPanel, TtText, stack } from '@/ui/tt'
 
 const game = useGameStore()
@@ -66,8 +66,8 @@ const rosters = computed(() =>
           </template>
           <GemRow :gems="r.team.gems" />
           <TtText :size="1" color="white">
-            {{ r.members.length }} players · {{ r.accounts }} accounts ·
-            <span :style="{ color: stack(r.value).color }">{{ formatGp(r.value) }}</span>
+            {{ count(r.members.length, 'player') }} · {{ count(r.accounts, 'account') }} ·
+            <span :style="{ color: stack(r.value).color }">{{ formatGp(r.value) }}</span> loot
           </TtText>
           <table class="tt-1 w-full">
             <thead style="color: var(--osrs-orange)">
@@ -95,6 +95,9 @@ const rosters = computed(() =>
                   <td class="text-right">{{ formatGp(a.value) }}</td>
                 </tr>
               </template>
+              <tr v-if="r.members.length === 0" style="color: var(--text-muted)">
+                <td colspan="3" class="pt-1.5 text-left">No players yet.</td>
+              </tr>
             </tbody>
           </table>
         </TtPanel>
