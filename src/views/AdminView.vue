@@ -225,8 +225,8 @@ function closeIssued() {
                   <span
                     class="block truncate"
                     style="color: var(--text-muted)"
-                    :title="teamStatusText(t, now)"
-                    >{{ teamStatusText(t, now) }}</span
+                    :title="teamStatusText(t, now, phase)"
+                    >{{ teamStatusText(t, now, phase) }}</span
                   >
                 </button>
               </li>

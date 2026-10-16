@@ -40,8 +40,9 @@ const gems = computed(() =>
   }),
 )
 
+// Before the start no team is on the board yet: the server places them all at once.
 const teams = computed(() =>
-  [...props.state.teams.values()].flatMap((team) => {
+  (props.state.phase === 'setup' ? [] : [...props.state.teams.values()]).flatMap((team) => {
     const p = at(props.shownAt(team.id))
     return p ? [{ id: team.id, name: team.name, color: teamColor(team), ...p }] : []
   }),

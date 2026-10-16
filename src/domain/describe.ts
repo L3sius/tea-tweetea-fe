@@ -5,7 +5,7 @@ import type { GameEvent } from './events'
 import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
 import { itemEntry } from './items'
-import type { Item, Suit } from './vocabulary'
+import type { Item, Phase, Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   clubs: '♣',
@@ -181,7 +181,9 @@ const elapsed = (ms: number) => {
 }
 
 /** What a team is doing right now, in a few words. */
-export function teamStatusText(team: Team, now: Date): string {
+/** What the team is doing. After the end its last status stays on the server, so `phase` overrides it. */
+export function teamStatusText(team: Team, now: Date, phase?: Phase): string {
+  if (phase === 'ended') return 'The game is over'
   if (team.frozenUntil && team.frozenUntil > now) return `Frozen until ${clock(team.frozenUntil)}`
   const { status } = team
   switch (status.kind) {
@@ -252,7 +254,7 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'shop_closed':
       return null
     case 'move_confirmed':
-      return `${team(event.teamId)} set off ${event.path.length - 1} tiles`
+      return `${team(event.teamId)} set off ${plural(event.path.length - 1, 'tile')}`
     case 'landed':
       return `${team(event.teamId)} landed on a new tile`
     case 'teleported':

@@ -39,7 +39,7 @@ test('a captain plays a whole turn, and a viewer sees it live', async ({
 
   // The viewer's log shows the draw, and the walk once the viewer's own page has animated it.
   await expect(viewer.getByText(new RegExp(`${red.name} drew`))).toBeVisible()
-  await expect(viewer.getByText(new RegExp(`${red.name} set off \\d+ tiles`))).toBeVisible({
+  await expect(viewer.getByText(new RegExp(`${red.name} set off \\d+ tiles?`))).toBeVisible({
     timeout: 30_000,
   })
 })
