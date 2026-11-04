@@ -58,7 +58,7 @@ export type Guide = {
 
 /**
  * The tutorial: a guided tour of the board for new players, shown on a first visit and again from
- * "How to play". It plays the script in tutorial/script.ts over the live page, which it hides and
+ * "Tutorial". It plays the script in tutorial/script.ts over the live page, which it hides and
  * reveals part by part (see RevealName), with Earl Grey walking the map.
  */
 export const useTutorialStore = defineStore('tutorial', () => {
@@ -67,7 +67,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
   const seen = ref(readSeen())
   /**
    * `fading`: the page fades to black, unchanged under it. `title`: the tour's own scene, with the
-   * map dark and Earl Grey waving over "How to play". `playing`: the tour.
+   * map dark and Earl Grey waving over "Tutorial". `playing`: the tour.
    */
   const phase = ref<'off' | 'fading' | 'title' | 'playing'>('off')
   /** The black cover over the page: fading in, or out again; and how long each takes. */
@@ -365,7 +365,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
 
   /**
    * Fades the page to black, sets the title scene up under the black and fades it in, with the
-   * music starting as it does. Browsers only play sound after a click: from "How to play" it starts
+   * music starting as it does. Browsers only play sound after a click: from "Tutorial" it starts
    * here, while a first visit opens by itself and has to wait for "Begin".
    */
   function start() {

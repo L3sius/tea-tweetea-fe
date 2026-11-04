@@ -12,6 +12,7 @@ const router = createRouter({
       component: () => import('@/views/CharactersView.vue'),
     },
     { path: '/items', name: 'items', component: () => import('@/views/ItemsView.vue') },
+    { path: '/faq', name: 'faq', component: () => import('@/views/FaqView.vue') },
     // Not linked anywhere; the admin code guards it.
     {
       path: '/admin',

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 
-test('a first visit opens the tutorial, which can be skipped for good', async ({ page }) => {
+test('a first visit opens the tutorial, then the Dink setup, each once', async ({ page }) => {
   await page.goto('/stats')
   // It opens on the board, with the rest of the page hidden.
-  await expect(page.getByRole('heading', { name: 'How to play' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tutorial' })).toBeVisible()
   await expect(page).toHaveURL(/\/$/)
   await expect(page.getByRole('heading', { level: 1 })).toBeHidden()
 
@@ -16,14 +16,23 @@ test('a first visit opens the tutorial, which can be skipped for good', async ({
   await expect(chat).toBeHidden()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
+  // Skipped or finished, the tour hands over to the Dink setup, which only its button closes.
+  const dink = page.getByRole('dialog', { name: 'Set up Dink' })
+  await expect(dink).toContainText('/dink/config')
+  await page.keyboard.press('Escape')
+  await expect(dink).toBeVisible()
+  await dink.getByRole('button', { name: "I've set it up" }).click()
+  await expect(dink).toBeHidden()
+
   await page.reload()
+  await expect(dink).toBeHidden()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'How to play' })).toBeHidden()
+  await expect(page.getByRole('heading', { name: 'Tutorial' })).toBeHidden()
   // With no tour running, the whole board is drawn: roads and nodes, gems and shops.
   await expect(page.locator('.leaflet-overlay-pane canvas')).toHaveCount(1)
   await expect(page.locator('.gem-marker').first()).toBeVisible()
 
-  // "How to play" opens it again.
-  await page.getByRole('button', { name: 'How to play' }).click()
-  await expect(page.getByRole('heading', { name: 'How to play' })).toBeVisible()
+  // "Tutorial" opens it again.
+  await page.getByRole('button', { name: 'Tutorial' }).click()
+  await expect(page.getByRole('heading', { name: 'Tutorial' })).toBeVisible()
 })

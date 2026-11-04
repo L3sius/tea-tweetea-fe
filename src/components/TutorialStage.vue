@@ -100,7 +100,7 @@ useEventListener(window, 'keydown', (e: KeyboardEvent) => {
     <Transition name="fade-slow">
       <div v-if="!playing" class="pointer-events-none absolute inset-0 text-center">
         <div class="absolute inset-x-4 top-[14%] flex flex-col items-center gap-2">
-          <TtText as="h2" :size="4" font="quill" color="orange" glow>How to play</TtText>
+          <TtText as="h2" :size="4" font="quill" color="orange" glow>Tutorial</TtText>
           <TtText :size="1" color="white">A short tour of the board with {{ GUIDE.name }}.</TtText>
         </div>
         <div

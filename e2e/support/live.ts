@@ -161,6 +161,7 @@ export { expect }
 export async function open(page: Page, as?: SeedTeam, path = '/') {
   await page.addInitScript((code) => {
     localStorage.setItem('tweetea.tutorial', '1')
+    localStorage.setItem('tweetea.dinkSetup', '1')
     if (code) localStorage.setItem('tweetea.teamCode', code)
   }, as?.code ?? null)
   await page.goto(path)

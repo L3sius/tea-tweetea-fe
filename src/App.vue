@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
+import DinkSetupDialog from '@/components/DinkSetupDialog.vue'
 import TutorialOverlay from '@/components/TutorialOverlay.vue'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
@@ -67,5 +68,6 @@ const reload = () => window.location.reload()
       <RouterView />
     </main>
     <TutorialOverlay v-if="tutorial.cover !== 'off'" />
+    <DinkSetupDialog />
   </div>
 </template>

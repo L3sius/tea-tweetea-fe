@@ -7,7 +7,10 @@ async function open(page: Page, path: string) {
     if (message.type() === 'error') errors.push(message.text())
   })
   page.on('pageerror', (error) => errors.push(error.message))
-  await page.addInitScript(() => localStorage.setItem('tweetea.tutorial', '1'))
+  await page.addInitScript(() => {
+    localStorage.setItem('tweetea.tutorial', '1')
+    localStorage.setItem('tweetea.dinkSetup', '1')
+  })
   await page.goto(path)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   return errors
@@ -18,6 +21,7 @@ const PAGES = [
   { path: '/stats', shows: 'By team' },
   { path: '/teams', shows: 'Varrock Sewer Rats' },
   { path: '/items', shows: 'Mystery box' },
+  { path: '/faq', shows: 'Dynamic Config URL' },
 ]
 
 for (const { path, shows } of PAGES) {
@@ -35,6 +39,7 @@ test('the header goes to every page', async ({ page }) => {
     ['Stats', /\/stats$/],
     ['Teams', /\/teams$/],
     ['Items', /\/items$/],
+    ['FAQ', /\/faq$/],
     ['Board', /\/$/],
   ] as const) {
     await nav.getByRole('button', { name: label }).click()

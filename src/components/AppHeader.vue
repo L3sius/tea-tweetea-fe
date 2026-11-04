@@ -19,7 +19,7 @@ const router = useRouter()
 const wide = useMediaQuery('(min-width: 1600px)')
 
 /** The tutorial plays on the board. */
-async function howToPlay() {
+async function playTutorial() {
   await router.push('/')
   tutorial.start()
 }
@@ -38,6 +38,7 @@ const LINKS = [
   { to: '/teams', label: 'Teams' },
   { to: '/characters', label: 'Characters' },
   { to: '/items', label: 'Items' },
+  { to: '/faq', label: 'FAQ' },
 ] as const
 </script>
 
@@ -67,7 +68,7 @@ const LINKS = [
           {{ link.label }}
         </TtButton>
       </RouterLink>
-      <TtButton size="sm" @click="howToPlay">How to play</TtButton>
+      <TtButton size="sm" @click="playTutorial">Tutorial</TtButton>
     </nav>
     <div class="flex flex-wrap items-center justify-center gap-3 lg:ml-auto">
       <!-- The team this browser plays for, with the way out beside it. -->

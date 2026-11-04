@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test'
 
 test('draws characters from the exported OSRS assets', async ({ page }) => {
   // A first visit opens the tutorial over the page (see tutorial.spec.ts).
-  await page.addInitScript(() => localStorage.setItem('tweetea.tutorial', '1'))
+  await page.addInitScript(() => {
+    localStorage.setItem('tweetea.tutorial', '1')
+    localStorage.setItem('tweetea.dinkSetup', '1')
+  })
   const errors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text())
