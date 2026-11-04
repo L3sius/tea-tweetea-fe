@@ -82,10 +82,11 @@ npm ci
 npm run build    # type-checks, then builds dist/ with .env.production (the API at api.tea-osrs.com)
 ```
 
-`dist/` is the whole site, sound effects included (`dist/sounds/`). Put it on `tea-osrs.com`:
+`dist/` is the whole site, sound effects included (`dist/sounds/`). Every push to `main` builds it
+and puts it on `tea-osrs.com`, after lint and the unit tests pass. The droplet keeps the previous
+release to roll back to. How it works, and the one-time setup, is in [deploy.md](deploy.md).
 
-> **TODO: write down how `dist/` gets onto `tea-osrs.com`** (which server, which command, who has
-> access). Nothing in either repo says yet.
+- [ ] The last **Deploy** run on the repo's Actions tab passed.
 
 - [ ] `https://tea-osrs.com` opens, and the header shows **Live** (green).
 - [ ] A team code logs in, and the team shows in the header.
