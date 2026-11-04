@@ -60,7 +60,8 @@ export type GameEvent =
   // Board effects
   | { kind: 'blocker_placed'; tileId: TileId; blocker: Blocker; by: TeamId }
   | { kind: 'blocker_removed'; tileId: TileId }
-  | { kind: 'frozen'; teamId: TeamId; until: Date }
+  /** `by`: the item behind the freeze that ends last, as in `Team.frozenBy`. */
+  | { kind: 'frozen'; teamId: TeamId; until: Date; by: Item | null }
   | { kind: 'shielded'; teamId: TeamId; until: Date }
   | { kind: 'thawed'; teamId: TeamId }
   | {

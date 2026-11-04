@@ -147,6 +147,7 @@ export function toGameEvent(wire: WireEvent): GameEvent {
     case 'blocker_removed':
       return { kind: wire.type, tileId: tileId(wire.tile) }
     case 'frozen':
+      return { kind: wire.type, teamId: teamId(wire.team), until: toDate(wire.until), by: wire.by }
     case 'shielded':
       return { kind: wire.type, teamId: teamId(wire.team), until: toDate(wire.until) }
     case 'random_event':

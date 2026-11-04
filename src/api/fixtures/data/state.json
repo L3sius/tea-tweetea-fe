@@ -1,6 +1,6 @@
 {
-  "seq": 1471,
-  "server_time": "2026-10-09T21:29:00.622626Z",
+  "seq": 1472,
+  "server_time": "2026-11-04T17:45:18.265897900Z",
   "phase": "running",
   "teams": [
     {
@@ -32,6 +32,7 @@
         "status": "ready"
       },
       "frozen_until": null,
+      "frozen_by": null,
       "shield_until": null,
       "gems": [
         "blue",
@@ -53,7 +54,8 @@
         "walk": 819,
         "run": 824,
         "swim": 772
-      }
+      },
+      "withdrawn": false
     },
     {
       "id": 1,
@@ -110,6 +112,7 @@
         ]
       },
       "frozen_until": null,
+      "frozen_by": null,
       "shield_until": null,
       "gems": [],
       "gold": 495,
@@ -127,7 +130,8 @@
         "walk": 1306,
         "run": 2251,
         "swim": 3415
-      }
+      },
+      "withdrawn": false
     },
     {
       "id": 2,
@@ -158,6 +162,7 @@
         "status": "ready"
       },
       "frozen_until": null,
+      "frozen_by": null,
       "shield_until": null,
       "gems": [
         "pink"
@@ -177,7 +182,8 @@
         "walk": 844,
         "run": 868,
         "swim": 772
-      }
+      },
+      "withdrawn": false
     },
     {
       "id": 3,
@@ -209,11 +215,12 @@
         "instance": 129
       },
       "frozen_until": null,
+      "frozen_by": null,
       "shield_until": null,
       "gems": [
         "yellow"
       ],
-      "gold": 130,
+      "gold": 138,
       "effects": {
         "multiplier": 1,
         "halved": false,
@@ -221,14 +228,15 @@
         "item_used_here": false
       },
       "tiles_completed": 22,
-      "version": 90,
+      "version": 91,
       "appearance": {
         "npc": 397,
         "idle": 808,
         "walk": 819,
         "run": 3854,
         "swim": 3418
-      }
+      },
+      "withdrawn": false
     }
   ],
   "tiles": [
@@ -804,7 +812,7 @@
   "instances": {
     "6": {
       "challenge": "sire-50",
-      "started": "2026-10-06T22:01:57.623925100Z",
+      "started": "2026-11-01T14:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 5
@@ -847,7 +855,7 @@
     },
     "22": {
       "challenge": "sire-50",
-      "started": "2026-10-07T03:21:57.623925100Z",
+      "started": "2026-11-01T19:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 21
@@ -890,7 +898,7 @@
     },
     "38": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-07T16:01:57.623925100Z",
+      "started": "2026-11-02T08:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 37
@@ -938,7 +946,7 @@
     },
     "42": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-07T19:01:57.623925100Z",
+      "started": "2026-11-02T11:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 41
@@ -986,7 +994,7 @@
     },
     "47": {
       "challenge": "sire-50",
-      "started": "2026-10-07T22:01:57.623925100Z",
+      "started": "2026-11-02T14:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 46
@@ -1029,7 +1037,7 @@
     },
     "55": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-08T01:21:57.623925100Z",
+      "started": "2026-11-02T17:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 54
@@ -1077,7 +1085,7 @@
     },
     "61": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-08T05:01:57.623925100Z",
+      "started": "2026-11-02T21:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 60
@@ -1125,7 +1133,7 @@
     },
     "64": {
       "challenge": "sire-50",
-      "started": "2026-10-08T06:21:57.623925100Z",
+      "started": "2026-11-02T22:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 63
@@ -1168,7 +1176,7 @@
     },
     "67": {
       "challenge": "sire-50",
-      "started": "2026-10-08T06:41:57.623925100Z",
+      "started": "2026-11-02T23:18:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 66
@@ -1213,7 +1221,7 @@
     },
     "89": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-08T21:41:57.623925100Z",
+      "started": "2026-11-03T14:18:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 88
@@ -1261,7 +1269,7 @@
     },
     "95": {
       "challenge": "sire-50",
-      "started": "2026-10-08T23:21:57.623925100Z",
+      "started": "2026-11-03T15:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 94
@@ -1307,7 +1315,7 @@
     },
     "98": {
       "challenge": "sire-50",
-      "started": "2026-10-09T00:21:57.623925100Z",
+      "started": "2026-11-03T16:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 97
@@ -1353,7 +1361,7 @@
     },
     "111": {
       "challenge": "any-drop-1m",
-      "started": "2026-10-09T08:01:57.623925100Z",
+      "started": "2026-11-04T00:38:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 110
@@ -1401,7 +1409,7 @@
     },
     "114": {
       "challenge": "sire-50",
-      "started": "2026-10-09T08:21:57.623925100Z",
+      "started": "2026-11-04T00:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 113
@@ -1446,7 +1454,7 @@
     },
     "123": {
       "challenge": "sire-50",
-      "started": "2026-10-09T12:41:57.623925100Z",
+      "started": "2026-11-04T05:18:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 122
@@ -1490,7 +1498,7 @@
     },
     "129": {
       "challenge": "sire-50",
-      "started": "2026-10-09T17:41:57.623925100Z",
+      "started": "2026-11-04T10:18:32.224735100Z",
       "scope": {
         "scope": "tile",
         "team": 3,
@@ -1510,7 +1518,7 @@
     },
     "135": {
       "challenge": "sire-50",
-      "started": "2026-10-09T20:21:57.623925100Z",
+      "started": "2026-11-04T12:58:32.224735100Z",
       "scope": {
         "scope": "minigame",
         "id": 134
@@ -1556,7 +1564,7 @@
         "gold_per_unit": 1
       },
       "initiator": 0,
-      "deadline": "2026-10-07T02:01:57.623925100Z",
+      "deadline": "2026-11-01T18:38:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1586,7 +1594,7 @@
         "gold_per_unit": 1
       },
       "initiator": 1,
-      "deadline": "2026-10-07T07:21:57.623925100Z",
+      "deadline": "2026-11-01T23:58:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1620,7 +1628,7 @@
         ]
       },
       "initiator": 3,
-      "deadline": "2026-10-07T22:01:57.623925100Z",
+      "deadline": "2026-11-02T14:38:32.224735100Z",
       "finished": [
         3,
         1,
@@ -1659,7 +1667,7 @@
         ]
       },
       "initiator": 0,
-      "deadline": "2026-10-08T01:01:57.623925100Z",
+      "deadline": "2026-11-02T17:38:32.224735100Z",
       "finished": [
         2,
         1,
@@ -1694,7 +1702,7 @@
         "gold_per_unit": 1
       },
       "initiator": 1,
-      "deadline": "2026-10-08T02:01:57.623925100Z",
+      "deadline": "2026-11-02T18:38:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1728,7 +1736,7 @@
         ]
       },
       "initiator": 1,
-      "deadline": "2026-10-08T07:21:57.623925100Z",
+      "deadline": "2026-11-02T23:58:32.224735100Z",
       "finished": [
         1,
         0,
@@ -1767,7 +1775,7 @@
         ]
       },
       "initiator": 2,
-      "deadline": "2026-10-08T11:01:57.623925100Z",
+      "deadline": "2026-11-03T03:38:32.224735100Z",
       "finished": [
         2,
         0,
@@ -1802,7 +1810,7 @@
         "gold_per_unit": 1
       },
       "initiator": 0,
-      "deadline": "2026-10-08T10:21:57.623925100Z",
+      "deadline": "2026-11-03T02:58:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1832,7 +1840,7 @@
         "gold_per_unit": 1
       },
       "initiator": 2,
-      "deadline": "2026-10-08T10:41:57.623925100Z",
+      "deadline": "2026-11-03T03:18:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1866,7 +1874,7 @@
         ]
       },
       "initiator": 2,
-      "deadline": "2026-10-09T03:41:57.623925100Z",
+      "deadline": "2026-11-03T20:18:32.224735100Z",
       "finished": [
         1,
         0,
@@ -1901,7 +1909,7 @@
         "gold_per_unit": 1
       },
       "initiator": 1,
-      "deadline": "2026-10-09T03:21:57.623925100Z",
+      "deadline": "2026-11-03T19:58:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1931,7 +1939,7 @@
         "gold_per_unit": 1
       },
       "initiator": 1,
-      "deadline": "2026-10-09T04:21:57.623925100Z",
+      "deadline": "2026-11-03T20:58:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -1965,7 +1973,7 @@
         ]
       },
       "initiator": 1,
-      "deadline": "2026-10-09T14:01:57.623925100Z",
+      "deadline": "2026-11-04T06:38:32.224735100Z",
       "finished": [
         0,
         3,
@@ -2000,7 +2008,7 @@
         "gold_per_unit": 1
       },
       "initiator": 2,
-      "deadline": "2026-10-09T12:21:57.623925100Z",
+      "deadline": "2026-11-04T04:58:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -2030,7 +2038,7 @@
         "gold_per_unit": 1
       },
       "initiator": 2,
-      "deadline": "2026-10-09T16:41:57.623925100Z",
+      "deadline": "2026-11-04T09:18:32.224735100Z",
       "finished": [],
       "gold": [
         {
@@ -2056,9 +2064,14 @@
         "gold_per_unit": 1
       },
       "initiator": 0,
-      "deadline": "2026-10-10T00:21:57.623925100Z",
+      "deadline": "2026-11-04T16:58:32.224735100Z",
       "finished": [],
-      "gold": null
+      "gold": [
+        {
+          "team": 3,
+          "gold": 8
+        }
+      ]
     }
   }
 }

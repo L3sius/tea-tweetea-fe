@@ -73,10 +73,17 @@
     "celebrate": [862, 818],
     "despair": [194],
     "arrive": [1265],
-    "frozen": [2338, 2339, 4094, 10084, 4196, 4758],
     "use_item": [8524],
-    "pass": [840],
-    "slip": [4031]
+    "pass": [840]
+  },
+  "stuck": {
+    "banana": { "hit": [4030], "hold": [4030], "free": [4031], "sideways": true, "holdAt": 16 },
+    "harpie_bug_swarm": { "hit": [2394, 2105], "hold": [12050, 12073], "free": [] },
+    "snake_charmer": { "hit": [1877], "hold": [1878, 1879, 3006], "free": [] },
+    "wilderness_web": { "hit": [14222], "hold": [14224, 10440], "free": [] },
+    "ice_barrage": { "hit": [848], "hold": [3361, 3367, 3358], "free": [] },
+    "entangle": { "hit": [7210], "hold": [4826, 14004], "free": [] },
+    "other": { "hit": [], "hold": [2338, 4094, 10084, 4196, 4758], "free": [] }
   },
   "easterEggs": {
     "idle": [848, 870, 855, 857, 858, 859, 861, 863, 864, 865, 872, 874, 908, 918, 4751],

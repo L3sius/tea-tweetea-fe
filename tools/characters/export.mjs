@@ -33,6 +33,8 @@ function rosterAnimations() {
   const ids = new Set()
   for (const options of Object.values(roster.styles)) for (const { id } of options) ids.add(id)
   for (const pool of Object.values(roster.reactions)) for (const id of pool) ids.add(id)
+  for (const { hit, hold, free } of Object.values(roster.stuck))
+    for (const id of [...hit, ...hold, ...free]) ids.add(id)
   for (const id of roster.easterEggs.idle) ids.add(id)
   return [...ids].sort((a, b) => a - b)
 }

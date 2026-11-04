@@ -82,6 +82,8 @@ export const WireTeam = z.object({
   position: Id,
   status: Status,
   frozen_until: Timestamp.nullable(),
+  // The item behind the freeze. Servers from before it existed leave it out.
+  frozen_by: Item.nullable().default(null),
   shield_until: Timestamp.nullable(),
   gems: z.array(Gem),
   gold: z.number(),

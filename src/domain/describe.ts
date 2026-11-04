@@ -5,6 +5,7 @@ import type { GameEvent } from './events'
 import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game'
 import type { ChallengeId, TeamId } from './ids'
 import { itemEntry } from './items'
+import { stuckState } from './stuck'
 import type { Item, Phase, Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
@@ -83,7 +84,7 @@ export function effectText(effect: Effect, seesItems = true): string {
     case 'gold':
       return effect.amount >= 0 ? `gains ${effect.amount} gold` : `loses ${-effect.amount} gold`
     case 'freeze':
-      return `is frozen for ${effect.hours}h`
+      return `is stuck for ${effect.hours}h`
     case 'give_item':
       return `gets ${effect.item && seesItems ? a(itemName(effect.item)) : 'an item'}`
     case 'lose_random_item':
@@ -184,7 +185,8 @@ const elapsed = (ms: number) => {
 /** What the team is doing. After the end its last status stays on the server, so `phase` overrides it. */
 export function teamStatusText(team: Team, now: Date, phase?: Phase): string {
   if (phase === 'ended') return 'The game is over'
-  if (team.frozenUntil && team.frozenUntil > now) return `Frozen until ${clock(team.frozenUntil)}`
+  if (team.frozenUntil && team.frozenUntil > now)
+    return `${stuckState(team.frozenBy)} until ${clock(team.frozenUntil)}`
   const { status } = team
   switch (status.kind) {
     case 'idle':
@@ -303,11 +305,11 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
     case 'blocker_removed':
       return null
     case 'frozen':
-      return `${team(event.teamId)} is frozen until ${clock(event.until)}`
+      return `${team(event.teamId)} is ${stuckState(event.by).toLowerCase()} until ${clock(event.until)}`
     case 'shielded':
       return `${team(event.teamId)} is shielded from hostile items until ${clock(event.until)}`
     case 'thawed':
-      return `${team(event.teamId)} thawed out`
+      return `${team(event.teamId)} is free again`
     case 'random_event':
       return `${event.title}: ${team(event.teamId)} ${effectText(event.effect, names.seesItems(event.teamId))}`
     case 'joker_effect':

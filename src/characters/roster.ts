@@ -3,9 +3,12 @@
 //
 // - Styles: what a team picks for itself, how its character stands, walks, runs and swims.
 // - Reactions: animations for moments on the board, picked from a pool when they happen.
+// - Stuck: for each thing that holds a team in place, a hit as it happens, a pose to hold, and
+//   optionally a way back up when it lets go.
 // - Easter eggs: rare idle emotes, and the odd walk in someone else's style.
 import type { Appearance } from '@/domain/game'
 import type { ReactionKind } from '@/domain/motion'
+import type { StuckCause } from '@/domain/stuck'
 import rosterJson from './roster.json'
 
 export const STYLES = ['idle', 'walk', 'run', 'swim'] as const
@@ -15,7 +18,16 @@ export type StyleOption = { id: number; label: string }
 
 type Roster = {
   styles: Record<Style, StyleOption[]>
-  reactions: Record<ReactionKind | 'frozen' | 'pass', number[]>
+  reactions: Record<Exclude<ReactionKind, 'struck' | 'freed'> | 'pass', number[]>
+  /**
+   * `sideways`: the cause leaves the team on the ground, so it half turns to show its length.
+   * `holdAt`: the hold stops at this client tick of its animation (partway through the hit, say)
+   *   instead of looping.
+   */
+  stuck: Record<
+    StuckCause,
+    { hit: number[]; hold: number[]; free: number[]; sideways?: boolean; holdAt?: number }
+  >
   easterEggs: { idle: number[]; idleChancePerMinute: number; gaitChancePerWalk: number }
   featured: number[]
 }

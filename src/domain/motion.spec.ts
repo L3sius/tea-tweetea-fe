@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { GameEvent, JournalEntry } from './events'
-import { teamId, tileId } from './ids'
+import { instanceId, teamId, tileId } from './ids'
 import { Choreography, JOKER_HOLD_MS, STEP_MS, TELEPORT_MS } from './motion'
 
 const red = teamId(0)
@@ -133,6 +133,80 @@ describe('Choreography', () => {
     expect(c.activeCues(T0 + STEP_MS)).toEqual([
       expect.objectContaining({ text: 'Blue gem!', tone: 'gem' }),
     ])
+  })
+
+  it('says what a blocker did once, not that the team is frozen', () => {
+    const c = new Choreography()
+    const blue = teamId(1)
+    const until = new Date(T0 + 3_600_000)
+    const blocker = { item: 'banana' as const, owner: blue, until }
+    c.apply(
+      entry(1, T0, [
+        { kind: 'blocker_triggered', teamId: red, tileId: tileId(11), blocker },
+        { kind: 'landed', teamId: red, tileId: tileId(11), instanceId: instanceId(3) },
+        { kind: 'frozen', teamId: red, until, by: 'banana' },
+      ]),
+    )
+    expect(c.activeCues(T0).map((cue) => cue.text)).toEqual(['Slipped!'])
+    expect(c.reactionsOf(red, T0)).toMatchObject([{ kind: 'struck', cause: 'banana' }])
+  })
+
+  it('names the spell that froze a team, even when something holds it longer', () => {
+    const c = new Choreography()
+    const blue = teamId(1)
+    const until = new Date(T0 + 3_600_000)
+    c.apply(
+      entry(1, T0, [
+        {
+          kind: 'item_used',
+          teamId: blue,
+          item: 'entangle',
+          target: { kind: 'team', teamId: red },
+        },
+        { kind: 'frozen', teamId: red, until, by: 'wilderness_web' },
+      ]),
+    )
+    expect(
+      c
+        .activeCues(T0)
+        .filter((cue) => cue.teamId === red)
+        .map((cue) => cue.text),
+    ).toEqual(['Entangled!'])
+    expect(c.reactionsOf(red, T0)).toMatchObject([{ kind: 'struck', cause: 'entangle' }])
+  })
+
+  it('gets a team back up from what held it as it thaws', () => {
+    const c = new Choreography()
+    const until = new Date(T0 + 60_000)
+    c.apply(entry(1, T0, [{ kind: 'frozen', teamId: red, until, by: 'banana' }]))
+    c.apply(entry(2, T0 + 60_000, [{ kind: 'thawed', teamId: red }]))
+    expect(c.reactionsOf(red, T0 + 60_000)[0]).toMatchObject({ kind: 'freed', cause: 'banana' })
+  })
+
+  it('shows a spell hit, and not the shield it leaves', () => {
+    const c = new Choreography()
+    const blue = teamId(1)
+    const until = new Date(T0 + 3_600_000)
+    c.apply(
+      entry(1, T0, [
+        {
+          kind: 'item_used',
+          teamId: blue,
+          item: 'ice_barrage',
+          target: { kind: 'team', teamId: red },
+        },
+        { kind: 'shielded', teamId: red, until },
+        { kind: 'frozen', teamId: red, until, by: 'ice_barrage' },
+      ]),
+    )
+    const onRed = c.activeCues(T0 + 2_000).filter((cue) => cue.teamId === red)
+    expect(onRed.map((cue) => cue.text)).toEqual(['Frozen!'])
+  })
+
+  it('calls a freeze without an item stuck', () => {
+    const c = new Choreography()
+    c.apply(entry(1, T0, [{ kind: 'frozen', teamId: red, until: new Date(T0 + 60_000), by: null }]))
+    expect(c.activeCues(T0).map((cue) => cue.text)).toEqual(['Stuck!'])
   })
 
   it('ignores entries it has already seen', () => {

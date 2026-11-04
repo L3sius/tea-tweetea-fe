@@ -30,7 +30,7 @@ function situation(over: Partial<Situation> = {}): Situation {
     time: T0,
     placement: { kind: 'still', tile: tileId(1) },
     appearance: look,
-    frozenUntil: null,
+    stuck: null,
     reactions: [],
     isSea: () => false,
     isOccupied: () => false,
@@ -107,13 +107,58 @@ describe('perform', () => {
     expect(after.anim).not.toBe(during.anim)
   })
 
-  it('holds one frozen pose for the whole freeze', () => {
-    const frozenUntil = T0 + 3_600_000
+  it('holds one pose for the whole freeze, from what caused it', () => {
+    const stuck = { until: T0 + 3_600_000, cause: 'banana' as const }
     const poses = [0, 60_000, 600_000].map(
-      (later) => perform(situation({ time: T0 + later, frozenUntil })).anim,
+      (later) => perform(situation({ time: T0 + later, stuck })).anim,
     )
     expect(new Set(poses).size).toBe(1)
-    expect(ROSTER.reactions.frozen).toContain(poses[0])
+    expect(ROSTER.stuck.banana.hold).toContain(poses[0])
+    const iced = perform(situation({ stuck: { ...stuck, cause: 'ice_barrage' } })).anim
+    expect(ROSTER.stuck.ice_barrage.hold).toContain(iced)
+  })
+
+  it('plays the hit of what struck the team, then holds its pose', () => {
+    const hit: Reaction = { id: '9.1', teamId: red, kind: 'struck', cause: 'snake_charmer', at: T0 }
+    const stuck = { until: T0 + 3_600_000, cause: 'snake_charmer' as const }
+    const during = perform(situation({ time: T0 + 100, reactions: [hit], stuck }))
+    expect(ROSTER.stuck.snake_charmer.hit).toContain(during.anim)
+    const after = perform(situation({ time: T0 + 9_000, reactions: [hit], stuck }))
+    expect(ROSTER.stuck.snake_charmer.hold).toContain(after.anim)
+  })
+
+  it('gets back up as a banana lets go', () => {
+    const up: Reaction = { id: '9.2', teamId: red, kind: 'freed', cause: 'banana', at: T0 }
+    const during = perform(situation({ time: T0 + 100, reactions: [up] }))
+    expect(ROSTER.stuck.banana.free).toContain(during.anim)
+    expect(during.sideways).toBe(true)
+  })
+
+  it('stays sitting partway through the slip, where the fall leaves it', () => {
+    const { hit, holdAt } = ROSTER.stuck.banana
+    const stuck = { until: T0 + 3_600_000, cause: 'banana' as const }
+    const slip: Reaction = { id: '9.1', teamId: red, kind: 'struck', cause: 'banana', at: T0 }
+    const falling = perform(situation({ time: T0 + 100, reactions: [slip], stuck }))
+    expect(falling).toMatchObject({ anim: hit[0], since: T0, stopAt: holdAt })
+    const floored = perform(situation({ time: T0 + 60_000, reactions: [slip], stuck }))
+    expect(floored).toMatchObject({ anim: hit[0], stopAt: holdAt })
+  })
+
+  it('lies across the screen while floored, and only then', () => {
+    const until = T0 + 3_600_000
+    expect(perform(situation({ stuck: { until, cause: 'banana' } })).sideways).toBe(true)
+    expect(perform(situation({ stuck: { until, cause: 'ice_barrage' } })).sideways).toBeUndefined()
+    expect(perform(situation({})).sideways).toBeUndefined()
+  })
+
+  it('every cause has a pose to hold, and only an itemless freeze goes without a hit', () => {
+    const counts = Object.entries(ROSTER.stuck).map(([cause, { hit, hold }]) => ({
+      cause,
+      hits: hit.length > 0,
+      holds: hold.length > 0,
+    }))
+    for (const c of counts)
+      expect(c).toEqual({ cause: c.cause, hits: c.cause !== 'other', holds: true })
   })
 
   it('stands idle, with an occasional emote', () => {

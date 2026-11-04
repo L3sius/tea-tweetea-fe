@@ -67,7 +67,7 @@ export const WireEvent = z.discriminatedUnion('type', [
   event('gold_changed', { team: Id, delta: z.number(), total: z.number(), reason: z.string() }),
   event('blocker_placed', { tile: Id, blocker: WireBlocker, by: Id }),
   event('blocker_removed', { tile: Id }),
-  event('frozen', { team: Id, until: Timestamp }),
+  event('frozen', { team: Id, until: Timestamp, by: Item.nullable().default(null) }),
   event('shielded', { team: Id, until: Timestamp }),
   event('thawed', { team: Id }),
   event('random_event', {

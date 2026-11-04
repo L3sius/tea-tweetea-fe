@@ -72,6 +72,8 @@ export type Team = {
   status: TeamStatus
   /** Frozen sits on top of the status; the status resumes when it ends. */
   frozenUntil: Date | null
+  /** The item behind the freeze that ends last; null without one (see stuck.ts). */
+  frozenBy: Item | null
   /** Hostile items can't target the team before then; every hit starts a new shield. */
   shieldUntil: Date | null
   gems: Set<Gem>

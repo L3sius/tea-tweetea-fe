@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, shallowRef } from 'vue'
 import { loadAnimationInfo, type AnimationInfo } from '@/characters/assets'
 import { ROSTER } from '@/characters/roster'
+import { STUCK_CAUSES, stuckCallout } from '@/domain/stuck'
 import { TtButton } from '@/ui/tt'
 import CharacterPreview from './CharacterPreview.vue'
 
@@ -15,10 +16,13 @@ const SHELVES = [
   { label: 'Tile completed', ids: ROSTER.reactions.celebrate },
   { label: 'Joker drawn', ids: ROSTER.reactions.despair },
   { label: 'Teleport landing', ids: ROSTER.reactions.arrive },
-  { label: 'Frozen', ids: ROSTER.reactions.frozen },
   { label: 'Item used', ids: ROSTER.reactions.use_item },
   { label: 'Passing a team', ids: ROSTER.reactions.pass },
-  { label: 'Caught by a blocker', ids: ROSTER.reactions.slip },
+  // Each cause's hit, the poses it holds, then its way back up.
+  ...STUCK_CAUSES.map((cause) => ({
+    label: stuckCallout(cause === 'other' ? null : cause).replace('!', ''),
+    ids: [...ROSTER.stuck[cause].hit, ...ROSTER.stuck[cause].hold, ...ROSTER.stuck[cause].free],
+  })),
   { label: 'Idle emotes', ids: ROSTER.easterEggs.idle },
 ]
 

@@ -54,7 +54,7 @@ describe('soundFor', () => {
         item: 'ice_barrage',
         target: { kind: 'team', teamId: blue },
       },
-      { kind: 'frozen', teamId: blue, until },
+      { kind: 'frozen', teamId: blue, until, by: 'ice_barrage' },
     ])
     expect(sounds).toEqual([
       { sound: 'ice-barrage-cast', team: red, audience: 'everyone' },
@@ -66,7 +66,7 @@ describe('soundFor', () => {
     const blocker = { item: 'wilderness_web', owner: blue, until } as const
     const sounds = soundsOf([
       { kind: 'blocker_triggered', teamId: red, tileId: tileId(4), blocker },
-      { kind: 'frozen', teamId: red, until },
+      { kind: 'frozen', teamId: red, until, by: 'wilderness_web' },
     ])
     expect(sounds.map((s) => s.sound)).toEqual(['web-stuck'])
   })

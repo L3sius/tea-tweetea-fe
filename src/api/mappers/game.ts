@@ -116,6 +116,7 @@ export function toTeam(wire: WireTeam): Team {
     position: tileId(wire.position),
     status: toStatus(wire.status),
     frozenUntil: toDateOrNull(wire.frozen_until),
+    frozenBy: wire.frozen_by,
     shieldUntil: toDateOrNull(wire.shield_until),
     gems: new Set(wire.gems),
     gold: wire.gold,

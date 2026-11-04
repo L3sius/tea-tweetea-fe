@@ -10,6 +10,7 @@ const wireTeam = (overrides: Partial<WireTeam> = {}): WireTeam => ({
   position: 40,
   status: { status: 'ready' },
   frozen_until: null,
+  frozen_by: null,
   shield_until: null,
   gems: ['blue', 'white'],
   gold: 55,
@@ -86,6 +87,8 @@ describe('teams', () => {
   it('parses the freeze time', () => {
     const team = toTeam(wireTeam({ frozen_until: '2026-10-05T12:00:00Z' }))
     expect(team.frozenUntil).toEqual(new Date('2026-10-05T12:00:00Z'))
+    expect(team.frozenBy).toBeNull()
+    expect(toTeam(wireTeam({ frozen_by: 'snake_charmer' })).frozenBy).toBe('snake_charmer')
   })
 })
 

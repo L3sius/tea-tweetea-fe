@@ -230,7 +230,9 @@ export class CharacterPiece {
     this.lastDraw = time
 
     const playing = this.animation(performance.anim)
-    const ticks = ((time - performance.since) * performance.rate) / TICK_MS
+    const played = ((time - performance.since) * performance.rate) / TICK_MS
+    // A pose held partway through its animation stops on that tick instead of looping.
+    const ticks = performance.stopAt === undefined ? played : Math.min(played, performance.stopAt)
     const frame = playing ? frameAt(playing.animation, Math.floor(ticks)) : -1
     const key = `${performance.anim}|${frame}|${this.heading.toFixed(3)}`
     if (key === this.drawn) return

@@ -58,6 +58,8 @@ import type { Guide } from '@/stores/tutorial'
 import type { BoardLayer, RevealName } from '@/tutorial/script'
 import { characterElement, spriteElement } from '@/map/sprite'
 import { itemEntry } from '@/domain/items'
+import { stuckCause } from '@/domain/stuck'
+import { itemSprite } from '@/ui/items'
 import type { Item } from '@/domain/vocabulary'
 import jester from '@/assets/cards/jacky-jester.png'
 import { liveCanvas } from '@/map/liveCanvas'
@@ -154,18 +156,12 @@ const passQuotes = new Map<TeamId, Quote & { seq: number }>()
  */
 const PICK_RADIUS = 20
 
-const BLOCKER_ICONS: Partial<Record<Item, string>> = {
-  banana: '🍌',
-  harpie_bug_swarm: '🐝',
-  snake_charmer: '🐍',
-  wilderness_web: '🕸️',
+/** A blocker's catalogue picture (OSRS Wiki), else its kit sprite, else the kit's cross. */
+function blockerHtml(item: Item): string {
+  const { url, icon } = itemSprite(item)
+  if (url) return `<img class="blocker-icon" src="${encodeURI(url)}" alt="">`
+  return `<span class="tt-sprite tt-icon-${icon ?? 'cross'}"></span>`
 }
-
-/** Blockers with a kit sprite draw it; the rest fall back to their emoji. */
-const blockerHtml = (item: Item) =>
-  item === 'banana'
-    ? '<span class="tt-sprite tt-icon-banana"></span>'
-    : (BLOCKER_ICONS[item] ?? '⛔')
 
 /** The last click while picking: a yellow cross on a tile, red when it missed. */
 const click = ref<{ x: number; y: number; key: number; color: 'yellow' | 'red' } | null>(null)
@@ -186,7 +182,7 @@ const placedTeams = () => (props.state.phase === 'setup' ? [] : [...props.state.
 function blockerText(blocker: Blocker): string {
   const freeze = blockerFreezeText(blocker)
   const stops = freeze
-    ? `stops every team that walks onto it and freezes it for ${freeze}.`
+    ? `stops every team that walks onto it and holds it there for ${freeze}.`
     : 'stops every team that walks onto it.'
   return `${stops} Placed by ${props.names.team(blocker.owner)}, gone at ${clock(blocker.until)}.`
 }
@@ -736,7 +732,10 @@ function drawCharacter(
     time,
     placement: p,
     appearance,
-    frozenUntil: frozenUntil !== null && frozenUntil > time ? frozenUntil : null,
+    stuck:
+      frozenUntil !== null && frozenUntil > time
+        ? { until: frozenUntil, cause: stuckCause(team.frozenBy) }
+        : null,
     reactions: choreographyOf(team.id).reactionsOf(team.id, time),
     isSea: (tile) => props.board.tiles.get(tile)?.sea ?? false,
     isOccupied: (tile) => (still.get(tile) ?? []).some((other) => other !== team.id),
@@ -745,8 +744,14 @@ function drawCharacter(
       return info ? ticksToMs(info.ticks) : null
     },
   })
-  // Characters face the way they walk, and turn to the viewer once they stop.
-  const heading = p.kind === 'walk' ? (walkHeading.get(team.id) ?? HEADING.south) : HEADING.south
+  // Characters face the way they walk, and turn to the viewer once they stop, unless they are on
+  // the ground: half turned, so the body shows its length (side on, it flattens into a bar).
+  const heading =
+    p.kind === 'walk'
+      ? (walkHeading.get(team.id) ?? HEADING.south)
+      : performance.sideways
+        ? HEADING.east / 2
+        : HEADING.south
   piece.draw(performance, heading, time)
 }
 
@@ -895,16 +900,20 @@ function renderFrame() {
             ? 'teleport-out'
             : 'teleport-in'
           : frozen
-            ? 'frozen'
+            ? 'stuck'
             : 'idle'
+    // Some causes tint the stuck pose (see the sprite-stuck-* styles). The server freezes a team
+    // before its walk has played, so the tint waits for the piece to stop.
+    const held = pose === 'stuck' ? stuckCause(team.frozenBy) : null
+    const cause = held ? ` sprite-stuck-${held}` : ''
     const group = p.kind === 'still' ? still.get(p.tile) : undefined
     const slot = group ? group.indexOf(team.id) - (group.length - 1) / 2 : 0
     if (entry.piece) drawCharacter(entry.piece, team, p, time, still)
-    const key = `${pose}|${facing.get(team.id) ?? 1}|${slot}|${props.selected === team.id}`
+    const key = `${pose}${cause}|${facing.get(team.id) ?? 1}|${slot}|${props.selected === team.id}`
     if (key !== entry.pose) {
       entry.pose = key
       const kind = entry.npc !== null ? ' sprite-character' : ''
-      entry.el.className = `sprite${kind} sprite-${pose}${props.selected === team.id ? ' sprite-selected' : ''}`
+      entry.el.className = `sprite${kind} sprite-${pose}${cause}${props.selected === team.id ? ' sprite-selected' : ''}`
       entry.el.style.setProperty('--facing', String(facing.get(team.id) ?? 1))
       entry.el.style.setProperty('--slot', String(slot))
     }
@@ -1650,14 +1659,14 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   filter: drop-shadow(1px 1px 0 #000);
 }
 .board-map .blocker-marker {
-  font-size: 24px;
-  line-height: 28px;
-  text-align: center;
   filter: drop-shadow(1px 1px 0 #000);
 }
-.board-map .blocker-marker .tt-sprite {
+.board-map .blocker-marker :is(.tt-sprite, .blocker-icon) {
+  display: block;
   width: 28px;
   height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 /* Where a walk can end: yellow squares with a glow, as on the event site. */
 .board-map .dest-ring {
@@ -1813,15 +1822,18 @@ defineExpose({ locate, panTo, zoomBy, showAll })
     filter: brightness(3);
   }
 }
-.board-map .sprite-frozen .sprite-body {
+/* What holds a stuck piece tints it: bananas, ice, vines and webs. */
+.board-map .sprite-stuck-banana .sprite-body {
+  filter: sepia(0.35) saturate(1.5) brightness(1.08);
+}
+.board-map .sprite-stuck-ice_barrage .sprite-body {
   filter: saturate(0.3) hue-rotate(160deg) brightness(1.2);
 }
-.board-map .sprite-frozen .sprite-body::after {
-  content: '❄';
-  position: absolute;
-  top: -8px;
-  right: -6px;
-  font-size: 14px;
+.board-map .sprite-stuck-entangle .sprite-body {
+  filter: sepia(0.5) hue-rotate(50deg) saturate(1.6);
+}
+.board-map .sprite-stuck-wilderness_web .sprite-body {
+  filter: grayscale(0.7) brightness(1.15);
 }
 .board-map .sprite-character {
   width: 60px;

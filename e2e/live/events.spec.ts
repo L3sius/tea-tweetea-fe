@@ -13,7 +13,7 @@ test('a death from Dink shows in the activity feed', async ({ page, backend }) =
   await expect(page.getByText(/killed by Vorkath/)).toBeVisible()
 })
 
-test('a frozen team can only wait, until it thaws', async ({ page, backend, devTools }) => {
+test('a team frozen by an admin is stuck, until it thaws', async ({ page, backend, devTools }) => {
   void devTools
   await backend.admin({ action: 'complete_tile', team: red.id, member: red.member })
   await open(page, red)
@@ -21,11 +21,11 @@ test('a frozen team can only wait, until it thaws', async ({ page, backend, devT
   await expect(page.getByRole('button', { name: /^Face-down card/ }).first()).toBeVisible()
 
   await backend.admin({ action: 'dev_freeze', team: red.id, hours: 1 })
-  await expect(page.getByText(/^Frozen until/)).toBeVisible()
+  await expect(page.getByText(/^Stuck until/)).toBeVisible()
   await expect(page.getByRole('button', { name: /^Face-down card/ })).toHaveCount(0)
 
   await backend.admin({ action: 'dev_thaw', team: red.id })
-  await expect(page.getByText(/^Frozen until/)).toBeHidden()
+  await expect(page.getByText(/^Stuck until/)).toBeHidden()
   await expect(page.getByRole('button', { name: /^Face-down card/ }).first()).toBeVisible()
 })
 

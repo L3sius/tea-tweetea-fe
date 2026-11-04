@@ -56,10 +56,11 @@ npm run characters:catalog                 # out/human-npcs.tsv: every NPC rigge
   - `celebrate`: a completed tile
   - `despair`: a Joker drawn
   - `arrive`: landing after a teleport
-  - `frozen`: the pose held while frozen
   - `use_item`: an item used
   - `pass`: climbing past another team
-  - `slip`: caught by a trap
+- `stuck`: for each thing that holds a team in place (the four blockers, Ice Barrage, Entangle,
+  and `other` for a freeze without an item), a `hit` played as it happens, a `hold` pose kept
+  until the team is free, and a `free` animation (getting up, say) as it lets go.
 - `easterEggs`: idle emotes, and how often they happen. Besides `idleChancePerMinute`, a walk
   sometimes borrows another style (`gaitChancePerWalk`).
 - `featured`: NPCs the character page suggests before a search.

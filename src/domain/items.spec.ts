@@ -13,6 +13,7 @@ function team(status: TeamStatus, overrides: Partial<Team> = {}): Team {
     position: tileId(1),
     status,
     frozenUntil: null,
+    frozenBy: null,
     shieldUntil: null,
     gems: new Set(),
     gold: 100,
@@ -59,9 +60,9 @@ describe('whyNotUsable', () => {
     expect(whyNotUsable(used, 'bronze_feather', NOW)).toMatch(/Already used/)
   })
 
-  it('locks everything while frozen, even when ready', () => {
+  it('locks everything while stuck, even when ready', () => {
     const frozen = team({ kind: 'ready' }, { frozenUntil: new Date(NOW.getTime() + 60_000) })
-    expect(whyNotUsable(frozen, 'bronze_feather', NOW)).toBe('Not while frozen')
+    expect(whyNotUsable(frozen, 'bronze_feather', NOW)).toBe('Not while stuck')
   })
 
   it('treats Protect from Magic as kept, not used', () => {

@@ -13,6 +13,7 @@ import {
 } from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import { whyNotUsable } from '@/domain/items'
+import { stuckState } from '@/domain/stuck'
 import type { Item } from '@/domain/vocabulary'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
@@ -79,14 +80,14 @@ const task = computed(() => {
   return { challenge, effort, ...challengeProgress(challenge, instance, t.id) }
 })
 
-/** Why the route ends early: it walks onto a blocker, which stops and freezes the team. */
+/** Why the route ends early: it walks onto a blocker, which stops the team and holds it there. */
 const stopText = computed(() => {
   const stop = my.stoppedBy
   if (!stop) return null
   const freeze = blockerFreezeText(stop.blocker)
   const name = blockerName(stop.blocker)
   return freeze
-    ? `Your walk stops at the ${name}, and you will be frozen for ${freeze}.`
+    ? `Your walk stops at the ${name}, and you will be stuck there for ${freeze}.`
     : `Your walk stops at the ${name}.`
 })
 
@@ -353,10 +354,12 @@ const lockClock = computed(
           {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
         </TtText>
         <template v-else-if="blocker === 'frozen' && frozen">
-          <TtText :size="2" color="cyan" glow>Frozen until {{ clock(frozen) }}</TtText>
+          <TtText :size="2" color="cyan" glow>
+            {{ stuckState(team?.frozenBy ?? null) }} until {{ clock(frozen) }}
+          </TtText>
           <TtText :size="1" color="white" class="max-w-[340px]">
-            You can't draw or use power-ups while frozen. Hold Protect from Magic to block the next
-            freeze.
+            You can't draw or use power-ups until then. Hold Protect from Magic to shrug off the
+            next one.
           </TtText>
         </template>
         <TtText v-else :size="2" color="white">Walking...</TtText>

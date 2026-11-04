@@ -37,6 +37,7 @@ export class PretendGame {
       position: start,
       status: { kind: 'idle' },
       frozenUntil: null,
+      frozenBy: null,
       shieldUntil: null,
       gems: new Set(),
       gold: 0,

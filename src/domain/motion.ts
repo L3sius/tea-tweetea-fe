@@ -4,11 +4,19 @@
 // entry's `at` plus a fixed pace per step says where a walking team should be at any moment
 // (docs/api.md, "Animation timing"). Because the timing is anchored to the server's clock, a
 // reloaded page resumes a walk mid-way instead of skipping to its end.
-import { blockerName, cardLabel, effectText, itemName } from './describe'
+import { cardLabel, effectText, itemName } from './describe'
 import type { GameEvent, JournalEntry } from './events'
 import type { Card } from './game'
 import type { TeamId, TileId } from './ids'
-import { entryContext, soundFor, type SoundAudience, type SoundName } from './sounds'
+import {
+  entryContext,
+  soundFor,
+  type EntryContext,
+  type SoundAudience,
+  type SoundName,
+} from './sounds'
+import { holdsTeams, stuckCallout, stuckCause, type StuckCause } from './stuck'
+import type { Item } from './vocabulary'
 import { moment, momentOf, type Moment } from './director'
 
 /** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
@@ -69,12 +77,14 @@ export type Placement =
   | { kind: SegmentKind; from: TileId; to: TileId; progress: number; steps: number; seq: number }
 
 /** Moments a team's character reacts to, after any movement that comes first. */
-export type ReactionKind = 'celebrate' | 'despair' | 'arrive' | 'use_item' | 'slip'
+export type ReactionKind = 'celebrate' | 'despair' | 'arrive' | 'use_item' | 'struck' | 'freed'
 
 export type Reaction = {
   id: string
   teamId: TeamId
   kind: ReactionKind
+  /** For `struck` and `freed`: what holds, or held, the team (a blocker, a spell). */
+  cause?: StuckCause
   /** Server time it starts. */
   at: number
 }
@@ -98,6 +108,8 @@ export class Choreography {
   private lastSeq = 0
   /** Length of each team's current walk, from its `move_confirmed`. */
   private readonly walkSteps = new Map<TeamId, number>()
+  /** What holds each stuck team, from its latest `frozen`, so its thaw can play the way back up. */
+  private readonly heldBy = new Map<TeamId, Item | null>()
 
   /** Adds an entry's movement and callouts. Entries must arrive in order; repeats are ignored. */
   /** `seesItems`: whether the viewer may know which items a team gains (its own team's only). */
@@ -149,8 +161,8 @@ export class Choreography {
       this.cues.push({ id: `${entry.seq}.${index}`, teamId: team, text, tone, at: time, card })
     }
 
-    const react = (team: TeamId, kind: ReactionKind, index: number) =>
-      this.reactions.push({ id: `${entry.seq}.${index}`, teamId: team, kind, at: now(team) })
+    const react = (team: TeamId, kind: ReactionKind, index: number, cause?: StuckCause) =>
+      this.reactions.push({ id: `${entry.seq}.${index}`, teamId: team, kind, cause, at: now(team) })
     /** Makes the rest of the entry wait `ms` for this team, so a reaction can be seen. */
     const hold = (team: TeamId, ms: number) => {
       const end = now(team) + ms
@@ -191,10 +203,24 @@ export class Choreography {
           if (event.card.kind !== 'joker') return
           react(event.teamId, 'despair', index)
           return hold(event.teamId, JOKER_HOLD_MS)
-        // The team has already stepped onto the blocker's tile; it stops there.
+        // The team has already stepped onto the blocker's tile; it stops there. Its callout is
+        // the blocker's, and the freeze that follows says nothing more.
         case 'blocker_triggered':
-          cue(event.teamId, `${blockerName(event.blocker)}!`, 'bad', index)
-          return react(event.teamId, 'slip', index)
+          react(event.teamId, 'struck', index, stuckCause(event.blocker.item))
+          break
+        // A blocker's freeze was shown with the blocker.
+        case 'frozen':
+          this.heldBy.set(event.teamId, event.by)
+          if (!context.blockerHit)
+            react(event.teamId, 'struck', index, stuckCause(freezer(event.by, context)))
+          break
+        // Getting back up from what held the team, when this page saw it start.
+        case 'thawed': {
+          const by = this.heldBy.get(event.teamId)
+          this.heldBy.delete(event.teamId)
+          if (by !== undefined) react(event.teamId, 'freed', index, stuckCause(by))
+          break
+        }
         case 'tile_completed':
           react(event.teamId, 'celebrate', index)
           break
@@ -202,7 +228,7 @@ export class Choreography {
           react(event.teamId, 'use_item', index)
           break
       }
-      const callout = cueFor(event, seesItems)
+      const callout = cueFor(event, seesItems, context)
       if (callout) cue(callout.team, callout.text, callout.tone, index)
     })
     for (const [team, span] of moving) {
@@ -301,9 +327,17 @@ export class Choreography {
   }
 }
 
+/**
+ * The item a `frozen` event is about: the spell used in its entry, else what holds the team longest
+ * (the event's `by`), which is what an admin's freeze names when the team was already stuck.
+ */
+const freezer = (by: Item | null, context: EntryContext): Item | null =>
+  holdsTeams(context.itemUsed) ? context.itemUsed : by
+
 function cueFor(
   event: GameEvent,
   seesItems: (team: TeamId) => boolean,
+  context: EntryContext,
 ): { team: TeamId; text: string; tone: CueTone } | null {
   switch (event.kind) {
     case 'gem_collected':
@@ -339,14 +373,18 @@ function cueFor(
           tone: 'bad',
         }
       return null
+    // The shield a hostile hit leaves says nothing new over the hit; the feed and log still tell.
     case 'shielded':
-      return { team: event.teamId, text: 'Shielded', tone: 'info' }
+      return null
     case 'item_used':
       return { team: event.teamId, text: itemName(event.item), tone: 'info' }
+    case 'blocker_triggered':
+      return { team: event.teamId, text: stuckCallout(event.blocker.item), tone: 'bad' }
     case 'frozen':
-      return { team: event.teamId, text: 'Frozen!', tone: 'bad' }
+      if (context.blockerHit) return null
+      return { team: event.teamId, text: stuckCallout(freezer(event.by, context)), tone: 'bad' }
     case 'thawed':
-      return { team: event.teamId, text: 'Thawed out', tone: 'good' }
+      return { team: event.teamId, text: 'Free!', tone: 'good' }
     case 'tile_completed':
       return { team: event.teamId, text: 'Tile complete!', tone: 'good' }
     case 'random_event':

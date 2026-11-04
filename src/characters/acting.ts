@@ -3,10 +3,21 @@
 // thing, and a reloaded page picks up where it was.
 import type { TeamId, TileId } from '@/domain/ids'
 import { STEP_MS, type Placement, type Reaction } from '@/domain/motion'
+import type { StuckCause } from '@/domain/stuck'
 import { RANDOM, ROSTER, RUN_FROM_STEPS, optionIds, type Appearance } from './roster'
 
-/** An animation to play: frame 0 shows at `since` (ms), and it plays `rate` times as fast. */
-export type Performance = { anim: number; since: number; rate: number }
+/**
+ * An animation to play: frame 0 shows at `since` (ms), and it plays `rate` times as fast.
+ * `sideways`: the character lies on the ground, so it turns across the screen to read as lying.
+ * `stopAt`: it plays up to this client tick and stays there, a pose held partway through.
+ */
+export type Performance = {
+  anim: number
+  since: number
+  rate: number
+  sideways?: boolean
+  stopAt?: number
+}
 
 export type Situation = {
   team: TeamId
@@ -14,8 +25,8 @@ export type Situation = {
   time: number
   placement: Placement
   appearance: Appearance
-  /** Server time a freeze ends, or null when not frozen. */
-  frozenUntil: number | null
+  /** What holds the team in place and the server time it lets go, or null when it is free. */
+  stuck: { until: number; cause: StuckCause } | null
   /** The team's reactions so far, latest first. */
   reactions: readonly Reaction[]
   isSea: (tile: TileId) => boolean
@@ -38,7 +49,7 @@ export function perform(s: Situation): Performance {
   if (p.kind === 'walk') return walking(s, p)
   if (p.kind === 'teleport') return loop(s.appearance.idle)
   return (
-    reacting(s) ?? (s.frozenUntil !== null ? frozen(s) : (idleEgg(s) ?? loop(s.appearance.idle)))
+    reacting(s) ?? (s.stuck !== null ? held(s, s.stuck) : (idleEgg(s) ?? loop(s.appearance.idle)))
   )
 }
 
@@ -77,19 +88,43 @@ function gait(s: Situation, p: Walk): number {
 /** The latest reaction still playing, if any. */
 function reacting(s: Situation): Performance | null {
   for (const reaction of s.reactions) {
-    const anim = pick(ROSTER.reactions[reaction.kind], s.team, reaction.id)
+    const stuck = ROSTER.stuck[reaction.cause ?? 'other']
+    const lying = reaction.kind === 'struck' || reaction.kind === 'freed'
+    const pool =
+      reaction.kind === 'struck'
+        ? stuck.hit
+        : reaction.kind === 'freed'
+          ? stuck.free
+          : ROSTER.reactions[reaction.kind]
+    const anim = pick(pool, s.team, reaction.id)
     if (anim === null) continue
-    if (s.time < reaction.at + playLength(s, anim)) return { anim, since: reaction.at, rate: 1 }
+    if (s.time < reaction.at + playLength(s, anim))
+      return {
+        anim,
+        since: reaction.at,
+        rate: 1,
+        ...(lying && stuck.sideways && { sideways: true }),
+        // A hit that ends in the held pose stops there, so the hold carries on from it.
+        ...(reaction.kind === 'struck' && stuck.holdAt !== undefined && { stopAt: stuck.holdAt }),
+      }
     // Older reactions ended before this one.
     return null
   }
   return null
 }
 
-/** A frozen pose, the same for the whole freeze. */
-function frozen(s: Situation): Performance {
-  const anim = pick(ROSTER.reactions.frozen, s.team, s.frozenUntil ?? 0, 'frozen')
-  return { anim: anim ?? s.appearance.idle, since: 0, rate: 1 }
+/** The pose its cause leaves the team in, the same until it is free. */
+function held(s: Situation, stuck: NonNullable<Situation['stuck']>): Performance {
+  const { hold, holdAt, sideways } = ROSTER.stuck[stuck.cause]
+  const anim = pick(hold, s.team, stuck.until, 'stuck')
+  // Played long ago (`since` 0), so a pose held partway shows only its `holdAt` tick.
+  return {
+    anim: anim ?? s.appearance.idle,
+    since: 0,
+    rate: 1,
+    ...(sideways && { sideways }),
+    ...(holdAt !== undefined && { stopAt: holdAt }),
+  }
 }
 
 /** Now and then, an idle character does an emote somewhere in the minute. */

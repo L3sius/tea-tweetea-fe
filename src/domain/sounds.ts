@@ -77,9 +77,9 @@ const BLOCKER_SOUNDS: Partial<Record<Item, SoundName>> = {
 const TELEPORT_ITEMS = new Set<Item>(['quetzal_whistle', 'ogre_boat', 'group_teleport'])
 
 /** What the rest of an entry says about an event in it: the item used, a blocker hit. */
-type Context = { itemUsed: Item | null; blockerHit: boolean }
+export type EntryContext = { itemUsed: Item | null; blockerHit: boolean }
 
-export function entryContext(entry: JournalEntry): Context {
+export function entryContext(entry: JournalEntry): EntryContext {
   let itemUsed: Item | null = null
   let blockerHit = false
   for (const e of entry.events) {
@@ -97,7 +97,7 @@ const everyone = (sound: SoundName, team: TeamId): SoundFor => ({
 const forTeam = (sound: SoundName, team: TeamId): SoundFor => ({ sound, team, audience: 'team' })
 
 /** The sound an event makes, if any. `context` is what else happened in its journal entry. */
-export function soundFor(event: GameEvent, context: Context): SoundFor | null {
+export function soundFor(event: GameEvent, context: EntryContext): SoundFor | null {
   switch (event.kind) {
     case 'card_drawn':
       return event.card.kind === 'joker'
