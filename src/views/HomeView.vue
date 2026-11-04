@@ -539,7 +539,7 @@ async function buyMysteryBox() {
               title="Dismiss"
               @click="game.dismissCatchUp()"
             >
-              ✕
+              <span class="tt-sprite tt-icon-cross block size-4" aria-hidden="true"></span>
             </button>
           </template>
         </div>
@@ -551,7 +551,7 @@ async function buyMysteryBox() {
           role="status"
         >
           <TtText :size="1" color="white" class="whitespace-nowrap">
-            🎬 <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span> ·
+            <span :style="{ color: teamColor(followed) }">{{ followed.name }}</span> ·
             {{ MOMENT_LABEL[shot.moment.kind] }}
           </TtText>
           <TtButton size="sm" class="!min-h-9" @click="skipAction()">Back</TtButton>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import hourglass from '@/assets/tt/img/icons/hourglass.png'
-import { ordinal, standingText, timeLeft, type Contest } from '@/domain/contests'
+import { ordinal, standingMet, standingText, timeLeft, type Contest } from '@/domain/contests'
 import type { Names } from '@/domain/describe'
 import type { Team } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
@@ -91,6 +91,11 @@ const stakeTitle = computed(() => {
             :color="s.place !== null || s.finished ? 'green' : 'white'"
             class="shrink-0"
           >
+            <span
+              v-if="standingMet(s)"
+              class="tt-sprite tt-icon-check mr-1 inline-block size-3.5 align-[-2px]"
+              aria-label="Done"
+            ></span>
             {{ standingText(s, contest.stake, contest.live) }}
           </TtText>
         </div>

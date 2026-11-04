@@ -73,7 +73,7 @@ const colorOf = (id: TeamId | null) => {
             title="Watch this move again on the map"
             @click="emit('watch', block.seq)"
           >
-            ▶ Watch
+            Watch
           </button>
         </div>
         <p v-for="(line, j) in block.lines" :key="j" class="tt-1 log-line">

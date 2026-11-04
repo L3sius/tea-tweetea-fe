@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { byStanding, ordinal, standingText, timeLeft, type Stake, type Standing } from './contests'
+import {
+  byStanding,
+  ordinal,
+  standingMet,
+  standingText,
+  timeLeft,
+  type Stake,
+  type Standing,
+} from './contests'
 import { teamId } from './ids'
 
 const standing = (over: Partial<Standing> = {}): Standing => ({
@@ -20,15 +28,17 @@ describe('standingText', () => {
     expect(standingText(standing(), race, false)).toBe("Didn't finish")
   })
 
-  it('counts a longer task, and ticks it once it is complete', () => {
+  it('counts a longer task, and knows when it is complete', () => {
     expect(standingText(standing({ done: 12, needed: 50 }), perUnit)).toBe('12/50')
-    expect(standingText(standing({ done: 50, needed: 50 }), perUnit)).toBe('50/50 ✓')
+    expect(standingText(standing({ done: 50, needed: 50 }), perUnit)).toBe('50/50')
+    expect(standingMet(standing({ done: 12, needed: 50 }))).toBe(false)
+    expect(standingMet(standing({ done: 50, needed: 50 }))).toBe(true)
   })
 
   it('shows a race place, and the gold once paid', () => {
-    expect(standingText(standing({ done: 1, finished: true, place: 1 }), race)).toBe('1st ✓')
+    expect(standingText(standing({ done: 1, finished: true, place: 1 }), race)).toBe('1st')
     expect(standingText(standing({ done: 1, finished: true, place: 2, gold: 10 }), race)).toBe(
-      '2nd ✓ +10 gold',
+      '2nd +10 gold',
     )
     expect(standingText(standing({ done: 30, needed: 50, gold: 30 }), perUnit)).toBe(
       '30/50 +30 gold',

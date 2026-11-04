@@ -165,7 +165,7 @@ async function playAs(id: TeamId) {
               title="From any state: thaw, leave a drawn card or walk, complete the tile"
               @click="dev.makeReady()"
             >
-              ⏭ Ready to draw
+              Ready to draw
             </button>
             <button
               type="button"
@@ -173,7 +173,7 @@ async function playAs(id: TeamId) {
               :disabled="dev.pending"
               @click="dev.completeTile()"
             >
-              ✓ Complete tile
+              Complete tile
             </button>
             <button
               type="button"
@@ -185,7 +185,7 @@ async function playAs(id: TeamId) {
               {{ dev.pickingTile ? 'Click a tile on the map…' : '⤳ Teleport' }}
             </button>
             <button type="button" class="dev-btn" :disabled="dev.pending" @click="dev.freeze(1)">
-              ❄ Freeze 1h
+              Freeze 1h
             </button>
             <button type="button" class="dev-btn" :disabled="dev.pending" @click="dev.thaw()">
               Thaw
@@ -279,7 +279,7 @@ async function playAs(id: TeamId) {
               class="dev-btn"
               @click="dev.riggedCard = null"
             >
-              ✕ Unrig {{ cardLabel(dev.riggedCard) }}
+              Unrig {{ cardLabel(dev.riggedCard) }}
             </button>
           </div>
         </div>
@@ -297,7 +297,7 @@ async function playAs(id: TeamId) {
             class="dev-btn"
             @click="dev.say(quoteText, { colour: quoteColour, motion: quoteMotion })"
           >
-            💬 Say
+            Say
           </button>
         </div>
         <div class="mt-1.5 flex gap-1.5">
@@ -312,7 +312,7 @@ async function playAs(id: TeamId) {
 
       <!-- The minigame slot machine, without waiting for a team to land on a red tile. -->
       <button type="button" class="dev-btn w-full text-left" @click="spinMinigame">
-        🎰 Spin a minigame
+        Spin a minigame
       </button>
 
       <!-- Undo -->
@@ -324,7 +324,7 @@ async function playAs(id: TeamId) {
           :disabled="dev.pending || !last"
           @click="dev.undo()"
         >
-          ↶ Undo
+          Undo
           <span v-if="last" style="color: var(--osrs-white)">#{{ last.seq }}: {{ last.text }}</span>
         </button>
         <p style="color: var(--text-muted)">

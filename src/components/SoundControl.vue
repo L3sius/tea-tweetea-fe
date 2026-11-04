@@ -35,7 +35,10 @@ const summary = computed(() =>
       :title="summary"
       @click="open = !open"
     >
-      {{ sound.muted ? '♪ Off' : '♪ On' }}
+      <span class="flex items-center gap-1.5">
+        <span class="tt-sprite tt-icon-music h-[17px] w-[14px]" aria-hidden="true"></span>
+        {{ sound.muted ? 'Off' : 'On' }}
+      </span>
     </TtButton>
     <div
       v-if="open"

@@ -114,21 +114,21 @@ export function ordinal(n: number): string {
 
 /**
  * A team's standing in a few words: "Not yet" while a one-off task is open ("Didn't finish" once
- * the contest is over), its count while it is under way, "1st ✓" once it placed in a race, and
- * the gold once paid.
+ * the contest is over), its count while it is under way, "1st" once it placed in a race, and the
+ * gold once paid. Whether to tick it is `standingMet`.
  */
 export function standingText(s: Standing, stake: Stake, live = true): string {
   const paid = s.gold !== null && s.gold > 0 ? ` +${s.gold} gold` : ''
-  if (s.place !== null) return `${ordinal(s.place)} ✓${paid}`
-  if (s.finished && stake.kind !== 'per_unit') return `Done ✓${paid}`
+  if (s.place !== null) return `${ordinal(s.place)}${paid}`
+  if (s.finished && stake.kind !== 'per_unit') return `Done${paid}`
   const count =
-    s.needed === 1 && s.done === 0
-      ? live
-        ? 'Not yet'
-        : "Didn't finish"
-      : `${s.done}/${s.needed}${s.finished || s.done >= s.needed ? ' ✓' : ''}`
+    s.needed === 1 && s.done === 0 ? (live ? 'Not yet' : "Didn't finish") : `${s.done}/${s.needed}`
   return `${count}${paid}`
 }
+
+/** Whether the team has done what the contest asks: placed, finished, or reached the count. */
+export const standingMet = (s: Standing): boolean =>
+  s.place !== null || s.finished || s.done >= s.needed
 
 /** Time left before `deadline`, as "4h 59m", "12m" or "Ending…". */
 export function timeLeft(deadline: Date, now: Date): string {
