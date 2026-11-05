@@ -579,7 +579,15 @@ function tileNear(e: LeafletMouseEvent, candidates: Iterable<TileId>): TileId | 
 
 /** The node whose contents the tooltip shows, so it is only rebuilt when that changes. */
 let infoTile: TileId | null = null
-const infoTip = tooltip({ direction: 'top', offset: [0, -10], className: 'tile-tip', opacity: 1 })
+// Permanent, because showInfo alone decides when it shows: Leaflet closes other tooltips on any map
+// click, which on a touch screen is the very tap that opened it.
+const infoTip = tooltip({
+  direction: 'top',
+  offset: [0, -10],
+  className: 'tile-tip',
+  opacity: 1,
+  permanent: true,
+})
 
 function showInfo(tile: TileId | null, refresh = false) {
   if (tile === infoTile && !refresh) return
