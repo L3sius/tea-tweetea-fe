@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import DinkSteps from '@/components/DinkSteps.vue'
+import { useDinkStore } from '@/stores/dink'
 import { useGameStore } from '@/stores/game'
 import { TtPanel, TtText } from '@/ui/tt'
 
-// How Tweetea works, how to set up Dink, and the questions players ask. Every number comes from the
+// How Tweetea works and the questions players ask; the Dink setup has its own dialog. Every number comes from the
 // server's rules and board, as everywhere on the site.
 
 const game = useGameStore()
+const dink = useDinkStore()
 
 const gems = computed(() => game.board?.continents.length ?? 8)
 const hours = (h: number) => (h === 1 ? '1 hour' : `${h} hours`)
@@ -33,8 +34,8 @@ const rules = computed(() => {
       <TtPanel variant="iron" :padding="6" :gap="3">
         <TtText as="h2" :size="3" font="quill" color="orange" glow>FAQ</TtText>
         <TtText :size="1" color="white">
-          How Tweetea works, how to set up Dink, and answers to common questions. For a guided tour
-          of the board, press <b class="text-[var(--osrs-yellow)]">Tutorial</b> at the top.
+          How Tweetea works, and answers to common questions. For a guided tour of the board, press
+          <b>Tutorial</b> at the top; to set up the Dink plugin, press <b>Dink</b>.
         </TtText>
       </TtPanel>
 
@@ -113,20 +114,13 @@ const rules = computed(() => {
         </TtText>
       </TtPanel>
 
-      <TtPanel id="dink" title="Set up Dink" :padding="12" :gap="9">
-        <TtText :size="1" color="white" align="left">
-          Progress is tracked through the Dink RuneLite plugin: loot, kill counts, clues, pets,
-          slayer tasks, combat achievements and deaths. Every player on a team sets it up once, on
-          every account they play.
-        </TtText>
-        <DinkSteps />
-      </TtPanel>
-
       <TtPanel title="Questions" :padding="12" :gap="9">
         <div class="faq-qa">
           <TtText :size="1" color="orange" align="left">My drops don't show up.</TtText>
           <TtText :size="1" color="white" align="left">
-            Check the Dink steps above, and that your account is on your team's roster on the
+            Check the
+            <button type="button" class="tt-link" @click="dink.show()">Dink setup</button>, and that
+            your account is on your team's roster on the
             <RouterLink to="/teams" class="tt-link">Teams</RouterLink> page. Alts count too, once
             they are added. If yours is missing, ask an organiser.
           </TtText>

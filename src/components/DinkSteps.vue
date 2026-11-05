@@ -4,7 +4,7 @@ import { readConfig } from '@/config/env'
 import { TtButton, TtText } from '@/ui/tt'
 
 // How to connect the Dink RuneLite plugin: Dink loads the event's settings, webhook included, from
-// the server's /dink/config. Shown on the FAQ page and in the first-visit setup dialog.
+// the server's /dink/config. Shown in the setup dialog.
 
 const api = readConfig().api
 // On recorded fixtures there is no server of our own; the real one is what players set up.

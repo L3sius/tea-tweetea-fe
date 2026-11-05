@@ -21,7 +21,7 @@ const PAGES = [
   { path: '/stats', shows: 'By team' },
   { path: '/teams', shows: 'Varrock Sewer Rats' },
   { path: '/items', shows: 'Mystery box' },
-  { path: '/faq', shows: 'Dynamic Config URL' },
+  { path: '/faq', shows: 'Is pre-stacking allowed?' },
 ]
 
 for (const { path, shows } of PAGES) {
@@ -46,6 +46,22 @@ test('the header goes to every page', async ({ page }) => {
     await expect(page).toHaveURL(url)
     await expect(nav.getByRole('button', { name: label })).toHaveAttribute('aria-current', 'page')
   }
+})
+
+test('the header opens the Dink setup, and it closes again', async ({ page }) => {
+  await open(page, '/')
+  const dink = page.getByRole('dialog', { name: 'Set up Dink' })
+  const nav = page.getByRole('navigation', { name: 'Pages' })
+
+  await nav.getByRole('button', { name: 'Dink' }).click()
+  await expect(dink).toContainText('/dink/config')
+  await dink.getByRole('button', { name: 'Close' }).click()
+  await expect(dink).toBeHidden()
+
+  await nav.getByRole('button', { name: 'Dink' }).click()
+  await expect(dink).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(dink).toBeHidden()
 })
 
 test('a captain logs in with the team code, and out again', async ({ page }) => {

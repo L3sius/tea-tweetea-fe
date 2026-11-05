@@ -3,6 +3,7 @@ import { onClickOutside, onKeyStroke, useMediaQuery } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useDinkStore } from '@/stores/dink'
 import { useGameStore } from '@/stores/game'
 import { useTeamStore } from '@/stores/team'
 import { useTutorialStore } from '@/stores/tutorial'
@@ -14,6 +15,7 @@ const game = useGameStore()
 const { connection } = storeToRefs(game)
 const my = useTeamStore()
 const tutorial = useTutorialStore()
+const dink = useDinkStore()
 const router = useRouter()
 const route = useRoute()
 // The big title only where the header still fits on one row beside it.
@@ -27,6 +29,11 @@ async function playTutorial() {
   menuOpen.value = false
   await router.push('/')
   tutorial.start()
+}
+
+function showDink() {
+  menuOpen.value = false
+  dink.show()
 }
 
 const CONNECTION = {
@@ -87,6 +94,7 @@ onClickOutside(menu, () => (menuOpen.value = false), { ignore: [toggle] })
         </TtButton>
       </RouterLink>
       <TtButton size="sm" @click="playTutorial">Tutorial</TtButton>
+      <TtButton size="sm" @click="showDink">Dink</TtButton>
     </nav>
     <div class="ml-auto flex flex-wrap items-center justify-center gap-3">
       <!-- The team this browser plays for, with the way out beside it. -->
@@ -184,6 +192,7 @@ onClickOutside(menu, () => (menuOpen.value = false), { ignore: [toggle] })
           </TtButton>
         </RouterLink>
         <TtButton size="sm" class="!w-full" @click="playTutorial">Tutorial</TtButton>
+        <TtButton size="sm" class="!w-full" @click="showDink">Dink</TtButton>
       </nav>
       <div class="flex flex-wrap items-center justify-between gap-2">
         <span v-if="my.team" class="flex min-w-0 items-center gap-1.5">

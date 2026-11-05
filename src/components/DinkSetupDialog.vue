@@ -1,44 +1,34 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { onKeyStroke } from '@vueuse/core'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useDinkStore } from '@/stores/dink'
 import { useTutorialStore } from '@/stores/tutorial'
 import { TtButton, TtPanel, TtText } from '@/ui/tt'
 import DinkSteps from './DinkSteps.vue'
 
-// The Dink setup, put in front of a first-time visitor once the tutorial is over (finished or
-// skipped). Progress only counts through Dink, so only "I've set it up" closes it; the FAQ page
-// keeps the same steps for later.
+// The Dink setup. It is put in front of a first-time visitor once the tutorial is over (finished
+// or skipped), and progress only counts through Dink, so then only "I've set it up" closes it.
+// Opened again from the header, it closes on Close, Escape or a click outside.
 
-const DONE_KEY = 'tweetea.dinkSetup'
-
+const dink = useDinkStore()
 const tutorial = useTutorialStore()
 const route = useRoute()
 
-const done = ref(readDone())
-// Not over the tutorial, and not for admins on their own page.
-const open = computed(() => !done.value && tutorial.seen && !tutorial.active && !route.meta.admin)
+// The first-visit ask: not over the tutorial, and not for admins on their own page.
+const asking = computed(() => !dink.done && tutorial.seen && !tutorial.active && !route.meta.admin)
+const open = computed(() => dink.shown || asking.value)
+const closable = computed(() => dink.shown && !asking.value)
 
-function confirm() {
-  done.value = true
-  try {
-    localStorage.setItem(DONE_KEY, '1')
-  } catch {
-    // Asked again next visit.
-  }
+function close() {
+  if (closable.value) dink.hide()
 }
-
-function readDone(): boolean {
-  try {
-    return localStorage.getItem(DONE_KEY) === '1'
-  } catch {
-    return false
-  }
-}
+onKeyStroke('Escape', close)
 </script>
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="dink-overlay">
+    <div v-if="open" class="dink-overlay" @click.self="close">
       <TtPanel
         variant="iron"
         title="Set up Dink"
@@ -51,11 +41,17 @@ function readDone(): boolean {
       >
         <TtText :size="1" color="white">
           Your drops, kills and clues reach the game through the Dink RuneLite plugin. Without it
-          nothing you do counts for your team.
+          nothing you do counts for your team. Every player sets it up once, on every account they
+          play.
         </TtText>
         <DinkSteps />
-        <TtText :size="1" color="muted">You can find these steps again on the FAQ page.</TtText>
-        <TtButton @click="confirm">I've set it up</TtButton>
+        <template v-if="asking">
+          <TtText :size="1" color="muted">
+            You can open these steps again with <b>Dink</b> at the top.
+          </TtText>
+          <TtButton @click="dink.confirm">I've set it up</TtButton>
+        </template>
+        <TtButton v-else @click="close">Close</TtButton>
       </TtPanel>
     </div>
   </Teleport>
@@ -72,5 +68,9 @@ function readDone(): boolean {
   padding: 16px;
   overflow-y: auto;
   background: rgb(0 0 0 / 0.55);
+}
+b {
+  color: var(--osrs-yellow);
+  font-weight: normal;
 }
 </style>
