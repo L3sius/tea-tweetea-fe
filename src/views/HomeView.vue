@@ -15,6 +15,8 @@ import TeamControls from '@/components/TeamControls.vue'
 import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
+import { challengeProgress, teamStatusText } from '@/domain/describe'
+import { GEMS } from '@/domain/vocabulary'
 import { MOMENT_LABEL, direct, type Shot } from '@/domain/director'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
@@ -30,7 +32,7 @@ import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
 import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
-import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
+import { TtButton, TtPanel, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -84,8 +86,28 @@ watch(
  */
 type Tab = 'overview' | 'play' | 'feed' | 'log'
 const tab = ref<Tab>('overview')
-/** On phones the panel is a bottom sheet that can be tucked away to see more map. */
-const sheetOpen = ref(true)
+// Below this the panel is a bottom sheet under the map, at one of three heights: `peek` shows only
+// its tabs and a line of status, `half` shares the screen with the map, `full` gives the lists the
+// whole height. Wider screens keep it beside the map, and so do phones held sideways: stacked,
+// their short screen would leave the map no height at all.
+const beside = useMediaQuery(
+  '(min-width: 1024px), (orientation: landscape) and (max-height: 500px) and (min-width: 640px)',
+)
+const short = useMediaQuery('(max-height: 500px)')
+const narrow = useMediaQuery('(max-width: 639px)')
+/** The team strip across the map's top; small maps leave it out and the overview offers teams. */
+const strip = computed(() => !narrow.value && !short.value)
+/**
+ * A phone held upright: the board is the map and a strip of status, nothing else on top. The
+ * follow, catch-up and overview overlays stay off it, and the panel starts tucked away.
+ */
+const compact = computed(() => !beside.value && !strip.value)
+type Sheet = 'peek' | 'half' | 'full'
+const SHEETS: readonly Sheet[] = ['peek', 'half', 'full']
+const sheet = ref<Sheet>(compact.value ? 'peek' : 'half')
+watch(compact, (on) => on && (sheet.value = 'peek'))
+/** Whether the panel's contents show: always beside the map, and unless peeking as a sheet. */
+const sheetOpen = computed(() => beside.value || sheet.value !== 'peek')
 const shopOpen = ref(false)
 /** The minigame pick playing now, and the team that landed on the red tile. */
 const spin = computed(() => game.spins[0] ?? null)
@@ -93,7 +115,8 @@ const spinTeam = computed(() =>
   spin.value?.teamId == null ? null : (state.value?.teams.get(spin.value.teamId) ?? null),
 )
 /** The overview starts closed on phones, where it would cover most of the map. */
-const insetOpen = ref(!useMediaQuery('(max-width: 639px)').value)
+const insetOpen = ref(strip.value)
+watch(strip, (on) => (insetOpen.value = on))
 
 const selected = ref<TeamId | null>(null)
 const follow = ref(false)
@@ -123,7 +146,39 @@ const controlsOpen = ref(false)
 
 function openTab(id: Tab) {
   tab.value = id
-  sheetOpen.value = true
+  if (sheet.value === 'peek') sheet.value = 'half'
+}
+
+// The sheet's handle: a drag up or down steps the sheet one height that way; a tap steps it up,
+// and from full back down to peek.
+let dragFrom: number | null = null
+function onHandleDown(e: PointerEvent) {
+  dragFrom = e.clientY
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+}
+function onHandleUp(e: PointerEvent) {
+  if (dragFrom === null) return
+  const moved = e.clientY - dragFrom
+  dragFrom = null
+  const at = SHEETS.indexOf(sheet.value)
+  if (moved < -24) sheet.value = SHEETS[Math.min(at + 1, SHEETS.length - 1)] ?? sheet.value
+  else if (moved > 24) sheet.value = SHEETS[Math.max(at - 1, 0)] ?? sheet.value
+  else stepSheet()
+}
+function onHandleCancel() {
+  dragFrom = null
+}
+/** Enter or Space on the handle; a pointer's tap is handled on its way up instead. */
+function onHandleKey(e: MouseEvent) {
+  if (e.detail === 0) stepSheet()
+}
+function stepSheet() {
+  sheet.value = SHEETS[(SHEETS.indexOf(sheet.value) + 1) % SHEETS.length] ?? sheet.value
+}
+const SHEET_LABEL: Record<Sheet, string> = {
+  peek: 'Open the panel',
+  half: 'Open the panel to full height',
+  full: 'Tuck the panel away',
 }
 
 // The tutorial shows the side panel on its overview, where the current tile and minigames are, and
@@ -303,6 +358,42 @@ const followed = computed(() =>
   selected.value === null ? null : (state.value?.teams.get(selected.value) ?? null),
 )
 
+/** A phone's tucked-away panel: the team in the overview, its gems, and its tile if it has one. */
+const statusStrip = computed(() => {
+  const team = focus.value
+  const s = state.value
+  if (!team || !s) return null
+  const instance =
+    team.status.kind === 'working' && !isAnimating(team.id)
+      ? s.instances.get(team.status.instanceId)
+      : undefined
+  const challenge = instance && challenges.value.get(instance.challengeId)
+  return {
+    team,
+    gems: `${team.gems.size}/${GEMS.length}`,
+    task: challenge
+      ? { name: challenge.name, ...challengeProgress(challenge, instance, team.id) }
+      : null,
+    text: isAnimating(team.id) ? 'Walking...' : teamStatusText(team, now.value, s.phase),
+  }
+})
+
+/** Back to following the team in the overview, from free roam or after dragging the map. */
+function recentre() {
+  const team = focus.value
+  if (!team || state.value?.phase === 'setup') return
+  dropActions()
+  selected.value = team.id
+  follow.value = true
+  boardMap.value?.locate(shownAt(team.id), 0.5)
+}
+
+/** The tucked-away sheet's one line: what the team in the overview is doing. */
+const peekLine = computed(() => {
+  const team = focus.value
+  return team ? { team, text: teamStatusText(team, now.value, state.value?.phase) } : null
+})
+
 // Sounds play as their moment shows on the board, replays included: big moments for everyone,
 // small ones only for your own team or the team you follow. The tour's pretend game stays quiet.
 useSoundEffects({
@@ -400,9 +491,16 @@ async function buyMysteryBox() {
     <TtText :size="2">Loading the board...</TtText>
   </div>
 
-  <div v-if="state && board" class="relative flex h-full flex-col gap-1.5 lg:flex-row">
-    <!-- The map and its overlays, in a stone frame -->
-    <div class="tt-frame-stone relative box-border min-h-0 min-w-0 flex-1">
+  <div
+    v-if="state && board"
+    class="relative flex h-full gap-1.5"
+    :class="beside ? 'flex-row' : 'flex-col'"
+  >
+    <!-- The map and its overlays, in a stone frame; a full-height sheet covers it. -->
+    <div
+      class="tt-frame-stone relative box-border min-h-0 min-w-0 flex-1"
+      :class="{ hidden: !beside && sheet === 'full' }"
+    >
       <BoardMap
         ref="boardMap"
         :board="board"
@@ -439,8 +537,9 @@ async function buyMysteryBox() {
 
       <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
       <ol
+        v-if="strip"
         v-tutorial="'teams'"
-        class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1 max-sm:hidden"
+        class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1"
         aria-label="Teams"
       >
         <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
@@ -499,14 +598,21 @@ async function buyMysteryBox() {
       </div>
 
       <!-- Bars at the bottom middle, stacked so they never overlap: a replay (or moves to catch up
-           on), then who the camera follows. -->
+           on), then who the camera follows. Small maps put them top left, where bigger ones show the
+           team strip, so they stay clear of the map's corner buttons. -->
       <div
-        v-if="game.replay || game.missedMoves > 0 || followed || actionShown"
+        v-if="game.replay || (!compact && (game.missedMoves > 0 || followed || actionShown))"
         v-tutorial="'controls'"
-        class="absolute bottom-1.5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-1"
+        class="absolute z-[1000] flex flex-col gap-1"
+        :class="
+          strip
+            ? 'bottom-1.5 left-1/2 -translate-x-1/2 items-center'
+            : // Below the Dev button, which shares the top of a small map when it is on.
+              ['left-1.5 items-start', dev.enabled && !tutorial.staged ? 'top-15' : 'top-1.5']
+        "
       >
         <div
-          v-if="game.replay || game.missedMoves > 0"
+          v-if="game.replay || (!compact && game.missedMoves > 0)"
           class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
           role="status"
         >
@@ -546,7 +652,7 @@ async function buyMysteryBox() {
 
         <!-- Following the action: the team the camera is on, and what it is doing -->
         <div
-          v-if="actionShown && shot && followed"
+          v-if="!compact && actionShown && shot && followed"
           class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
           role="status"
         >
@@ -558,7 +664,7 @@ async function buyMysteryBox() {
         </div>
         <!-- Follow / free roam; before the start there is no piece to follow -->
         <div
-          v-else-if="followed && state?.phase !== 'setup'"
+          v-else-if="!compact && followed && state?.phase !== 'setup'"
           class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
         >
           <TtText v-if="follow" :size="1" color="white" class="whitespace-nowrap">
@@ -613,6 +719,23 @@ async function buyMysteryBox() {
               All
             </TtButton>
             <TtButton
+              v-if="focus && state?.phase !== 'setup'"
+              size="sm"
+              class="map-btn"
+              :aria-label="`Follow ${focus.name}`"
+              :title="`Follow ${focus.name}`"
+              @click="recentre()"
+            >
+              <svg class="menu-icon" viewBox="0 0 9 9" aria-hidden="true">
+                <rect x="4" y="0" width="1" height="9" />
+                <rect x="0" y="4" width="9" height="1" />
+                <rect x="2" y="2" width="5" height="1" />
+                <rect x="2" y="6" width="5" height="1" />
+                <rect x="2" y="2" width="1" height="5" />
+                <rect x="6" y="2" width="1" height="5" />
+              </svg>
+            </TtButton>
+            <TtButton
               size="sm"
               class="map-btn"
               :selected="insetOpen"
@@ -646,13 +769,6 @@ async function buyMysteryBox() {
         v-if="insetOpen"
         v-tutorial="'controls'"
         class="absolute bottom-1.5 left-1.5 z-[1000] w-36 sm:w-52 lg:w-64"
-        :class="
-          game.replay || game.missedMoves > 0
-            ? 'bottom-26 sm:bottom-1.5'
-            : followed || actionShown
-              ? 'bottom-14 sm:bottom-1.5'
-              : ''
-        "
       >
         <InsetMap
           :board="board"
@@ -669,11 +785,68 @@ async function buyMysteryBox() {
     <!-- Side panel (desktop) / bottom sheet (phone) -->
     <aside
       v-tutorial="'panel'"
-      class="z-[1000] flex min-h-0 flex-col gap-1.5 lg:w-[456px]"
-      :class="sheetOpen ? 'max-lg:h-[46dvh]' : ''"
+      class="z-[1000] flex min-h-0 flex-col gap-1.5"
+      :class="
+        beside
+          ? 'w-[min(456px,48%)] shrink-0'
+          : { 'h-1/2 sm:h-[42%]': sheet === 'half', 'flex-1': sheet === 'full' }
+      "
     >
+      <!-- Phones and tablets: the sheet's handle, dragged or tapped to change its height. -->
+      <button
+        v-if="!beside"
+        type="button"
+        class="sheet-handle"
+        :aria-label="SHEET_LABEL[sheet]"
+        :title="SHEET_LABEL[sheet]"
+        @pointerdown="onHandleDown"
+        @pointerup="onHandleUp"
+        @pointercancel="onHandleCancel"
+        @click="onHandleKey"
+      >
+        <span aria-hidden="true" />
+      </button>
+      <!-- A phone's tucked-away panel: one strip of status, which opens the panel when tapped. -->
+      <button
+        v-if="compact && !sheetOpen && statusStrip"
+        type="button"
+        class="tt-sprite-display flex w-full shrink-0 flex-col gap-1 !py-0 text-left"
+        aria-label="Show the full panel"
+        @click="sheet = 'half'"
+      >
+        <span class="flex w-full items-baseline justify-between gap-2">
+          <TtText
+            :size="1"
+            font="bold"
+            :color="teamColor(statusStrip.team)"
+            align="left"
+            class="truncate"
+          >
+            {{ statusStrip.team.name }}
+          </TtText>
+          <TtText :size="1" color="muted" class="shrink-0">{{ statusStrip.gems }} gems</TtText>
+        </span>
+        <span v-if="statusStrip.task" class="flex w-full items-center gap-2">
+          <TtText :size="1" color="white" align="left" class="min-w-0 truncate">
+            {{ statusStrip.task.name }}
+          </TtText>
+          <TtProgressBar
+            :value="statusStrip.task.done"
+            :max="statusStrip.task.needed"
+            :label="`${statusStrip.task.done}/${statusStrip.task.needed}`"
+            :width="120"
+            :height="14"
+            class="ml-auto shrink-0"
+          />
+        </span>
+        <TtText v-else :size="1" color="white" align="left" class="truncate">{{
+          statusStrip.text
+        }}</TtText>
+      </button>
       <nav
-        class="flex shrink-0 gap-1 max-lg:overflow-x-auto max-lg:pb-1 lg:flex-wrap lg:justify-center"
+        v-else
+        class="flex shrink-0 gap-1"
+        :class="beside ? 'flex-wrap justify-center' : 'overflow-x-auto pb-1'"
         role="tablist"
       >
         <TtButton
@@ -689,18 +862,18 @@ async function buyMysteryBox() {
           {{ t.label }}
           <span v-if="t.badge" :style="{ color: 'var(--osrs-red)' }">({{ t.badge }})</span>
         </TtButton>
-        <!-- Phones only: tuck the panel away for more map. -->
-        <div class="shrink-0 lg:hidden">
-          <TtButton
-            size="sm"
-            class="!min-w-0"
-            :aria-label="sheetOpen ? 'Hide the panel' : 'Show the panel'"
-            @click="sheetOpen = !sheetOpen"
-          >
-            {{ sheetOpen ? 'Hide' : 'Show' }}
-          </TtButton>
-        </div>
       </nav>
+      <!-- Tucked away, the sheet still says what the team in the overview is doing. -->
+      <TtText
+        v-if="!compact && !sheetOpen && peekLine"
+        :size="1"
+        color="white"
+        class="truncate px-1"
+      >
+        <span :style="{ color: teamColor(peekLine.team) }">{{ peekLine.team.name }}</span
+        >:
+        {{ peekLine.text }}
+      </TtText>
       <div
         v-if="sheetOpen"
         class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
@@ -713,10 +886,11 @@ async function buyMysteryBox() {
             :gap="10"
             data-tutorial-spot="current-tile"
           >
-            <!-- Which team to watch, on phones only: wider screens pick it on the map's team strip,
-                 which phones hide to keep the small map clear. -->
+            <!-- Which team to watch, where the map is too small for its team strip (phones, and
+                 phones held sideways): bigger maps pick it on the strip. -->
             <div
-              class="flex flex-wrap justify-center gap-1 sm:hidden"
+              v-if="!strip"
+              class="flex flex-wrap justify-center gap-1"
               role="group"
               aria-label="Team"
             >
@@ -820,6 +994,22 @@ async function buyMysteryBox() {
 </template>
 
 <style scoped>
+/* A grab bar across the top of the bottom sheet, wide enough for a thumb. */
+.sheet-handle {
+  display: grid;
+  place-items: center;
+  height: 22px;
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: grab;
+}
+.sheet-handle > span {
+  width: 56px;
+  height: 6px;
+  border: 1px solid #000;
+  background: var(--osrs-orange);
+  box-shadow: 1px 1px 0 #000;
+}
 .map-btn {
   min-width: 48px !important;
   min-height: 42px !important;
