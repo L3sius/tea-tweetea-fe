@@ -68,6 +68,14 @@ onBeforeUnmount(() => clearTimeout(timer))
           Close the settings with the <b>&lt;</b> back arrow.
         </TtText>
       </li>
+      <li>
+        <!-- Not a Dink setting, but Dink only hears of a combat achievement the game announces. -->
+        <TtText :size="1" color="white" align="left">
+          Only if you already have some combat achievements: in the OSRS settings, turn on
+          <b>Combat Achievement Tasks</b> and allow <b>repeat completion</b>. Without it, the game
+          doesn't announce a task you already have, so it can't count.
+        </TtText>
+      </li>
     </ol>
     <TtText :size="1" color="orange" align="left">
       Don't change the Dink settings after this, or your drops may count for the wrong thing or not

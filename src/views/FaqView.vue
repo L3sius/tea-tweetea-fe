@@ -126,6 +126,28 @@ const rules = computed(() => {
           </TtText>
         </div>
         <div class="faq-qa">
+          <TtText :size="1" color="orange" align="left">
+            My combat achievement doesn't count.
+          </TtText>
+          <TtText :size="1" color="white" align="left">
+            Dink only sees a combat achievement the game announces, and the game doesn't announce
+            one you already have. If you completed that task before, turn on
+            <b>Combat Achievement Tasks</b> and allow <b>repeat completion</b> in the OSRS settings,
+            as in the last step of the
+            <button type="button" class="tt-link" @click="dink.show()">Dink setup</button>. A task
+            you don't have yet counts without it.
+          </TtText>
+        </div>
+        <div class="faq-qa">
+          <TtText :size="1" color="orange" align="left">
+            How do I find the spot for a clue location task?
+          </TtText>
+          <TtText :size="1" color="white" align="left">
+            Turn on the <b>World Location</b> RuneLite plugin with its <b>Region Lines</b> setting.
+            It divides the world map into regions, which helps you pinpoint the spot a task names.
+          </TtText>
+        </div>
+        <div class="faq-qa">
           <TtText :size="1" color="orange" align="left">Is pre-stacking allowed?</TtText>
           <TtText :size="1" color="white" align="left">
             No. Clue caskets, loot keys and anything else saved up before the start don't count.
