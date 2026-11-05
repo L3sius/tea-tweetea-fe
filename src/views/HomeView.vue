@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useIntervalFn, useMediaQuery, useNow } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import ActivityFeed from '@/components/ActivityFeed.vue'
 import AlertToasts from '@/components/AlertToasts.vue'
 import BoardMap from '@/components/BoardMap.vue'
@@ -15,8 +15,6 @@ import TeamControls from '@/components/TeamControls.vue'
 import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
-import { challengeProgress, teamStatusText } from '@/domain/describe'
-import { GEMS } from '@/domain/vocabulary'
 import { MOMENT_LABEL, direct, type Shot } from '@/domain/director'
 import type { JournalEntry } from '@/domain/events'
 import type { TeamId, TileId } from '@/domain/ids'
@@ -32,7 +30,7 @@ import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
 import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
-import { TtButton, TtPanel, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
+import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -86,10 +84,9 @@ watch(
  */
 type Tab = 'overview' | 'play' | 'feed' | 'log'
 const tab = ref<Tab>('overview')
-// Below this the panel is a bottom sheet under the map, at one of three heights: `peek` shows only
-// its tabs and a line of status, `half` shares the screen with the map, `full` gives the lists the
-// whole height. Wider screens keep it beside the map, and so do phones held sideways: stacked,
-// their short screen would leave the map no height at all.
+// Below this the page scrolls: the map fills the screen but for a strip at the bottom where the
+// panel's tabs show, and the panel follows under it. Wider screens keep the panel beside the map,
+// and so do phones held sideways: stacked, their short screen would leave the map no height.
 const beside = useMediaQuery(
   '(min-width: 1024px), (orientation: landscape) and (max-height: 500px) and (min-width: 640px)',
 )
@@ -97,17 +94,8 @@ const short = useMediaQuery('(max-height: 500px)')
 const narrow = useMediaQuery('(max-width: 639px)')
 /** The team strip across the map's top; small maps leave it out and the overview offers teams. */
 const strip = computed(() => !narrow.value && !short.value)
-/**
- * A phone held upright: the board is the map and a strip of status, nothing else on top. The
- * follow, catch-up and overview overlays stay off it, and the panel starts tucked away.
- */
+/** A phone held upright: nothing on the map but its own buttons; the panel under it says the rest. */
 const compact = computed(() => !beside.value && !strip.value)
-type Sheet = 'peek' | 'half' | 'full'
-const SHEETS: readonly Sheet[] = ['peek', 'half', 'full']
-const sheet = ref<Sheet>(compact.value ? 'peek' : 'half')
-watch(compact, (on) => on && (sheet.value = 'peek'))
-/** Whether the panel's contents show: always beside the map, and unless peeking as a sheet. */
-const sheetOpen = computed(() => beside.value || sheet.value !== 'peek')
 const shopOpen = ref(false)
 /** The minigame pick playing now, and the team that landed on the red tile. */
 const spin = computed(() => game.spins[0] ?? null)
@@ -146,39 +134,6 @@ const controlsOpen = ref(false)
 
 function openTab(id: Tab) {
   tab.value = id
-  if (sheet.value === 'peek') sheet.value = 'half'
-}
-
-// The sheet's handle: a drag up or down steps the sheet one height that way; a tap steps it up,
-// and from full back down to peek.
-let dragFrom: number | null = null
-function onHandleDown(e: PointerEvent) {
-  dragFrom = e.clientY
-  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-}
-function onHandleUp(e: PointerEvent) {
-  if (dragFrom === null) return
-  const moved = e.clientY - dragFrom
-  dragFrom = null
-  const at = SHEETS.indexOf(sheet.value)
-  if (moved < -24) sheet.value = SHEETS[Math.min(at + 1, SHEETS.length - 1)] ?? sheet.value
-  else if (moved > 24) sheet.value = SHEETS[Math.max(at - 1, 0)] ?? sheet.value
-  else stepSheet()
-}
-function onHandleCancel() {
-  dragFrom = null
-}
-/** Enter or Space on the handle; a pointer's tap is handled on its way up instead. */
-function onHandleKey(e: MouseEvent) {
-  if (e.detail === 0) stepSheet()
-}
-function stepSheet() {
-  sheet.value = SHEETS[(SHEETS.indexOf(sheet.value) + 1) % SHEETS.length] ?? sheet.value
-}
-const SHEET_LABEL: Record<Sheet, string> = {
-  peek: 'Open the panel',
-  half: 'Open the panel to full height',
-  full: 'Tuck the panel away',
 }
 
 // The tutorial shows the side panel on its overview, where the current tile and minigames are, and
@@ -190,7 +145,14 @@ watch(
 )
 watch(
   () => (tutorial.staged ? tutorial.spotlight : null),
-  (spot) => spot && openTab(SPOT_TABS[spot]),
+  async (spot) => {
+    if (!spot) return
+    openTab(SPOT_TABS[spot])
+    // Stacked, the panel is below the map: bring the part it points at into view.
+    if (beside.value) return
+    await nextTick()
+    document.querySelector(`[data-tutorial-spot="${spot}"]`)?.scrollIntoView({ block: 'nearest' })
+  },
 )
 
 /** The team this viewer last chose to follow, so the overview opens on it next time. */
@@ -358,26 +320,6 @@ const followed = computed(() =>
   selected.value === null ? null : (state.value?.teams.get(selected.value) ?? null),
 )
 
-/** A phone's tucked-away panel: the team in the overview, its gems, and its tile if it has one. */
-const statusStrip = computed(() => {
-  const team = focus.value
-  const s = state.value
-  if (!team || !s) return null
-  const instance =
-    team.status.kind === 'working' && !isAnimating(team.id)
-      ? s.instances.get(team.status.instanceId)
-      : undefined
-  const challenge = instance && challenges.value.get(instance.challengeId)
-  return {
-    team,
-    gems: `${team.gems.size}/${GEMS.length}`,
-    task: challenge
-      ? { name: challenge.name, ...challengeProgress(challenge, instance, team.id) }
-      : null,
-    text: isAnimating(team.id) ? 'Walking...' : teamStatusText(team, now.value, s.phase),
-  }
-})
-
 /** Back to following the team in the overview, from free roam or after dragging the map. */
 function recentre() {
   const team = focus.value
@@ -387,12 +329,6 @@ function recentre() {
   follow.value = true
   boardMap.value?.locate(shownAt(team.id), 0.5)
 }
-
-/** The tucked-away sheet's one line: what the team in the overview is doing. */
-const peekLine = computed(() => {
-  const team = focus.value
-  return team ? { team, text: teamStatusText(team, now.value, state.value?.phase) } : null
-})
 
 // Sounds play as their moment shows on the board, replays included: big moments for everyone,
 // small ones only for your own team or the team you follow. The tour's pretend game stays quiet.
@@ -494,12 +430,12 @@ async function buyMysteryBox() {
   <div
     v-if="state && board"
     class="relative flex h-full gap-1.5"
-    :class="beside ? 'flex-row' : 'flex-col'"
+    :class="beside ? 'flex-row' : 'flex-col overflow-y-auto'"
   >
-    <!-- The map and its overlays, in a stone frame; a full-height sheet covers it. -->
+    <!-- The map and its overlays, in a stone frame. Stacked, it leaves room for the tabs below. -->
     <div
-      class="tt-frame-stone relative box-border min-h-0 min-w-0 flex-1"
-      :class="{ hidden: !beside && sheet === 'full' }"
+      class="tt-frame-stone relative box-border min-w-0"
+      :class="beside ? 'min-h-0 flex-1' : 'h-[calc(100%-4.25rem)] min-h-64 shrink-0'"
     >
       <BoardMap
         ref="boardMap"
@@ -782,69 +718,13 @@ async function buyMysteryBox() {
       </div>
     </div>
 
-    <!-- Side panel (desktop) / bottom sheet (phone) -->
+    <!-- The panel: beside the map, or under it on a page that scrolls -->
     <aside
       v-tutorial="'panel'"
-      class="z-[1000] flex min-h-0 flex-col gap-1.5"
-      :class="
-        beside
-          ? 'w-[min(456px,48%)] shrink-0'
-          : { 'h-1/2 sm:h-[42%]': sheet === 'half', 'flex-1': sheet === 'full' }
-      "
+      class="z-[1000] flex flex-col gap-1.5"
+      :class="beside ? 'min-h-0 w-[min(456px,48%)] shrink-0' : 'shrink-0'"
     >
-      <!-- Phones and tablets: the sheet's handle, dragged or tapped to change its height. -->
-      <button
-        v-if="!beside"
-        type="button"
-        class="sheet-handle"
-        :aria-label="SHEET_LABEL[sheet]"
-        :title="SHEET_LABEL[sheet]"
-        @pointerdown="onHandleDown"
-        @pointerup="onHandleUp"
-        @pointercancel="onHandleCancel"
-        @click="onHandleKey"
-      >
-        <span aria-hidden="true" />
-      </button>
-      <!-- A phone's tucked-away panel: one strip of status, which opens the panel when tapped. -->
-      <button
-        v-if="compact && !sheetOpen && statusStrip"
-        type="button"
-        class="tt-sprite-display flex w-full shrink-0 flex-col gap-1 !py-0 text-left"
-        aria-label="Show the full panel"
-        @click="sheet = 'half'"
-      >
-        <span class="flex w-full items-baseline justify-between gap-2">
-          <TtText
-            :size="1"
-            font="bold"
-            :color="teamColor(statusStrip.team)"
-            align="left"
-            class="truncate"
-          >
-            {{ statusStrip.team.name }}
-          </TtText>
-          <TtText :size="1" color="muted" class="shrink-0">{{ statusStrip.gems }} gems</TtText>
-        </span>
-        <span v-if="statusStrip.task" class="flex w-full items-center gap-2">
-          <TtText :size="1" color="white" align="left" class="min-w-0 truncate">
-            {{ statusStrip.task.name }}
-          </TtText>
-          <TtProgressBar
-            :value="statusStrip.task.done"
-            :max="statusStrip.task.needed"
-            :label="`${statusStrip.task.done}/${statusStrip.task.needed}`"
-            :width="120"
-            :height="14"
-            class="ml-auto shrink-0"
-          />
-        </span>
-        <TtText v-else :size="1" color="white" align="left" class="truncate">{{
-          statusStrip.text
-        }}</TtText>
-      </button>
       <nav
-        v-else
         class="flex shrink-0 gap-1"
         :class="beside ? 'flex-wrap justify-center' : 'overflow-x-auto pb-1'"
         role="tablist"
@@ -855,7 +735,7 @@ async function buyMysteryBox() {
           size="sm"
           role="tab"
           class="!min-w-0 shrink-0"
-          :selected="tab === t.id && sheetOpen"
+          :selected="tab === t.id"
           :aria-selected="tab === t.id"
           @click="openTab(t.id)"
         >
@@ -863,20 +743,9 @@ async function buyMysteryBox() {
           <span v-if="t.badge" :style="{ color: 'var(--osrs-red)' }">({{ t.badge }})</span>
         </TtButton>
       </nav>
-      <!-- Tucked away, the sheet still says what the team in the overview is doing. -->
-      <TtText
-        v-if="!compact && !sheetOpen && peekLine"
-        :size="1"
-        color="white"
-        class="truncate px-1"
-      >
-        <span :style="{ color: teamColor(peekLine.team) }">{{ peekLine.team.name }}</span
-        >:
-        {{ peekLine.text }}
-      </TtText>
       <div
-        v-if="sheetOpen"
-        class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [&>*]:shrink-0"
+        class="flex flex-col overflow-x-hidden [&>*]:shrink-0"
+        :class="{ 'min-h-0 flex-1 overflow-y-auto': beside }"
       >
         <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
           <TtPanel
@@ -994,22 +863,6 @@ async function buyMysteryBox() {
 </template>
 
 <style scoped>
-/* A grab bar across the top of the bottom sheet, wide enough for a thumb. */
-.sheet-handle {
-  display: grid;
-  place-items: center;
-  height: 22px;
-  flex-shrink: 0;
-  touch-action: none;
-  cursor: grab;
-}
-.sheet-handle > span {
-  width: 56px;
-  height: 6px;
-  border: 1px solid #000;
-  background: var(--osrs-orange);
-  box-shadow: 1px 1px 0 #000;
-}
 .map-btn {
   min-width: 48px !important;
   min-height: 42px !important;

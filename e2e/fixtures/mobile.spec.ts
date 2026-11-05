@@ -49,29 +49,25 @@ test('the menu reaches every page, and none scrolls sideways', async ({ page }) 
   }
 })
 
-test('the board is the map and a status strip, which opens the panel', async ({ page }) => {
+test('the board is the map, and the panel is a scroll away below it', async ({ page }) => {
   await open(page, '/')
-  // Tucked away at first: most of the screen is map, and no tabs, only the strip.
+  // Most of the screen is map, with the tabs showing at the bottom.
   await expect.poll(() => mapHeight(page)).toBeGreaterThan(MOSTLY_MAP)
-  await expect(page.getByRole('tab', { name: 'Overview' })).toBeHidden()
+  await expect(page.getByRole('tab', { name: 'Overview' })).toBeInViewport()
   // Nothing but the map's own buttons on top of it.
   await expect(page.getByText('Following')).toBeHidden()
   await expect(page.getByText('Free roam')).toBeHidden()
 
-  // The strip opens the panel to half height, with its tabs.
-  await page.getByRole('button', { name: 'Show the full panel' }).click()
-  await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible()
-  await expect.poll(() => mapHeight(page)).toBeGreaterThan(150)
+  // Scrolling down brings the panel up, and the map keeps its size.
+  const before = await mapHeight(page)
+  await page.getByText('Current tile').scrollIntoViewIfNeeded()
+  await expect(page.getByText('Current tile')).toBeInViewport()
+  expect(await mapHeight(page)).toBe(before)
 
-  // Up to full height: the lists take the screen, and the map steps aside.
-  await page.getByRole('button', { name: 'Open the panel to full height' }).click()
-  await expect.poll(() => mapHeight(page)).toBe(0)
-  await expect(page.getByText('Current tile')).toBeVisible()
-
-  // And tucked away again.
-  await page.getByRole('button', { name: 'Tuck the panel away' }).click()
-  await expect.poll(() => mapHeight(page)).toBeGreaterThan(MOSTLY_MAP)
-  await expect(page.getByRole('button', { name: 'Show the full panel' })).toBeVisible()
+  // The tabs switch what is below.
+  await page.getByRole('tab', { name: 'Log' }).click()
+  await expect(page.getByText('Current tile')).toBeHidden()
+  expect(await scrollsSideways(page)).toBe(false)
 })
 
 test('a tap on a tile shows its task, and stays up', async ({ page }) => {
