@@ -26,7 +26,8 @@ const ClueFilter = z.discriminatedUnion('by', [
   z.object({ by: z.literal('exact_stack'), item: z.string(), quantity: z.int() }),
 ])
 
-const Criterion = z.discriminatedUnion('kind', [
+// Every criterion but the compound one; a compound tile's parts are these.
+const LEAF_CRITERIA = [
   z.object({ kind: z.literal('loot'), filter: LootFilter }),
   z.object({ kind: z.literal('clue'), tier: ClueTier, filter: ClueFilter }),
   z.object({ kind: z.literal('kill_count'), bosses: z.array(z.string()) }),
@@ -44,6 +45,19 @@ const Criterion = z.discriminatedUnion('kind', [
       }),
     ),
   }),
+] as const
+
+/** One step of a compound tile; `name` is also its progress key. */
+const Part = z.object({
+  name: z.string(),
+  criterion: z.discriminatedUnion('kind', LEAF_CRITERIA),
+  n: z.int().positive(),
+})
+
+const Criterion = z.discriminatedUnion('kind', [
+  ...LEAF_CRITERIA,
+  // Every part must reach its own `n`; parts are never compound themselves.
+  z.object({ kind: z.literal('all'), parts: z.array(Part).min(1) }),
 ])
 
 const Effort = z.discriminatedUnion('kind', [

@@ -113,6 +113,8 @@ function progressKeys(criterion: Criterion): string[] {
       return criterion.tasks.map((task) => task.name)
     case 'timed_kill':
       return [criterion.boss]
+    case 'all':
+      return criterion.parts.map((part) => part.name)
   }
 }
 
@@ -129,9 +131,27 @@ export function challengeProgress(
 ): Progress {
   const standing = instance?.progress.get(team)
   if (standing) return { done: standing.done, needed: standing.target }
+  // A compound tile needs every part's own count, as the server's target does.
+  if (challenge.criterion.kind === 'all')
+    return { done: 0, needed: challenge.criterion.parts.reduce((n, part) => n + part.n, 0) }
   const { goal } = challenge
   const keys = goal.kind === 'each' ? progressKeys(challenge.criterion).length : 1
   return { done: 0, needed: goal.n * Math.max(keys, 1) }
+}
+
+export type PartProgress = { name: string; done: number; needed: number }
+
+/** A compound tile's steps, each with the team's count towards its own `n`; empty for other tiles. */
+export function partProgress(
+  challenge: Challenge,
+  standing: TeamProgress | undefined,
+): PartProgress[] {
+  if (challenge.criterion.kind !== 'all') return []
+  return challenge.criterion.parts.map((part) => ({
+    name: part.name,
+    done: Math.min(standing?.counts.get(part.name) ?? 0, part.n),
+    needed: part.n,
+  }))
 }
 
 /**

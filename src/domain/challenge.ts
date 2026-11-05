@@ -22,8 +22,8 @@ export type ClueFilter =
   | { kind: 'items'; items: string[] }
   | { kind: 'exact_stack'; item: string; quantity: number }
 
-/** Which Dink events count towards a challenge. */
-export type Criterion =
+/** Which Dink events count towards a challenge, for every kind but the compound one. */
+export type LeafCriterion =
   | { kind: 'loot'; filter: LootFilter }
   | { kind: 'clue'; tier: ClueTier; filter: ClueFilter }
   | { kind: 'kill_count'; bosses: string[] }
@@ -31,6 +31,12 @@ export type Criterion =
   | { kind: 'slayer'; tasks: string[] }
   | { kind: 'pet'; pets: string[] }
   | { kind: 'combat_achievement'; tasks: CaTask[] }
+
+/** One step of a compound tile. `name` is what players see and its progress key. */
+export type Part = { name: string; criterion: LeafCriterion; n: number }
+
+/** Which Dink events count towards a challenge. `all`: every part reaches its own `n`. */
+export type Criterion = LeafCriterion | { kind: 'all'; parts: Part[] }
 
 /** One combat achievement, with its in-game text. */
 export type CaTask = {

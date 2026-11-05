@@ -3,6 +3,7 @@ import type {
   ClueFilter,
   Criterion,
   Effort,
+  LeafCriterion,
   LootFilter,
   Sources,
 } from '@/domain/challenge'
@@ -47,6 +48,15 @@ function toClueFilter(wire: WireClueFilter): ClueFilter {
 }
 
 function toCriterion(wire: WireCriterion): Criterion {
+  if (wire.kind === 'all')
+    return {
+      kind: 'all',
+      parts: wire.parts.map((p) => ({ name: p.name, n: p.n, criterion: toLeaf(p.criterion) })),
+    }
+  return toLeaf(wire)
+}
+
+function toLeaf(wire: Exclude<WireCriterion, { kind: 'all' }>): LeafCriterion {
   switch (wire.kind) {
     case 'loot':
       return { kind: 'loot', filter: toLootFilter(wire.filter) }

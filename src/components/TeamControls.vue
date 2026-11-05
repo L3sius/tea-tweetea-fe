@@ -10,6 +10,7 @@ import {
   effectText,
   effortText,
   itemName,
+  partProgress,
 } from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import { whyNotUsable } from '@/domain/items'
@@ -76,8 +77,10 @@ const task = computed(() => {
   const instance = state.value.instances.get(t.status.instanceId)
   const challenge = instance && game.challenges.get(instance.challengeId)
   if (!challenge) return null
-  const effort = effortText(challenge, instance, instance.progress.get(t.id), now.value)
-  return { challenge, effort, ...challengeProgress(challenge, instance, t.id) }
+  const standing = instance.progress.get(t.id)
+  const effort = effortText(challenge, instance, standing, now.value)
+  const parts = partProgress(challenge, standing)
+  return { challenge, effort, parts, ...challengeProgress(challenge, instance, t.id) }
 })
 
 /** Why the route ends early: it walks onto a blocker, which stops the team and holds it there. */
@@ -380,6 +383,15 @@ const lockClock = computed(
             :width="330"
             class="max-w-full"
           />
+          <!-- A compound tile: each step with its own count. -->
+          <ul v-if="task.parts.length" class="flex w-[330px] max-w-full flex-col gap-0.5">
+            <li v-for="part in task.parts" :key="part.name" class="flex justify-between gap-3">
+              <TtText :size="1" color="white" align="left">{{ part.name }}</TtText>
+              <TtText :size="1" :color="part.done >= part.needed ? 'green' : 'white'">
+                {{ part.done }} / {{ part.needed }}
+              </TtText>
+            </li>
+          </ul>
           <TtText v-if="task.effort" :size="1" color="cyan">{{ task.effort }}</TtText>
         </template>
         <TtText :size="1" color="muted" class="max-w-[340px]">

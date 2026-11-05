@@ -11,6 +11,7 @@ import {
   hoursText,
   itemName,
   observationText,
+  partProgress,
   teamParts,
   teamStatusText,
   useQuestion,
@@ -86,6 +87,72 @@ describe('challengeProgress', () => {
   it('starts at zero without progress', () => {
     const c = challenge({ kind: 'total', n: 3 }, [])
     expect(challengeProgress(c, undefined, red)).toEqual({ done: 0, needed: 3 })
+  })
+})
+
+describe('compound tiles', () => {
+  // As /challenges served it, with the parts trimmed of nothing.
+  const wire = {
+    'sire-chest-day': {
+      id: 'sire-chest-day',
+      name: 'Sire and Slayer',
+      description:
+        'Kill the Abyssal Sire 5 times, complete a dagannoth slayer task and open a hard clue casket',
+      est_hours: 3,
+      criterion: {
+        kind: 'all',
+        parts: [
+          {
+            name: 'Abyssal Sire kills',
+            criterion: { kind: 'kill_count', bosses: ['Abyssal Sire'] },
+            n: 5,
+          },
+          { name: 'Dagannoth task', criterion: { kind: 'slayer', tasks: ['Dagannoth'] }, n: 1 },
+          {
+            name: 'Hard casket',
+            criterion: { kind: 'clue', tier: 'hard', filter: { by: 'count' } },
+            n: 1,
+          },
+        ],
+      },
+      goal: { kind: 'each', n: 1 },
+      effort: { kind: 'elapsed' },
+    },
+  }
+  const { path, schema, map } = endpoints.challenges
+  const sire = () => {
+    const c = decode(path, schema, map, wire).get(challengeId('sire-chest-day'))
+    if (!c) throw new Error('not decoded')
+    return c
+  }
+
+  it('reads the parts, each with its own criterion and count', () => {
+    const { criterion } = sire()
+    expect(criterion.kind).toBe('all')
+    if (criterion.kind !== 'all') return
+    expect(criterion.parts.map((p) => [p.name, p.criterion.kind, p.n])).toEqual([
+      ['Abyssal Sire kills', 'kill_count', 5],
+      ['Dagannoth task', 'slayer', 1],
+      ['Hard casket', 'clue', 1],
+    ])
+  })
+
+  it('needs every part in full before the team has a standing, as the server counts it', () => {
+    expect(challengeProgress(sire(), undefined, red)).toEqual({ done: 0, needed: 7 })
+  })
+
+  it('shows each part against its own count, capped at it', () => {
+    const counts = new Map([
+      ['Abyssal Sire kills', 7],
+      ['Hard casket', 1],
+    ])
+    const standing = { counts, done: 6, target: 7, effort: null }
+    expect(partProgress(sire(), standing)).toEqual([
+      { name: 'Abyssal Sire kills', done: 5, needed: 5 },
+      { name: 'Dagannoth task', done: 0, needed: 1 },
+      { name: 'Hard casket', done: 1, needed: 1 },
+    ])
+    expect(partProgress(challenge({ kind: 'total', n: 1 }, []), standing)).toEqual([])
   })
 })
 
