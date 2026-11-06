@@ -150,8 +150,9 @@ const rules = computed(() => {
         <div class="faq-qa">
           <TtText :size="1" color="orange" align="left">Is pre-stacking allowed?</TtText>
           <TtText :size="1" color="white" align="left">
-            No. Clue caskets, loot keys and anything else saved up before the start don't count.
-            Only what you get after the event starts counts.
+            Yes. You may save up rewards before the start and open them during the event: clue
+            caskets, Soul Wars crates, Tempoross, Wintertodt, Vale Totems, Guardians of the Rift and
+            the like. What you get when you open them counts.
           </TtText>
         </div>
         <div class="faq-qa">
