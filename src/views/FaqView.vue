@@ -105,8 +105,8 @@ const rules = computed(() => {
           too. A team can have {{ rules.blockersPerTeam }} out at once.
         </TtText>
         <TtText v-if="rules" :size="1" color="white" align="left">
-          <b>Spells and attacks</b> (Ice Barrage, Entangle, Morrigan's throwing axe) hit a rival.
-          The team hit can't be targeted again for {{ rules.shield }}.
+          <b>Spells and attacks</b> (Ice Barrage, Entangle, the Handegg, Morrigan's throwing axe)
+          hit a rival. The team hit can't be targeted again for {{ rules.shield }}.
         </TtText>
         <TtText :size="1" color="white" align="left">
           While <b>stuck</b>, a team can't draw or use items. A held

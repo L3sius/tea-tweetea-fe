@@ -13,6 +13,8 @@ export const SOUNDS = [
   'ice-barrage-impact',
   'entangle-cast',
   'entangle-hit',
+  'handegg-throw',
+  'handegg-hit',
   'axe-throw',
   'feather-wind',
   'quetzal-whistle',
@@ -52,6 +54,7 @@ export type SoundFor = { sound: SoundName; team: TeamId; audience: SoundAudience
 const ITEM_SOUNDS: Partial<Record<Item, { sound: SoundName; audience: SoundAudience }>> = {
   ice_barrage: { sound: 'ice-barrage-cast', audience: 'everyone' },
   entangle: { sound: 'entangle-cast', audience: 'everyone' },
+  handegg: { sound: 'handegg-throw', audience: 'everyone' },
   morrigans_throwing_axe: { sound: 'axe-throw', audience: 'everyone' },
   bronze_feather: { sound: 'feather-wind', audience: 'team' },
   silver_feather: { sound: 'feather-wind', audience: 'team' },
@@ -114,6 +117,7 @@ export function soundFor(event: GameEvent, context: EntryContext): SoundFor | nu
       if (context.blockerHit) return null
       if (context.itemUsed === 'entangle') return everyone('entangle-hit', event.teamId)
       if (context.itemUsed === 'ice_barrage') return everyone('ice-barrage-impact', event.teamId)
+      if (context.itemUsed === 'handegg') return everyone('handegg-hit', event.teamId)
       return everyone('stunned', event.teamId)
     case 'blocker_triggered': {
       const sound = BLOCKER_SOUNDS[event.blocker.item]

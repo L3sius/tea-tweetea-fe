@@ -1,7 +1,7 @@
 # Sounds
 
 The board plays OSRS sounds as moments show on the map: a card turning, a spell landing, a gem
-collected. They ship with the site in `public/sounds/` (34 files, about 0.6 MB), so a deploy always
+collected. They ship with the site in `public/sounds/` (36 files, about 0.6 MB), so a deploy always
 carries the sounds its code plays. The music is bigger and lives on the asset server instead (see
 [Music](#music) below).
 
@@ -33,6 +33,8 @@ OSRS Wiki's [jingles](https://oldschool.runescape.wiki/w/Jingles), by name.
 | `ice-barrage-impact` | Ice Barrage freezes its target                            | sound 168 `ice_barrage_impact`         |
 | `entangle-cast`      | Entangle is cast                                          | sound 151 `entangle_cast_and_fire`     |
 | `entangle-hit`       | Entangle freezes its target                               | sound 153 `entangle_hit`               |
+| `handegg-throw`      | the Handegg is thrown                                     | sound 3300 `barbassault_egglauncher`   |
+| `handegg-hit`        | the Handegg turns its target into an omelette             | sound 556 `kalthite_egg_crack`         |
 | `axe-throw`          | Morrigan's throwing axe                                   | sound 3841 `godwars_axe_throw`         |
 | `feather-wind`       | a feather is used                                         | sound 220 `windstrike_cast_and_fire`   |
 | `quetzal-whistle`    | the Quetzal whistle                                       | sound 1569 `whistle`                   |

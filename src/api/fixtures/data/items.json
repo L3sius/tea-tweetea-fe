@@ -11,7 +11,7 @@
     "bronze_feather": {
       "name": "Bronze feather",
       "description": "Your next move is 1.5 times as long (rounded).",
-      "icon": "https://oldschool.runescape.wiki/images/Bronze_feather.png",
+      "icon": "/icons/bronze_feather.png",
       "price": 40,
       "freeze_hours": null,
       "multiplier": 1.5
@@ -19,7 +19,7 @@
     "silver_feather": {
       "name": "Silver feather",
       "description": "Your next move is 2 times as long.",
-      "icon": "https://oldschool.runescape.wiki/images/Silver_feather.png",
+      "icon": "/icons/silver_feather.png",
       "price": 80,
       "freeze_hours": null,
       "multiplier": 2
@@ -35,7 +35,7 @@
     "morrigans_throwing_axe": {
       "name": "Morrigan's throwing axe",
       "description": "Halves a rival team's next move. Hostile: the target is then shielded for 12 hours.",
-      "icon": "https://oldschool.runescape.wiki/images/Morrigan%27s_throwing_axe.png",
+      "icon": "/icons/morrigans_throwing_axe.png",
       "price": 30,
       "freeze_hours": null,
       "multiplier": null
@@ -43,7 +43,7 @@
     "quetzal_whistle": {
       "name": "Quetzal whistle",
       "description": "On land only: fly to a random land tile away from the gems.",
-      "icon": "https://oldschool.runescape.wiki/images/Perfected_quetzal_whistle.png",
+      "icon": "/icons/quetzal_whistle.png",
       "price": 20,
       "freeze_hours": null,
       "multiplier": null
@@ -51,7 +51,7 @@
     "ogre_boat": {
       "name": "Ogre boat",
       "description": "At sea only: sail to a random sea tile away from the gems.",
-      "icon": "https://oldschool.runescape.wiki/images/thumb/Ogre_boat.png/300px-Ogre_boat.png",
+      "icon": "/icons/ogre_boat.png",
       "price": 20,
       "freeze_hours": null,
       "multiplier": null
@@ -59,7 +59,7 @@
     "group_teleport": {
       "name": "Group teleport",
       "description": "Sends every team that is not moving or in a match to a random shop.",
-      "icon": "https://oldschool.runescape.wiki/images/Ice_plateau_teleport_%28tablet%29.png",
+      "icon": "/icons/group_teleport.png",
       "price": 50,
       "freeze_hours": null,
       "multiplier": null
@@ -67,7 +67,7 @@
     "banana": {
       "name": "Banana",
       "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is stuck there for 30 minutes.",
-      "icon": "https://oldschool.runescape.wiki/images/Banana.png",
+      "icon": "/icons/banana.png",
       "price": 10,
       "freeze_hours": 0.5,
       "multiplier": null
@@ -75,7 +75,7 @@
     "harpie_bug_swarm": {
       "name": "Harpie bug swarm",
       "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is stuck there for 1 hour.",
-      "icon": "https://oldschool.runescape.wiki/images/Harpie_Bug_Swarm_icon.png",
+      "icon": "/icons/harpie_bug_swarm.png",
       "price": 15,
       "freeze_hours": 1,
       "multiplier": null
@@ -83,7 +83,7 @@
     "snake_charmer": {
       "name": "Snake charmer",
       "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is stuck there for 2 hours.",
-      "icon": "https://oldschool.runescape.wiki/images/Snake_charm.png",
+      "icon": "/icons/snake_charmer.png",
       "price": 25,
       "freeze_hours": 2,
       "multiplier": null
@@ -91,7 +91,7 @@
     "wilderness_web": {
       "name": "Wilderness web",
       "description": "Blocker for a tile up to 10 tiles away, for 24 hours. Every team that walks onto it, yours included, stops there, loses the rest of its move and is stuck there for 4 hours.",
-      "icon": "https://oldschool.runescape.wiki/images/Web.png",
+      "icon": "/icons/wilderness_web.png",
       "price": 40,
       "freeze_hours": 4,
       "multiplier": null
@@ -99,7 +99,7 @@
     "ice_barrage": {
       "name": "Ice Barrage",
       "description": "Freezes a rival team for 6 hours. Hostile: the target is then shielded for 12 hours.",
-      "icon": "https://oldschool.runescape.wiki/images/Ice_Barrage.png",
+      "icon": "/icons/ice_barrage.png",
       "price": 30,
       "freeze_hours": 6,
       "multiplier": null
@@ -107,15 +107,23 @@
     "entangle": {
       "name": "Entangle",
       "description": "Roots a rival team in place for 3 hours. Hostile: the target is then shielded for 12 hours.",
-      "icon": "https://oldschool.runescape.wiki/images/Entangle.png",
+      "icon": "/icons/entangle.png",
       "price": 20,
       "freeze_hours": 3,
+      "multiplier": null
+    },
+    "handegg": {
+      "name": "The Handegg",
+      "description": "Launch it at another team to turn them into an omelette for 2 hours. Hostile: the target is then shielded for 12 hours.",
+      "icon": "/icons/handegg.png",
+      "price": 15,
+      "freeze_hours": 2,
       "multiplier": null
     },
     "protect_from_magic": {
       "name": "Protect from Magic",
       "description": "Passive: cancels the next hold on your team, from a spell or a blocker (which still ends your move), then is used up.",
-      "icon": "https://oldschool.runescape.wiki/images/Protect_from_Magic.png",
+      "icon": "/icons/protect_from_magic.png",
       "price": 20,
       "freeze_hours": null,
       "multiplier": null
@@ -123,7 +131,7 @@
     "leprechaun_hat": {
       "name": "Leprechaun hat",
       "description": "For your next 5 draws, a club pays gold.",
-      "icon": "https://oldschool.runescape.wiki/images/Leprechaun_hat.png",
+      "icon": "/icons/leprechaun_hat.png",
       "price": 30,
       "freeze_hours": null,
       "multiplier": null
@@ -131,7 +139,7 @@
     "saturated_heart": {
       "name": "Saturated heart",
       "description": "For your next 5 draws, a heart pays gold.",
-      "icon": "https://oldschool.runescape.wiki/images/Saturated_heart.png",
+      "icon": "/icons/saturated_heart.png",
       "price": 30,
       "freeze_hours": null,
       "multiplier": null

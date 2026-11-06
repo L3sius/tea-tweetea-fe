@@ -83,6 +83,12 @@
     "wilderness_web": { "hit": [14222], "hold": [14224, 10440], "free": [] },
     "ice_barrage": { "hit": [848], "hold": [3361, 3367, 3358], "free": [] },
     "entangle": { "hit": [7210], "hold": [4826, 14004], "free": [] },
+    "handegg": {
+      "hit": [12308],
+      "hold": [12311],
+      "free": [],
+      "becomes": { "npc": 14491, "scale": 1.6 }
+    },
     "other": { "hit": [], "hold": [2338, 4094, 10084, 4196, 4758], "free": [] }
   },
   "easterEggs": {

@@ -4,12 +4,13 @@
 import type { TeamId, TileId } from '@/domain/ids'
 import { STEP_MS, type Placement, type Reaction } from '@/domain/motion'
 import type { StuckCause } from '@/domain/stuck'
-import { RANDOM, ROSTER, RUN_FROM_STEPS, optionIds, type Appearance } from './roster'
+import { RANDOM, ROSTER, RUN_FROM_STEPS, optionIds, type Appearance, type Disguise } from './roster'
 
 /**
  * An animation to play: frame 0 shows at `since` (ms), and it plays `rate` times as fast.
  * `sideways`: the character lies on the ground, so it turns across the screen to read as lying.
  * `stopAt`: it plays up to this client tick and stays there, a pose held partway through.
+ * `disguise`: the piece shows this instead of its character, and `anim` animates it.
  */
 export type Performance = {
   anim: number
@@ -17,6 +18,7 @@ export type Performance = {
   rate: number
   sideways?: boolean
   stopAt?: number
+  disguise?: Disguise
 }
 
 export type Situation = {
@@ -106,6 +108,8 @@ function reacting(s: Situation): Performance | null {
         ...(lying && stuck.sideways && { sideways: true }),
         // A hit that ends in the held pose stops there, so the hold carries on from it.
         ...(reaction.kind === 'struck' && stuck.holdAt !== undefined && { stopAt: stuck.holdAt }),
+        // The hit is the change itself; getting free is the character again.
+        ...(reaction.kind === 'struck' && stuck.becomes && { disguise: stuck.becomes }),
       }
     // Older reactions ended before this one.
     return null
@@ -115,8 +119,10 @@ function reacting(s: Situation): Performance | null {
 
 /** The pose its cause leaves the team in, the same until it is free. */
 function held(s: Situation, stuck: NonNullable<Situation['stuck']>): Performance {
-  const { hold, holdAt, sideways } = ROSTER.stuck[stuck.cause]
+  const { hold, holdAt, sideways, becomes } = ROSTER.stuck[stuck.cause]
   const anim = pick(hold, s.team, stuck.until, 'stuck')
+  // A disguise has no idle of the team's to fall back on: it stands at rest instead.
+  if (becomes) return { anim: anim ?? -1, since: 0, rate: 1, disguise: becomes }
   // Played long ago (`since` 0), so a pose held partway shows only its `holdAt` tick.
   return {
     anim: anim ?? s.appearance.idle,

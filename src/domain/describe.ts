@@ -39,6 +39,9 @@ export function useQuestion(item: Item, target: string | null): string {
   switch (item) {
     case 'morrigans_throwing_axe':
       return `Throw ${name} at ${on}?`
+    // Its name starts with "The", which reads wrong mid-sentence.
+    case 'handegg':
+      return `Throw the Handegg at ${on}?`
     case 'ice_barrage':
     case 'entangle':
       return `Cast ${name} on ${on}?`

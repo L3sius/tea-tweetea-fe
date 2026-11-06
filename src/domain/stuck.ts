@@ -10,6 +10,7 @@ export const STUCK_CAUSES = [
   'wilderness_web',
   'ice_barrage',
   'entangle',
+  'handegg',
   // No item: an admin's freeze, or a card or random event that freezes.
   'other',
 ] as const
@@ -29,6 +30,7 @@ const WORDING: Record<StuckCause, Wording> = {
   wilderness_web: { callout: 'Caught in a web!', state: 'Webbed' },
   ice_barrage: { callout: 'Frozen!', state: 'Frozen' },
   entangle: { callout: 'Entangled!', state: 'Entangled' },
+  handegg: { callout: 'Scrambled!', state: 'Omeletted' },
   other: { callout: 'Stuck!', state: 'Stuck' },
 }
 

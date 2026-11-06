@@ -8,6 +8,7 @@ const TARGETS: Partial<Record<Item, ItemTargetKind>> = {
   morrigans_throwing_axe: 'team',
   ice_barrage: 'team',
   entangle: 'team',
+  handegg: 'team',
   banana: 'tile',
   harpie_bug_swarm: 'tile',
   snake_charmer: 'tile',
@@ -38,6 +39,7 @@ export const HOSTILE_ITEMS: ReadonlySet<Item> = new Set<Item>([
   'morrigans_throwing_axe',
   'ice_barrage',
   'entangle',
+  'handegg',
 ])
 
 /** An item as the catalogue (`GET /items`) describes it, numbers included. */
@@ -48,7 +50,7 @@ export type ItemEntry = {
   icon: string | null
   /** Gold, at any shop that stocks it. */
   price: number
-  /** How long the item freezes a team: blockers, Ice Barrage, Entangle. */
+  /** How long the item freezes a team: blockers, Ice Barrage, Entangle, the Handegg. */
   freezeHours: number | null
   /** The factor a feather applies to the next move. */
   multiplier: number | null
@@ -126,6 +128,7 @@ export const ITEM_GROUP: Record<Item, ItemGroup> = {
   wilderness_web: 'board',
   ice_barrage: 'rival',
   entangle: 'rival',
+  handegg: 'rival',
   protect_from_magic: 'held',
   leprechaun_hat: 'draw',
   saturated_heart: 'draw',

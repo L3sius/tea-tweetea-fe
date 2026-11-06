@@ -5,7 +5,8 @@
 //
 // Usage: node export.mjs [out dir]   (default out/osrs/; upload.sh puts it on the server)
 //
-//   index.json        { revision, npcs: [{ id, name, combat, models, recolor?, scale? }] }
+//   index.json        { revision, npcs: [{ id, name, combat, models, recolor?, scale? }], props }
+//                     props: the NPCs roster.json's stuck causes turn a piece into, same shape
 //   anims.json        { "<id>": { name, ticks } }
 //   models/<id>.bin   one model part
 //   framemaps/<id>.bin, anims/<id>.bin
@@ -37,6 +38,18 @@ function rosterAnimations() {
     for (const id of [...hit, ...hold, ...free]) ids.add(id)
   for (const id of roster.easterEggs.idle) ids.add(id)
   return [...ids].sort((a, b) => a - b)
+}
+
+/** The NPCs a stuck cause turns a piece into, and the animations that move them. */
+function rosterProps() {
+  const npcs = new Set()
+  const anims = new Set()
+  for (const { hit, hold, becomes } of Object.values(roster.stuck)) {
+    if (!becomes) continue
+    npcs.add(becomes.npc)
+    for (const id of [...hit, ...hold]) anims.add(id)
+  }
+  return { npcs: [...npcs], anims }
 }
 
 /** A little-endian byte writer. */
@@ -160,8 +173,12 @@ rmSync(out, { recursive: true, force: true })
 
 // NPCs and the model parts they use.
 const npcs = npcIndex(await playerRiggedNpcs(cache))
-write(resolve(out, 'index.json'), JSON.stringify({ revision, npcs }))
-const parts = new Set(npcs.flatMap((npc) => npc.models))
+const wanted = rosterProps()
+const props = npcIndex(
+  await Promise.all(wanted.npcs.map((id) => cache.getDef(IndexType.CONFIGS, ConfigType.NPC, id))),
+)
+write(resolve(out, 'index.json'), JSON.stringify({ revision, npcs, props }))
+const parts = new Set([...npcs, ...props].flatMap((npc) => npc.models))
 let partBytes = 0
 for (const id of parts) {
   const bytes = encodeModel((await cache.getFile(IndexType.MODELS, id)).def)
@@ -178,7 +195,8 @@ const anims = {}
 const framemaps = new Set()
 for (const id of rosterAnimations()) {
   const skeleton = await framemapOf(cache, id)
-  if (skeleton !== PLAYER_FRAMEMAP) {
+  // A prop moves on its own skeleton; everything else must move the player's.
+  if (skeleton !== PLAYER_FRAMEMAP && !(wanted.anims.has(id) && typeof skeleton === 'number')) {
     console.warn(`  ! animation ${id} moves skeleton ${skeleton}, not the player's; skipped`)
     continue
   }

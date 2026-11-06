@@ -314,6 +314,7 @@ describe('useQuestion', () => {
     expect(useQuestion('morrigans_throwing_axe', 'Blue')).toBe(
       "Throw Morrigan's throwing axe at Blue?",
     )
+    expect(useQuestion('handegg', 'Blue')).toBe('Throw the Handegg at Blue?')
     expect(useQuestion('banana', null)).toBe('Place the Banana on this tile?')
     expect(useQuestion('ogre_boat', null)).toBe('Sail away in the Ogre boat?')
     expect(useQuestion('bronze_feather', null)).toBe('Use the Bronze feather?')

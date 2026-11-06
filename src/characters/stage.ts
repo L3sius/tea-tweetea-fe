@@ -184,10 +184,15 @@ function stage() {
 
 type Playing = { animation: Animation; framemap: Framemap }
 
-/** One NPC drawn into `canvas`, filling its pixel size. */
+/**
+ * One NPC drawn into `canvas`, filling its pixel size. A performance with a disguise draws that
+ * prop instead, framed like the character so it keeps its size next to the other pieces.
+ */
 export class CharacterPiece {
   private readonly context: CanvasRenderingContext2D | null
   private figure: Figure | null = null
+  /** Props this piece has turned into, loaded the first time they are needed. */
+  private readonly props = new Map<number, Figure | 'loading' | 'missing'>()
   private readonly playing = new Map<number, Playing | 'loading'>()
   /** The heading drawn last, turning towards the one asked for. */
   private heading: number | null = null
@@ -208,6 +213,8 @@ export class CharacterPiece {
 
   /** The animation and its skeleton, or null while they load. */
   private animation(id: number): Playing | null {
+    // A prop's rest pose has no animation.
+    if (id < 0) return null
     const known = this.playing.get(id)
     if (known === 'loading') return null
     if (known) return known
@@ -223,8 +230,12 @@ export class CharacterPiece {
    * the game's turning speed. Until an animation loads, the piece stands at rest.
    */
   draw(performance: Performance, heading: number, time: number): void {
-    const { figure, context } = this
-    if (!figure || !context) return
+    const { figure: character, context } = this
+    if (!character || !context) return
+    const disguise = performance.disguise
+    const figure = disguise ? this.prop(disguise.npc) : character
+    // Until the prop loads, or if it can't, the character stays as it is.
+    if (!figure) return
     const turned = this.heading ?? heading
     this.heading = turnTowards(turned, heading, Math.max(0, time - this.lastDraw) * TURN_PER_MS)
     this.lastDraw = time
@@ -234,39 +245,65 @@ export class CharacterPiece {
     // A pose held partway through its animation stops on that tick instead of looping.
     const ticks = performance.stopAt === undefined ? played : Math.min(played, performance.stopAt)
     const frame = playing ? frameAt(playing.animation, Math.floor(ticks)) : -1
-    const key = `${performance.anim}|${frame}|${this.heading.toFixed(3)}`
+    const key = `${disguise?.npc ?? ''}|${performance.anim}|${frame}|${this.heading.toFixed(3)}`
     if (key === this.drawn) return
     this.drawn = key
 
     if (playing) figure.pose(playing.framemap, playing.animation, frame)
     else figure.show(figure.model.positions)
     figure.root.rotation.y = this.heading
-    this.render(figure, context)
+    this.render(figure, context, character.height, disguise?.scale ?? 1)
   }
 
-  private render(figure: Figure, context: CanvasRenderingContext2D) {
+  private prop(npc: number): Figure | null {
+    const known = this.props.get(npc)
+    if (known === 'loading' || known === 'missing') return null
+    if (known) return known
+    this.props.set(npc, 'loading')
+    void loadFigure(npc).then(
+      (figure) => {
+        if (this.disposed) figure.dispose()
+        else this.props.set(npc, figure)
+      },
+      // Not in the hosted assets (an older upload): keep showing the character.
+      () => this.props.set(npc, 'missing'),
+    )
+    return null
+  }
+
+  /** Draws `figure` framed for a character `frameHeight` tall, scaled by `scale`. */
+  private render(
+    figure: Figure,
+    context: CanvasRenderingContext2D,
+    frameHeight: number,
+    scale: number,
+  ) {
     const { renderer, scene, camera } = stage()
     const { width, height } = this.canvas
     renderer.setSize(width, height, false)
 
-    // Fit the model's height, with room above for raised arms and below for the feet.
-    const span = figure.height * 1.25
+    // Fit the character's height, with room above for raised arms and below for the feet.
+    const span = frameHeight * 1.25
     const aspect = width / height
     camera.left = (-span * aspect) / 2
     camera.right = (span * aspect) / 2
     camera.top = span / 2
     camera.bottom = -span / 2
     camera.near = 1
-    camera.far = figure.height * 20
-    const middle = figure.height * 0.52
-    const distance = figure.height * 5
+    camera.far = frameHeight * 20
+    const middle = frameHeight * 0.52
+    const distance = frameHeight * 5
     camera.position.set(0, middle + Math.sin(PITCH) * distance, Math.cos(PITCH) * distance)
     camera.lookAt(0, middle, 0)
     camera.updateProjectionMatrix()
 
+    // A look's own width and height scale stay; a prop's size is on top of them.
+    const own = figure.root.scale.clone()
+    figure.root.scale.multiplyScalar(scale)
     scene.add(figure.root)
     renderer.render(scene, camera)
     scene.remove(figure.root)
+    figure.root.scale.copy(own)
     context.clearRect(0, 0, width, height)
     context.drawImage(renderer.domElement, 0, 0)
   }
@@ -275,5 +312,7 @@ export class CharacterPiece {
     this.disposed = true
     this.figure?.dispose()
     this.figure = null
+    for (const prop of this.props.values()) if (typeof prop !== 'string') prop.dispose()
+    this.props.clear()
   }
 }

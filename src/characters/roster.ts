@@ -4,7 +4,8 @@
 // - Styles: what a team picks for itself, how its character stands, walks, runs and swims.
 // - Reactions: animations for moments on the board, picked from a pool when they happen.
 // - Stuck: for each thing that holds a team in place, a hit as it happens, a pose to hold, and
-//   optionally a way back up when it lets go.
+//   optionally a way back up when it lets go. A cause can turn the character into something else
+//   (the Handegg makes an omelette of it), whose own animations the hit and hold then are.
 // - Easter eggs: rare idle emotes, and the odd walk in someone else's style.
 import type { Appearance } from '@/domain/game'
 import type { ReactionKind } from '@/domain/motion'
@@ -16,6 +17,9 @@ export type Style = (typeof STYLES)[number]
 
 export type StyleOption = { id: number; label: string }
 
+/** Something a piece turns into: an exported NPC (a prop), drawn `scale` times its size. */
+export type Disguise = { npc: number; scale?: number }
+
 type Roster = {
   styles: Record<Style, StyleOption[]>
   reactions: Record<Exclude<ReactionKind, 'struck' | 'freed'> | 'pass', number[]>
@@ -23,10 +27,19 @@ type Roster = {
    * `sideways`: the cause leaves the team on the ground, so it half turns to show its length.
    * `holdAt`: the hold stops at this client tick of its animation (partway through the hit, say)
    *   instead of looping.
+   * `becomes`: the piece shows this NPC instead, at `scale` times its own size next to the
+   *   character, from the hit until it is free. Its hit and hold animate that NPC.
    */
   stuck: Record<
     StuckCause,
-    { hit: number[]; hold: number[]; free: number[]; sideways?: boolean; holdAt?: number }
+    {
+      hit: number[]
+      hold: number[]
+      free: number[]
+      sideways?: boolean
+      holdAt?: number
+      becomes?: Disguise
+    }
   >
   easterEggs: { idle: number[]; idleChancePerMinute: number; gaitChancePerWalk: number }
   featured: number[]

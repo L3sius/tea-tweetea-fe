@@ -7,7 +7,7 @@ export const WireItemInfo = z.object({
   icon: z.string().nullable(),
   /** Gold, at any shop that stocks it. */
   price: z.number(),
-  /** How long the item freezes a team: blockers, Ice Barrage, Entangle. */
+  /** How long the item freezes a team: blockers, Ice Barrage, Entangle, the Handegg. */
   freeze_hours: z.number().nullable(),
   /** The factor a feather applies to the next move. */
   multiplier: z.number().nullable(),

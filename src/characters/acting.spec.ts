@@ -144,6 +144,26 @@ describe('perform', () => {
     expect(floored).toMatchObject({ anim: hit[0], stopAt: holdAt })
   })
 
+  it('turns into an omelette from the Handegg hit until it is free', () => {
+    const { hit, hold, becomes } = ROSTER.stuck.handegg
+    const stuck = { until: T0 + 3_600_000, cause: 'handegg' as const }
+    const splat: Reaction = { id: '9.1', teamId: red, kind: 'struck', cause: 'handegg', at: T0 }
+    const splatting = perform(situation({ time: T0 + 100, reactions: [splat], stuck }))
+    expect(splatting).toMatchObject({ anim: hit[0], disguise: becomes })
+    const lying = perform(situation({ time: T0 + 60_000, reactions: [splat], stuck }))
+    expect(lying).toMatchObject({ anim: hold[0], disguise: becomes })
+    const up: Reaction = {
+      id: '9.2',
+      teamId: red,
+      kind: 'freed',
+      cause: 'handegg',
+      at: T0 + 60_000,
+    }
+    const free = perform(situation({ time: T0 + 60_100, reactions: [up, splat] }))
+    expect(free.disguise).toBeUndefined()
+    expect(perform(situation({ stuck: { ...stuck, cause: 'entangle' } })).disguise).toBeUndefined()
+  })
+
   it('lies across the screen while floored, and only then', () => {
     const until = T0 + 3_600_000
     expect(perform(situation({ stuck: { until, cause: 'banana' } })).sideways).toBe(true)

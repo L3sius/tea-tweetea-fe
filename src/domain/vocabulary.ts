@@ -34,6 +34,7 @@ export const ITEMS = [
   'wilderness_web',
   'ice_barrage',
   'entangle',
+  'handegg',
   'protect_from_magic',
   'leprechaun_hat',
   'saturated_heart',

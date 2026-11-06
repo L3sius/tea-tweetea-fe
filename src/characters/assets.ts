@@ -60,8 +60,11 @@ export const loadNpcs = once(async () => {
   const index = (await (await fetchOk('index.json')).json()) as {
     revision: number | null
     npcs: NpcLook[]
+    /** Looks a piece can turn into (roster.json `becomes`), not offered to teams. */
+    props?: NpcLook[]
   }
-  return { ...index, byId: new Map(index.npcs.map((npc) => [npc.id, npc])) }
+  const all = [...index.npcs, ...(index.props ?? [])]
+  return { ...index, byId: new Map(all.map((npc) => [npc.id, npc])) }
 })
 
 let animationInfo = new Map<number, AnimationInfo>()

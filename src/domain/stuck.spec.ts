@@ -7,6 +7,8 @@ describe('stuck', () => {
     expect(stuckState('banana')).toBe('Floored')
     expect(stuckCallout('snake_charmer')).toBe('Charmed!')
     expect(stuckState('ice_barrage')).toBe('Frozen')
+    expect(stuckCallout('handegg')).toBe('Scrambled!')
+    expect(stuckState('handegg')).toBe('Omeletted')
   })
 
   it('calls a freeze without an item, or with an item that does not freeze, stuck', () => {

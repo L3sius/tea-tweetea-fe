@@ -62,6 +62,17 @@ describe('soundFor', () => {
     ])
   })
 
+  it('throws the Handegg from the user and cracks it on the target', () => {
+    const sounds = soundsOf([
+      { kind: 'item_used', teamId: red, item: 'handegg', target: { kind: 'team', teamId: blue } },
+      { kind: 'frozen', teamId: blue, until, by: 'handegg' },
+    ])
+    expect(sounds).toEqual([
+      { sound: 'handegg-throw', team: red, audience: 'everyone' },
+      { sound: 'handegg-hit', team: blue, audience: 'everyone' },
+    ])
+  })
+
   it('plays only the blocker for a freeze a blocker caused', () => {
     const blocker = { item: 'wilderness_web', owner: blue, until } as const
     const sounds = soundsOf([
