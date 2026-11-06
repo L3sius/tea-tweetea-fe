@@ -86,14 +86,14 @@ test('a captain logs in with the team code, and out again', async ({ page }) => 
   await expect(page.getByLabel('Team code')).toBeVisible()
 })
 
-test('the Actions camera option is remembered', async ({ page }) => {
+test('the Auto camera option is remembered', async ({ page }) => {
   await open(page, '/')
-  const actions = page.getByRole('button', { name: 'Actions' }).first()
+  const actions = page.getByRole('button', { name: 'Auto camera' }).first()
   await expect(actions).toHaveAttribute('aria-pressed', 'false')
   await actions.click()
   await expect(actions).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
-  await expect(page.getByRole('button', { name: 'Actions' }).first()).toHaveAttribute(
+  await expect(page.getByRole('button', { name: 'Auto camera' }).first()).toHaveAttribute(
     'aria-pressed',
     'true',
   )
@@ -125,11 +125,11 @@ async function expectTooltipOnTop(page: Page) {
 }
 
 test('hover boxes show whole, over the header and panels', async ({ page }) => {
-  // Wide enough that the map's buttons fit on one row, so the Actions box rises into the header.
+  // Wide enough that the map's buttons fit on one row, so the Auto camera box rises into the header.
   await page.setViewportSize({ width: 1920, height: 1080 })
   await open(page, '/')
-  await page.getByRole('button', { name: 'Actions' }).first().hover()
-  await expect(page.getByRole('tooltip')).toContainText('The camera visits')
+  await page.getByRole('button', { name: 'Auto camera' }).first().hover()
+  await expect(page.getByRole('tooltip')).toContainText('Moves the camera')
   const tip = await page.getByRole('tooltip').boundingBox()
   const header = await page.getByRole('banner').boundingBox()
   expect(tip && header && tip.y < header.y + header.height, 'the box reaches into the header').toBe(

@@ -223,9 +223,10 @@ function freeRoam() {
 // --- Actions: the camera visits whatever is happening, then goes home (see domain/director.ts) ---
 
 const ACTIONS_KEY = 'tweetea.followActions'
-/** The Actions option, remembered for this browser. */
+/** The Auto camera option, remembered for this browser. */
 const followActions = ref(readActions())
-const ACTIONS_TIP = 'The camera visits whatever is happening, then comes back'
+const ACTIONS_TIP =
+  'Moves the camera to each move, item and minigame as it happens, then back to where you were'
 const shot = shallowRef<Shot | null>(null)
 /**
  * The viewer's own camera while an action borrows it: the team followed, or free roam (no team
@@ -508,17 +509,20 @@ async function buyMysteryBox() {
             />
           </button>
         </li>
-        <TtTooltip as="li" class="pointer-events-auto">
+        <!-- A setting, not a team: set apart, in plain text, with the game's tick or cross box. -->
+        <TtTooltip as="li" class="pointer-events-auto ml-2">
           <button
             type="button"
-            class="tt-sprite-display tt-press relative px-2 hover:brightness-[1.18]"
-            :class="{ 'tt-pressed': followActions }"
+            class="tt-sprite-display tt-press flex items-center gap-1.5 px-2 hover:brightness-[1.18]"
             :aria-pressed="followActions"
             @click="followActions = !followActions"
           >
-            <TtText :size="1" font="bold" color="orange">Actions</TtText>
-            <!-- On: pressed in and outlined like a followed team. -->
-            <span v-if="followActions" class="tt-select-ring" aria-hidden="true" />
+            <span
+              class="tt-sprite block size-4"
+              :class="followActions ? 'tt-icon-check' : 'tt-icon-cross'"
+              aria-hidden="true"
+            />
+            <TtText :size="1" color="white">Auto camera</TtText>
           </button>
           <template #tip>{{ ACTIONS_TIP }}</template>
         </TtTooltip>
@@ -788,15 +792,21 @@ async function buyMysteryBox() {
               >
                 <span :style="{ color: teamColor(team) }">{{ team.name }}</span>
               </TtButton>
-              <TtTooltip>
+              <TtTooltip class="ml-2">
                 <TtButton
                   size="sm"
                   class="!min-w-0"
-                  :selected="followActions"
                   :aria-pressed="followActions"
                   @click="followActions = !followActions"
                 >
-                  Actions
+                  <span class="flex items-center gap-1.5">
+                    <span
+                      class="tt-sprite block size-4"
+                      :class="followActions ? 'tt-icon-check' : 'tt-icon-cross'"
+                      aria-hidden="true"
+                    />
+                    <span class="text-white">Auto camera</span>
+                  </span>
                 </TtButton>
                 <template #tip>{{ ACTIONS_TIP }}</template>
               </TtTooltip>
