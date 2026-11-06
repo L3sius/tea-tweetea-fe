@@ -754,9 +754,11 @@ async function buyMysteryBox() {
           <span v-if="t.badge" :style="{ color: 'var(--osrs-red)' }">({{ t.badge }})</span>
         </TtButton>
       </nav>
+      <!-- The scrollbar's space is always kept: the logo shrinks with the panel, so a scrollbar that
+           took its width could shorten the content, vanish, and come back, flickering. -->
       <div
         class="flex flex-col overflow-x-hidden [&>*]:shrink-0"
-        :class="{ 'min-h-0 flex-1 overflow-y-auto': beside }"
+        :class="{ 'min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]': beside }"
       >
         <div v-if="tab === 'overview'" class="flex flex-col gap-1.5">
           <TtPanel
