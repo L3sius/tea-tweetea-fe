@@ -75,3 +75,9 @@ export type Challenge = {
   goal: Goal
   effort: Effort
 }
+
+/** The server tags minigame challenges; they open on red tiles and are never a board tile's task. */
+export const MINIGAME_TAG = 'red-tile'
+
+export const isMinigame = (challenge: Pick<Challenge, 'tags'>) =>
+  challenge.tags.includes(MINIGAME_TAG)

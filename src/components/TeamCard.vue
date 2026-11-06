@@ -5,6 +5,7 @@ import {
   challengeProgress,
   effortText,
   itemName,
+  partProgress,
   teamStatusText,
   type Names,
 } from '@/domain/describe'
@@ -17,6 +18,7 @@ import { count } from '@/ui/format'
 import { TtGemTracker, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
+import TaskParts from './TaskParts.vue'
 import TeamLogo from './TeamLogo.vue'
 
 const props = defineProps<{
@@ -43,8 +45,10 @@ const task = computed(() => {
   const instance = props.state.instances.get(status.instanceId)
   const challenge = instance && props.challenges.get(instance.challengeId)
   if (!challenge) return null
-  const effort = effortText(challenge, instance, instance.progress.get(id), props.now)
-  return { challenge, effort, ...challengeProgress(challenge, instance, id) }
+  const standing = instance.progress.get(id)
+  const effort = effortText(challenge, instance, standing, props.now)
+  const parts = partProgress(challenge, standing)
+  return { challenge, effort, parts, ...challengeProgress(challenge, instance, id) }
 })
 
 /** The team's items, each with what it does, for the hover box. */
@@ -97,6 +101,7 @@ const items = computed(() =>
         :height="24"
         class="max-w-full"
       />
+      <TaskParts :parts="task.parts" />
       <TtText v-if="task.effort" :size="1" color="muted">{{ task.effort }}</TtText>
     </template>
 

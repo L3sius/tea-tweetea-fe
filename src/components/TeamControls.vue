@@ -34,6 +34,7 @@ import ConfirmDialog from './ConfirmDialog.vue'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
 import PowerUpPicker from './PowerUpPicker.vue'
+import TaskParts from './TaskParts.vue'
 
 const emit = defineEmits<{ openShop: [] }>()
 
@@ -383,15 +384,7 @@ const lockClock = computed(
             :width="330"
             class="max-w-full"
           />
-          <!-- A compound tile: each step with its own count. -->
-          <ul v-if="task.parts.length" class="flex w-[330px] max-w-full flex-col gap-0.5">
-            <li v-for="part in task.parts" :key="part.name" class="flex justify-between gap-3">
-              <TtText :size="1" color="white" align="left">{{ part.name }}</TtText>
-              <TtText :size="1" :color="part.done >= part.needed ? 'green' : 'white'">
-                {{ part.done }} / {{ part.needed }}
-              </TtText>
-            </li>
-          </ul>
+          <TaskParts :parts="task.parts" />
           <TtText v-if="task.effort" :size="1" color="cyan">{{ task.effort }}</TtText>
         </template>
         <TtText :size="1" color="muted" class="max-w-[340px]">

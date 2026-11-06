@@ -10,6 +10,7 @@ import {
   type ChatColour,
   type ChatMotion,
 } from '@/characters/quotes'
+import { isMinigame } from '@/domain/challenge'
 import { cardLabel, itemName, teamStatusText } from '@/domain/describe'
 import type { Card } from '@/domain/game'
 import { ITEM_GROUP, ITEM_GROUPS, inventorySize, type ItemGroup } from '@/domain/items'
@@ -82,9 +83,9 @@ const last = computed(() => {
   return dev.lastEntry()
 })
 
-/** Plays the minigame pick for the chosen team, landing on a random real challenge. */
+/** Plays the minigame pick for the chosen team, landing on a random real minigame. */
 function spinMinigame() {
-  const names = [...game.challenges.values()].map((c) => c.name)
+  const names = [...game.challenges.values()].filter(isMinigame).map((c) => c.name)
   const winner = names[Math.floor(Math.random() * names.length)] ?? 'Test minigame'
   game.queueSpin({ teamId: dev.teamId ?? teams.value[0]?.id ?? null, winner, alert: null })
 }

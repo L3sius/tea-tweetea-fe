@@ -3,9 +3,16 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import AdminNotice from '@/components/admin/AdminNotice.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import ItemSlot from '@/components/ItemSlot.vue'
+import TaskParts from '@/components/TaskParts.vue'
 import { accountRows, normRsn, type AccountRow } from '@/domain/admin'
 import type { AdminCommand } from '@/domain/commands'
-import { challengeProgress, effortText, itemName, teamStatusText } from '@/domain/describe'
+import {
+  challengeProgress,
+  effortText,
+  itemName,
+  partProgress,
+  teamStatusText,
+} from '@/domain/describe'
 import type { Member, Team } from '@/domain/game'
 import { ITEM_GROUP, ITEM_GROUPS, itemEntry, type ItemGroup } from '@/domain/items'
 import { ITEMS, type Item, type Phase } from '@/domain/vocabulary'
@@ -77,6 +84,7 @@ const task = computed(() => {
     instance,
     challenge,
     effort: effortText(challenge, instance, standing, props.now),
+    parts: partProgress(challenge, standing),
     keys: [...(standing?.counts.keys() ?? [])],
     ...challengeProgress(challenge, instance, id.value),
   }
@@ -337,6 +345,7 @@ async function renameMember() {
                 :label="`${task.done} / ${task.needed}`"
                 :height="30"
               />
+              <TaskParts :parts="task.parts" />
               <TtText v-if="task.effort" :size="1" color="muted" align="left">{{
                 task.effort
               }}</TtText>
