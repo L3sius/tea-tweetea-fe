@@ -89,3 +89,11 @@ export type GameEventKind = GameEvent['kind']
 
 /** The events of one accepted command, as stored in the server's journal. */
 export type JournalEntry = { seq: number; at: Date; events: GameEvent[] }
+
+/**
+ * Whether the game log keeps the entry. Dink's task progress is most of the journal once the game
+ * runs (every kill and drop that counts), and the log doesn't show it: kept, it would push the
+ * moves the log is for out of its window.
+ */
+export const isLogged = (entry: JournalEntry): boolean =>
+  entry.events.some((event) => event.kind !== 'progress')

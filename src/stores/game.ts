@@ -5,7 +5,7 @@ import type { FeedItem } from '@/domain/activity'
 import type { Board } from '@/domain/board'
 import type { Challenge } from '@/domain/challenge'
 import { itemName, type Names } from '@/domain/describe'
-import type { GameEvent, JournalEntry } from '@/domain/events'
+import { isLogged, type GameEvent, type JournalEntry } from '@/domain/events'
 import type { GameState, Team } from '@/domain/game'
 import type { ChallengeId, TeamId, TileId } from '@/domain/ids'
 import { useItemCatalogue } from '@/domain/items'
@@ -24,6 +24,10 @@ import { useApiClient } from './apiClient'
 
 /** Journal entries kept for the game log; also how far back a reload looks for walks to resume. */
 const LOG_LENGTH = 120
+/** The server's most journal entries per request. */
+const JOURNAL_PAGE = 500
+/** How many pages a load reads back at most, looking for entries the log keeps. */
+const LOG_MAX_PAGES = 6
 /** The newest journal entry this browser has seen, so a later visit can catch up from it. */
 const LAST_SEEN_KEY = 'tweetea.lastSeenSeq'
 /** A replay starts this long after it is asked for, so the camera can get there first. */
@@ -158,13 +162,29 @@ export const useGameStore = defineStore('game', () => {
   /** Takes a fresh snapshot, reloads the log up to it and streams from there. */
   async function adopt(snapshot: GameState) {
     setState(snapshot)
-    log.value = await api.getJournal({ after: Math.max(0, snapshot.seq - LOG_LENGTH) })
+    log.value = await loadLog(snapshot.seq)
     const choreo = choreography.value
     for (const entry of log.value) choreo.apply(entry)
     for (const team of snapshot.teams.values()) choreo.know(team.id, team.position)
     triggerRef(choreography)
     closeStream?.()
     closeStream = api.subscribe(snapshot.seq, onMessage)
+  }
+
+  /**
+   * The newest `LOG_LENGTH` entries the log keeps, up to `seq`. Task progress fills most of the
+   * journal, so this pages back until it has enough, or reaches the start, or the page limit.
+   */
+  async function loadLog(seq: number): Promise<JournalEntry[]> {
+    let kept: JournalEntry[] = []
+    let to = seq
+    for (let page = 0; page < LOG_MAX_PAGES && to > 0 && kept.length < LOG_LENGTH; page++) {
+      const from = Math.max(0, to - JOURNAL_PAGE)
+      const entries = await api.getJournal({ after: from, limit: to - from })
+      kept = [...entries.filter((e) => e.seq <= to && isLogged(e)), ...kept]
+      to = from
+    }
+    return kept.slice(-LOG_LENGTH)
   }
 
   function setState(snapshot: GameState) {
@@ -185,7 +205,7 @@ export const useGameStore = defineStore('game', () => {
       case 'entry': {
         const last = log.value.at(-1)
         if (last && message.entry.seq <= last.seq) return
-        log.value = [...log.value, message.entry].slice(-LOG_LENGTH)
+        if (isLogged(message.entry)) log.value = [...log.value, message.entry].slice(-LOG_LENGTH)
         choreography.value.apply(message.entry, names.seesItems)
         triggerRef(choreography)
         raiseAlerts(message.entry.events)

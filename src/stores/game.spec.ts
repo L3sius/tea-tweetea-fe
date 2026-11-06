@@ -6,8 +6,20 @@ import type { ApiClient } from '@/api'
 import type { StreamListener } from '@/api/client'
 import { createFixtureClient } from '@/api/fixtures/fixtureClient'
 import type { FeedItem } from '@/domain/activity'
+import type { JournalEntry } from '@/domain/events'
+import { instanceId, teamId, tileId } from '@/domain/ids'
 import { apiClientKey } from './apiClient'
 import { useGameStore } from './game'
+
+/** A started game store on `client`. */
+async function gameOn(client: ApiClient) {
+  const app = createApp({})
+  app.provide(apiClientKey, client)
+  app.use(createPinia())
+  const game = app.runWithContext(() => useGameStore())
+  await game.start()
+  return game
+}
 
 /** The game store on the recorded game, with the stream in the test's hands. */
 async function startedGame() {
@@ -22,11 +34,7 @@ async function startedGame() {
       return () => {}
     },
   }
-  const app = createApp({})
-  app.provide(apiClientKey, client)
-  app.use(createPinia())
-  const game = app.runWithContext(() => useGameStore())
-  await game.start()
+  const game = await gameOn(client)
   getFeed.mockClear()
   return { game, getFeed, send: (message: Parameters<StreamListener>[0]) => send(message) }
 }
@@ -92,5 +100,45 @@ describe('the activity feed', () => {
     send({ kind: 'feed', item: drop('death') })
     await settle()
     expect(getFeed).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('the game log', () => {
+  it('pages back past task progress to the moves it shows, and leaves the progress out', async () => {
+    const fixtures = createFixtureClient()
+    const SEQ = 1200
+    const at = new Date(0)
+    const progress = (seq: number): JournalEntry => ({
+      seq,
+      at,
+      events: [
+        {
+          kind: 'progress',
+          instanceId: instanceId(1),
+          teamId: teamId(0),
+          key: 'Royal Titans',
+          amount: 1,
+          progress: { counts: new Map(), done: 1, target: 315, effort: 1 },
+        },
+      ],
+    })
+    const journal = Array.from({ length: SEQ }, (_, i): JournalEntry =>
+      i + 1 === 100
+        ? { seq: 100, at, events: [{ kind: 'stepped', teamId: teamId(0), tileId: tileId(3) }] }
+        : progress(i + 1),
+    )
+    const getJournal = vi.fn<ApiClient['getJournal']>(async ({ after = 0, limit = 500 } = {}) =>
+      journal.filter((e) => e.seq > after).slice(0, Math.min(limit, 500)),
+    )
+    const client: ApiClient = {
+      ...fixtures,
+      getState: async () => ({ ...(await fixtures.getState()), seq: SEQ }),
+      getJournal,
+      subscribe: () => () => {},
+    }
+    const game = await gameOn(client)
+
+    expect(game.log.map((e) => e.seq)).toEqual([100])
+    expect(getJournal).toHaveBeenCalledTimes(3)
   })
 })
