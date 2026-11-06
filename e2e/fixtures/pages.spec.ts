@@ -151,3 +151,18 @@ test('the log and activity tabs list the recorded game', async ({ page }) => {
   await page.getByRole('button', { name: 'Filter' }).click()
   await expect(page.getByLabel('Player name')).toBeVisible()
 })
+
+test('the activity feed pops out into a window of its own', async ({ page, context }) => {
+  await open(page, '/')
+  await page.getByRole('tab', { name: 'Activity' }).click()
+  const [popup] = await Promise.all([
+    context.waitForEvent('page'),
+    page.getByRole('button', { name: 'Pop out' }).click(),
+  ])
+  await expect(popup).toHaveURL(/\/activity$/)
+  await expect(popup.getByText('Drops and kills')).toBeVisible()
+  await expect(popup.locator('ol time').first()).toBeVisible()
+  // Just the feed: no header, and no offer to pop out again.
+  await expect(popup.getByRole('heading', { level: 1 })).toHaveCount(0)
+  await expect(popup.getByRole('button', { name: 'Pop out' })).toHaveCount(0)
+})

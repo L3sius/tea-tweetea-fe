@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import DinkSetupDialog from '@/components/DinkSetupDialog.vue'
@@ -19,6 +19,8 @@ const frontendUpdated = useFrontendUpdates()
 const tutorial = useTutorialStore()
 const router = useRouter()
 const route = useRoute()
+/** A page that pops out on its own (the Activity feed): no header, tutorial or Dink setup. */
+const bare = computed(() => route.meta.bare === true)
 
 // A first visit opens the tutorial on the board, once the board has loaded. Not for admins:
 // it would take them off the admin page.
@@ -26,7 +28,7 @@ watch(
   () => game.board,
   async (board) => {
     await router.isReady()
-    if (!board || tutorial.seen || tutorial.active || route.meta.admin) return
+    if (!board || tutorial.seen || tutorial.active || route.meta.admin || route.meta.bare) return
     await router.push('/')
     tutorial.start()
   },
@@ -45,7 +47,7 @@ const reload = () => window.location.reload()
 
 <template>
   <div class="flex h-dvh flex-col gap-1.5 overflow-hidden p-1.5">
-    <AppHeader v-tutorial="'header'" />
+    <AppHeader v-if="!bare" v-tutorial="'header'" />
     <div
       v-if="newBuildAvailable || frontendUpdated"
       class="tt-sprite-display z-[1100] flex flex-wrap items-center justify-center gap-3 px-3"
@@ -67,7 +69,9 @@ const reload = () => window.location.reload()
     <main class="relative min-h-0 flex-1">
       <RouterView />
     </main>
-    <TutorialOverlay v-if="tutorial.cover !== 'off'" />
-    <DinkSetupDialog />
+    <template v-if="!bare">
+      <TutorialOverlay v-if="tutorial.cover !== 'off'" />
+      <DinkSetupDialog />
+    </template>
   </div>
 </template>

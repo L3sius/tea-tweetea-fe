@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import filterIcon from '@/assets/tt/img/icons/account-management.png'
 import type { FeedItem } from '@/domain/activity'
 import { mergedDrops, mergedText } from '@/domain/describe'
@@ -15,6 +16,8 @@ const props = defineProps<{
   feed: readonly FeedItem[]
   teams: ReadonlyMap<TeamId, Team>
   now: Date
+  /** Shown in a window of its own, so it doesn't offer to pop out again. */
+  detached?: boolean
 }>()
 
 // While shown, the feed stays live; other views skip refetching it on every drop.
@@ -32,6 +35,14 @@ const toggleRow = (key: string) => {
   if (!canHover) openRow.value = openRow.value === key ? null : key
 }
 const showFilters = ref(false)
+
+// Pop-out is for a second screen or a stream overlay; on touch devices a new window is just a tab.
+const canPopOut = computed(() => !props.detached && canHover)
+const router = useRouter()
+function popOut() {
+  const href = router.resolve({ name: 'activity' }).href
+  window.open(href, 'tweetea-activity', 'popup,width=460,height=860')
+}
 
 const rows = computed(() => feedRows(props.feed, filter, expanded.value))
 const active = computed(() => filter.teamId !== null || filter.rsn !== '')
@@ -93,6 +104,28 @@ function reset() {
         @click="showFilters = !showFilters"
       >
         <img :src="filterIcon" alt="" width="27" height="27" draggable="false" />
+      </button>
+      <button
+        v-if="canPopOut"
+        type="button"
+        class="filter-tab"
+        title="Open in its own window: for a second screen or a stream overlay"
+        aria-label="Pop out"
+        @click="popOut"
+      >
+        <svg class="popout-icon" viewBox="0 0 9 9" aria-hidden="true">
+          <rect x="0" y="2" width="4" height="1" />
+          <rect x="0" y="2" width="1" height="7" />
+          <rect x="0" y="8" width="7" height="1" />
+          <rect x="6" y="5" width="1" height="4" />
+          <rect x="3" y="5" width="1" height="1" />
+          <rect x="4" y="4" width="1" height="1" />
+          <rect x="5" y="3" width="1" height="1" />
+          <rect x="6" y="2" width="1" height="1" />
+          <rect x="7" y="1" width="1" height="1" />
+          <rect x="5" y="0" width="4" height="1" />
+          <rect x="8" y="0" width="1" height="4" />
+        </svg>
       </button>
     </template>
 
@@ -182,6 +215,13 @@ function reset() {
 }
 .filter-tab img {
   image-rendering: pixelated;
+}
+.popout-icon {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+  shape-rendering: crispEdges;
+  filter: drop-shadow(1px 1px 0 #000);
 }
 .filter-tab:hover {
   filter: brightness(1.18);

@@ -13,6 +13,13 @@ const router = createRouter({
     },
     { path: '/items', name: 'items', component: () => import('@/views/ItemsView.vue') },
     { path: '/faq', name: 'faq', component: () => import('@/views/FaqView.vue') },
+    // The Activity feed on its own, for a second screen or a stream overlay: the board's pop-out.
+    {
+      path: '/activity',
+      name: 'activity',
+      component: () => import('@/views/ActivityView.vue'),
+      meta: { bare: true },
+    },
     // Not linked anywhere; the admin code guards it.
     {
       path: '/admin',
