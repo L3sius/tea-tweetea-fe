@@ -20,7 +20,16 @@ export const BURST_LIMIT = 3
 export const BURST_WINDOW_MS = 10 * 60_000
 
 export type FeedRow =
-  | { kind: 'item'; key: string; item: FeedItem; count: number; value: number }
+  | {
+      kind: 'item'
+      key: string
+      /** The newest of the merged items. */
+      item: FeedItem
+      /** Every item merged into the row, newest first; `item` is the first. */
+      items: FeedItem[]
+      count: number
+      value: number
+    }
   | { kind: 'folded'; key: string; rsn: string; teamId: TeamId | null; hidden: FeedItem[] }
 
 export function matchesFilter(item: FeedItem, filter: FeedFilter): boolean {
@@ -53,6 +62,7 @@ export function feedRows(
     const sameKey = `${item.rsn}|${item.kind}|${item.subject}`
     const previous = lastRow.get(sameKey)
     if (previous && previous.item.at.getTime() - item.at.getTime() <= MERGE_WINDOW_MS) {
+      previous.items.push(item)
       previous.count += item.count
       previous.value += item.value
       continue
@@ -86,6 +96,7 @@ export function feedRows(
       kind: 'item' as const,
       key: `item-${item.id}`,
       item,
+      items: [item],
       count: item.count,
       value: item.value,
     }

@@ -30,7 +30,7 @@ describe('feedRows', () => {
       NO_FILTER,
     )
     expect(rows).toHaveLength(1)
-    expect(rows[0]).toMatchObject({ kind: 'item', count: 3 })
+    expect(rows[0]).toMatchObject({ kind: 'item', count: 3, items: { length: 3 } })
   })
 
   it('folds a player’s burst past the limit but keeps other players visible', () => {

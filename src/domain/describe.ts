@@ -378,6 +378,49 @@ export function observationText(observation: Observation): string {
   }
 }
 
+/**
+ * A feed row that merges `count` repeats of one thing (same player, kind and subject), newest
+ * first. One observation's details would read as if it happened `count` times, so loot names the
+ * source instead of a drop and kills give the best time. `note` goes after the count.
+ */
+export function mergedText(
+  observations: readonly Observation[],
+  count: number,
+): { text: string; note: string | null } {
+  const [first] = observations
+  if (!first) return { text: '', note: null }
+  if (count <= 1) return { text: observationText(first), note: null }
+  switch (first.kind) {
+    case 'loot':
+      return { text: `looted ${first.source}`, note: null }
+    case 'clue':
+      return {
+        text: first.tier === 'any' ? 'opened clue caskets' : `opened ${first.tier} clue caskets`,
+        note: null,
+      }
+    case 'kill_count': {
+      const times = observations.flatMap((o) =>
+        o.kind === 'kill_count' && o.seconds !== null ? [o.seconds] : [],
+      )
+      return {
+        text: `killed ${first.boss}`,
+        note: times.length > 0 ? `best ${duration(Math.min(...times))}` : null,
+      }
+    }
+    default:
+      return { text: observationText(first), note: null }
+  }
+}
+
+/** What each loot or casket of a merged row held, one line each, newest first, for its tooltip. */
+export function mergedDrops(observations: readonly Observation[]): string[] {
+  return observations.flatMap((o) =>
+    (o.kind === 'loot' || o.kind === 'clue') && o.items.length > 0
+      ? [o.items.map(dropText).join(', ')]
+      : [],
+  )
+}
+
 const dropText = (drop: Drop) => (drop.quantity > 1 ? `${drop.quantity} × ${drop.name}` : drop.name)
 
 const duration = (seconds: number) =>

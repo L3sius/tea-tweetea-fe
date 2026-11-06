@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { decode } from '@/api/decode'
 import { endpoints } from '@/api/endpoints'
 import recordedItems from '@/api/fixtures/data/items.json'
+import type { Observation } from './activity'
 import type { Challenge } from './challenge'
 import {
   cardLabel,
@@ -10,6 +11,8 @@ import {
   effortText,
   hoursText,
   itemName,
+  mergedDrops,
+  mergedText,
   observationText,
   partProgress,
   teamParts,
@@ -265,6 +268,47 @@ describe('observationText', () => {
     expect(observationText({ kind: 'kill_count', boss: 'Zulrah', seconds: 65 })).toBe(
       'killed Zulrah in 1:05',
     )
+  })
+})
+
+describe('mergedText', () => {
+  const loot = (name: string, quantity = 1): Observation => ({
+    kind: 'loot',
+    source: 'Commander Zilyana',
+    items: [{ name, quantity, priceEach: 1 }],
+  })
+  const kill = (seconds: number | null): Observation => ({
+    kind: 'kill_count',
+    boss: 'Royal Titans',
+    seconds,
+  })
+
+  it('words a single item as before', () => {
+    expect(mergedText([kill(78)], 1)).toEqual({ text: 'killed Royal Titans in 1:18', note: null })
+  })
+
+  it('names the source of merged loot, not one of its drops', () => {
+    expect(mergedText([loot('Grimy ranarr weed'), loot('Coins', 19735)], 2)).toEqual({
+      text: 'looted Commander Zilyana',
+      note: null,
+    })
+    expect(mergedDrops([loot('Grimy ranarr weed'), loot('Coins', 19735)])).toEqual([
+      'Grimy ranarr weed',
+      '19735 × Coins',
+    ])
+  })
+
+  it('gives merged kills their best time', () => {
+    expect(mergedText([kill(78), kill(null), kill(76)], 3)).toEqual({
+      text: 'killed Royal Titans',
+      note: 'best 1:16',
+    })
+    expect(mergedText([kill(null)], 2)).toEqual({ text: 'killed Royal Titans', note: null })
+  })
+
+  it('makes merged caskets plural', () => {
+    const clue: Observation = { kind: 'clue', tier: 'easy', items: [], region: null }
+    expect(mergedText([clue, clue], 2).text).toBe('opened easy clue caskets')
   })
 })
 

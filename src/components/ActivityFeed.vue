@@ -2,8 +2,8 @@
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
 import filterIcon from '@/assets/tt/img/icons/account-management.png'
 import type { FeedItem } from '@/domain/activity'
-import { observationText } from '@/domain/describe'
-import { NO_FILTER, feedRows, type FeedFilter } from '@/domain/feed'
+import { mergedDrops, mergedText } from '@/domain/describe'
+import { NO_FILTER, feedRows, type FeedFilter, type FeedRow } from '@/domain/feed'
 import type { Team } from '@/domain/game'
 import type { TeamId } from '@/domain/ids'
 import { useGameStore } from '@/stores/game'
@@ -43,15 +43,32 @@ const colorOf = (id: TeamId | null) => {
 
 type Part = { text: string; color: string; bold?: boolean }
 
+type ItemRow = Extract<FeedRow, { kind: 'item' }>
+
 /** A row's pieces in order, coloured: who, what, how many and what it was worth. */
-function rowParts(item: FeedItem, count: number, value: number): Part[] {
+function rowParts({ item, items, count, value }: ItemRow): Part[] {
+  const { text, note } = mergedText(
+    items.map((i) => i.observation),
+    count,
+  )
   const parts: Part[] = [
     { text: item.rsn, color: colorOf(item.teamId), bold: true },
-    { text: observationText(item.observation), color: 'white' },
+    { text, color: 'white' },
   ]
   if (count > 1) parts.push({ text: `x${count}`, color: 'muted' })
+  if (note) parts.push({ text: `(${note})`, color: 'muted' })
   if (value > 0) parts.push({ text: `(${formatGp(value)})`, color: stack(value).color })
   return parts
+}
+
+/**
+ * What each drop of a merged row was, for its tooltip. The server may have merged some repeats
+ * already and sends only the newest of those, so the list can be shorter than the count.
+ */
+function rowDrops(row: ItemRow): { lines: string[]; more: boolean } {
+  if (row.count <= 1) return { lines: [], more: false }
+  const lines = mergedDrops(row.items.map((i) => i.observation))
+  return { lines, more: lines.length > 0 && lines.length < row.count }
 }
 
 function expand(rsn: string) {
@@ -113,7 +130,7 @@ function reset() {
           @click="toggleRow(row.key)"
         >
           <p class="min-w-0 flex-1" :class="openRow === row.key ? 'break-words' : 'truncate'">
-            <template v-for="(part, p) in rowParts(row.item, row.count, row.value)" :key="p">
+            <template v-for="(part, p) in rowParts(row)" :key="p">
               {{ p > 0 ? ' ' : ''
               }}<TtText :size="1" :font="part.bold ? 'bold' : undefined" :color="part.color">{{
                 part.text
@@ -124,12 +141,20 @@ function reset() {
             {{ timeFrom(row.item.at, now) }}
           </time>
           <template #tip>
-            <template v-for="(part, p) in rowParts(row.item, row.count, row.value)" :key="p">
+            <template v-for="(part, p) in rowParts(row)" :key="p">
               {{ p > 0 ? ' ' : ''
               }}<TtText :size="1" :font="part.bold ? 'bold' : undefined" :color="part.color">{{
                 part.text
               }}</TtText>
             </template>
+            <ul v-if="rowDrops(row).lines.length > 0" class="drops">
+              <li v-for="(line, d) in rowDrops(row).lines" :key="d">
+                <TtText :size="1" color="white">{{ line }}</TtText>
+              </li>
+              <li v-if="rowDrops(row).more">
+                <TtText :size="1" color="muted">and earlier drops</TtText>
+              </li>
+            </ul>
             <span class="feed-time block">{{ row.item.at.toLocaleString() }}</span>
           </template>
         </TtTooltip>
@@ -164,6 +189,10 @@ function reset() {
 .filter-tab.open,
 .filter-tab.on {
   background: #6b2a1f;
+}
+/* The drops of a merged row, one loot per line. */
+.drops {
+  margin: 3px 0;
 }
 /* When it happened, small at the end of the row: the native 16px step of the pixel font. */
 .feed-time {
