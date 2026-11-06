@@ -1,3 +1,4 @@
+import { normRsn } from './admin'
 import type { TeamId } from './ids'
 import type { ClueTier } from './vocabulary'
 
@@ -55,4 +56,21 @@ export type StatRow = {
   count: number
   /** Total gp value (loot and clues). */
   value: number
+}
+
+/**
+ * Per-account stats looked up the way the server matches names to rosters: the stats group Dink's
+ * exact spelling, so variants of one name ("Zezima", "zezima") add up under one key.
+ */
+export function statsByRsn(rows: readonly StatRow[]): Map<string, StatRow> {
+  const out = new Map<string, StatRow>()
+  for (const r of rows) {
+    const key = normRsn(r.key)
+    const known = out.get(key)
+    out.set(
+      key,
+      known ? { key, count: known.count + r.count, value: known.value + r.value } : { ...r, key },
+    )
+  }
+  return out
 }

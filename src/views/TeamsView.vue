@@ -2,6 +2,8 @@
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted } from 'vue'
 import GemRow from '@/components/GemRow.vue'
+import { statsByRsn } from '@/domain/activity'
+import { normRsn } from '@/domain/admin'
 import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
 import { teamColor } from '@/ui/colors'
@@ -19,16 +21,16 @@ onMounted(() => {
 })
 onUnmounted(stats.close)
 
-const byAccount = computed(() => new Map((stats.tables?.account ?? []).map((r) => [r.key, r])))
+const byAccount = computed(() => statsByRsn(stats.tables?.account ?? []))
 
 const rosters = computed(() =>
   standings.value.map((team) => {
     const members = team.members.map((m) => {
       const accounts = m.accounts.map((rsn) => ({
         rsn,
-        alt: rsn !== m.name,
-        count: byAccount.value.get(rsn)?.count ?? 0,
-        value: byAccount.value.get(rsn)?.value ?? 0,
+        alt: normRsn(rsn) !== normRsn(m.name),
+        count: byAccount.value.get(normRsn(rsn))?.count ?? 0,
+        value: byAccount.value.get(normRsn(rsn))?.value ?? 0,
       }))
       return {
         name: m.name,

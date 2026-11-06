@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import BarList, { type BarRow } from '@/components/BarList.vue'
 import HourChart from '@/components/HourChart.vue'
 import type { ObservationKind, StatRow } from '@/domain/activity'
+import { normRsn } from '@/domain/admin'
 import { teamId } from '@/domain/ids'
 import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
@@ -43,7 +44,8 @@ const teams = computed(() => [...(game.state?.teams.values() ?? [])])
 const teamOfAccount = computed(() => {
   const out = new Map<string, (typeof teams.value)[number]>()
   for (const team of teams.value)
-    for (const member of team.members) for (const rsn of member.accounts) out.set(rsn, team)
+    for (const member of team.members)
+      for (const rsn of member.accounts) out.set(normRsn(rsn), team)
   return out
 })
 
@@ -82,7 +84,7 @@ const byAccount = computed(() =>
     tables.value?.account ?? [],
     (r) => r.key,
     (r) => {
-      const team = teamOfAccount.value.get(r.key)
+      const team = teamOfAccount.value.get(normRsn(r.key))
       return team ? teamColor(team) : undefined
     },
   ).slice(0, 15),
