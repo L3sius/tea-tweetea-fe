@@ -17,6 +17,7 @@ import { count } from '@/ui/format'
 import { TtGemTracker, TtProgressBar, TtText, TtTooltip } from '@/ui/tt'
 import ItemSlot from './ItemSlot.vue'
 import PlayingCard from './PlayingCard.vue'
+import TeamLogo from './TeamLogo.vue'
 
 const props = defineProps<{
   team: Team
@@ -61,6 +62,7 @@ const items = computed(() =>
 
 <template>
   <article class="flex w-full flex-col items-center gap-1.5">
+    <TeamLogo :team="team" />
     <header class="flex flex-wrap items-baseline justify-center gap-x-3">
       <TtText as="h3" :size="2" font="bold" :color="color" class="[overflow-wrap:anywhere]">
         {{ team.name }}
