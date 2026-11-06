@@ -11,6 +11,9 @@ export type WorldMap = {
   yMax: number
 }
 
+/** Where the map view is: its centre in map coordinates, and its zoom. */
+export type CameraView = { lat: number; lng: number; zoom: number }
+
 export const worldMap: WorldMap = {
   imageUrl,
   width: meta.width,

@@ -64,7 +64,14 @@ import type { Item } from '@/domain/vocabulary'
 import jester from '@/assets/cards/jacky-jester.png'
 import { liveCanvas } from '@/map/liveCanvas'
 import { tileTheme } from '@/map/tileTheme'
-import { CRS_ORIGIN, imageBounds, terrainScene, tileCentre, worldMap } from '@/map/world'
+import {
+  CRS_ORIGIN,
+  imageBounds,
+  terrainScene,
+  tileCentre,
+  worldMap,
+  type CameraView,
+} from '@/map/world'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { TtClickMarker } from '@/ui/tt'
 import TileScene, { type TileView } from './TileScene.vue'
@@ -1188,24 +1195,12 @@ onMounted(() => {
   }).addTo(map)
 
   // The map always fills the view: zooming out stops where it just covers it, and panning stops at
-  // its edges, so no background ever shows. Fully zoomed out it centres itself, as "All" does.
+  // its edges, so no background ever shows. Fully zoomed out, the view stays where it is: only
+  // "All" centres it.
   const fillView = () => map.setMinZoom(map.getBoundsZoom(bounds, true))
   fillView()
   map.on('resize', fillView)
   map.setView(bounds.getCenter(), map.getMinZoom())
-  // In free roam, zooming all the way out lands in the overview; a flight to a team never does.
-  // While following a team, zooming out stays on the team: only a drag, "All" or Stop ends
-  // following. Every wheel tick stops a running glide, even at full zoom-out, so the overview
-  // waits until the wheel is quiet, and scrolling out further there brings it back if a tick cut
-  // it short.
-  const atMin = () => map.getZoom() <= map.getMinZoom() + 0.001
-  let overviewTimer: ReturnType<typeof setTimeout> | undefined
-  const overviewSoon = () => {
-    clearTimeout(overviewTimer)
-    if (props.follow) return
-    overviewTimer = setTimeout(() => !props.follow && atMin() && showAll(), OVERVIEW_QUIET_MS)
-  }
-  let zoomedFrom = map.getZoom()
   // Characters grow with the map when zoomed in close (see PIECE_FULL_ZOOM): at the start of an
   // animated zoom, so they grow along with it, and on every other zoom change.
   const scalePieces = (zoom: number) =>
@@ -1213,22 +1208,9 @@ onMounted(() => {
   map.on('zoomanim', (e: ZoomAnimEvent) => scalePieces(e.zoom))
   map.on('zoom', () => scalePieces(map.getZoom()))
   scalePieces(map.getZoom())
-  map.on('zoomstart', () => {
-    zoomedFrom = map.getZoom()
-    zooming = true
-  })
-  map.on('zoomend', () => {
-    zooming = false
-    if (!flying && atMin() && zoomedFrom > map.getZoom()) overviewSoon()
-  })
-  container.value.addEventListener(
-    'wheel',
-    (e) => {
-      stopFlight()
-      if (e.deltaY > 0 && atMin()) overviewSoon()
-    },
-    { passive: true },
-  )
+  map.on('zoomstart', () => (zooming = true))
+  map.on('zoomend', () => (zooming = false))
+  container.value.addEventListener('wheel', stopFlight, { passive: true })
   drawBoard()
   cueLayer.addTo(map)
   // The map fills whatever room it has, as panels come and go.
@@ -1398,9 +1380,6 @@ onBeforeUnmount(() => {
   leaflet = null
 })
 
-/** How long the wheel must rest before zooming out all the way glides to the overview. */
-const OVERVIEW_QUIET_MS = 200
-
 /** How far past the full zoom-out a flight to a tile goes at least, so the piece reads clearly. */
 const LOCATE_ZOOM_IN = 1.5
 
@@ -1467,14 +1446,14 @@ const GESTURE_GAP_MS = 250
 let glideTarget: number | null = null
 let glideFrame = 0
 let restoreGlideSnap = () => {}
-/** The view reached full zoom-out while following: a new gesture outward ends following. */
+/** The view reached full zoom-out while following: a new gesture outward lets go of the team. */
 let followAtMin = false
 let lastWheelOut = 0
 
 /**
  * Zooms by `delta` levels while following: the map glides there frame by frame, always centred on
- * the team's piece. Zooming out from full zoom-out, in a new gesture, shows the whole map and ends
- * following instead, so one fast scroll can not end it by accident.
+ * the team's piece. Zooming out from full zoom-out, in a new gesture, ends following where the view
+ * is, so one fast scroll can not end it by accident.
  */
 function glideZoomBy(delta: number) {
   const map = leaflet
@@ -1488,7 +1467,7 @@ function glideZoomBy(delta: number) {
     if (from <= min + 0.001) {
       if (followAtMin && newGesture) {
         stopGlide()
-        showAll()
+        emit('freeRoam')
       }
       return
     }
@@ -1550,8 +1529,8 @@ function zoomBy(delta: number) {
 }
 
 /**
- * The overview: fully zoomed out and centred, from "All" or from zooming out as far as it goes. It
- * ends following, which would otherwise pull the view off centre again.
+ * The overview: fully zoomed out and centred, from "All". It ends following, which would otherwise
+ * pull the view off centre again.
  */
 function showAll(ms = FLIGHT_MS) {
   const map = leaflet
@@ -1563,7 +1542,26 @@ function showAll(ms = FLIGHT_MS) {
   fly(map, centre, map.getMinZoom(), ms)
 }
 
-defineExpose({ locate, panTo, zoomBy, showAll })
+/** Where the view is now, to come back to later with `restoreView`. */
+function currentView(): CameraView | null {
+  const map = leaflet
+  if (!map) return null
+  const { lat, lng } = map.getCenter()
+  return { lat, lng, zoom: map.getZoom() }
+}
+
+/**
+ * Glides back to a view from `currentView`, at its zoom, in or out. With `tile`, it centres there
+ * instead: the team followed then has moved on since.
+ */
+function restoreView(view: CameraView, tile?: TileId, ms = FLIGHT_MS) {
+  const map = leaflet
+  if (!map) return
+  const at = tile === undefined ? latLng(view.lat, view.lng) : tileLatLng(tile)
+  if (at) fly(map, at, view.zoom, ms)
+}
+
+defineExpose({ locate, panTo, zoomBy, showAll, currentView, restoreView })
 </script>
 
 <template>
@@ -1590,6 +1588,15 @@ defineExpose({ locate, panTo, zoomBy, showAll })
   /* The tutorial fades the map in. */
   transition: opacity 1.8s ease;
   image-rendering: pixelated;
+}
+/*
+ * The fade above replaces Leaflet's zoom transition, so the map jumped to a new zoom while the
+ * roads over it eased there. Both ease together again, as Leaflet's own rule has it.
+ */
+.board-map .leaflet-zoom-anim .pixel-map {
+  transition:
+    opacity 1.8s ease,
+    transform 0.25s cubic-bezier(0, 0, 0.25, 1);
 }
 /*
  * During the tutorial only the task card it points at shows. A card hovered on the page as the tour

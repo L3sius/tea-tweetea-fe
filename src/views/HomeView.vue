@@ -26,6 +26,7 @@ import { useCharacterStore } from '@/stores/characters'
 import { byStanding, useGameStore } from '@/stores/game'
 import { useDevStore } from '@/stores/dev'
 import { useTeamStore } from '@/stores/team'
+import type { CameraView } from '@/map/world'
 import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
 import type { SpotName } from '@/tutorial/script'
@@ -228,9 +229,10 @@ const ACTIONS_TIP = 'The camera visits whatever is happening, then comes back'
 const shot = shallowRef<Shot | null>(null)
 /**
  * The viewer's own camera while an action borrows it: the team followed, or free roam (no team
- * followed). The camera goes back to it once nothing is left to show.
+ * followed), and where the view was and how far zoomed. The camera goes back to it once nothing
+ * is left to show.
  */
-let home: { team: TeamId | null; follow: boolean } | null = null
+let home: { team: TeamId | null; follow: boolean; view: CameraView | null } | null = null
 /** Actions that started before this (server ms) are left alone: the viewer chose to look elsewhere. */
 let ignoreBefore = 0
 
@@ -266,7 +268,10 @@ function dropActions(): boolean {
   return borrowed
 }
 
-/** Back to the viewer's own camera: the team it follows, or the whole map from free roam. */
+/**
+ * Back to the viewer's own camera, at the zoom it had: on the team it follows, wherever that team
+ * is now, or from free roam on the view it left.
+ */
 function goHome() {
   const back = home
   home = null
@@ -276,10 +281,12 @@ function goHome() {
   selected.value = back.team
   if (back.follow && team) {
     follow.value = true
-    boardMap.value?.locate(shownAt(team.id), 0.5)
+    if (back.view) boardMap.value?.restoreView(back.view, shownAt(team.id))
+    else boardMap.value?.locate(shownAt(team.id), 0.5)
   } else {
     follow.value = false
-    boardMap.value?.showAll()
+    if (back.view) boardMap.value?.restoreView(back.view)
+    else boardMap.value?.showAll()
   }
 }
 
@@ -307,7 +314,11 @@ function directCamera() {
   shot.value = next
   if (before && !before.quiet && before.moment.id === next.moment.id) return
   // The first action to borrow the camera remembers where to bring it back to.
-  home ??= { team: selected.value, follow: follow.value }
+  home ??= {
+    team: selected.value,
+    follow: follow.value,
+    view: boardMap.value?.currentView() ?? null,
+  }
   const team = next.moment.teamId
   const fly = !before || before.quiet || team !== before.moment.teamId || !follow.value
   selected.value = team
