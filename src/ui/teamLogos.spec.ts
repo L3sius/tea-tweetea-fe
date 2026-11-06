@@ -8,6 +8,6 @@ describe('teamLogo', () => {
   })
 
   it('gives no logo to a team without one', () => {
-    expect(teamLogo({ name: 'Team Oathless' })).toBeNull()
+    expect(teamLogo({ name: 'Varrock Sewer Rats' })).toBeNull()
   })
 })
