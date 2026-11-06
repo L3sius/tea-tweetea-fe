@@ -10,7 +10,7 @@ const LOGOS: Record<string, string> = {
   'What Team Am I On': 'wtaio.webp',
   'Bground Boys': 'bb.webp',
   'Up The Brugge': 'utb.webp',
-  'Team Oathless': 'to.webp',
+  'Team Oathless': 'to-2.webp',
 }
 
 /** The URL of the team's logo, or `null` for a team without one. */
