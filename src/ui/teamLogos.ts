@@ -4,6 +4,7 @@ import type { Team } from '@/domain/game'
 // by the team's name, not its id: the sample game and the fixtures reuse the live ids for other
 // teams, so an id would put a live team's logo on a stranger.
 const LOGOS: Record<string, string> = {
+  "Gertrude's Lil' Pussy": 'glp.webp',
   "Dhilly's Dirty Diamonds": 'ddd.webp',
   "Eve's Big Gems": 'ebg.webp',
   'What Team Am I On': 'wtaio.webp',
