@@ -6,6 +6,7 @@ import type { Team } from '@/domain/game'
 const LOGOS: Record<string, string> = {
   "Dhilly's Dirty Diamonds": 'ddd.webp',
   "Eve's Big Gems": 'ebg.webp',
+  'What Team Am I On': 'wtaio.webp',
 }
 
 /** The URL of the team's logo, or `null` for a team without one. */
