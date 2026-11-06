@@ -85,6 +85,10 @@ function copyConfig(to) {
     const target = resolve(dirname(link), readFileSync(link, 'utf8').trim())
     cpSync(target, join(to, path.slice('config/sample/'.length)))
   }
+  // tweety serves the item icons from config/icons under its working folder, and won't start
+  // without them.
+  const icons = join(tweety, 'config', 'icons')
+  if (existsSync(icons)) cpSync(icons, join(to, 'icons'), { recursive: true })
 }
 
 let api = null
