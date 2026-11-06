@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useIntervalFn, useMediaQuery, useNow } from '@vueuse/core'
+import { onClickOutside, useElementSize, useIntervalFn, useMediaQuery, useNow } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import ActivityFeed from '@/components/ActivityFeed.vue'
@@ -12,6 +12,7 @@ import MinigameSpin from '@/components/MinigameSpin.vue'
 import ShopPanel from '@/components/ShopPanel.vue'
 import TeamCard from '@/components/TeamCard.vue'
 import TeamControls from '@/components/TeamControls.vue'
+import TeamStripButton from '@/components/TeamStripButton.vue'
 import TutorialStage from '@/components/TutorialStage.vue'
 import UseItemDialog from '@/components/UseItemDialog.vue'
 import DevTools from '@/components/DevTools.vue'
@@ -31,6 +32,7 @@ import { useTutorialStore } from '@/stores/tutorial'
 import { vTutorial } from '@/tutorial/directive'
 import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
+import { wrapRows } from '@/ui/wrapRows'
 import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
 
 const game = useGameStore()
@@ -95,6 +97,32 @@ const short = useMediaQuery('(max-height: 500px)')
 const narrow = useMediaQuery('(max-width: 639px)')
 /** The team strip across the map's top; small maps leave it out and the overview offers teams. */
 const strip = computed(() => !narrow.value && !short.value)
+// The strip takes the map's top left but for room for the Dev button at the top right (8rem). Up
+// to two rows of teams leave the map clear enough; past that they fold under one button. An
+// unseen copy of the strip on one row gives each box's width.
+const mapFrame = useTemplateRef('mapFrame')
+const teamGhost = useTemplateRef('teamGhost')
+const { width: frameWidth } = useElementSize(mapFrame)
+const { width: ghostWidth } = useElementSize(teamGhost)
+const STRIP_SPARE_PX = 128 + 12
+const STRIP_MAX_ROWS = 2
+const STRIP_GAP_PX = 4
+/** The Auto camera box's extra space before it, set apart from the teams. */
+const STRIP_SETTING_GAP_PX = 8
+const stripFits = computed(() => {
+  const room = frameWidth.value - STRIP_SPARE_PX
+  if (ghostWidth.value <= room) return true
+  const boxes = [...(teamGhost.value?.children ?? [])].map((el, i, all) => {
+    const w = el.getBoundingClientRect().width
+    return i === all.length - 1 ? w + STRIP_SETTING_GAP_PX : w
+  })
+  return wrapRows(boxes, room, STRIP_GAP_PX) <= STRIP_MAX_ROWS
+})
+const teamsOpen = ref(false)
+watch(stripFits, () => (teamsOpen.value = false))
+const teamsList = useTemplateRef('teamsList')
+const teamsToggle = useTemplateRef('teamsToggle')
+onClickOutside(teamsList, () => (teamsOpen.value = false), { ignore: [teamsToggle] })
 /** A phone held upright: nothing on the map but its own buttons; the panel under it says the rest. */
 const compact = computed(() => !beside.value && !strip.value)
 const shopOpen = ref(false)
@@ -446,6 +474,7 @@ async function buyMysteryBox() {
   >
     <!-- The map and its overlays, in a stone frame. Stacked, it leaves room for the tabs below. -->
     <div
+      ref="mapFrame"
       class="tt-frame-stone relative box-border min-w-0"
       :class="beside ? 'min-h-0 flex-1' : 'h-[calc(100%-4.25rem)] min-h-64 shrink-0'"
     >
@@ -483,37 +512,57 @@ async function buyMysteryBox() {
       <!-- The tutorial's tour plays inside the map's frame. -->
       <TutorialStage v-if="tutorial.staged" />
 
-      <!-- Teams to follow: names only; the overview shows the rest of the chosen team. -->
-      <ol
+      <!-- Teams to follow: names only; the overview shows the rest of the chosen team. In up to two
+           rows where they fit; where they would cover more of the map, folded under one button
+           that opens them, wrapped, below it. Open, it stays over the overview map. -->
+      <div
         v-if="strip"
         v-tutorial="'teams'"
-        class="pointer-events-none absolute top-1.5 left-1.5 z-[1000] flex max-w-[calc(100%-8rem)] flex-wrap gap-1"
-        aria-label="Teams"
+        class="pointer-events-none absolute top-1.5 left-1.5 flex max-w-[calc(100%-8rem)] flex-wrap items-start gap-1"
+        :class="teamsOpen ? 'z-[1010]' : 'z-[1000]'"
       >
-        <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
-          <button
-            type="button"
-            class="tt-sprite-display tt-press relative px-2 hover:brightness-[1.18]"
-            :class="{ 'tt-pressed': selected === team.id }"
-            :aria-pressed="selected === team.id"
-            :title="`Follow ${team.name}`"
-            @click="showTeam(team.id)"
-          >
-            <TtText :size="1" font="bold" :color="teamColor(team)">{{ team.name }}</TtText>
-            <!-- The followed team: its box's outline in its colour. -->
-            <span
-              v-if="selected === team.id"
-              class="tt-select-ring"
-              :style="{ '--ring-color': teamColor(team) }"
-              aria-hidden="true"
+        <!-- Its items wrap with the Auto camera box, as one row of boxes. -->
+        <ol v-if="stripFits" class="contents" aria-label="Teams">
+          <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
+            <TeamStripButton
+              :team="team"
+              :selected="selected === team.id"
+              @click="showTeam(team.id)"
             />
-          </button>
-        </li>
+          </li>
+        </ol>
+        <button
+          v-else
+          ref="teamsToggle"
+          type="button"
+          class="tt-sprite-display tt-press pointer-events-auto flex max-w-full min-w-0 items-center gap-1.5 px-2 hover:brightness-[1.18]"
+          :class="{ 'tt-pressed': teamsOpen }"
+          :aria-expanded="teamsOpen"
+          :aria-label="
+            followed ? `Following ${followed.name}: pick a team` : `Pick a team to follow`
+          "
+          @click="teamsOpen = !teamsOpen"
+        >
+          <TtText
+            :size="1"
+            font="bold"
+            :color="followed ? teamColor(followed) : 'white'"
+            class="truncate"
+          >
+            {{ followed?.name ?? 'Teams' }}
+          </TtText>
+          <svg class="caret-icon shrink-0" viewBox="0 0 7 4" aria-hidden="true">
+            <rect x="0" y="0" width="7" height="1" />
+            <rect x="1" y="1" width="5" height="1" />
+            <rect x="2" y="2" width="3" height="1" />
+            <rect x="3" y="3" width="1" height="1" />
+          </svg>
+        </button>
         <!-- A setting, not a team: set apart, in plain text, with the game's tick or cross box. -->
-        <TtTooltip as="li" class="pointer-events-auto ml-2">
+        <TtTooltip class="pointer-events-auto ml-2 shrink-0">
           <button
             type="button"
-            class="tt-sprite-display tt-press flex items-center gap-1.5 px-2 hover:brightness-[1.18]"
+            class="tt-sprite-display tt-press flex items-center gap-1.5 px-2 whitespace-nowrap hover:brightness-[1.18]"
             :aria-pressed="followActions"
             @click="followActions = !followActions"
           >
@@ -526,7 +575,37 @@ async function buyMysteryBox() {
           </button>
           <template #tip>{{ ACTIONS_TIP }}</template>
         </TtTooltip>
-      </ol>
+        <ol
+          v-if="!stripFits && teamsOpen"
+          ref="teamsList"
+          class="flex basis-full flex-wrap gap-1"
+          aria-label="Teams"
+        >
+          <li v-for="team in standings" :key="team.id" class="pointer-events-auto">
+            <TeamStripButton
+              :team="team"
+              :selected="selected === team.id"
+              @click="(showTeam(team.id), (teamsOpen = false))"
+            />
+          </li>
+        </ol>
+        <!-- The whole strip on one row, unseen, to tell whether it fits. -->
+        <ol
+          ref="teamGhost"
+          class="invisible absolute top-0 left-0 flex w-max gap-1"
+          aria-hidden="true"
+        >
+          <li v-for="team in standings" :key="team.id">
+            <TeamStripButton :team="team" :selected="false" tabindex="-1" />
+          </li>
+          <li class="ml-2">
+            <span class="tt-sprite-display flex items-center gap-1.5 px-2 whitespace-nowrap">
+              <span class="block size-4" />
+              <TtText :size="1">Auto camera</TtText>
+            </span>
+          </li>
+        </ol>
+      </div>
 
       <!-- Play-testing tools -->
       <div
@@ -895,6 +974,15 @@ async function buyMysteryBox() {
   width: 18px;
   height: 14px;
   fill: currentColor;
+  shape-rendering: crispEdges;
+  filter: drop-shadow(1px 1px 0 #000);
+}
+/* The folded team strip's caret: a small pixel triangle pointing down. */
+.caret-icon {
+  width: 14px;
+  height: 8px;
+  fill: currentColor;
+  color: #fff;
   shape-rendering: crispEdges;
   filter: drop-shadow(1px 1px 0 #000);
 }
