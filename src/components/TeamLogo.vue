@@ -3,8 +3,8 @@ import { computed } from 'vue'
 import type { Team } from '@/domain/game'
 import { teamLogo } from '@/ui/teamLogos'
 
-// A team's logo. Teams send images of any size and shape, so every logo fits the same square box,
-// no wider than its panel. Nothing shows for a team without one.
+// A team's logo. Teams send images of any size and shape, so every logo keeps its shape and fits
+// inside the same 240 px square, no wider than its panel. Nothing shows for a team without one.
 
 const props = defineProps<{ team: Pick<Team, 'name'> }>()
 
@@ -18,10 +18,8 @@ const src = computed(() => teamLogo(props.team))
 <style scoped>
 .team-logo {
   display: block;
-  width: 240px;
-  max-width: 100%;
-  aspect-ratio: 1;
-  object-fit: contain;
+  max-width: min(240px, 100%);
+  max-height: 240px;
   border: 2px solid #000;
   box-shadow: 2px 2px 0 #000;
 }
