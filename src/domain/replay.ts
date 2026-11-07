@@ -12,6 +12,10 @@ export const REPLAY_GAP_MS = 700
 export const LATER_MIN_MS = 5 * 60_000
 /** "Watch from here" pauses longer between entries, so each one can be taken in. */
 export const WATCH_GAP_MS = 2000
+/** "Watch from here" keeps each entry on screen at least this long, even one with nothing to animate. */
+export const WATCH_MIN_ENTRY_MS = 1500
+/** How long a "… later" title card floats over the map, as the entry it introduces plays. */
+export const LATER_CARD_MS = 3000
 /** How long a replay stays up after its pieces settle, counting down, before going back to live. */
 export const RETURN_COUNTDOWN_S = 3
 /** The team an event moves, if it moves one. */
@@ -118,7 +122,7 @@ export function buildReplay(
       const tile = tileBefore(log, entry.seq, team)
       if (tile !== null) choreography.know(team, tile)
     }
-  return play(choreography, teams, entries, startAt, seesItems, REPLAY_GAP_MS)
+  return play(choreography, teams, entries, startAt, seesItems, REPLAY_GAP_MS, 0)
 }
 
 /**
@@ -133,7 +137,8 @@ export function buildReplayFrom(
 ): Replay {
   const choreography = new Choreography()
   for (const [team, tile] of positions) choreography.know(team, tile)
-  return play(choreography, new Set(positions.keys()), entries, startAt, seesItems, WATCH_GAP_MS)
+  const teams = new Set(positions.keys())
+  return play(choreography, teams, entries, startAt, seesItems, WATCH_GAP_MS, WATCH_MIN_ENTRY_MS)
 }
 
 function play(
@@ -142,8 +147,10 @@ function play(
   entries: readonly JournalEntry[],
   startAt: number,
   seesItems: (team: TeamId) => boolean,
-  /** The pause after an entry; a card draw is always followed quickly by the walk it is for. */
+  /** The pause between two entries; a card draw is always followed quickly by its walk. */
   gap: number,
+  /** The shortest time an entry stays on screen before the pause after it. */
+  minEntry: number,
 ): Replay {
   const focus: { at: number; team: TeamId }[] = []
   const steps: Replay['steps'] = []
@@ -152,15 +159,23 @@ function play(
     const team = movesIn(entry)[0] ?? cardTeam(entry)
     if (team !== null) focus.push({ at, team })
     choreography.apply({ ...entry, at: new Date(at) }, seesItems)
-    const done = Math.max(at, choreography.revealAt(entry.seq))
+    const done = Math.max(at + minEntry, choreography.revealAt(entry.seq))
     steps.push({ entry, at, done })
     const next = entries[i + 1]
-    const walkFollows = next !== undefined && team !== null && movesIn(next)[0] === team
+    if (!next) break
+    const walkFollows = team !== null && movesIn(next)[0] === team
     at = done + (cardTeam(entry) === team && walkFollows ? REPLAY_GAP_MS : gap)
   }
-  const settled = Math.max(at, ...[...teams].map((t) => choreography.settlesAt(t)))
+  const last = steps.at(-1)?.done ?? at
+  const settled = Math.max(last, ...[...teams].map((t) => choreography.settlesAt(t)))
   const endsAt = Math.max(settled + RETURN_COUNTDOWN_S * 1000, settled + CUE_MS)
   return { choreography, teams, focus, steps, settledAt: settled, endsAt }
+}
+
+/** The team an entry is about: the one it moves, else the first it names; null for none. */
+export function entryTeam(entry: JournalEntry): TeamId | null {
+  const named = entry.events.find((e) => 'teamId' in e)
+  return movesIn(entry)[0] ?? (named && 'teamId' in named ? named.teamId : null)
 }
 
 const cardTeam = (entry: JournalEntry): TeamId | null => {
@@ -181,9 +196,15 @@ export function timeLater(from: Date, to: Date): string | null {
   return `${unit(hours, 'hour')} ${unit(rest, 'minute')} later`
 }
 
-/** A replayed entry's time of day, with the weekday when it was not today, like "Fri 23:10". */
+/** When a replayed entry happened, in UTC like the event's schedule: "09:34 UTC yesterday". */
 export function replayTime(at: Date, now: Date): string {
-  const time = at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  if (at.toDateString() === now.toDateString()) return time
-  return `${at.toLocaleDateString([], { weekday: 'short' })} ${time}`
+  const time = at.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  })
+  const day = (d: Date) => Math.floor(d.getTime() / 86_400_000)
+  const ago = day(now) - day(at)
+  const when = ago <= 0 ? 'today' : ago === 1 ? 'yesterday' : `${ago} days ago`
+  return `${time} UTC ${when}`
 }

@@ -16,6 +16,7 @@ import {
   buildReplay,
   buildReplayFrom,
   missedMoveEntries,
+  entryTeam,
   timeLater,
   movesIn,
   watchEntries,
@@ -242,11 +243,13 @@ export const useGameStore = defineStore('game', () => {
    * the live state while it plays; null otherwise.
    */
   const replayState = shallowRef<GameState | null>(null)
+  /** The entry a "watch from here" replay is playing: when it happened and the team it is about. */
+  const replayClock = ref<{ at: Date; team: TeamId | null } | null>(null)
   /**
-   * When the entry a "watch from here" replay is on happened, and how long after the entry before
-   * ("2 hours later", only when they were far apart). It moves on as the pause before it starts.
+   * A title card floating over the map between entries far apart, like "2 hours later". `id`
+   * restarts its animation for each new card.
    */
-  const replayClock = ref<{ at: Date; later: string | null } | null>(null)
+  const replayCard = ref<{ id: number; text: string } | null>(null)
   /** How many of a "watch from here" replay's entries have played. */
   const replayProgress = ref<{ done: number; total: number } | null>(null)
   /** Bumped by every stop, so a replay still loading knows it was cancelled. */
@@ -313,14 +316,15 @@ export const useGameStore = defineStore('game', () => {
       const r = buildReplayFrom(positions, entries, startAt, names.seesItems)
       replayState.value = before
       replayProgress.value = { done: 0, total: entries.length }
-      replayClock.value = { at: first.at, later: null }
       const later = show(r, label ?? '')
       for (const [i, step] of r.steps.entries()) {
+        const clock = { at: step.entry.at, team: entryTeam(step.entry) }
+        if (i === 0) replayClock.value = clock
+        else later(step.at, () => (replayClock.value = clock))
+        // Far apart from the entry before: a title card floats up as this one starts.
         const prev = r.steps[i - 1]
-        if (prev) {
-          const clock = { at: step.entry.at, later: timeLater(prev.entry.at, step.entry.at) }
-          later(prev.done, () => (replayClock.value = clock))
-        }
+        const text = prev ? timeLater(prev.entry.at, step.entry.at) : null
+        if (text) later(step.at, () => (replayCard.value = { id: step.entry.seq, text }))
         // Fetched as the entry starts, shown once it has played out.
         let after: Promise<GameState> | null = null
         later(step.at, () => {
@@ -382,6 +386,7 @@ export const useGameStore = defineStore('game', () => {
     replayState.value = null
     replayProgress.value = null
     replayClock.value = null
+    replayCard.value = null
     replayFocus.value = null
     replayCountdown.value = null
   }
@@ -495,6 +500,7 @@ export const useGameStore = defineStore('game', () => {
     replayState,
     replayProgress,
     replayClock,
+    replayCard,
     missedMoves,
     watchMove,
     watchFrom,

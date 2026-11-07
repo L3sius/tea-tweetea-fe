@@ -34,7 +34,7 @@ import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { wrapRows } from '@/ui/wrapRows'
 import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
-import { replayTime } from '@/domain/replay'
+import { LATER_CARD_MS, replayTime } from '@/domain/replay'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -69,6 +69,11 @@ const names = computed(() => (world.value ? tutorial.tourNames : null) ?? game.n
 const standings = computed(() => {
   const shown = world.value?.state ?? replayState.value
   return shown ? [...shown.teams.values()].sort(byStanding) : liveStandings.value
+})
+/** The team the entry a "watch from here" replay is playing is about, as the board shows it then. */
+const clockTeam = computed(() => {
+  const id = game.replayClock?.team
+  return id == null ? null : (state.value?.teams.get(id) ?? null)
 })
 const appearanceOf = (team: TeamId) =>
   world.value
@@ -519,6 +524,18 @@ async function buyMysteryBox() {
         @view="view = $event"
       />
 
+      <!-- Between replayed entries far apart, a title card floats up and fades, like a stage
+           direction: "2 hours later". -->
+      <div
+        v-if="game.replayCard && !world"
+        :key="game.replayCard.id"
+        class="later-card pointer-events-none absolute inset-x-0 top-[30%] z-[1000] flex justify-center"
+        :style="{ animationDuration: `${LATER_CARD_MS}ms` }"
+        aria-live="polite"
+      >
+        <TtText :size="3" font="quill" color="orange" glow>{{ game.replayCard.text }}</TtText>
+      </div>
+
       <!-- The tutorial's tour plays inside the map's frame. -->
       <TutorialStage v-if="tutorial.staged" />
 
@@ -656,23 +673,22 @@ async function buyMysteryBox() {
           class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
           role="status"
         >
-          <template v-if="game.replay">
+          <template v-if="game.replay && game.replayClock">
+            <TtText :size="1" color="orange" class="whitespace-nowrap">Replaying</TtText>
+            <TtText :size="1" color="white" class="whitespace-nowrap">
+              <span v-if="clockTeam" :style="{ color: teamColor(clockTeam) }">{{
+                clockTeam.name
+              }}</span>
+              at {{ replayTime(game.replayClock.at, now) }}
+            </TtText>
+          </template>
+          <template v-else-if="game.replay">
             <TtText :size="1" color="orange" class="whitespace-nowrap">Replay</TtText>
-            <TtText v-if="game.replayLabel" :size="1" color="white" class="whitespace-nowrap">{{
+            <TtText :size="1" color="white" class="whitespace-nowrap">{{
               game.replayLabel
             }}</TtText>
-            <TtText v-if="game.replayClock" :size="1" color="white" class="whitespace-nowrap">
-              {{ replayTime(game.replayClock.at, now) }}
-            </TtText>
-            <TtText
-              v-if="game.replayClock?.later"
-              :size="1"
-              color="orange"
-              class="whitespace-nowrap"
-              aria-live="polite"
-            >
-              · {{ game.replayClock.later }}
-            </TtText>
+          </template>
+          <template v-if="game.replay">
             <TtText
               v-if="game.replayProgress && game.replayCountdown === null"
               :size="1"
@@ -1002,6 +1018,43 @@ async function buyMysteryBox() {
 }
 .map-past {
   filter: sepia(0.45) saturate(0.85) brightness(0.92);
+}
+/* Fades in as it rises, holds, then drifts on up and fades out. */
+.later-card {
+  animation: later-card ease-out forwards;
+}
+@keyframes later-card {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .later-card {
+    animation-name: later-card-still;
+  }
+}
+@keyframes later-card-still {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
 }
 .map-btn {
   min-width: 48px !important;

@@ -6,8 +6,10 @@ import {
   REPLAY_GAP_MS,
   RETURN_COUNTDOWN_S,
   WATCH_GAP_MS,
+  WATCH_MIN_ENTRY_MS,
   buildReplay,
   buildReplayFrom,
+  entryTeam,
   missedMoveEntries,
   replayTime,
   timeLater,
@@ -134,8 +136,10 @@ describe('buildReplayFrom', () => {
     // Blue doesn't move until the last entry, but it is drawn from the past state all along.
     expect(replay.choreography.placement(blue, now)).toEqual({ kind: 'still', tile: 6 })
     expect(replay.steps.map((s) => s.entry.seq)).toEqual([2, 3, 4, 5])
-    for (const step of replay.steps) expect(step.done).toBeGreaterThanOrEqual(step.at)
-    // A card leads straight into its walk; between moves there is a longer pause.
+    for (const step of replay.steps)
+      expect(step.done - step.at).toBeGreaterThanOrEqual(WATCH_MIN_ENTRY_MS)
+    // A card leads straight into its walk; between moves there is a longer pause (the entries
+    // here are a minute apart, too close for a title card).
     const gaps = replay.steps.slice(1).map((s, i) => s.at - (replay.steps[i]?.done ?? 0))
     expect(gaps).toEqual([REPLAY_GAP_MS, WATCH_GAP_MS, REPLAY_GAP_MS])
     expect(replay.choreography.finalTile(blue)).toBe(10)
@@ -158,9 +162,18 @@ describe('timeLater', () => {
 })
 
 describe('replayTime', () => {
-  it('names the weekday only for an earlier day', () => {
-    const at = new Date(2026, 10, 6, 23, 10)
-    expect(replayTime(at, new Date(2026, 10, 6, 23, 30))).not.toMatch(/[A-Za-z]/)
-    expect(replayTime(at, new Date(2026, 10, 7, 9, 0))).toMatch(/^\S+ /)
+  it('reads in UTC, with the day counted back from now', () => {
+    const at = new Date('2026-11-06T23:10:00Z')
+    expect(replayTime(at, new Date('2026-11-06T23:40:00Z'))).toBe('23:10 UTC today')
+    expect(replayTime(at, new Date('2026-11-07T09:00:00Z'))).toBe('23:10 UTC yesterday')
+    expect(replayTime(at, new Date('2026-11-09T01:00:00Z'))).toBe('23:10 UTC 3 days ago')
+  })
+})
+
+describe('entryTeam', () => {
+  it('is the team that moves, or the one the entry names', () => {
+    expect(entryTeam(walk(3, [5, 7], blue))).toBe(blue)
+    expect(entryTeam(card(2, red))).toBe(red)
+    expect(entryTeam(start)).toBeNull()
   })
 })
