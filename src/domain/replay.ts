@@ -8,6 +8,8 @@ import { CUE_MS, Choreography } from './motion'
 
 /** Pause between replayed entries, so one move ends before the next begins. */
 export const REPLAY_GAP_MS = 700
+/** "Watch from here" pauses longer between entries, so each one can be taken in. */
+export const WATCH_GAP_MS = 2000
 /** How long a replay stays up after its pieces settle, counting down, before going back to live. */
 export const RETURN_COUNTDOWN_S = 3
 /** The team an event moves, if it moves one. */
@@ -114,7 +116,7 @@ export function buildReplay(
       const tile = tileBefore(log, entry.seq, team)
       if (tile !== null) choreography.know(team, tile)
     }
-  return play(choreography, teams, entries, startAt, seesItems)
+  return play(choreography, teams, entries, startAt, seesItems, REPLAY_GAP_MS)
 }
 
 /**
@@ -129,7 +131,7 @@ export function buildReplayFrom(
 ): Replay {
   const choreography = new Choreography()
   for (const [team, tile] of positions) choreography.know(team, tile)
-  return play(choreography, new Set(positions.keys()), entries, startAt, seesItems)
+  return play(choreography, new Set(positions.keys()), entries, startAt, seesItems, WATCH_GAP_MS)
 }
 
 function play(
@@ -138,17 +140,21 @@ function play(
   entries: readonly JournalEntry[],
   startAt: number,
   seesItems: (team: TeamId) => boolean,
+  /** The pause after an entry; a card draw is always followed quickly by the walk it is for. */
+  gap: number,
 ): Replay {
   const focus: { at: number; team: TeamId }[] = []
   const steps: Replay['steps'] = []
   let at = startAt
-  for (const entry of entries) {
+  for (const [i, entry] of entries.entries()) {
     const team = movesIn(entry)[0] ?? cardTeam(entry)
     if (team !== null) focus.push({ at, team })
     choreography.apply({ ...entry, at: new Date(at) }, seesItems)
     const done = Math.max(at, choreography.revealAt(entry.seq))
     steps.push({ entry, at, done })
-    at = done + REPLAY_GAP_MS
+    const next = entries[i + 1]
+    const walkFollows = next !== undefined && team !== null && movesIn(next)[0] === team
+    at = done + (cardTeam(entry) === team && walkFollows ? REPLAY_GAP_MS : gap)
   }
   const settled = Math.max(at, ...[...teams].map((t) => choreography.settlesAt(t)))
   const endsAt = Math.max(settled + RETURN_COUNTDOWN_S * 1000, settled + CUE_MS)

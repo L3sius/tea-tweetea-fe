@@ -5,6 +5,7 @@ import { STEP_MS } from './motion'
 import {
   REPLAY_GAP_MS,
   RETURN_COUNTDOWN_S,
+  WATCH_GAP_MS,
   buildReplay,
   buildReplayFrom,
   missedMoveEntries,
@@ -132,9 +133,9 @@ describe('buildReplayFrom', () => {
     expect(replay.choreography.placement(blue, now)).toEqual({ kind: 'still', tile: 6 })
     expect(replay.steps.map((s) => s.entry.seq)).toEqual([2, 3, 4, 5])
     for (const step of replay.steps) expect(step.done).toBeGreaterThanOrEqual(step.at)
-    // Each entry starts a gap after the one before has played out.
+    // A card leads straight into its walk; between moves there is a longer pause.
     const gaps = replay.steps.slice(1).map((s, i) => s.at - (replay.steps[i]?.done ?? 0))
-    expect(gaps).toEqual([REPLAY_GAP_MS, REPLAY_GAP_MS, REPLAY_GAP_MS])
+    expect(gaps).toEqual([REPLAY_GAP_MS, WATCH_GAP_MS, REPLAY_GAP_MS])
     expect(replay.choreography.finalTile(blue)).toBe(10)
     expect(replay.settledAt).toBeGreaterThanOrEqual(replay.steps.at(-1)?.done ?? Infinity)
   })
