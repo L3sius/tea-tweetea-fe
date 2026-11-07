@@ -10,6 +10,12 @@ import { CUE_MS, Choreography } from './motion'
 export const REPLAY_GAP_MS = 700
 /** Entries further apart than this get a "… later" note when a replay moves on to them. */
 export const LATER_MIN_MS = 5 * 60_000
+/** The camera heads to the next entry's team this long after the entry before has played out. */
+export const CAMERA_DELAY_MS = 300
+/** At the latest, the camera heads to an entry's team this long before the entry starts. */
+export const CAMERA_LEAD_MS = 300
+/** How long the camera takes to fly to a team. */
+export const CAMERA_FLY_MS = 500
 /** "Watch from here" pauses longer between entries, so each one can be taken in. */
 export const WATCH_GAP_MS = 2000
 /** "Watch from here" keeps each entry on screen at least this long, even one with nothing to animate. */
@@ -92,10 +98,13 @@ export type Replay = {
   choreography: Choreography
   /** Teams whose pieces the replay draws; the rest stay live. */
   teams: ReadonlySet<TeamId>
-  /** When each replayed entry starts, and the team it is about (for the camera). */
-  focus: { at: number; team: TeamId }[]
-  /** Each replayed entry, oldest first: when it starts and when it has played out. */
-  steps: { entry: JournalEntry; at: number; done: number }[]
+  /** When each replayed entry starts, the team it is about, and when the camera heads there. */
+  focus: { at: number; team: TeamId; camera: number }[]
+  /**
+   * Each replayed entry, oldest first: when the camera heads to it, when it starts and when it has
+   * played out.
+   */
+  steps: { entry: JournalEntry; camera: number; at: number; done: number }[]
   /** When the last replayed piece has settled; the return countdown starts then. */
   settledAt: number
   /** When the countdown is over and the board goes back to live. */
@@ -152,15 +161,21 @@ function play(
   /** The shortest time an entry stays on screen before the pause after it. */
   minEntry: number,
 ): Replay {
-  const focus: { at: number; team: TeamId }[] = []
+  const focus: Replay['focus'] = []
   const steps: Replay['steps'] = []
   let at = startAt
   for (const [i, entry] of entries.entries()) {
     const team = movesIn(entry)[0] ?? cardTeam(entry)
-    if (team !== null) focus.push({ at, team })
+    // Soon after the entry before has played out, so it can land before this one starts.
+    const prevDone = steps.at(-1)?.done
+    const camera =
+      prevDone === undefined
+        ? at - CAMERA_LEAD_MS
+        : Math.min(at - CAMERA_LEAD_MS, prevDone + CAMERA_DELAY_MS)
+    if (team !== null) focus.push({ at, team, camera })
     choreography.apply({ ...entry, at: new Date(at) }, seesItems)
     const done = Math.max(at + minEntry, choreography.revealAt(entry.seq))
-    steps.push({ entry, at, done })
+    steps.push({ entry, camera, at, done })
     const next = entries[i + 1]
     if (!next) break
     const walkFollows = team !== null && movesIn(next)[0] === team

@@ -34,7 +34,7 @@ import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { wrapRows } from '@/ui/wrapRows'
 import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
-import { LATER_CARD_MS, replayTime } from '@/domain/replay'
+import { CAMERA_FLY_MS, LATER_CARD_MS, replayTime } from '@/domain/replay'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -207,7 +207,7 @@ watch(
     if (focus === null) return
     selected.value = focus.team
     follow.value = true
-    if (focus.tile !== null) boardMap.value?.locate(focus.tile, 0.5)
+    if (focus.tile !== null) boardMap.value?.locate(focus.tile, CAMERA_FLY_MS / 1000)
   },
 )
 

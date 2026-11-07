@@ -14,6 +14,7 @@ import { Choreography } from '@/domain/motion'
 import {
   RETURN_COUNTDOWN_S,
   buildReplay,
+  CAMERA_FLY_MS,
   buildReplayFrom,
   missedMoveEntries,
   entryTeam,
@@ -285,7 +286,7 @@ export const useGameStore = defineStore('game', () => {
     const later = (at: number, run: () => void) =>
       replayTimers.push(setTimeout(run, Math.max(0, at - serverNow())))
     for (const f of r.focus)
-      later(f.at - REPLAY_LEAD_MS / 2, () => {
+      later(f.camera, () => {
         const p = r.choreography.placement(f.team, f.at)
         const tile = p === null ? null : p.kind === 'still' ? p.tile : p.from
         replayFocus.value = { team: f.team, tile }
@@ -320,11 +321,12 @@ export const useGameStore = defineStore('game', () => {
       for (const [i, step] of r.steps.entries()) {
         const clock = { at: step.entry.at, team: entryTeam(step.entry) }
         if (i === 0) replayClock.value = clock
-        else later(step.at, () => (replayClock.value = clock))
-        // Far apart from the entry before: a title card floats up as this one starts.
+        else later(step.camera, () => (replayClock.value = clock))
+        // Far apart from the entry before: a title card floats up once the camera has got there.
         const prev = r.steps[i - 1]
         const text = prev ? timeLater(prev.entry.at, step.entry.at) : null
-        if (text) later(step.at, () => (replayCard.value = { id: step.entry.seq, text }))
+        const card = { id: step.entry.seq, text: text ?? '' }
+        if (text) later(step.camera + CAMERA_FLY_MS, () => (replayCard.value = card))
         // Fetched as the entry starts, shown once it has played out.
         let after: Promise<GameState> | null = null
         later(step.at, () => {

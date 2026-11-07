@@ -3,6 +3,8 @@ import type { GameEvent, JournalEntry } from './events'
 import { instanceId, teamId, tileId } from './ids'
 import { STEP_MS } from './motion'
 import {
+  CAMERA_DELAY_MS,
+  CAMERA_LEAD_MS,
   REPLAY_GAP_MS,
   RETURN_COUNTDOWN_S,
   WATCH_GAP_MS,
@@ -142,6 +144,11 @@ describe('buildReplayFrom', () => {
     // here are a minute apart, too close for a title card).
     const gaps = replay.steps.slice(1).map((s, i) => s.at - (replay.steps[i]?.done ?? 0))
     expect(gaps).toEqual([REPLAY_GAP_MS, WATCH_GAP_MS, REPLAY_GAP_MS])
+    // The camera heads to each entry soon after the one before, in time to land first.
+    for (const [i, step] of replay.steps.entries()) {
+      const prevDone = replay.steps[i - 1]?.done ?? step.at - CAMERA_LEAD_MS
+      expect(step.camera).toBe(Math.min(step.at - CAMERA_LEAD_MS, prevDone + CAMERA_DELAY_MS))
+    }
     expect(replay.choreography.finalTile(blue)).toBe(10)
     expect(replay.settledAt).toBeGreaterThanOrEqual(replay.steps.at(-1)?.done ?? Infinity)
   })
