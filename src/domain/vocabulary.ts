@@ -5,6 +5,18 @@
 export const GEMS = ['blue', 'green', 'purple', 'red', 'yellow', 'orange', 'pink', 'white'] as const
 export type Gem = (typeof GEMS)[number]
 
+/** The OSRS gem each server colour stands for, as players see it: its sprite and its name. */
+export const GEM_NAMES: Record<Gem, string> = {
+  blue: 'Sapphire',
+  green: 'Emerald',
+  purple: 'Dragonstone',
+  red: 'Ruby',
+  yellow: 'Onyx',
+  orange: 'Zenyte',
+  pink: 'Red topaz',
+  white: 'Diamond',
+}
+
 export const SUITS = ['clubs', 'diamonds', 'hearts', 'spades'] as const
 export type Suit = (typeof SUITS)[number]
 

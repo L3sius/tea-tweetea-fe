@@ -205,7 +205,7 @@ describe('effortText', () => {
 describe('describeEvent', () => {
   it('names the team involved', () => {
     expect(describeEvent({ kind: 'gem_lost', teamId: red, gem: 'blue' }, names)).toBe(
-      'Red lost the blue gem',
+      'Red lost the Sapphire',
     )
   })
 

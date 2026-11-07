@@ -6,7 +6,7 @@ import type { Blocker, Card, Effect, Instance, Team, TeamProgress } from './game
 import type { ChallengeId, TeamId } from './ids'
 import { itemEntry } from './items'
 import { stuckState } from './stuck'
-import type { Item, Phase, Suit } from './vocabulary'
+import { GEM_NAMES, type Item, type Phase, type Suit } from './vocabulary'
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   clubs: '♣',
@@ -291,9 +291,9 @@ export function describeEvent(event: GameEvent, names: Names): string | null {
         ? `${team(event.teamId)} completed a tile, credited to ${event.by}`
         : `${team(event.teamId)} completed a tile`
     case 'gem_collected':
-      return `${team(event.teamId)} collected the ${event.gem} gem`
+      return `${team(event.teamId)} collected the ${GEM_NAMES[event.gem]}`
     case 'gem_lost':
-      return `${team(event.teamId)} lost the ${event.gem} gem`
+      return `${team(event.teamId)} lost the ${GEM_NAMES[event.gem]}`
     case 'shop_opened':
       return `${team(event.teamId)} entered a shop`
     case 'bought':

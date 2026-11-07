@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { Board } from '@/domain/board'
 import type { GameState } from '@/domain/game'
 import type { TeamId, TileId } from '@/domain/ids'
+import { GEM_NAMES } from '@/domain/vocabulary'
 import { worldMap } from '@/map/world'
 import { GEM_COLORS, teamColor } from '@/ui/colors'
 
@@ -99,7 +100,7 @@ function onClick(e: MouseEvent) {
       :key="g.gem"
       class="pointer-events-none absolute size-2 -translate-1/2 border border-black"
       :style="{ left: `${g.left}%`, top: `${g.top}%`, background: GEM_COLORS[g.gem] }"
-      :title="`${g.gem} gem`"
+      :title="GEM_NAMES[g.gem]"
     />
     <button
       v-for="team in teams"

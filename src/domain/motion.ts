@@ -16,7 +16,7 @@ import {
   type SoundName,
 } from './sounds'
 import { holdsTeams, stuckCallout, stuckCause, type StuckCause } from './stuck'
-import type { Item } from './vocabulary'
+import { GEM_NAMES, type Item } from './vocabulary'
 import { moment, momentOf, type Moment } from './director'
 
 /** Time per tile on a walk: slow enough to watch the characters' walk and run animations. */
@@ -341,9 +341,9 @@ function cueFor(
 ): { team: TeamId; text: string; tone: CueTone } | null {
   switch (event.kind) {
     case 'gem_collected':
-      return { team: event.teamId, text: `${capital(event.gem)} gem!`, tone: 'gem' }
+      return { team: event.teamId, text: `${GEM_NAMES[event.gem]}!`, tone: 'gem' }
     case 'gem_lost':
-      return { team: event.teamId, text: `Lost the ${event.gem} gem`, tone: 'bad' }
+      return { team: event.teamId, text: `Lost the ${GEM_NAMES[event.gem]}`, tone: 'bad' }
     case 'gold_changed':
       return {
         team: event.teamId,
@@ -403,5 +403,3 @@ function cueFor(
       return null
   }
 }
-
-const capital = (word: string) => word.charAt(0).toUpperCase() + word.slice(1)

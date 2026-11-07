@@ -131,7 +131,7 @@ describe('Choreography', () => {
     c.apply(entry(2, T0, [{ kind: 'gem_collected', teamId: red, gem: 'blue', tileId: tileId(11) }]))
     expect(c.activeCues(T0)).toHaveLength(0)
     expect(c.activeCues(T0 + STEP_MS)).toEqual([
-      expect.objectContaining({ text: 'Blue gem!', tone: 'gem' }),
+      expect.objectContaining({ text: 'Sapphire!', tone: 'gem' }),
     ])
   })
 

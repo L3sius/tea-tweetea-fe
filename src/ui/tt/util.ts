@@ -1,5 +1,5 @@
 // Shared constants for the Tt components, copied from tweetea-design-system/src/util.mjs.
-import type { Gem } from '@/domain/vocabulary'
+export { GEM_NAMES } from '@/domain/vocabulary'
 
 export const px = (v: number | string | undefined) => (typeof v === 'number' ? `${v}px` : v)
 
@@ -19,18 +19,6 @@ export const FONTS: Record<string, string> = {
   plain: 'var(--font-plain)',
   bold: 'var(--font-bold)',
   quill: 'var(--font-quill)',
-}
-
-/** Server gem colour -> the OSRS gem its sprite shows. */
-export const GEM_NAMES: Record<Gem, string> = {
-  blue: 'Sapphire',
-  green: 'Emerald',
-  purple: 'Dragonstone',
-  red: 'Ruby',
-  yellow: 'Onyx',
-  orange: 'Zenyte',
-  pink: 'Red topaz',
-  white: 'Diamond',
 }
 
 /** Display size of each icon sprite at the 3px art pixel. */

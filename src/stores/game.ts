@@ -23,6 +23,7 @@ import {
   watchEntries,
   type Replay,
 } from '@/domain/replay'
+import { GEM_NAMES } from '@/domain/vocabulary'
 import { useApiClient } from './apiClient'
 
 /** Journal entries kept for the game log; also how far back a reload looks for walks to resume. */
@@ -565,8 +566,8 @@ function alertFor(
       return {
         team: event.teamId,
         alert: {
-          title: `${names.team(event.teamId)} has the ${event.gem} gem`,
-          text: `${names.team(event.teamId)} collected its ${event.gem} gem.`,
+          title: `${names.team(event.teamId)} has the ${GEM_NAMES[event.gem]}`,
+          text: `${names.team(event.teamId)} collected the ${GEM_NAMES[event.gem]}.`,
           tone: 'gem',
         },
       }
