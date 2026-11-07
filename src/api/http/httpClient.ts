@@ -55,9 +55,11 @@ export function createHttpClient({
     getChallenges: () => send(endpoints.challenges),
     getItems: () => send(endpoints.items),
     getRules: () => send(endpoints.rules),
-    getState: () => send(endpoints.state, { cache: 'no-store' }),
+    getState: (at) => send(endpoints.state, { cache: 'no-store', query: { seq: at } }),
     getJournal: (page = {}) =>
-      send(endpoints.journal, { query: { after: page.after, limit: page.limit } }),
+      send(endpoints.journal, {
+        query: { after: page.after, limit: page.limit, logged: page.logged ? 'true' : undefined },
+      }),
     getFeed: (query = {}) =>
       send(endpoints.feed, {
         query: {

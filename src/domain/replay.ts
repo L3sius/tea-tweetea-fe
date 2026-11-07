@@ -1,17 +1,29 @@
-// Replays of past moves, from the journal alone: a fresh Choreography fed old entries at new times.
-// A move is self-contained in the journal (where it starts, every step, how it ends), so the moving
-// team plays it exactly; teams that aren't replayed stay where they are now.
+// Replays of past moves: a fresh Choreography fed old entries at new times. A move is
+// self-contained in the journal (where it starts, every step, how it ends), so the moving team
+// plays it exactly. A single move leaves the other teams where they are now; "watch from here"
+// starts every team from a past state and plays everything since, one entry after another.
 import type { GameEvent, JournalEntry } from './events'
 import type { TeamId, TileId } from './ids'
 import { CUE_MS, Choreography } from './motion'
 
 /** Pause between replayed entries, so one move ends before the next begins. */
 export const REPLAY_GAP_MS = 700
+/** Entries further apart than this get a "… later" note when a replay moves on to them. */
+export const LATER_MIN_MS = 5 * 60_000
+/** The camera heads to the next entry's team this long after the entry before has played out. */
+export const CAMERA_DELAY_MS = 300
+/** At the latest, the camera heads to an entry's team this long before the entry starts. */
+export const CAMERA_LEAD_MS = 300
+/** How long the camera takes to fly to a team. */
+export const CAMERA_FLY_MS = 500
+/** "Watch from here" pauses longer between entries, so each one can be taken in. */
+export const WATCH_GAP_MS = 2000
+/** "Watch from here" keeps each entry on screen at least this long, even one with nothing to animate. */
+export const WATCH_MIN_ENTRY_MS = 1500
+/** How long a "… later" title card floats over the map, as the entry it introduces plays. */
+export const LATER_CARD_MS = 3000
 /** How long a replay stays up after its pieces settle, counting down, before going back to live. */
 export const RETURN_COUNTDOWN_S = 3
-/** Most moves a catch-up plays; older ones are left out. */
-export const CATCH_UP_MOVES = 12
-
 /** The team an event moves, if it moves one. */
 function movedTeam(event: GameEvent): TeamId | null {
   switch (event.kind) {
@@ -82,27 +94,17 @@ export function watchEntries(log: readonly JournalEntry[], seq: number): Journal
 export const missedMoveEntries = (log: readonly JournalEntry[], after: number, upTo: number) =>
   log.filter((e) => e.seq > after && e.seq <= upTo && movesIn(e).length > 0)
 
-/**
- * The latest moves missed between a last visit (`after`) and loading the page (`upTo`), each with
- * the card drawn for it. Moves after `upTo` were watched live, so they are not offered again.
- */
-export function catchUpEntries(
-  log: readonly JournalEntry[],
-  after: number,
-  upTo = Infinity,
-): JournalEntry[] {
-  const moves = missedMoveEntries(log, after, upTo).slice(-CATCH_UP_MOVES)
-  const picked = new Map<number, JournalEntry>()
-  for (const move of moves) for (const e of watchEntries(log, move.seq)) picked.set(e.seq, e)
-  return [...picked.values()].sort((a, b) => a.seq - b.seq)
-}
-
 export type Replay = {
   choreography: Choreography
   /** Teams whose pieces the replay draws; the rest stay live. */
   teams: ReadonlySet<TeamId>
-  /** When each replayed entry starts, and the team it is about (for the camera). */
-  focus: { at: number; team: TeamId }[]
+  /** When each replayed entry starts, the team it is about, and when the camera heads there. */
+  focus: { at: number; team: TeamId; camera: number }[]
+  /**
+   * Each replayed entry, oldest first: when the camera heads to it, when it starts and when it has
+   * played out.
+   */
+  steps: { entry: JournalEntry; camera: number; at: number; done: number }[]
   /** When the last replayed piece has settled; the return countdown starts then. */
   settledAt: number
   /** When the countdown is over and the board goes back to live. */
@@ -129,20 +131,96 @@ export function buildReplay(
       const tile = tileBefore(log, entry.seq, team)
       if (tile !== null) choreography.know(team, tile)
     }
-  const focus: { at: number; team: TeamId }[] = []
+  return play(choreography, teams, entries, startAt, seesItems, REPLAY_GAP_MS, 0)
+}
+
+/**
+ * Plays `entries` one after another from `startAt`, with every team in `positions` drawn from the
+ * replay, starting on its tile there: the board as it was just before the first entry.
+ */
+export function buildReplayFrom(
+  positions: ReadonlyMap<TeamId, TileId>,
+  entries: readonly JournalEntry[],
+  startAt: number,
+  seesItems: (team: TeamId) => boolean = () => true,
+): Replay {
+  const choreography = new Choreography()
+  for (const [team, tile] of positions) choreography.know(team, tile)
+  const teams = new Set(positions.keys())
+  return play(choreography, teams, entries, startAt, seesItems, WATCH_GAP_MS, WATCH_MIN_ENTRY_MS)
+}
+
+function play(
+  choreography: Choreography,
+  teams: Set<TeamId>,
+  entries: readonly JournalEntry[],
+  startAt: number,
+  seesItems: (team: TeamId) => boolean,
+  /** The pause between two entries; a card draw is always followed quickly by its walk. */
+  gap: number,
+  /** The shortest time an entry stays on screen before the pause after it. */
+  minEntry: number,
+): Replay {
+  const focus: Replay['focus'] = []
+  const steps: Replay['steps'] = []
   let at = startAt
-  for (const entry of entries) {
-    const team = movesIn(entry)[0] ?? cardTeam(entry)
-    if (team !== null) focus.push({ at, team })
+  for (const [i, entry] of entries.entries()) {
+    // The camera goes to the team the entry is about, as the replay bar names it, moving or not.
+    const team = entryTeam(entry)
+    // Soon after the entry before has played out, so it can land before this one starts.
+    const prevDone = steps.at(-1)?.done
+    const camera =
+      prevDone === undefined
+        ? at - CAMERA_LEAD_MS
+        : Math.min(at - CAMERA_LEAD_MS, prevDone + CAMERA_DELAY_MS)
+    if (team !== null) focus.push({ at, team, camera })
     choreography.apply({ ...entry, at: new Date(at) }, seesItems)
-    at = Math.max(at, choreography.revealAt(entry.seq)) + REPLAY_GAP_MS
+    const done = Math.max(at + minEntry, choreography.revealAt(entry.seq))
+    steps.push({ entry, camera, at, done })
+    const next = entries[i + 1]
+    if (!next) break
+    const walkFollows = team !== null && movesIn(next)[0] === team
+    at = done + (cardTeam(entry) === team && walkFollows ? REPLAY_GAP_MS : gap)
   }
-  const settled = Math.max(at, ...[...teams].map((t) => choreography.settlesAt(t)))
+  const last = steps.at(-1)?.done ?? at
+  const settled = Math.max(last, ...[...teams].map((t) => choreography.settlesAt(t)))
   const endsAt = Math.max(settled + RETURN_COUNTDOWN_S * 1000, settled + CUE_MS)
-  return { choreography, teams, focus, settledAt: settled, endsAt }
+  return { choreography, teams, focus, steps, settledAt: settled, endsAt }
+}
+
+/** The team an entry is about: the one it moves, else the first it names; null for none. */
+export function entryTeam(entry: JournalEntry): TeamId | null {
+  const named = entry.events.find((e) => 'teamId' in e)
+  return movesIn(entry)[0] ?? (named && 'teamId' in named ? named.teamId : null)
 }
 
 const cardTeam = (entry: JournalEntry): TeamId | null => {
   const card = entry.events.find((e) => e.kind === 'card_drawn')
   return card && 'teamId' in card ? card.teamId : null
+}
+
+/** How long after `from` the entry at `to` happened, like "2 hours 10 minutes later"; null if soon after. */
+export function timeLater(from: Date, to: Date): string | null {
+  const ms = to.getTime() - from.getTime()
+  if (ms < LATER_MIN_MS) return null
+  const minutes = Math.round(ms / 60_000)
+  const unit = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
+  if (minutes < 60) return `${unit(minutes, 'minute')} later`
+  const hours = Math.floor(minutes / 60)
+  const rest = Math.round((minutes % 60) / 5) * 5
+  if (rest === 0 || rest === 60) return `${unit(rest === 60 ? hours + 1 : hours, 'hour')} later`
+  return `${unit(hours, 'hour')} ${unit(rest, 'minute')} later`
+}
+
+/** When a replayed entry happened, in UTC like the event's schedule: "09:34 UTC yesterday". */
+export function replayTime(at: Date, now: Date): string {
+  const time = at.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  })
+  const day = (d: Date) => Math.floor(d.getTime() / 86_400_000)
+  const ago = day(now) - day(at)
+  const when = ago <= 0 ? 'today' : ago === 1 ? 'yesterday' : `${ago} days ago`
+  return `${time} UTC ${when}`
 }

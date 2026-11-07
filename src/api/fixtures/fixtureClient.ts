@@ -1,4 +1,5 @@
 import type { StatsGroup } from '@/domain/activity'
+import { isLogged } from '@/domain/events'
 import { teamId } from '@/domain/ids'
 import type { Me, Overview } from '@/domain/server'
 import type { ApiClient } from '../client'
@@ -87,11 +88,11 @@ export function createFixtureClient({ delayMs = 0 }: FixtureClientOptions = {}):
 
     getState,
 
-    async getJournal({ after = 0, limit = JOURNAL_PAGE_LIMIT } = {}) {
+    async getJournal({ after = 0, limit = JOURNAL_PAGE_LIMIT, logged = false } = {}) {
       const { schema, map } = endpoints.journal
       const entries = decode('fixture:events', schema, map, await load('events'))
       return entries
-        .filter((entry) => entry.seq > after)
+        .filter((entry) => entry.seq > after && (!logged || isLogged(entry)))
         .slice(0, Math.min(limit, JOURNAL_PAGE_LIMIT))
     },
 

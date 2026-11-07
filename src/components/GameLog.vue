@@ -9,7 +9,8 @@ import { timeFrom } from '@/ui/format'
 import { TtPanel, TtText } from '@/ui/tt'
 
 // What happened, newest first: one block per journal entry (everything that happened together),
-// its lines left-aligned with team names in their colours, and a Watch link on moves.
+// its lines left-aligned with team names in their colours, a Watch link on moves, and a From here
+// link that replays everything since.
 
 const props = defineProps<{
   log: readonly JournalEntry[]
@@ -19,7 +20,12 @@ const props = defineProps<{
   /** Hides entries until their animations have played, so the log never spoils a walk. */
   revealed?: (entry: JournalEntry) => boolean
 }>()
-const emit = defineEmits<{ watch: [seq: number] }>()
+const emit = defineEmits<{
+  /** Replay this move. */
+  watch: [seq: number]
+  /** Replay everything from this entry up to now. */
+  watchFrom: [seq: number]
+}>()
 
 const MAX_ENTRIES = 40
 
@@ -66,15 +72,25 @@ const colorOf = (id: TeamId | null) => {
           >
             {{ timeFrom(block.at, now) }}
           </time>
-          <button
-            v-if="block.watch"
-            type="button"
-            class="tt-link tt-1 shrink-0"
-            title="Watch this move again on the map"
-            @click="emit('watch', block.seq)"
-          >
-            Watch
-          </button>
+          <span class="flex shrink-0 gap-3">
+            <button
+              v-if="block.watch"
+              type="button"
+              class="tt-link tt-1"
+              title="Watch this move again on the map"
+              @click="emit('watch', block.seq)"
+            >
+              Watch
+            </button>
+            <button
+              type="button"
+              class="tt-link tt-1"
+              title="Watch everything that has happened since this on the map"
+              @click="emit('watchFrom', block.seq)"
+            >
+              From here
+            </button>
+          </span>
         </div>
         <p v-for="(line, j) in block.lines" :key="j" class="tt-1 log-line">
           <span

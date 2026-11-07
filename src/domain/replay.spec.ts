@@ -3,12 +3,18 @@ import type { GameEvent, JournalEntry } from './events'
 import { instanceId, teamId, tileId } from './ids'
 import { STEP_MS } from './motion'
 import {
-  CATCH_UP_MOVES,
+  CAMERA_DELAY_MS,
+  CAMERA_LEAD_MS,
   REPLAY_GAP_MS,
   RETURN_COUNTDOWN_S,
+  WATCH_GAP_MS,
+  WATCH_MIN_ENTRY_MS,
   buildReplay,
-  catchUpEntries,
-  movesIn,
+  buildReplayFrom,
+  entryTeam,
+  missedMoveEntries,
+  replayTime,
+  timeLater,
   tileBefore,
   watchEntries,
 } from './replay'
@@ -84,23 +90,12 @@ describe('watchEntries', () => {
   })
 })
 
-describe('catchUpEntries', () => {
-  it('plays the moves after the last visit, with their cards, oldest first', () => {
+describe('missedMoveEntries', () => {
+  it('counts the moves after the last visit, up to loading the page', () => {
     const log = [start, card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10, 11], blue)]
-    expect(catchUpEntries(log, 3).map((e) => e.seq)).toEqual([4, 5])
-    expect(catchUpEntries(log, 0).map((e) => e.seq)).toEqual([2, 3, 4, 5])
-  })
-
-  it('leaves out moves made after the page loaded, which were watched live', () => {
-    const log = [start, card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10, 11], blue)]
-    expect(catchUpEntries(log, 1, 3).map((e) => e.seq)).toEqual([2, 3])
-    expect(catchUpEntries(log, 3, 3)).toEqual([])
-  })
-
-  it(`keeps only the last ${CATCH_UP_MOVES} moves`, () => {
-    const log = [start]
-    for (let i = 0; i < 30; i++) log.push(walk(2 + i, [5, 7]))
-    expect(catchUpEntries(log, 0).filter((e) => movesIn(e).length)).toHaveLength(CATCH_UP_MOVES)
+    expect(missedMoveEntries(log, 0, 5).map((e) => e.seq)).toEqual([3, 5])
+    expect(missedMoveEntries(log, 1, 3).map((e) => e.seq)).toEqual([3])
+    expect(missedMoveEntries(log, 3, 3)).toEqual([])
   })
 })
 
@@ -127,5 +122,77 @@ describe('buildReplay', () => {
     expect(replay.endsAt - replay.settledAt).toBe(RETURN_COUNTDOWN_S * 1000)
     expect(replay.choreography.finalTile(red)).toBe(8)
     expect(replay.choreography.finalTile(blue)).toBe(10)
+  })
+})
+
+describe('buildReplayFrom', () => {
+  it('starts every team from the past state and steps through each entry in turn', () => {
+    const positions = new Map([
+      [red, tileId(5)],
+      [blue, tileId(6)],
+    ])
+    const entries = [card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10], blue)]
+    const now = T0 + 10_000_000
+    const replay = buildReplayFrom(positions, entries, now)
+    expect([...replay.teams]).toEqual([red, blue])
+    // Blue doesn't move until the last entry, but it is drawn from the past state all along.
+    expect(replay.choreography.placement(blue, now)).toEqual({ kind: 'still', tile: 6 })
+    expect(replay.steps.map((s) => s.entry.seq)).toEqual([2, 3, 4, 5])
+    for (const step of replay.steps)
+      expect(step.done - step.at).toBeGreaterThanOrEqual(WATCH_MIN_ENTRY_MS)
+    // A card leads straight into its walk; between moves there is a longer pause (the entries
+    // here are a minute apart, too close for a title card).
+    const gaps = replay.steps.slice(1).map((s, i) => s.at - (replay.steps[i]?.done ?? 0))
+    expect(gaps).toEqual([REPLAY_GAP_MS, WATCH_GAP_MS, REPLAY_GAP_MS])
+    // The camera heads to each entry soon after the one before, in time to land first.
+    for (const [i, step] of replay.steps.entries()) {
+      const prevDone = replay.steps[i - 1]?.done ?? step.at - CAMERA_LEAD_MS
+      expect(step.camera).toBe(Math.min(step.at - CAMERA_LEAD_MS, prevDone + CAMERA_DELAY_MS))
+    }
+    expect(replay.choreography.finalTile(blue)).toBe(10)
+    expect(replay.settledAt).toBeGreaterThanOrEqual(replay.steps.at(-1)?.done ?? Infinity)
+  })
+})
+
+describe('timeLater', () => {
+  const at = (minutes: number) => new Date(T0 + minutes * 60_000)
+  it('says nothing for entries a few minutes apart', () => {
+    expect(timeLater(at(0), at(4))).toBeNull()
+  })
+
+  it('reads in minutes, then hours rounded to five minutes', () => {
+    expect(timeLater(at(0), at(25))).toBe('25 minutes later')
+    expect(timeLater(at(0), at(60))).toBe('1 hour later')
+    expect(timeLater(at(0), at(131))).toBe('2 hours 10 minutes later')
+    expect(timeLater(at(0), at(179))).toBe('3 hours later')
+  })
+})
+
+describe('replayTime', () => {
+  it('reads in UTC, with the day counted back from now', () => {
+    const at = new Date('2026-11-06T23:10:00Z')
+    expect(replayTime(at, new Date('2026-11-06T23:40:00Z'))).toBe('23:10 UTC today')
+    expect(replayTime(at, new Date('2026-11-07T09:00:00Z'))).toBe('23:10 UTC yesterday')
+    expect(replayTime(at, new Date('2026-11-09T01:00:00Z'))).toBe('23:10 UTC 3 days ago')
+  })
+})
+
+describe('replay camera', () => {
+  it('goes to a team whose entry moves nothing, like a completed tile', () => {
+    const done = entry(4, [{ kind: 'tile_completed', teamId: blue, tileId: tileId(6), by: null }])
+    const positions = new Map([
+      [red, tileId(5)],
+      [blue, tileId(6)],
+    ])
+    const replay = buildReplayFrom(positions, [walk(3, [5, 7]), done], T0 + 10_000_000)
+    expect(replay.focus.map((f) => f.team)).toEqual([red, blue])
+  })
+})
+
+describe('entryTeam', () => {
+  it('is the team that moves, or the one the entry names', () => {
+    expect(entryTeam(walk(3, [5, 7], blue))).toBe(blue)
+    expect(entryTeam(card(2, red))).toBe(red)
+    expect(entryTeam(start)).toBeNull()
   })
 })

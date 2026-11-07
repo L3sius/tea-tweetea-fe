@@ -34,6 +34,7 @@ import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { wrapRows } from '@/ui/wrapRows'
 import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
+import { CAMERA_FLY_MS, LATER_CARD_MS, replayTime } from '@/domain/replay'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -50,20 +51,30 @@ const {
   standings: liveStandings,
   alerts,
   choreography: liveChoreography,
+  replayState,
 } = storeToRefs(game)
 
 // The tutorial plays on its own frozen world (tutorial/world) with Earl Grey as a team in it
 // (tutorial/pretend), so the tour looks the same whatever the live game does; the live game comes
-// back when it ends.
+// back when it ends. A "watch from here" replay shows the board as it was at the point it has
+// reached, until it goes back to live.
 const world = computed(() => (tutorial.staged ? tutorial.world : null))
 const board = computed(() => world.value?.board ?? liveBoard.value)
-const state = computed(() => (world.value ? tutorial.tourState : null) ?? liveState.value)
+const state = computed(
+  () => (world.value ? tutorial.tourState : null) ?? replayState.value ?? liveState.value,
+)
 const challenges = computed(() => world.value?.challenges ?? liveChallenges.value)
 const choreography = computed(() => world.value?.choreography ?? liveChoreography.value)
 const names = computed(() => (world.value ? tutorial.tourNames : null) ?? game.names)
-const standings = computed(() =>
-  world.value ? [...world.value.state.teams.values()].sort(byStanding) : liveStandings.value,
-)
+const standings = computed(() => {
+  const shown = world.value?.state ?? replayState.value
+  return shown ? [...shown.teams.values()].sort(byStanding) : liveStandings.value
+})
+/** The team the entry a "watch from here" replay is playing is about, as the board shows it then. */
+const clockTeam = computed(() => {
+  const id = game.replayClock?.team
+  return id == null ? null : (state.value?.teams.get(id) ?? null)
+})
 const appearanceOf = (team: TeamId) =>
   world.value
     ? (world.value.state.teams.get(team)?.appearance ?? null)
@@ -196,7 +207,7 @@ watch(
     if (focus === null) return
     selected.value = focus.team
     follow.value = true
-    if (focus.tile !== null) boardMap.value?.locate(focus.tile, 0.5)
+    if (focus.tile !== null) boardMap.value?.locate(focus.tile, CAMERA_FLY_MS / 1000)
   },
 )
 
@@ -482,6 +493,8 @@ async function buyMysteryBox() {
     >
       <BoardMap
         ref="boardMap"
+        class="map-tint"
+        :class="{ 'map-past': game.replay && !world }"
         :board="board"
         :state="state"
         :challenges="challenges"
@@ -510,6 +523,18 @@ async function buyMysteryBox() {
         @free-roam="freeRoam"
         @view="view = $event"
       />
+
+      <!-- Between replayed entries far apart, a title card floats up and fades, like a stage
+           direction: "2 hours later". -->
+      <div
+        v-if="game.replayCard && !world"
+        :key="game.replayCard.id"
+        class="later-card pointer-events-none absolute inset-x-0 top-[30%] z-[1000] flex justify-center"
+        :style="{ animationDuration: `${LATER_CARD_MS}ms` }"
+        aria-live="polite"
+      >
+        <TtText :size="3" font="quill" color="orange" glow>{{ game.replayCard.text }}</TtText>
+      </div>
 
       <!-- The tutorial's tour plays inside the map's frame. -->
       <TutorialStage v-if="tutorial.staged" />
@@ -648,11 +673,30 @@ async function buyMysteryBox() {
           class="tt-sprite-display flex items-center gap-2 py-0 pr-0 pl-1"
           role="status"
         >
-          <template v-if="game.replay">
+          <template v-if="game.replay && game.replayClock">
+            <TtText :size="1" color="orange" class="whitespace-nowrap">Replaying</TtText>
+            <TtText :size="1" color="white" class="whitespace-nowrap">
+              <span v-if="clockTeam" :style="{ color: teamColor(clockTeam) }">{{
+                clockTeam.name
+              }}</span>
+              at {{ replayTime(game.replayClock.at, now) }}
+            </TtText>
+          </template>
+          <template v-else-if="game.replay">
             <TtText :size="1" color="orange" class="whitespace-nowrap">Replay</TtText>
             <TtText :size="1" color="white" class="whitespace-nowrap">{{
               game.replayLabel
             }}</TtText>
+          </template>
+          <template v-if="game.replay">
+            <TtText
+              v-if="game.replayProgress && game.replayCountdown === null"
+              :size="1"
+              color="muted"
+              class="whitespace-nowrap"
+            >
+              · {{ game.replayProgress.done }} of {{ game.replayProgress.total }}
+            </TtText>
             <TtText
               v-if="game.replayCountdown !== null"
               :size="1"
@@ -924,6 +968,7 @@ async function buyMysteryBox() {
           :now="now"
           :revealed="revealed"
           @watch="game.watchMove"
+          @watch-from="(seq) => game.watchFrom(seq)"
         />
       </div>
     </aside>
@@ -967,6 +1012,50 @@ async function buyMysteryBox() {
 </template>
 
 <style scoped>
+/* A replay shows the past: the map takes on an old-photo tint while it plays. */
+.map-tint {
+  transition: filter 0.6s ease;
+}
+.map-past {
+  filter: sepia(0.45) saturate(0.85) brightness(0.92);
+}
+/* Fades in as it rises, holds, then drifts on up and fades out. */
+.later-card {
+  animation: later-card ease-out forwards;
+}
+@keyframes later-card {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .later-card {
+    animation-name: later-card-still;
+  }
+}
+@keyframes later-card-still {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
+}
 .map-btn {
   min-width: 48px !important;
   min-height: 42px !important;
