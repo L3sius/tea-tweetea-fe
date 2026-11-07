@@ -248,18 +248,19 @@ function freeRoam() {
   dropActions()
 }
 
-// --- Actions: the camera visits whatever is happening, then goes home (see domain/director.ts) ---
+// --- Actions: the camera visits whatever is happening and stays there (see domain/director.ts) ---
 
 const ACTIONS_KEY = 'tweetea.followActions'
 /** The Auto camera option, remembered for this browser. */
 const followActions = ref(readActions())
 const ACTIONS_TIP =
-  'Moves the camera to each move, item and minigame as it happens, then back to where you were'
+  'Moves the camera to each move, item and minigame as it happens, and stays on the last team it showed'
 const shot = shallowRef<Shot | null>(null)
 /**
  * The viewer's own camera while an action borrows it: the team followed, or free roam (no team
- * followed), and where the view was and how far zoomed. The camera goes back to it once nothing
- * is left to show.
+ * followed), and where the view was and how far zoomed. "Back" and turning Actions off return to
+ * it. When the action ends by itself the camera stays where it is, so the viewer can see what the
+ * team did next.
  */
 let home: { team: TeamId | null; follow: boolean; view: CameraView | null } | null = null
 /** Actions that started before this (server ms) are left alone: the viewer chose to look elsewhere. */
@@ -326,8 +327,8 @@ function skipAction() {
 }
 
 /**
- * Points the camera at the action the director picks, flying to a new team and following it, and
- * goes home once the action is over and nothing else is happening.
+ * Points the camera at the action the director picks, flying to a new team and following it. Once
+ * the action is over the camera keeps following that team; going back is for the viewer to choose.
  */
 function directCamera() {
   if (!followActions.value || world.value || game.replay) return
@@ -336,8 +337,9 @@ function directCamera() {
   const moments = game.choreography.momentsAt(time).filter((m) => m.at >= ignoreBefore)
   const next = direct(before, moments, time)
   if (!next || next.quiet) {
-    if (before && !before.quiet) goHome()
-    else shot.value = next
+    // The team on screen is now the viewer's own camera, so the next action starts from here.
+    if (before && !before.quiet) home = null
+    shot.value = next
     return
   }
   shot.value = next
