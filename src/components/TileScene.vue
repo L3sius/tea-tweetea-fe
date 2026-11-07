@@ -11,7 +11,17 @@ export type TileView = {
   task: { name: string; description: string } | null
   /** A gem lying on this very tile. */
   gemHere: Gem | null
-  blocker: { name: string; icon: string | null; text: string; web: boolean } | null
+  /**
+   * A blocker here, told in two short lines: how long it holds a team, then who placed it and how
+   * long it stays. What blockers do in general is for the shop and the items page, not every tile.
+   */
+  blocker: {
+    name: string
+    icon: string | null
+    hold: string | null
+    detail: string
+    web: boolean
+  } | null
   /** Teams standing here, with how far they are through the tile's task. */
   teams: {
     name: string
@@ -96,8 +106,12 @@ const frame = computed(() => ({
         </p>
         <p v-if="view.blocker" class="fact fact-bad">
           <img v-if="view.blocker.icon" :src="view.blocker.icon" alt="" />
-          <span>
-            <b>{{ view.blocker.name }}</b> {{ view.blocker.text }}
+          <span class="fact-lines">
+            <span>
+              <b>{{ view.blocker.name }}</b>
+              <template v-if="view.blocker.hold"> · {{ view.blocker.hold }}</template>
+            </span>
+            <span>{{ view.blocker.detail }}</span>
           </span>
         </p>
       </section>
@@ -384,6 +398,10 @@ const frame = computed(() => ({
 }
 .fact-bad {
   color: #ff7a6b;
+}
+.fact-lines {
+  display: flex;
+  flex-direction: column;
 }
 .fact-bad b {
   font-weight: normal;

@@ -53,7 +53,7 @@ const KINDS: Record<TileKind, TileTheme['kind']> = {
   normal: { colour: '#e8dcb8', note: null },
   red: {
     colour: '#ff0000',
-    note: 'Minigame! Landing here starts a random minigame for every team.',
+    note: 'Minigame tile: landing here starts one for every team.',
   },
   shop: { colour: '#ffb000', note: 'Teams passing through can shop here.' },
 }

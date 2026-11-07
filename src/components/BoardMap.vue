@@ -33,7 +33,6 @@ import {
   blockerName,
   cardLabel,
   challengeProgress,
-  clock,
   timeLeft,
   type Names,
 } from '@/domain/describe'
@@ -186,14 +185,17 @@ const tileGems = () => new Map([...props.state.gemTiles].map(([gem, tile]) => [t
 /** Teams with a piece on the board: none before the start, when the server places them all. */
 const placedTeams = () => (props.state.phase === 'setup' ? [] : [...props.state.teams.values()])
 
-/** What a blocker does to whoever walks onto it, who placed it and when it goes. */
-function blockerText(blocker: Blocker): string {
+/** A blocker on a tile, in the tile box's two short lines. */
+function blockerView(blocker: Blocker): NonNullable<TileView['blocker']> {
   const freeze = blockerFreezeText(blocker)
-  const stops = freeze
-    ? `stops every team that walks onto it and holds it there for ${freeze}.`
-    : 'stops every team that walks onto it.'
   const left = timeLeft(blocker.until, new Date(props.serverNow()))
-  return `${stops} Placed by ${props.names.team(blocker.owner)}. ${left}, gone at ${clock(blocker.until)}.`
+  return {
+    name: blockerName(blocker),
+    icon: itemEntry(blocker.item).icon,
+    hold: freeze && `holds a team ${freeze}`,
+    detail: `Placed by ${props.names.team(blocker.owner)} · ${left}`,
+    web: blocker.item === 'wilderness_web',
+  }
 }
 
 /**
@@ -231,14 +233,7 @@ function tileView(tile: Tile): TileView {
     terrain: tile.sea ? null : terrainScene(tile),
     task: challenge ? { name: challenge.name, description: challenge.description } : null,
     gemHere: tileGems().get(tile.id) ?? null,
-    blocker: blocker
-      ? {
-          name: blockerName(blocker),
-          icon: itemEntry(blocker.item).icon,
-          text: blockerText(blocker),
-          web: blocker.item === 'wilderness_web',
-        }
-      : null,
+    blocker: blocker ? blockerView(blocker) : null,
     teams,
   }
 }
