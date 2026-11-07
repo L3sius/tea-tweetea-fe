@@ -3,12 +3,11 @@ import type { GameEvent, JournalEntry } from './events'
 import { instanceId, teamId, tileId } from './ids'
 import { STEP_MS } from './motion'
 import {
-  CATCH_UP_MOVES,
   REPLAY_GAP_MS,
   RETURN_COUNTDOWN_S,
   buildReplay,
-  catchUpEntries,
-  movesIn,
+  buildReplayFrom,
+  missedMoveEntries,
   tileBefore,
   watchEntries,
 } from './replay'
@@ -84,23 +83,12 @@ describe('watchEntries', () => {
   })
 })
 
-describe('catchUpEntries', () => {
-  it('plays the moves after the last visit, with their cards, oldest first', () => {
+describe('missedMoveEntries', () => {
+  it('counts the moves after the last visit, up to loading the page', () => {
     const log = [start, card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10, 11], blue)]
-    expect(catchUpEntries(log, 3).map((e) => e.seq)).toEqual([4, 5])
-    expect(catchUpEntries(log, 0).map((e) => e.seq)).toEqual([2, 3, 4, 5])
-  })
-
-  it('leaves out moves made after the page loaded, which were watched live', () => {
-    const log = [start, card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10, 11], blue)]
-    expect(catchUpEntries(log, 1, 3).map((e) => e.seq)).toEqual([2, 3])
-    expect(catchUpEntries(log, 3, 3)).toEqual([])
-  })
-
-  it(`keeps only the last ${CATCH_UP_MOVES} moves`, () => {
-    const log = [start]
-    for (let i = 0; i < 30; i++) log.push(walk(2 + i, [5, 7]))
-    expect(catchUpEntries(log, 0).filter((e) => movesIn(e).length)).toHaveLength(CATCH_UP_MOVES)
+    expect(missedMoveEntries(log, 0, 5).map((e) => e.seq)).toEqual([3, 5])
+    expect(missedMoveEntries(log, 1, 3).map((e) => e.seq)).toEqual([3])
+    expect(missedMoveEntries(log, 3, 3)).toEqual([])
   })
 })
 
@@ -127,5 +115,27 @@ describe('buildReplay', () => {
     expect(replay.endsAt - replay.settledAt).toBe(RETURN_COUNTDOWN_S * 1000)
     expect(replay.choreography.finalTile(red)).toBe(8)
     expect(replay.choreography.finalTile(blue)).toBe(10)
+  })
+})
+
+describe('buildReplayFrom', () => {
+  it('starts every team from the past state and steps through each entry in turn', () => {
+    const positions = new Map([
+      [red, tileId(5)],
+      [blue, tileId(6)],
+    ])
+    const entries = [card(2), walk(3, [5, 7, 8]), card(4, blue), walk(5, [6, 10], blue)]
+    const now = T0 + 10_000_000
+    const replay = buildReplayFrom(positions, entries, now)
+    expect([...replay.teams]).toEqual([red, blue])
+    // Blue doesn't move until the last entry, but it is drawn from the past state all along.
+    expect(replay.choreography.placement(blue, now)).toEqual({ kind: 'still', tile: 6 })
+    expect(replay.steps.map((s) => s.entry.seq)).toEqual([2, 3, 4, 5])
+    for (const step of replay.steps) expect(step.done).toBeGreaterThanOrEqual(step.at)
+    // Each entry starts a gap after the one before has played out.
+    const gaps = replay.steps.slice(1).map((s, i) => s.at - (replay.steps[i]?.done ?? 0))
+    expect(gaps).toEqual([REPLAY_GAP_MS, REPLAY_GAP_MS, REPLAY_GAP_MS])
+    expect(replay.choreography.finalTile(blue)).toBe(10)
+    expect(replay.settledAt).toBeGreaterThanOrEqual(replay.steps.at(-1)?.done ?? Infinity)
   })
 })

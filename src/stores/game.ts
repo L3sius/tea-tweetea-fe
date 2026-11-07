@@ -14,7 +14,7 @@ import { Choreography } from '@/domain/motion'
 import {
   RETURN_COUNTDOWN_S,
   buildReplay,
-  catchUpEntries,
+  buildReplayFrom,
   missedMoveEntries,
   movesIn,
   watchEntries,
@@ -30,6 +30,8 @@ const JOURNAL_PAGE = 500
 const LOG_MAX_PAGES = 6
 /** The newest journal entry this browser has seen, so a later visit can catch up from it. */
 const LAST_SEEN_KEY = 'tweetea.lastSeenSeq'
+/** Most logged-journal pages "watch from here" reads (500 entries each, days of play). */
+const WATCH_MAX_PAGES = 10
 /** A replay starts this long after it is asked for, so the camera can get there first. */
 const REPLAY_LEAD_MS = 600
 const FEED_LIMIT = 60
@@ -234,6 +236,15 @@ export const useGameStore = defineStore('game', () => {
   const replayLabel = ref('')
   /** Seconds left before a finished replay goes back to live; null while it still plays. */
   const replayCountdown = ref<number | null>(null)
+  /**
+   * The board as it was at the point a "watch from here" replay has reached, shown in place of
+   * the live state while it plays; null otherwise.
+   */
+  const replayState = shallowRef<GameState | null>(null)
+  /** How many of a "watch from here" replay's entries have played. */
+  const replayProgress = ref<{ done: number; total: number } | null>(null)
+  /** Bumped by every stop, so a replay still loading knows it was cancelled. */
+  let replayToken = 0
   /** The team the replayed entry is about, and where it stands then, for the camera. */
   const replayFocus = shallowRef<{ team: TeamId; tile: TileId | null } | null>(null)
   let replayTimers: ReturnType<typeof setTimeout>[] = []
@@ -255,7 +266,11 @@ export const useGameStore = defineStore('game', () => {
   function startReplay(entries: JournalEntry[], label: string) {
     stopReplay()
     if (entries.length === 0) return
-    const r = buildReplay(log.value, entries, serverNow() + REPLAY_LEAD_MS, names.seesItems)
+    show(buildReplay(log.value, entries, serverNow() + REPLAY_LEAD_MS, names.seesItems), label)
+  }
+
+  /** Shows a built replay: camera, countdown and the return to live. Returns its timer helper. */
+  function show(r: Replay, label: string) {
     replay.value = r
     replayLabel.value = label
     const later = (at: number, run: () => void) =>
@@ -270,6 +285,63 @@ export const useGameStore = defineStore('game', () => {
     for (let s = RETURN_COUNTDOWN_S; s >= 1; s--)
       later(r.endsAt - s * 1000, () => (replayCountdown.value = s))
     later(r.endsAt, stopReplay)
+    return later
+  }
+
+  /**
+   * Replays everything from entry `seq` up to entry `upTo` (now, by default): every team starts
+   * where it stood just before, then each logged entry plays in turn, its card draws, walks and
+   * headlines included, and the board (gems, gold, blockers, tasks) steps to the state after it.
+   */
+  async function watchFrom(seq: number, label?: string, upTo = state.value?.seq ?? 0) {
+    stopReplay()
+    const token = replayToken
+    await guard(async () => {
+      const entries = await loggedEntries(seq - 1, upTo)
+      const first = entries[0]
+      if (!first) return
+      const before = await api.getState(first.seq - 1)
+      if (token !== replayToken) return
+      const positions = new Map([...before.teams.values()].map((t) => [t.id, t.position]))
+      const startAt = serverNow() + REPLAY_LEAD_MS
+      const r = buildReplayFrom(positions, entries, startAt, names.seesItems)
+      replayState.value = before
+      replayProgress.value = { done: 0, total: entries.length }
+      const later = show(r, label ?? `Since ${clockTime(first.at)}`)
+      for (const [i, step] of r.steps.entries()) {
+        // Fetched as the entry starts, shown once it has played out.
+        let after: Promise<GameState> | null = null
+        later(step.at, () => {
+          after = api.getState(step.entry.seq)
+          after.catch(() => {})
+        })
+        later(step.done, () =>
+          guard(async () => {
+            const next = await (after ?? api.getState(step.entry.seq))
+            if (token !== replayToken) return
+            if ((replayState.value?.seq ?? -1) < next.seq) replayState.value = next
+            replayProgress.value = { done: i + 1, total: entries.length }
+            for (const event of step.entry.events) {
+              const found = alertFor(event, names)
+              if (found) raise({ ...found.alert, id: `alert-${++alertCount}`, sticky: false })
+            }
+          }),
+        )
+      }
+    })
+  }
+
+  /** Logged journal entries after `after`, up to `upTo`, oldest first. */
+  async function loggedEntries(after: number, upTo: number): Promise<JournalEntry[]> {
+    const out: JournalEntry[] = []
+    for (let page = 0; page < WATCH_MAX_PAGES && after < upTo; page++) {
+      const got = await api.getJournal({ after, limit: JOURNAL_PAGE, logged: true })
+      out.push(...got.filter((e) => e.seq <= upTo))
+      const last = got.at(-1)
+      if (!last || got.length < JOURNAL_PAGE) break
+      after = last.seq
+    }
+    return out
   }
 
   /** Replays the move in entry `seq`, with the card drawn for it. */
@@ -282,17 +354,21 @@ export const useGameStore = defineStore('game', () => {
     startReplay(entries, `${name}${name.endsWith('s') ? "'" : "'s"} move`)
   }
 
-  /** Replays the moves made since the last visit, then counts them as seen. */
+  /** Replays everything between the last visit and loading the page, then counts it as seen. */
   function catchUp() {
     if (lastSeen.value === null || loadedSeq.value === null) return
-    startReplay(catchUpEntries(log.value, lastSeen.value, loadedSeq.value), 'While you were away')
+    const [from, upTo] = [lastSeen.value + 1, loadedSeq.value]
     lastSeen.value = null
+    void watchFrom(from, 'While you were away', upTo)
   }
 
   function stopReplay() {
+    replayToken++
     for (const t of replayTimers) clearTimeout(t)
     replayTimers = []
     replay.value = null
+    replayState.value = null
+    replayProgress.value = null
     replayFocus.value = null
     replayCountdown.value = null
   }
@@ -403,8 +479,11 @@ export const useGameStore = defineStore('game', () => {
     replayLabel,
     replayCountdown,
     replayFocus,
+    replayState,
+    replayProgress,
     missedMoves,
     watchMove,
+    watchFrom,
     catchUp,
     stopReplay,
     dismissCatchUp: () => (lastSeen.value = null),
@@ -492,6 +571,9 @@ function alertFor(
       return null
   }
 }
+
+/** A time of day as the log's readers know it, like 06:50. */
+const clockTime = (at: Date) => at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 function messageOf(error: unknown): string {
   if (isApiError(error)) return describeProblem(error.problem)

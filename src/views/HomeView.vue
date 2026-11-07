@@ -50,20 +50,25 @@ const {
   standings: liveStandings,
   alerts,
   choreography: liveChoreography,
+  replayState,
 } = storeToRefs(game)
 
 // The tutorial plays on its own frozen world (tutorial/world) with Earl Grey as a team in it
 // (tutorial/pretend), so the tour looks the same whatever the live game does; the live game comes
-// back when it ends.
+// back when it ends. A "watch from here" replay shows the board as it was at the point it has
+// reached, until it goes back to live.
 const world = computed(() => (tutorial.staged ? tutorial.world : null))
 const board = computed(() => world.value?.board ?? liveBoard.value)
-const state = computed(() => (world.value ? tutorial.tourState : null) ?? liveState.value)
+const state = computed(
+  () => (world.value ? tutorial.tourState : null) ?? replayState.value ?? liveState.value,
+)
 const challenges = computed(() => world.value?.challenges ?? liveChallenges.value)
 const choreography = computed(() => world.value?.choreography ?? liveChoreography.value)
 const names = computed(() => (world.value ? tutorial.tourNames : null) ?? game.names)
-const standings = computed(() =>
-  world.value ? [...world.value.state.teams.values()].sort(byStanding) : liveStandings.value,
-)
+const standings = computed(() => {
+  const shown = world.value?.state ?? replayState.value
+  return shown ? [...shown.teams.values()].sort(byStanding) : liveStandings.value
+})
 const appearanceOf = (team: TeamId) =>
   world.value
     ? (world.value.state.teams.get(team)?.appearance ?? null)
@@ -654,6 +659,14 @@ async function buyMysteryBox() {
               game.replayLabel
             }}</TtText>
             <TtText
+              v-if="game.replayProgress && game.replayCountdown === null"
+              :size="1"
+              color="muted"
+              class="whitespace-nowrap"
+            >
+              · {{ game.replayProgress.done }} of {{ game.replayProgress.total }}
+            </TtText>
+            <TtText
               v-if="game.replayCountdown !== null"
               :size="1"
               color="muted"
@@ -924,6 +937,7 @@ async function buyMysteryBox() {
           :now="now"
           :revealed="revealed"
           @watch="game.watchMove"
+          @watch-from="(seq) => game.watchFrom(seq)"
         />
       </div>
     </aside>

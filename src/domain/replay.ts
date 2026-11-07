@@ -1,6 +1,7 @@
-// Replays of past moves, from the journal alone: a fresh Choreography fed old entries at new times.
-// A move is self-contained in the journal (where it starts, every step, how it ends), so the moving
-// team plays it exactly; teams that aren't replayed stay where they are now.
+// Replays of past moves: a fresh Choreography fed old entries at new times. A move is
+// self-contained in the journal (where it starts, every step, how it ends), so the moving team
+// plays it exactly. A single move leaves the other teams where they are now; "watch from here"
+// starts every team from a past state and plays everything since, one entry after another.
 import type { GameEvent, JournalEntry } from './events'
 import type { TeamId, TileId } from './ids'
 import { CUE_MS, Choreography } from './motion'
@@ -9,9 +10,6 @@ import { CUE_MS, Choreography } from './motion'
 export const REPLAY_GAP_MS = 700
 /** How long a replay stays up after its pieces settle, counting down, before going back to live. */
 export const RETURN_COUNTDOWN_S = 3
-/** Most moves a catch-up plays; older ones are left out. */
-export const CATCH_UP_MOVES = 12
-
 /** The team an event moves, if it moves one. */
 function movedTeam(event: GameEvent): TeamId | null {
   switch (event.kind) {
@@ -82,27 +80,14 @@ export function watchEntries(log: readonly JournalEntry[], seq: number): Journal
 export const missedMoveEntries = (log: readonly JournalEntry[], after: number, upTo: number) =>
   log.filter((e) => e.seq > after && e.seq <= upTo && movesIn(e).length > 0)
 
-/**
- * The latest moves missed between a last visit (`after`) and loading the page (`upTo`), each with
- * the card drawn for it. Moves after `upTo` were watched live, so they are not offered again.
- */
-export function catchUpEntries(
-  log: readonly JournalEntry[],
-  after: number,
-  upTo = Infinity,
-): JournalEntry[] {
-  const moves = missedMoveEntries(log, after, upTo).slice(-CATCH_UP_MOVES)
-  const picked = new Map<number, JournalEntry>()
-  for (const move of moves) for (const e of watchEntries(log, move.seq)) picked.set(e.seq, e)
-  return [...picked.values()].sort((a, b) => a.seq - b.seq)
-}
-
 export type Replay = {
   choreography: Choreography
   /** Teams whose pieces the replay draws; the rest stay live. */
   teams: ReadonlySet<TeamId>
   /** When each replayed entry starts, and the team it is about (for the camera). */
   focus: { at: number; team: TeamId }[]
+  /** Each replayed entry, oldest first: when it starts and when it has played out. */
+  steps: { entry: JournalEntry; at: number; done: number }[]
   /** When the last replayed piece has settled; the return countdown starts then. */
   settledAt: number
   /** When the countdown is over and the board goes back to live. */
@@ -129,17 +114,45 @@ export function buildReplay(
       const tile = tileBefore(log, entry.seq, team)
       if (tile !== null) choreography.know(team, tile)
     }
+  return play(choreography, teams, entries, startAt, seesItems)
+}
+
+/**
+ * Plays `entries` one after another from `startAt`, with every team in `positions` drawn from the
+ * replay, starting on its tile there: the board as it was just before the first entry.
+ */
+export function buildReplayFrom(
+  positions: ReadonlyMap<TeamId, TileId>,
+  entries: readonly JournalEntry[],
+  startAt: number,
+  seesItems: (team: TeamId) => boolean = () => true,
+): Replay {
+  const choreography = new Choreography()
+  for (const [team, tile] of positions) choreography.know(team, tile)
+  return play(choreography, new Set(positions.keys()), entries, startAt, seesItems)
+}
+
+function play(
+  choreography: Choreography,
+  teams: Set<TeamId>,
+  entries: readonly JournalEntry[],
+  startAt: number,
+  seesItems: (team: TeamId) => boolean,
+): Replay {
   const focus: { at: number; team: TeamId }[] = []
+  const steps: Replay['steps'] = []
   let at = startAt
   for (const entry of entries) {
     const team = movesIn(entry)[0] ?? cardTeam(entry)
     if (team !== null) focus.push({ at, team })
     choreography.apply({ ...entry, at: new Date(at) }, seesItems)
-    at = Math.max(at, choreography.revealAt(entry.seq)) + REPLAY_GAP_MS
+    const done = Math.max(at, choreography.revealAt(entry.seq))
+    steps.push({ entry, at, done })
+    at = done + REPLAY_GAP_MS
   }
   const settled = Math.max(at, ...[...teams].map((t) => choreography.settlesAt(t)))
   const endsAt = Math.max(settled + RETURN_COUNTDOWN_S * 1000, settled + CUE_MS)
-  return { choreography, teams, focus, settledAt: settled, endsAt }
+  return { choreography, teams, focus, steps, settledAt: settled, endsAt }
 }
 
 const cardTeam = (entry: JournalEntry): TeamId | null => {

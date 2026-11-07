@@ -28,6 +28,8 @@ export type JournalPage = {
   after?: number
   /** At most 500. */
   limit?: number
+  /** Only entries the game log shows: those with an event other than plain task progress. */
+  logged?: boolean
 }
 
 export type TeamCommandRequest = {
@@ -52,7 +54,8 @@ export type ApiClient = {
   getItems(): Promise<ItemCatalogue>
   /** Game-wide numbers: limits, ranges, lifetimes. */
   getRules(): Promise<Rules>
-  getState(): Promise<GameState>
+  /** The state now; with `at`, the state just after journal entry `at`, for replays. */
+  getState(at?: number): Promise<GameState>
   /** Journal entries, oldest first. */
   getJournal(page?: JournalPage): Promise<JournalEntry[]>
   /** Feed items, newest first. */
