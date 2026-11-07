@@ -80,6 +80,11 @@ const appearanceOf = (team: TeamId) =>
     ? (world.value.state.teams.get(team)?.appearance ?? null)
     : characters.appearanceOf(team)
 const now = useNow({ scheduler: (tick) => useIntervalFn(tick, 1_000) })
+/** The server's clock, ticking with `now`, so countdowns to server times hold on a device whose clock is off. */
+const gameNow = computed(() => {
+  void now.value
+  return new Date(game.serverNow())
+})
 const boardMap = useTemplateRef('boardMap')
 
 // The tutorial flies the camera as its script says.
@@ -943,7 +948,7 @@ async function buyMysteryBox() {
               :state="state"
               :challenges="challenges"
               :names="names"
-              :now="now"
+              :now="gameNow"
               :moving="isAnimating(focus.id)"
             />
             <TtText v-else-if="state.teams.size === 0" :size="1" color="muted"

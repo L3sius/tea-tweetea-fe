@@ -31,7 +31,7 @@ test('Ice Barrage freezes a rival, who sees it on their own page', async ({
     .click()
 
   await expect.poll(async () => (await backend.team(blue.id)).frozen_until).not.toBeNull()
-  await expect(rival.getByText(/^Frozen until/)).toBeVisible()
+  await expect(rival.getByText(/^Frozen · \d/)).toBeVisible()
   // The item is used up.
   await expect(page.getByRole('button', { name: 'Ice Barrage' })).toHaveCount(0)
 })

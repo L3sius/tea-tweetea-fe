@@ -11,6 +11,7 @@ import {
   effortText,
   itemName,
   partProgress,
+  timeLeft,
 } from '@/domain/describe'
 import type { GameState, Team } from '@/domain/game'
 import { whyNotUsable } from '@/domain/items'
@@ -28,6 +29,7 @@ import {
   TtPanel,
   TtProgressBar,
   TtText,
+  TtTooltip,
 } from '@/ui/tt'
 import CardDraw from './CardDraw.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
@@ -54,9 +56,15 @@ const animating = computed(() => {
   return team.value ? game.choreography.isAnimating(team.value.id, game.serverNow()) : false
 })
 
+/** The server's clock, ticking with `now`, for countdowns to server times (stuck, shielded). */
+const gameNow = computed(() => {
+  void now.value
+  return new Date(game.serverNow())
+})
+
 const frozen = computed(() => {
   const until = team.value?.frozenUntil
-  return until && until > now.value ? until : null
+  return until && until > gameNow.value ? until : null
 })
 
 const pause = computed(() =>
@@ -224,7 +232,7 @@ const baseSteps = computed(() => {
  * Rivals a team-targeted item can hit. Every such item is hostile, and a team hit by one is
  * shielded from them for a while, so shielded teams are left out and listed apart.
  */
-const isShielded = (t: Team) => t.shieldUntil !== null && t.shieldUntil > now.value
+const isShielded = (t: Team) => t.shieldUntil !== null && t.shieldUntil > gameNow.value
 // Withdrawn teams cannot be targeted at all, so they are not even listed as shielded.
 const others = computed(() =>
   [...state.value.teams.values()].filter((t) => t.id !== team.value?.id && !t.withdrawn),
@@ -358,9 +366,12 @@ const lockClock = computed(
           {{ state.phase === 'setup' ? 'The game has not started yet.' : 'The game is over.' }}
         </TtText>
         <template v-else-if="blocker === 'frozen' && frozen">
-          <TtText :size="2" color="cyan" glow>
-            {{ stuckState(team?.frozenBy ?? null) }} until {{ clock(frozen) }}
-          </TtText>
+          <TtTooltip tabindex="0">
+            <TtText :size="2" color="cyan" glow>
+              {{ stuckState(team?.frozenBy ?? null) }} · {{ timeLeft(frozen, gameNow) }}
+            </TtText>
+            <template #tip>Free at {{ clock(frozen) }}</template>
+          </TtTooltip>
           <TtText :size="1" color="white" class="max-w-[340px]">
             You can't draw or use power-ups until then. Hold Protect from Magic to shrug off the
             next one.
@@ -420,9 +431,12 @@ const lockClock = computed(
                 <span :style="{ color: teamColor(rival) }">{{ rival.name }}</span>
               </TtButton>
             </div>
-            <TtText v-for="t in shieldedRivals" :key="t.id" :size="1" color="muted">
-              {{ t.name }} is shielded until {{ clock(t.shieldUntil!) }}.
-            </TtText>
+            <TtTooltip v-for="t in shieldedRivals" :key="t.id" tabindex="0">
+              <TtText :size="1" color="muted">
+                {{ t.name }} is shielded · {{ timeLeft(t.shieldUntil!, gameNow) }}
+              </TtText>
+              <template #tip>Shielded until {{ clock(t.shieldUntil!) }}</template>
+            </TtTooltip>
           </template>
           <TtText v-else :size="1" color="white">
             Click one of the orange-ringed tiles on the map (within

@@ -204,12 +204,19 @@ const elapsed = (ms: number) => {
   return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`
 }
 
+/**
+ * How long until `until`, as "12m left" or "2h 5m left". Rounded up, so it says "1m left" until the
+ * very end, never "0m left" while the hold still applies.
+ */
+export const timeLeft = (until: Date, now: Date) =>
+  `${elapsed(Math.ceil((until.getTime() - now.getTime()) / 60_000) * 60_000)} left`
+
 /** What a team is doing right now, in a few words. */
 /** What the team is doing. After the end its last status stays on the server, so `phase` overrides it. */
 export function teamStatusText(team: Team, now: Date, phase?: Phase): string {
   if (phase === 'ended') return 'The game is over'
   if (team.frozenUntil && team.frozenUntil > now)
-    return `${stuckState(team.frozenBy)} until ${clock(team.frozenUntil)}`
+    return `${stuckState(team.frozenBy)} · ${timeLeft(team.frozenUntil, now)}`
   const { status } = team
   switch (status.kind) {
     case 'idle':

@@ -21,11 +21,11 @@ test('a team frozen by an admin is stuck, until it thaws', async ({ page, backen
   await expect(page.getByRole('button', { name: /^Face-down card/ }).first()).toBeVisible()
 
   await backend.admin({ action: 'dev_freeze', team: red.id, hours: 1 })
-  await expect(page.getByText(/^Stuck until/)).toBeVisible()
+  await expect(page.getByText(/^Stuck · \d/)).toBeVisible()
   await expect(page.getByRole('button', { name: /^Face-down card/ })).toHaveCount(0)
 
   await backend.admin({ action: 'dev_thaw', team: red.id })
-  await expect(page.getByText(/^Stuck until/)).toBeHidden()
+  await expect(page.getByText(/^Stuck · \d/)).toBeHidden()
   await expect(page.getByRole('button', { name: /^Face-down card/ }).first()).toBeVisible()
 })
 

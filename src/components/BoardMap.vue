@@ -34,6 +34,7 @@ import {
   cardLabel,
   challengeProgress,
   clock,
+  timeLeft,
   type Names,
 } from '@/domain/describe'
 import type { Blocker, Card, GameState, Team } from '@/domain/game'
@@ -191,7 +192,8 @@ function blockerText(blocker: Blocker): string {
   const stops = freeze
     ? `stops every team that walks onto it and holds it there for ${freeze}.`
     : 'stops every team that walks onto it.'
-  return `${stops} Placed by ${props.names.team(blocker.owner)}, gone at ${clock(blocker.until)}.`
+  const left = timeLeft(blocker.until, new Date(props.serverNow()))
+  return `${stops} Placed by ${props.names.team(blocker.owner)}. ${left}, gone at ${clock(blocker.until)}.`
 }
 
 /**

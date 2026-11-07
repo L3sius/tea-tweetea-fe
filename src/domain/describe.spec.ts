@@ -17,6 +17,7 @@ import {
   partProgress,
   teamParts,
   teamStatusText,
+  timeLeft,
   useQuestion,
 } from './describe'
 import type { Instance, Team } from './game'
@@ -239,6 +240,30 @@ describe('teamStatusText', () => {
 
   it('says the game is over after the end, whatever the last status was', () => {
     expect(teamStatusText(team, new Date(), 'ended')).toBe('The game is over')
+  })
+
+  it('counts down how long a stuck team has left', () => {
+    const now = new Date('2026-11-07T20:00:00Z')
+    const frozenUntil = new Date('2026-11-07T20:12:00Z')
+    const stuck = { ...team, frozenUntil, frozenBy: 'banana' } as Team
+    expect(teamStatusText(stuck, now, 'running')).toMatch(/ · 12m left$/)
+    // Once the freeze is over the plain status comes back.
+    expect(teamStatusText(stuck, frozenUntil, 'running')).toBe('Ready to draw a card')
+  })
+})
+
+describe('timeLeft', () => {
+  const now = new Date('2026-11-07T20:00:00Z')
+  const after = (ms: number) => new Date(now.getTime() + ms)
+
+  it('gives minutes, and hours past the hour', () => {
+    expect(timeLeft(after(12 * 60_000), now)).toBe('12m left')
+    expect(timeLeft(after((2 * 60 + 5) * 60_000), now)).toBe('2h 5m left')
+  })
+
+  it('rounds up, so it never says 0m while time is left', () => {
+    expect(timeLeft(after(1_000), now)).toBe('1m left')
+    expect(timeLeft(after(60_001), now)).toBe('2m left')
   })
 })
 

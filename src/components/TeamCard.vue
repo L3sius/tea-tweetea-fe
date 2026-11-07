@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { Challenge } from '@/domain/challenge'
 import {
   challengeProgress,
+  clock,
   effortText,
   itemName,
   partProgress,
@@ -37,6 +38,13 @@ const color = computed(() => teamColor(props.team))
 const statusText = computed(() =>
   props.moving ? 'Walking...' : teamStatusText(props.team, props.now, props.state.phase),
 )
+
+/** When a stuck team is free, for the status's hover box; the status itself counts down. */
+const freeAt = computed(() => {
+  const until = props.team.frozenUntil
+  if (props.moving || props.state.phase === 'ended' || !until || until <= props.now) return null
+  return clock(until)
+})
 
 /** The tile task the team is working on, with how far along it is. */
 const task = computed(() => {
@@ -85,7 +93,10 @@ const items = computed(() =>
         :card="team.status.card"
         size="sm"
       />
-      <TtText :size="1">{{ statusText }}</TtText>
+      <TtTooltip :disabled="!freeAt" :tabindex="freeAt ? 0 : undefined">
+        <TtText :size="1">{{ statusText }}</TtText>
+        <template #tip>Free at {{ freeAt }}</template>
+      </TtTooltip>
     </div>
     <template v-if="task">
       <TtText :size="1" color="white">{{ task.challenge.name }}</TtText>
