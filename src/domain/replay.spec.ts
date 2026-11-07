@@ -177,6 +177,18 @@ describe('replayTime', () => {
   })
 })
 
+describe('replay camera', () => {
+  it('goes to a team whose entry moves nothing, like a completed tile', () => {
+    const done = entry(4, [{ kind: 'tile_completed', teamId: blue, tileId: tileId(6), by: null }])
+    const positions = new Map([
+      [red, tileId(5)],
+      [blue, tileId(6)],
+    ])
+    const replay = buildReplayFrom(positions, [walk(3, [5, 7]), done], T0 + 10_000_000)
+    expect(replay.focus.map((f) => f.team)).toEqual([red, blue])
+  })
+})
+
 describe('entryTeam', () => {
   it('is the team that moves, or the one the entry names', () => {
     expect(entryTeam(walk(3, [5, 7], blue))).toBe(blue)

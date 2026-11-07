@@ -165,7 +165,8 @@ function play(
   const steps: Replay['steps'] = []
   let at = startAt
   for (const [i, entry] of entries.entries()) {
-    const team = movesIn(entry)[0] ?? cardTeam(entry)
+    // The camera goes to the team the entry is about, as the replay bar names it, moving or not.
+    const team = entryTeam(entry)
     // Soon after the entry before has played out, so it can land before this one starts.
     const prevDone = steps.at(-1)?.done
     const camera =
