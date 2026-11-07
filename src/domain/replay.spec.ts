@@ -9,6 +9,8 @@ import {
   buildReplay,
   buildReplayFrom,
   missedMoveEntries,
+  replayTime,
+  timeLater,
   tileBefore,
   watchEntries,
 } from './replay'
@@ -138,5 +140,27 @@ describe('buildReplayFrom', () => {
     expect(gaps).toEqual([REPLAY_GAP_MS, WATCH_GAP_MS, REPLAY_GAP_MS])
     expect(replay.choreography.finalTile(blue)).toBe(10)
     expect(replay.settledAt).toBeGreaterThanOrEqual(replay.steps.at(-1)?.done ?? Infinity)
+  })
+})
+
+describe('timeLater', () => {
+  const at = (minutes: number) => new Date(T0 + minutes * 60_000)
+  it('says nothing for entries a few minutes apart', () => {
+    expect(timeLater(at(0), at(4))).toBeNull()
+  })
+
+  it('reads in minutes, then hours rounded to five minutes', () => {
+    expect(timeLater(at(0), at(25))).toBe('25 minutes later')
+    expect(timeLater(at(0), at(60))).toBe('1 hour later')
+    expect(timeLater(at(0), at(131))).toBe('2 hours 10 minutes later')
+    expect(timeLater(at(0), at(179))).toBe('3 hours later')
+  })
+})
+
+describe('replayTime', () => {
+  it('names the weekday only for an earlier day', () => {
+    const at = new Date(2026, 10, 6, 23, 10)
+    expect(replayTime(at, new Date(2026, 10, 6, 23, 30))).not.toMatch(/[A-Za-z]/)
+    expect(replayTime(at, new Date(2026, 10, 7, 9, 0))).toMatch(/^\S+ /)
   })
 })

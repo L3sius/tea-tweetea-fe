@@ -16,6 +16,7 @@ import {
   buildReplay,
   buildReplayFrom,
   missedMoveEntries,
+  timeLater,
   movesIn,
   watchEntries,
   type Replay,
@@ -241,6 +242,11 @@ export const useGameStore = defineStore('game', () => {
    * the live state while it plays; null otherwise.
    */
   const replayState = shallowRef<GameState | null>(null)
+  /**
+   * When the entry a "watch from here" replay is on happened, and how long after the entry before
+   * ("2 hours later", only when they were far apart). It moves on as the pause before it starts.
+   */
+  const replayClock = ref<{ at: Date; later: string | null } | null>(null)
   /** How many of a "watch from here" replay's entries have played. */
   const replayProgress = ref<{ done: number; total: number } | null>(null)
   /** Bumped by every stop, so a replay still loading knows it was cancelled. */
@@ -307,8 +313,14 @@ export const useGameStore = defineStore('game', () => {
       const r = buildReplayFrom(positions, entries, startAt, names.seesItems)
       replayState.value = before
       replayProgress.value = { done: 0, total: entries.length }
-      const later = show(r, label ?? `Since ${clockTime(first.at)}`)
+      replayClock.value = { at: first.at, later: null }
+      const later = show(r, label ?? '')
       for (const [i, step] of r.steps.entries()) {
+        const prev = r.steps[i - 1]
+        if (prev) {
+          const clock = { at: step.entry.at, later: timeLater(prev.entry.at, step.entry.at) }
+          later(prev.done, () => (replayClock.value = clock))
+        }
         // Fetched as the entry starts, shown once it has played out.
         let after: Promise<GameState> | null = null
         later(step.at, () => {
@@ -369,6 +381,7 @@ export const useGameStore = defineStore('game', () => {
     replay.value = null
     replayState.value = null
     replayProgress.value = null
+    replayClock.value = null
     replayFocus.value = null
     replayCountdown.value = null
   }
@@ -481,6 +494,7 @@ export const useGameStore = defineStore('game', () => {
     replayFocus,
     replayState,
     replayProgress,
+    replayClock,
     missedMoves,
     watchMove,
     watchFrom,
@@ -571,9 +585,6 @@ function alertFor(
       return null
   }
 }
-
-/** A time of day as the log's readers know it, like 06:50. */
-const clockTime = (at: Date) => at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 function messageOf(error: unknown): string {
   if (isApiError(error)) return describeProblem(error.problem)

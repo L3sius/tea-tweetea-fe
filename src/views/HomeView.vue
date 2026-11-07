@@ -34,6 +34,7 @@ import type { SpotName } from '@/tutorial/script'
 import { TILE_COLORS, teamColor } from '@/ui/colors'
 import { wrapRows } from '@/ui/wrapRows'
 import { TtButton, TtPanel, TtText, TtTooltip } from '@/ui/tt'
+import { replayTime } from '@/domain/replay'
 
 const game = useGameStore()
 const my = useTeamStore()
@@ -487,6 +488,8 @@ async function buyMysteryBox() {
     >
       <BoardMap
         ref="boardMap"
+        class="map-tint"
+        :class="{ 'map-past': game.replay && !world }"
         :board="board"
         :state="state"
         :challenges="challenges"
@@ -655,9 +658,21 @@ async function buyMysteryBox() {
         >
           <template v-if="game.replay">
             <TtText :size="1" color="orange" class="whitespace-nowrap">Replay</TtText>
-            <TtText :size="1" color="white" class="whitespace-nowrap">{{
+            <TtText v-if="game.replayLabel" :size="1" color="white" class="whitespace-nowrap">{{
               game.replayLabel
             }}</TtText>
+            <TtText v-if="game.replayClock" :size="1" color="white" class="whitespace-nowrap">
+              {{ replayTime(game.replayClock.at, now) }}
+            </TtText>
+            <TtText
+              v-if="game.replayClock?.later"
+              :size="1"
+              color="orange"
+              class="whitespace-nowrap"
+              aria-live="polite"
+            >
+              · {{ game.replayClock.later }}
+            </TtText>
             <TtText
               v-if="game.replayProgress && game.replayCountdown === null"
               :size="1"
@@ -981,6 +996,13 @@ async function buyMysteryBox() {
 </template>
 
 <style scoped>
+/* A replay shows the past: the map takes on an old-photo tint while it plays. */
+.map-tint {
+  transition: filter 0.6s ease;
+}
+.map-past {
+  filter: sepia(0.45) saturate(0.85) brightness(0.92);
+}
 .map-btn {
   min-width: 48px !important;
   min-height: 42px !important;

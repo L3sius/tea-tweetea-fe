@@ -8,6 +8,8 @@ import { CUE_MS, Choreography } from './motion'
 
 /** Pause between replayed entries, so one move ends before the next begins. */
 export const REPLAY_GAP_MS = 700
+/** Entries further apart than this get a "… later" note when a replay moves on to them. */
+export const LATER_MIN_MS = 5 * 60_000
 /** "Watch from here" pauses longer between entries, so each one can be taken in. */
 export const WATCH_GAP_MS = 2000
 /** How long a replay stays up after its pieces settle, counting down, before going back to live. */
@@ -164,4 +166,24 @@ function play(
 const cardTeam = (entry: JournalEntry): TeamId | null => {
   const card = entry.events.find((e) => e.kind === 'card_drawn')
   return card && 'teamId' in card ? card.teamId : null
+}
+
+/** How long after `from` the entry at `to` happened, like "2 hours 10 minutes later"; null if soon after. */
+export function timeLater(from: Date, to: Date): string | null {
+  const ms = to.getTime() - from.getTime()
+  if (ms < LATER_MIN_MS) return null
+  const minutes = Math.round(ms / 60_000)
+  const unit = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
+  if (minutes < 60) return `${unit(minutes, 'minute')} later`
+  const hours = Math.floor(minutes / 60)
+  const rest = Math.round((minutes % 60) / 5) * 5
+  if (rest === 0 || rest === 60) return `${unit(rest === 60 ? hours + 1 : hours, 'hour')} later`
+  return `${unit(hours, 'hour')} ${unit(rest, 'minute')} later`
+}
+
+/** A replayed entry's time of day, with the weekday when it was not today, like "Fri 23:10". */
+export function replayTime(at: Date, now: Date): string {
+  const time = at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  if (at.toDateString() === now.toDateString()) return time
+  return `${at.toLocaleDateString([], { weekday: 'short' })} ${time}`
 }
