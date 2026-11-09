@@ -13,12 +13,19 @@ const dink = useDinkStore()
 
 const gems = computed(() => game.board?.continents.length ?? 8)
 const hours = (h: number) => (h === 1 ? '1 hour' : `${h} hours`)
+/** "1 time in 5" reads better than "20%", when the chance is one. */
+const chance = (p: number) => {
+  const n = Math.round(1 / p)
+  return Math.abs(n * p - 1) < 1e-9 ? `1 time in ${n}` : `${Math.round(p * 100)}% of the time`
+}
 const rules = computed(() => {
   const r = game.rules
   return r
     ? {
         inventory: r.inventoryLimit,
-        eventChance: `${Math.round(r.randomEventChance * 100)}%`,
+        eventChance: r.randomEventChance > 0 ? chance(r.randomEventChance) : null,
+        minigameChance: r.minigameChance > 0 ? chance(r.minigameChance) : null,
+        initiatorGold: r.initiatorMultiplier === 2 ? 'double' : `${r.initiatorMultiplier} times the`,
         blockerRange: r.blockerRange,
         blockersPerTeam: r.blockersPerTeam,
         blockerLife: hours(r.blockerLifetimeHours),
@@ -80,16 +87,19 @@ const rules = computed(() => {
 
       <TtPanel title="The board" :padding="12" :gap="6">
         <TtText :size="1" color="white" align="left">
-          <b>Red tiles</b> are minigames. Any team can take part once one opens, and they pay out
-          gold. The team that opened it earns extra.
+          <b>Minigames</b> open when a team lands on a <b>red tile</b><template
+            v-if="rules?.minigameChance"
+            >, and {{ rules.minigameChance }} when it lands on an ordinary one</template
+          >. Every team can take part while one runs, and they pay out gold. The team that opened it
+          earns {{ rules?.initiatorGold ?? 'extra' }} gold.
         </TtText>
         <TtText :size="1" color="white" align="left">
           <b>Shops</b> each sell a few items, and every shop sells the mystery box. Prices and what
           each item does are on the <RouterLink to="/items" class="tt-link">Items</RouterLink> page.
         </TtText>
-        <TtText v-if="rules" :size="1" color="white" align="left">
-          <b>Random events</b> can happen when you land on an ordinary tile ({{ rules.eventChance }}
-          of the time): some help, some don't.
+        <TtText v-if="rules?.eventChance" :size="1" color="white" align="left">
+          <b>Random events</b> can happen when you land on an ordinary tile ({{ rules.eventChance }}):
+          some help, some don't.
         </TtText>
       </TtPanel>
 
@@ -167,6 +177,20 @@ const rules = computed(() => {
           <TtText :size="1" color="white" align="left">
             Some can't, like a pet Dink can't name. Tell an organiser: they can complete the tile
             for your team.
+          </TtText>
+        </div>
+        <div class="faq-qa">
+          <TtText :size="1" color="orange" align="left">The drop just won't come.</TtText>
+          <TtText :size="1" color="white" align="left">
+            Some drop tiles have a way out: the tile also completes after enough kills, even without
+            the drop. The task says how many, as in "… or kill Zulrah 525 times".
+          </TtText>
+        </div>
+        <div class="faq-qa">
+          <TtText :size="1" color="orange" align="left">Our minigame didn't count.</TtText>
+          <TtText :size="1" color="white" align="left">
+            Some minigames count only on one game world, and the task ends by naming it, as in "Play
+            on world 519". Games played on other worlds don't count.
           </TtText>
         </div>
       </TtPanel>

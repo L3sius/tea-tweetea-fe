@@ -18,6 +18,8 @@ export type Rules = {
   initiatorMultiplier: number
   /** Chance of a random event when landing on a normal tile. */
   randomEventChance: number
+  /** Chance that landing on a normal tile opens a minigame, as a red tile does. */
+  minigameChance: number
   /** Spawns and random teleports keep at least this many tiles from gems. */
   minGemDistance: number
 }

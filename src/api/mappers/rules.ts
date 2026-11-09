@@ -14,5 +14,6 @@ export const toRules = (wire: WireRules): Rules => ({
   suitGoldPerRank: wire.suit_gold_per_rank,
   initiatorMultiplier: wire.initiator_multiplier,
   randomEventChance: wire.random_event_chance,
+  minigameChance: wire.minigame_chance,
   minGemDistance: wire.min_gem_distance,
 })
