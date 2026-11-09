@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { statsByRsn } from './activity'
+import { statSubject, statTeam, statsByRsn } from './activity'
+
+describe('stats row keys', () => {
+  it('reads a team id, and "none" as no team', () => {
+    expect(statTeam('3')).toBe(3)
+    expect(statTeam('0')).toBe(0)
+    expect(statTeam('none')).toBeNull()
+  })
+
+  it('names an event with no source', () => {
+    expect(statSubject('')).toBe('Unknown source')
+    expect(statSubject('Vorkath')).toBe('Vorkath')
+  })
+})
 
 describe('statsByRsn', () => {
   it('adds up spelling variants of one account under its normal name', () => {

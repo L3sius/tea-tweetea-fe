@@ -33,9 +33,15 @@ export const useStatsStore = defineStore('stats', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   let active = false
+  let latest = 0
 
-  async function load() {
-    loading.value = true
+  /**
+   * Refetches every table. Refreshes after new activity are `quiet`: the numbers just change, with
+   * no "Updating..." flashing on every Dink event. Only the newest load's answer is kept.
+   */
+  async function load(quiet = false) {
+    const seq = ++latest
+    if (!quiet) loading.value = true
     try {
       const { kind, teamId } = filter.value
       const query = { kind: kind ?? undefined, teamId: teamId ?? undefined }
@@ -46,6 +52,7 @@ export const useStatsStore = defineStore('stats', () => {
         api.getStats({ by: 'hour', ...query, limit: 24 * 30 }),
         ...KINDS.map((k) => api.getStats({ by: 'team', kind: k, teamId: query.teamId })),
       ])
+      if (seq !== latest) return
       const kinds: StatsTables['kinds'] = {}
       KINDS.forEach((k, i) => {
         const rows = perKind[i] ?? []
@@ -58,9 +65,9 @@ export const useStatsStore = defineStore('stats', () => {
       tables.value = { account, team, subject, hour, kinds }
       error.value = null
     } catch (e) {
-      error.value = isApiError(e) ? describeProblem(e.problem) : String(e)
+      if (seq === latest) error.value = isApiError(e) ? describeProblem(e.problem) : String(e)
     } finally {
-      loading.value = false
+      if (seq === latest) loading.value = false
     }
   }
 
@@ -71,7 +78,7 @@ export const useStatsStore = defineStore('stats', () => {
     () => {
       if (!active) return
       clearTimeout(timer)
-      timer = setTimeout(load, 1_000)
+      timer = setTimeout(() => void load(true), 1_000)
     },
   )
   watch(filter, () => void load(), { deep: true })

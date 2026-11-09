@@ -1,5 +1,5 @@
 import { normRsn } from './admin'
-import type { TeamId } from './ids'
+import { teamId, type TeamId } from './ids'
 import type { ClueTier } from './vocabulary'
 
 export type Drop = { name: string; quantity: number; priceEach: number }
@@ -57,6 +57,14 @@ export type StatRow = {
   /** Total gp value (loot and clues). */
   value: number
 }
+
+/** The team a `by: 'team'` row is for; the server groups accounts on no team under "none". */
+export function statTeam(key: string): TeamId | null {
+  return /^\d+$/.test(key) ? teamId(Number(key)) : null
+}
+
+/** A `by: 'subject'` row's name; the server groups events with no source (a death with no killer) under "". */
+export const statSubject = (key: string) => key || 'Unknown source'
 
 /**
  * Per-account stats looked up the way the server matches names to rosters: the stats group Dink's

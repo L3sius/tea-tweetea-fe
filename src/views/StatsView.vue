@@ -3,9 +3,8 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import BarList, { type BarRow } from '@/components/BarList.vue'
 import HourChart from '@/components/HourChart.vue'
-import type { ObservationKind, StatRow } from '@/domain/activity'
+import { statSubject, statTeam, type ObservationKind, type StatRow } from '@/domain/activity'
 import { normRsn } from '@/domain/admin'
-import { teamId } from '@/domain/ids'
 import { useGameStore } from '@/stores/game'
 import { useStatsStore } from '@/stores/stats'
 import { teamColor } from '@/ui/colors'
@@ -71,14 +70,20 @@ function toBars(
 const byTeam = computed(() =>
   toBars(
     tables.value?.team ?? [],
-    (r) => game.names.team(teamId(Number(r.key))),
     (r) => {
-      const team = game.state?.teams.get(teamId(Number(r.key)))
+      const id = statTeam(r.key)
+      return id === null ? 'No team' : game.names.team(id)
+    },
+    (r) => {
+      const id = statTeam(r.key)
+      const team = id === null ? undefined : game.state?.teams.get(id)
       return team ? teamColor(team) : undefined
     },
   ),
 )
-const bySubject = computed(() => toBars(tables.value?.subject ?? [], (r) => r.key).slice(0, 15))
+const bySubject = computed(() =>
+  toBars(tables.value?.subject ?? [], (r) => statSubject(r.key)).slice(0, 15),
+)
 const byAccount = computed(() =>
   toBars(
     tables.value?.account ?? [],
@@ -147,7 +152,10 @@ const gameRows = computed(() =>
               {{ m === 'value' ? 'GP value' : 'Count' }}
             </TtButton>
           </div>
-          <TtText v-if="loading" :size="1" color="muted">Updating...</TtText>
+          <!-- Its room is kept, so the controls never move when it shows. -->
+          <TtText :size="1" color="muted" :class="{ invisible: !loading }" :aria-hidden="!loading">
+            Updating...
+          </TtText>
         </div>
         <TtText v-if="error" role="alert" :size="1" color="red">{{ error }}</TtText>
         <dl class="flex flex-wrap justify-center gap-1.5">
