@@ -46,7 +46,8 @@ export const useStatsStore = defineStore('stats', () => {
       const { kind, teamId } = filter.value
       const query = { kind: kind ?? undefined, teamId: teamId ?? undefined }
       const [account, team, subject, hour, ...perKind] = await Promise.all([
-        api.getStats({ by: 'account', ...query, limit: 50 }),
+        // Every account (the server's maximum): the Teams page shows each one, not just the top ones.
+        api.getStats({ by: 'account', ...query, limit: 1000 }),
         api.getStats({ by: 'team', ...query }),
         api.getStats({ by: 'subject', ...query, limit: 50 }),
         api.getStats({ by: 'hour', ...query, limit: 24 * 30 }),
